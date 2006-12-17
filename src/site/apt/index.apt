@@ -1,0 +1,58 @@
+       ------
+                                    EPCIS
+                                    ------
+                                    ------
+
+
+
+Welcome to the Accada EPCIS Project
+
+
+* Objective
+
+     The objective of the EPCIS Project is to implement the EPCIS role in the EPC Network and to develop the appropriate tools that facilitate communication with an EPCIS Repository instance. 
+ 
+
+* How can the Accada EPCIS Project help you?
+ 
+  This project allows you to:
+
+     * Deploy an EPCIS Repository using our implementation
+     
+     []
+     * Query an existing EPCIS Repository using our graphical user interface 
+     
+     []
+     * Fill an existing EPCIS Repository using our graphical user interface with data
+     
+     []
+
+  
+* Organization
+
+  The EPCIS Project comprises three separate modules:
+  
+     * the EPCIS Repository implementation
+     
+     * an interactive EPCIS Capture Application
+     
+     * an interactive EPCIS Query Application
+     
+     []
+
+[images/EPCISArchitecture.png]
+
+
+* Usage Scenarios	
+
+  Possible usage scenarios include the following:
+
+  * Embed our EPCIS Repository into your own applications to add an EPCIS interface to it
+  
+  []
+  * Interactively explore any EPCIS Repository using our graphical EPCIS Query Application
+  
+  []
+  * Use our EPCIS accessing applications as a blueprint to build your own EPCIS Capture or Query Application
+  
+  []

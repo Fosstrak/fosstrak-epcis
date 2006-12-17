@@ -1,0 +1,131 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- POM basics  -->
+  <groupId>org.accada.epcis</groupId>
+  <artifactId>epcis</artifactId>
+  <version>0.2.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Modules -->
+  <modules>
+    <!--
+    <module>epcis-repository</module>
+    <module>epcis-queryclient</module>
+    <module>epcis-captureclient</module>
+    -->
+  </modules>
+
+  <!-- Dependencies -->
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!-- Build settings -->
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <tagBase>https://svn.accada.org/repos/epcis/tags</tagBase>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <!-- Repositories -->
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>accada-repository</id>
+      <name>Accada repository</name>
+      <!-- change url to www.accada.org/repository/... as soon as server
+           migration is completed. -->
+      <url>http://accada.inf.ethz.ch/repository/releases</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+  <!-- Infrastructure -->
+  <scm>
+    <!-- keep empty tags here to avoid release:prepare crashes -->
+    <connection></connection>
+    <developerConnection>scm:svn:https://svn.accada.org/repos/epcis</developerConnection>
+    <url></url>
+  </scm>
+  <distributionManagement>
+    <repository>
+      <id>accada-repository</id>
+      <name>Accada repository</name>
+      <url>sftp://svn.accada.org/local/home/accadarep/public_html/releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>accada-repository</id>
+      <name>Accada repository</name>
+      <url>sftp://svn.accada.org/local/home/accadarep/public_html/snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>accada-website</id>
+      <name>Accada website</name>
+      <url>sftp://svn.accada.org/local/home/accadaweb/public_html/epcis</url>
+    </site>
+  </distributionManagement>
+  <issueManagement>
+    <system>Sourceforge</system>
+    <url>http://sourceforge.net/tracker/?group_id=170911</url>
+  </issueManagement>
+  <mailingLists>
+    <mailingList>
+      <name>Filtering and Collection user mailing list</name>
+      <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</subscribe>
+      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</unsubscribe>
+      <post>accada-epcis-user@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=accada-epcis-user</archive>
+    </mailingList>
+    <mailingList>
+      <name>Filtering and Collection developer mailing list</name>
+      <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
+      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
+      <post>accada-epcis-developer@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=accada-epcis-developer</archive>
+    </mailingList>
+  </mailingLists>
+
+  <!-- Additional project information -->
+  <name>fc</name>
+  <url>http://www.accada.org/epcis</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+    </license>
+  </licenses>
+  <developers>
+  </developers>
+  <contributors>
+  </contributors>
+
+</project>

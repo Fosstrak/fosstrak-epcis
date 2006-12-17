@@ -1,0 +1,64 @@
+       ------
+                                    Demo
+                                    ------
+                                    ------
+
+
+Demo
+
+* Public EPCIS Repository
+
+   We provide a public EPCIS Repository that can be used in connection with any Capture or Query Application. We provide an HTTP binding for the Capture Interface and a SOAP binding for the Query Interface. The two two interfaces are available at the following URLs:
+
+   Capture Interface (HTTP binding):
+   <http://demo.accada.org/EPCIS-Capture-v0.2.0>
+
+   Query Interface (SOAP binding):
+   <http://demo.accada.org/EPCIS-Query-v0.2.0>
+
+   The EPCIS Repository is purged and initialized with some sample data every night.
+
+* Generic Capture Application and Query Application
+
+   We also provide a generic Capture Application and Query Application. You can use them to interact with our public EPCIS Repository or with any other EPCIS repository run by third parties. Both applications include sample queries and capture data to illustrate the functionality offered by EPCIS. You can also use them as templates for your own experiments.
+
+   {{{http://www.accada.org/webstart/query-app.jnlp} Launch Query Application }} (via Java Web Start)
+   
+   {{{http://www.accada.org/webstart/capture-app.jnlp} Launch Capture Application }} (via Java Web Start)
+ 
+
+   In order to use these applications, you need to have the Java Runtime Environment (JRE) 1.5 or higher installed on your computer (Java Web Start is used to launch the applications). Please note that we currently use a self-signed certificate, which causes a security warning when the applications are launched. 
+
+
+* Screenshots of Capture and Query Application
+
+[images/EPCISCaptureApp.png]
+
+[images/EPCISQueryApp.png]
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+ 

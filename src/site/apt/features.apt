@@ -1,0 +1,57 @@
+       ------
+                                    Features
+                                    ------
+                                    ------
+
+
+Features
+
+  The EPCIS Project comprises three separate modules:
+  
+  * the EPCIS Repository implementation
+  
+  * an interactive EPCIS Capture Application
+  
+  * an interactive EPCIS Query Application
+  
+	
+  All three implement the EPC Information Services (EPCIS) Specification defined by EPCglobal and its members. (Please note: Up to this time, the EPCIS Specification has not been publicly released by EPCglobal.)
+
+    
+* EPCIS Repository Features
+
+  We have currently implemented both the EPCIS Capture Interface and the EPCIS Query Interface. We provide an HTTP binding for the Capture Interface and a SOAP binding for the Query Interface. Our implementation requires Java 1.5 (or higher) and a MySQL database (version 5.0.15 or higher) as a storage engine.
+
+
+* EPCIS Capture and Query Application Features
+
+  The EPCIS Capture and Query Applications provide an intuitive graphical user interface to store EPCIS events in and retrieve EPCIS events from an EPCIS Repository. They can be used to interactively test and explore any EPCIS Repository. They support the bindings mentioned above.
+
+[images/EPCISCaptureApp.png]
+[images/EPCISQueryApp.png]
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+ 
