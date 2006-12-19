@@ -9,11 +9,9 @@
 
   <!-- Modules -->
   <modules>
-    <!--
     <module>epcis-repository</module>
     <module>epcis-queryclient</module>
     <module>epcis-captureclient</module>
-    -->
   </modules>
 
   <!-- Dependencies -->
@@ -115,7 +113,7 @@
   </mailingLists>
 
   <!-- Additional project information -->
-  <name>fc</name>
+  <name>epcis</name>
   <url>http://www.accada.org/epcis</url>
   <licenses>
     <license>

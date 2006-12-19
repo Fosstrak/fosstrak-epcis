@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- =========================================================== -->
+  <!-- POM basics                                                  -->
+  <!-- =========================================================== -->
+
+  <groupId>org.accada.epcis</groupId>
+  <artifactId>epcis-captureclient</artifactId>
+  <version>0.2.0-SNAPSHOT</version>
+  <parent>
+    <artifactId>epcis</artifactId>
+    <groupId>org.accada.epcis</groupId>
+    <version>0.2.0-SNAPSHOT</version>
+  </parent>
+  <packaging>jar</packaging>
+  <modelVersion>4.0.0</modelVersion>
+
+
+  <!-- =========================================================== -->
+  <!-- Dependencies                                                -->
+  <!-- =========================================================== -->
+
+  <dependencies>
+  </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!-- Build settings                                              -->
+  <!-- =========================================================== -->
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Class-Path>.</Class-Path>
+            </manifestEntries>
+            <manifest>
+              <mainClass>org.accada.epcis.captureclient.CaptureClientGui</mainClass>
+              <addClasspath>true</addClasspath>
+              <!-- <classpathPrefix>./lib</classpathPrefix> -->
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+
+  <!-- =========================================================== -->
+  <!-- Additional project information                              -->
+  <!-- =========================================================== -->
+
+  <name>epcis-captureclient</name>
+
+</project>
