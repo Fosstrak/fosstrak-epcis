@@ -201,6 +201,21 @@
       </plugin>
       -->
 
+      <!--
+        the tomcat-maven-plugin used to deploy the application to tomcat.
+        this requires a corresponding server block in your settings.xml
+        stating username and password for the tomcat-manager application.
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>tomcat-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <server>tomcat-manager</server>
+          <url>http://localhost:8080/manager</url>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
@@ -210,5 +225,36 @@
   <!-- =========================================================== -->
 
   <name>epcis-repository</name>
+
+
+  <!--
+    the tomcat-maven-plugin is not in maven's core set of plugins.
+    therefore we need to tell maven to look into the mojo sandbox
+    repository where the plugin resides
+  -->
+  <repositories>
+    <repository>
+      <id>Maven Snapshots</id>
+      <url>http://snapshots.maven.codehaus.org/maven2/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>Maven Snapshots</id>
+      <url>http://snapshots.maven.codehaus.org/maven2/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
 
 </project>
