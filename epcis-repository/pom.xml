@@ -52,6 +52,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.axis</groupId>
+      <artifactId>axis-saaj</artifactId>
+      <version>1.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.axis</groupId>
       <artifactId>axis-ant</artifactId>
       <version>1.4</version>
       <scope>compile</scope>
