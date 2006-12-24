@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Context docBase="${catalina.home}/webapps/epcis-repository" path="/epcis-repository" reloadable="true">
+  <Environment name="InsertMissingVoc" value="true" type="java.lang.Boolean"/>
+
+  <Resource
+    name="jdbc/EPCISDB"
+    type="javax.sql.DataSource"
+    auth="Container"
+    username="epcis"
+    password="epcis"
+    driverClassName="com.mysql.jdbc.Driver"
+    url="jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true">
+  </Resource>
+</Context>
