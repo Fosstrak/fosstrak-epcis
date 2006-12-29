@@ -33,6 +33,12 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.accada.epcis</groupId>
+      <artifactId>epcis-commons</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <version>2.4</version>
@@ -101,14 +107,17 @@
 
   <build>
     <plugins>
+      <!--
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
+            -->
             <!--
             See http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration
             for more information on Axis integration.
             -->
+            <!--
             <id>wsdl2java</id>
             <phase>generate-sources</phase>
             <configuration>
@@ -145,18 +154,22 @@
                     package="${package.structure.soapapi}" />
                 </axis-wsdl2java>
           
+            -->
                 <!--
                 Delete Axis-generated server side implementation of
                 BusinessTransactionType.java. We provide our own
                 implementation in src/main/java.
                 -->
+            <!--
                 <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/BusinessTransactionType.java" />
 
+            -->
                 <!--
                 Tie EPCISServiceBindingSkeleton to our existing
                 EpcisQueryInterface implementation and delete
                 unneeded class.
                 -->
+            <!--
                 <replace
                   file="target/generated-sources/main/java/${directory.structure.soapapi}/EPCISServiceBindingSkeleton.java"
                   token="new ${package.structure.soapapi}.EPCISServiceBindingImpl"
@@ -166,7 +179,9 @@
 
               </tasks>
 
+            -->
               <!-- add "generated-sources" folders to the compile path -->
+            <!--
               <sourceRoot>target/generated-sources/main/java</sourceRoot>
               <testSourceRoot>target/generated-sources/test/java</testSourceRoot>
               
@@ -178,6 +193,7 @@
 
         </executions>
       </plugin>
+      -->
 
       <!--
       Current version of plugin does not meet all of our requirements.
