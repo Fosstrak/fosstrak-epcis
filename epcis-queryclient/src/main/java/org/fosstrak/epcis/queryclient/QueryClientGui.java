@@ -47,13 +47,10 @@ import org.apache.axis.types.URI;
 
 /**
  * Implements the GUI part of the EPCIS Query Interface client.
+ * 
  * @author David Gubler
- *
  */
-public class QueryClientGui
-        extends WindowAdapter
-        implements ActionListener {
-
+public class QueryClientGui extends WindowAdapter implements ActionListener {
 
     /**
      * The enumaration of all possible Types a Queryparameter can have.
@@ -63,33 +60,22 @@ public class QueryClientGui
     };
 
     /**
-     * The HasMap wich holds all possible queryParameters.
-     * Key is the UserText.
+     * The HasMap wich holds all possible queryParameters. Key is the UserText.
      */
-    LinkedHashMap<String, QueryItem> queryParamsUserText;
+    private LinkedHashMap<String, QueryItem> queryParamsUserText;
 
     /**
-     * The HasMap wich holds all possible queryParameters.
-     * Key is the QueryText.
+     * The HasMap wich holds all possible queryParameters. Key is the QueryText.
      */
-    LinkedHashMap<String, QueryItem> queryParamsQueryText;
+    private LinkedHashMap<String, QueryItem> queryParamsQueryText;
 
     /**
      * Contains the column names for the result table.
      */
     private final String[] columnNames = {
-            "Event",
-            "occured",
-            "recorded",
-            "Parent ID",
-            "Quantity",
-            "EPCs",
-            "Action",
-            "Business step",
-            "Disposition",
-            "Readpoint ID",
-            "Business location",
-            "Business transaction"
+            "Event", "occured", "recorded", "Parent ID", "Quantity", "EPCs",
+            "Action", "Business step", "Disposition", "Readpoint ID",
+            "Business location", "Business transaction"
     };
 
     /**
@@ -104,17 +90,16 @@ public class QueryClientGui
     private Object[][] data = {};
 
     /**
-     * ISO 8601 SimpleDateFormat.
-     * Use it like this for current time: isoDateFormat.format(now)
+     * ISO 8601 SimpleDateFormat. Use it like this for current time:
+     * isoDateFormat.format(now)
      */
-    private final SimpleDateFormat isoDateFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private final SimpleDateFormat isoDateFormat = new SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /**
      * The default URL for the service.
      */
-    private String defaultUrl =
-            "http://demo.accada.org/EPCIS-Query-v0.2.0";
+    private String defaultUrl = "http://demo.accada.org/EPCIS-Query-v0.2.0";
 
     /**
      * The query client instance. Has methods to actually execute a query.
@@ -124,8 +109,7 @@ public class QueryClientGui
     /**
      * All the examples are contained in an ExampleQueries instance.
      */
-    private QueryClientGuiExampleQueries exampleQueries =
-            new QueryClientGuiExampleQueries();
+    private QueryClientGuiExampleQueries exampleQueries = new QueryClientGuiExampleQueries();
 
     /* main window */
     private JFrame mainWindow;
@@ -155,11 +139,11 @@ public class QueryClientGui
     private JCheckBox mwQuantityEventsCheckBox;
     private JCheckBox mwTransactionEventsCheckBox;
 
-    /* These lists hold the input fields for the query arguments.
-     * The lists are modified by the user to allow for as many
-     * arguments as the user wants
-     * Objects may be deleted from these lists by selecting "ignore"
-     * from the drop-down box
+    /*
+     * These lists hold the input fields for the query arguments. The lists are
+     * modified by the user to allow for as many arguments as the user wants
+     * Objects may be deleted from these lists by selecting "ignore" from the
+     * drop-down box
      */
     private LinkedList<JComboBox> mwQuerySelectComboBoxes;
     private LinkedList<JTextFieldEnhanced> mwQueryArgumentTextFields;
@@ -210,17 +194,26 @@ public class QueryClientGui
 
     /**
      * The constructor. Starts a new thread which draws the main window.
-     *
      */
     public QueryClientGui() {
         initWindow();
     }
-    
-    public QueryClientGui(String address) {
+
+    /**
+     * Constructs a new QueryClientGui which sends its queries to the given
+     * address.
+     * 
+     * @param address
+     *            The address to send the queries to.
+     */
+    public QueryClientGui(final String address) {
         this.defaultUrl = address;
         initWindow();
     }
-    
+
+    /**
+     * Initializes the GUI window.
+     */
     private void initWindow() {
         generateParamHashMap();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -353,7 +346,7 @@ public class QueryClientGui
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         // "EQ_bizTransaction_type", "business transaction type with ID's= ",
-        //          we do not support this in the GUI (List of String)
+        // we do not support this in the GUI (List of String)
 
         newEntry = new QueryItem();
         newEntry.setDescription("Space-separated list "
@@ -441,23 +434,23 @@ public class QueryClientGui
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         // "EQ_fieldname", "Fieldname with values = "
-        //          we do not support this in the GUI (List of String)
+        // we do not support this in the GUI (List of String)
         // "EQ_fieldname", "Fieldname with values = "
-        //          we do not support this in the GUI (Int, Float, Time)
+        // we do not support this in the GUI (Int, Float, Time)
         // "GT_fieldname", "Fieldname with values > "
-        //          we do not support this in the GUI (Int, Float, Time)
+        // we do not support this in the GUI (Int, Float, Time)
         // "GE_fieldname", "Fieldname with values >= "
-        //          we do not support this in the GUI (Int, Float, Time)
+        // we do not support this in the GUI (Int, Float, Time)
         // "LT_fieldname", "Fieldname with values < "
-        //          we do not support this in the GUI (Int, Float, Time)
+        // we do not support this in the GUI (Int, Float, Time)
         // "LE_fieldname", "Fieldname with values <= "
-        //          we do not support this in the GUI (Int, Float, Time)
-        // "EXISTS_fieldname",  "exists field: "
-        //          we do not support this in the GUI (Void)
+        // we do not support this in the GUI (Int, Float, Time)
+        // "EXISTS_fieldname", "exists field: "
+        // we do not support this in the GUI (Void)
         // "HASATTR_fieldname", "Has fieldname attributes: "
-        //          we do not support this in the GUI (List of String)
+        // we do not support this in the GUI (List of String)
         // "EQATTR_fieldname_attrname", "Equals fieldname attributname: "
-        //          we do not support this in the GUI (List of String)
+        // we do not support this in the GUI (List of String)
 
         newEntry = new QueryItem();
         newEntry.setDescription("A single fieldname written in");
@@ -497,25 +490,24 @@ public class QueryClientGui
 
         queryParameterUsertext = new String[queryParamsUserText.size()];
         int i = 0;
-        for (Iterator it = queryParamsUserText.keySet().iterator(); it.hasNext(); ) {
-            queryParameterUsertext[i] = (String)it.next();
+        for (Iterator it = queryParamsUserText.keySet().iterator(); it.hasNext();) {
+            queryParameterUsertext[i] = (String) it.next();
             i++;
-       }
+        }
     }
-
 
     /**
      * Set a query client.
+     * 
      * @param newclient
+     *            The QueryClient through which the queries will be sent.
      */
     public void setQueryClient(final QueryClient newclient) {
         client = newclient;
     }
 
     /**
-     * Sets up the main window.
-     * To be called only once per program run
-     *
+     * Sets up the main window. To be called only once per program run
      */
     private void createMainWindow() {
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -525,13 +517,12 @@ public class QueryClientGui
         mainWindow.setResizable(false);
 
         mwMainPanel = new JPanel();
-        mwMainPanel
-                .setLayout(new BoxLayout(mwMainPanel, BoxLayout.PAGE_AXIS));
+        mwMainPanel.setLayout(new BoxLayout(mwMainPanel, BoxLayout.PAGE_AXIS));
         mwMainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         mwConfigPanel = new JPanel(new GridBagLayout());
         mwMainPanel.add(mwConfigPanel);
-        
+
         mwSubscribeManagementPanel = new JPanel(new GridBagLayout());
         mwMainPanel.add(mwSubscribeManagementPanel);
 
@@ -540,15 +531,14 @@ public class QueryClientGui
 
         mwQueryPanel = new JPanel();
         mwSubscriptionPanel = new JPanel();
-        mwQueryPanel.setLayout(
-                new BoxLayout(mwQueryPanel, BoxLayout.PAGE_AXIS));
+        mwQueryPanel.setLayout(new BoxLayout(mwQueryPanel, BoxLayout.PAGE_AXIS));
         mwSubscriptionPanel.setLayout(new GridBagLayout());
         mwMainPanel.add(mwQueryPanel);
 
         isSubscribed = new JCheckBox("Subscribe this query");
         mwMainPanel.add(isSubscribed);
         isSubscribed.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 if (mwSubscriptionPanel.isVisible()) {
                     mwSubscriptionPanel.setVisible(false);
                     mwRunQueryButton.setText("Run Query");
@@ -586,7 +576,6 @@ public class QueryClientGui
                 BorderFactory.createTitledBorder("Subscription Arguments"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-
         mwServiceUrlLabel = new JLabel("Query interface URL: ");
         mwServiceUrlTextField = new JTextField(defaultUrl, 40);
         mwServiceInfoButton = new JButton("Info");
@@ -605,7 +594,7 @@ public class QueryClientGui
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(5,5,5,0);
+        c.insets = new Insets(5, 5, 5, 0);
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 0;
@@ -623,7 +612,6 @@ public class QueryClientGui
         c.gridy = 1;
         c.gridwidth = 2;
         mwConfigPanel.add(mwShowDebugWindowCheckBox, c);
-
 
         c.weightx = 0;
         c.gridx = 0;
@@ -643,7 +631,6 @@ public class QueryClientGui
         c.gridy = 0;
         mwSubscribeManagementPanel.add(mwSubscriptionIdButton, c);
 
-
         mwObjectEventsCheckBox = new JCheckBox("ObjectEvents");
         mwEventTypeSelectPanel.add(mwObjectEventsCheckBox);
         mwAggregationEventsCheckBox = new JCheckBox("AggregationEvents");
@@ -657,8 +644,7 @@ public class QueryClientGui
         mwQueryArgumentTextFields = new LinkedList<JTextFieldEnhanced>();
 
         mwQuerySelectComboBoxes.add(new JComboBox(queryParameterUsertext));
-        ((JComboBox) mwQuerySelectComboBoxes.getFirst())
-                .addActionListener(this);
+        ((JComboBox) mwQuerySelectComboBoxes.getFirst()).addActionListener(this);
         queryParamsUserText.get("ignore");
         mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15,
                 queryParamsUserText.get("ignore")));
@@ -670,24 +656,20 @@ public class QueryClientGui
 
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10,5,5,0);
+        c.insets = new Insets(10, 5, 5, 0);
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 0;
-        mwQueryArgsPanel.add(
-                (JComboBox) mwQuerySelectComboBoxes.getFirst(), c);
+        mwQueryArgsPanel.add((JComboBox) mwQuerySelectComboBoxes.getFirst(), c);
         c.weightx = 1;
         c.gridx = 1;
         c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
-        mwQueryArgsPanel.add(
-                (JTextField) mwQueryArgumentTextFields.getFirst(), c);
-
-
-
+        mwQueryArgsPanel.add((JTextField) mwQueryArgumentTextFields.getFirst(),
+                c);
 
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10,5,5,0);
+        c.insets = new Insets(10, 5, 5, 0);
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 0;
@@ -718,8 +700,8 @@ public class QueryClientGui
         c.gridy = 2;
         c.gridwidth = 6;
         Date now = new Date();
-        SimpleDateFormat dateTime =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        SimpleDateFormat dateTime = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss.SSS");
         mwInitRecTimeField = new JTextField(dateTime.format(now), 40);
         mwSubscriptionPanel.add(mwInitRecTimeField, c);
 
@@ -803,8 +785,6 @@ public class QueryClientGui
         mwScheduleSecField = new JTextField("", 10);
         mwSubscriptionPanel.add(mwScheduleSecField, c);
 
-
-
         mwFillInExampleButton = new JButton("Fill in example");
         mwFillInExampleButton.addActionListener(this);
         mwQueryExamplesPanel.add(mwFillInExampleButton, BorderLayout.EAST);
@@ -824,36 +804,30 @@ public class QueryClientGui
          */
         client = new QueryClient(defaultUrl, dwOutputTextArea);
 
-        /* Find out how much the window has to be scaled whenever new
-         * components are added. This must be done after rendering the
-         * GUI, otherwise the sizes will be wrong!
+        /*
+         * Find out how much the window has to be scaled whenever new components
+         * are added. This must be done after rendering the GUI, otherwise the
+         * sizes will be wrong!
          */
-        if (((JComboBox) mwQuerySelectComboBoxes.getFirst())
-                    .getSize().height
-            > ((JTextField) mwQueryArgumentTextFields.getFirst())
-                    .getSize().height) {
-            mwHeightDifference = ((JComboBox) mwQuerySelectComboBoxes
-                    .getFirst()).getPreferredSize().height
+        if (((JComboBox) mwQuerySelectComboBoxes.getFirst()).getSize().height > ((JTextField) mwQueryArgumentTextFields.getFirst()).getSize().height) {
+            mwHeightDifference = ((JComboBox) mwQuerySelectComboBoxes.getFirst()).getPreferredSize().height
                     + c.insets.top + c.insets.bottom;
         } else {
-            mwHeightDifference = ((JTextField) mwQueryArgumentTextFields
-                    .getFirst()).getPreferredSize().height
+            mwHeightDifference = ((JTextField) mwQueryArgumentTextFields.getFirst()).getPreferredSize().height
                     + c.insets.top + c.insets.bottom;
         }
     }
 
     /**
-     * Sets up the window used for results display.
-     * Does not destroy the old window.
-     *
+     * Sets up the window used for results display. Does not destroy the old
+     * window.
      */
     private void createResultsWindow() {
         resultsWindow = new JFrame("Query results");
         resultsWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
         rwResultsPanel = new JPanel();
-        rwResultsPanel.setLayout(
-                new BoxLayout(rwResultsPanel, BoxLayout.Y_AXIS));
+        rwResultsPanel.setLayout(new BoxLayout(rwResultsPanel, BoxLayout.Y_AXIS));
 
         rwResultsTable = new JTable(data, columnNames);
         rwResultsScrollPane = new JScrollPane(rwResultsTable);
@@ -866,9 +840,8 @@ public class QueryClientGui
     }
 
     /**
-     * Sets up the window used to show the list of examples.
-     * Can only be open once.
-     *
+     * Sets up the window used to show the list of examples. Can only be open
+     * once.
      */
     private void createExampleWindow() {
         if (exampleWindow != null) {
@@ -887,10 +860,9 @@ public class QueryClientGui
         ewListPanel.setLayout(new BoxLayout(ewListPanel, BoxLayout.PAGE_AXIS));
 
         ewButtonPanel = new JPanel();
-        ewButtonPanel.setBorder(
-                BorderFactory.createEmptyBorder(5, 10, 10, 10));
-        ewButtonPanel.setLayout(
-                new BoxLayout(ewButtonPanel, BoxLayout.LINE_AXIS));
+        ewButtonPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+        ewButtonPanel.setLayout(new BoxLayout(ewButtonPanel,
+                BoxLayout.LINE_AXIS));
 
         ewMainPanel.add(ewListPanel);
         ewMainPanel.add(ewButtonPanel);
@@ -900,11 +872,9 @@ public class QueryClientGui
         ewListPanel.add(ewExampleScrollPane);
         ewExampleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        String exampleList[] = new String[exampleQueries.examples.size()];
-        for (int i = 0; i < exampleQueries.examples.size(); i++) {
-            exampleList[i] =
-                    ((Query) exampleQueries.
-                            examples.get(i)).getDescription();
+        String[] exampleList = new String[exampleQueries.getExamples().size()];
+        for (int i = 0; i < exampleQueries.getExamples().size(); i++) {
+            exampleList[i] = ((Query) exampleQueries.getExamples().get(i)).getDescription();
         }
         ewExampleList.setListData(exampleList);
 
@@ -942,8 +912,11 @@ public class QueryClientGui
 
     /**
      * Dispatcher for the various events. Some simple cases may be handled
-     * directly within this method.     *
+     * directly within this method.
+     * 
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      * @param e
+     *            The ActionEvent.
      */
     public final void actionPerformed(final ActionEvent e) {
         if (e.getSource() == mwRunQueryButton) {
@@ -955,7 +928,7 @@ public class QueryClientGui
             return;
         }
         if (e.getSource() == mwSubscriptionIdButton) {
-                client.querySubscriptionId();
+            client.querySubscriptionId();
             return;
         }
         if (e.getSource() == mwFillInExampleButton) {
@@ -1009,7 +982,7 @@ public class QueryClientGui
             if (mwTransactionEventsCheckBox.isSelected()) {
                 eventVector.add("TransactionEvent");
             }
-            String eventArray[] = new String[eventVector.size()];
+            String[] eventArray = new String[eventVector.size()];
             eventVector.toArray(eventArray);
 
             ArrayOfString events = new ArrayOfString();
@@ -1018,51 +991,42 @@ public class QueryClientGui
 
             String name;
             for (int i = 0; i < mwQueryArgumentTextFields.size() - 1; i++) {
-                name = ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i))
-                                .queryItem.getQueryText();
-                switch (((JTextFieldEnhanced)mwQueryArgumentTextFields.get(i))
-                                .queryItem.getParamType()) {
+                name = ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).queryItem.getQueryText();
+                switch (((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).queryItem.getParamType()) {
                 case ListOfString:
-                    ArrayOfString valueArray = client.stringListToArray(
-                          ((JTextField) mwQueryArgumentTextFields.get(i))
-                              .getText());
+                    ArrayOfString valueArray = client.stringListToArray(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
                     client.addParameter(new QueryParam(name, valueArray));
                     break;
                 case Int:
-                    Integer valueInteger = Integer.decode(((JTextField)
-                            mwQueryArgumentTextFields.get(i)).getText());
+                    Integer valueInteger = Integer.decode(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
                     client.addParameter(new QueryParam(name, valueInteger));
                     break;
                 case Time:
                     Calendar valueCalendar = Calendar.getInstance();
                     Date dateTemp;
                     try {
-                        dateTemp = isoDateFormat.parse(((JTextField)
-                                mwQueryArgumentTextFields.get(i)).getText());
+                        dateTemp = isoDateFormat.parse(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
                     } catch (ParseException e) {
-                        SimpleDateFormat isoDateFormatTemp =
-                            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        dateTemp = isoDateFormatTemp.parse(((JTextField)
-                                mwQueryArgumentTextFields.get(i)).getText());
+                        SimpleDateFormat isoDateFormatTemp = new SimpleDateFormat(
+                                "yyyy-MM-dd'T'HH:mm:ss");
+                        dateTemp = isoDateFormatTemp.parse(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
                     }
                     valueCalendar.setTime(dateTemp);
                     client.addParameter(new QueryParam(name, valueCalendar));
                     break;
                 default:
-                    String value = ((JTextField) mwQueryArgumentTextFields.
-                            get(i)).getText();
+                    String value = ((JTextField) mwQueryArgumentTextFields.get(i)).getText();
                     client.addParameter(new QueryParam(name, value));
                     break;
                 }
             }
 
             if (isSubscribed.isSelected()) {
-                if(mwSubIdField.getText().equals("")) {
+                if (mwSubIdField.getText().equals("")) {
                     JFrame frame = new JFrame();
                     JOptionPane.showMessageDialog(frame,
                             "Please specify a SubscriptionID",
-                            "Service is responding",
-                            JOptionPane.ERROR_MESSAGE);
+                            "Service is responding", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 Subscribe subcr = new Subscribe();
@@ -1073,13 +1037,11 @@ public class QueryClientGui
                 Calendar valueCalendar = Calendar.getInstance();
                 Date dateTemp;
                 try {
-                    dateTemp = isoDateFormat.parse(
-                            mwInitRecTimeField.getText());
+                    dateTemp = isoDateFormat.parse(mwInitRecTimeField.getText());
                 } catch (ParseException e) {
-                    SimpleDateFormat isoDateFormatTemp =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    dateTemp = isoDateFormatTemp.parse(
-                            mwInitRecTimeField.getText());
+                    SimpleDateFormat isoDateFormatTemp = new SimpleDateFormat(
+                            "yyyy-MM-dd'T'HH:mm:ss");
+                    dateTemp = isoDateFormatTemp.parse(mwInitRecTimeField.getText());
                 }
                 valueCalendar.setTime(dateTemp);
                 controls.setInitialRecordTime(valueCalendar);
@@ -1096,8 +1058,7 @@ public class QueryClientGui
                 client.subscribeQuery(subcr);
                 JFrame frame = new JFrame();
                 JOptionPane.showMessageDialog(frame, "You have sucessfully "
-                        + "subscribed to that Query"
-                        , "Service is responding",
+                        + "subscribed to that Query", "Service is responding",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
                 data = client.runQuery();
@@ -1106,12 +1067,13 @@ public class QueryClientGui
         } catch (AxisFault af) {
             String msg = new String("EPCIS Query Interface service error.\n");
             if (af.getFaultDetails().length >= 2
-                    && af.getFaultDetails()[1].getTextContent()
-                            .endsWith("ImplementationException")) {
-                msg += "Reason: " + af.getFaultDetails()[0].getChildNodes()
-                        .item(0).getTextContent() + "\n";
-                msg += "Severity: " + af.getFaultDetails()[0].getChildNodes()
-                        .item(1).getTextContent();
+                    && af.getFaultDetails()[1].getTextContent().endsWith(
+                            "ImplementationException")) {
+                msg += "Reason: "
+                        + af.getFaultDetails()[0].getChildNodes().item(0).getTextContent()
+                        + "\n";
+                msg += "Severity: "
+                        + af.getFaultDetails()[0].getChildNodes().item(1).getTextContent();
             } else {
                 msg += af.getFaultDetails()[0].getTextContent();
             }
@@ -1133,24 +1095,27 @@ public class QueryClientGui
             dwOutputTextArea.append(detailed.toString());
 
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame,
-                    "Could not execute query:\n" + e.getMessage(),
-                    "Could not execute query", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Could not execute query:\n"
+                    + e.getMessage(), "Could not execute query",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
      * Handles the event of a changed JComboBox in the query arguments section
      * Will add or remove JComboBoxes as necessary and resize the window.
+     * 
      * @param i
+     *            The index of the combo box.
      */
     private void mwQuerySelectComboBoxesChanged(final int i) {
         JComboBox cb = (JComboBox) mwQuerySelectComboBoxes.get(i);
 
         if ((cb.getSelectedIndex() == 0)
                 && (cb != mwQuerySelectComboBoxes.getLast())) {
-            /* the user selected "ignore" and this is not the last row,
-             * so remove it
+            /*
+             * the user selected "ignore" and this is not the last row, so
+             * remove it
              */
             removeArgumentRow(i);
         } else if ((cb.getSelectedIndex() != 0)
@@ -1158,20 +1123,17 @@ public class QueryClientGui
             /* the user changed the value of the last row, so add a new row */
             addArgumentRow(i);
         } else {
-            /* the user changed an existing row, so just update description  */
-            ((JTextFieldEnhanced)
-                    mwQueryArgumentTextFields.get(i)).setQueryItem(queryParamsUserText.
-                            get(queryParameterUsertext[cb.getSelectedIndex()])
-            );
+            /* the user changed an existing row, so just update description */
+            ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).setQueryItem(queryParamsUserText.get(queryParameterUsertext[cb.getSelectedIndex()]));
         }
     }
 
     /**
      * Handles the event of a pressed "info" button. Queries the server for
      * information about it's version and the implemented standard. If this
-     * succeedes, one can assume that the connection to the service works
-     * fine; if this fails, an error message will be shown to the user with
-     * the cause and a stack trace will be printed to the console
+     * succeedes, one can assume that the connection to the service works fine;
+     * if this fails, an error message will be shown to the user with the cause
+     * and a stack trace will be printed to the console
      */
     private void mwInfoButtonPressed() {
         dwOutputTextArea.setText("");
@@ -1180,16 +1142,15 @@ public class QueryClientGui
             String standardVersion = client.queryStandardVersion();
             String vendorVersion = client.queryVendorVersion();
             String[] queryNames = client.queryNames();
-            String text = "Service is responding:\n"
-                + "Implemented standard: " + standardVersion + "\n"
-                + "Service version: " + vendorVersion + "\n"
-                + "Supports the following queries: ";
+            String text = "Service is responding:\n" + "Implemented standard: "
+                    + standardVersion + "\n" + "Service version: "
+                    + vendorVersion + "\n" + "Supports the following queries: ";
             for (String elem : queryNames) {
                 text += elem + "\n";
             }
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, text,
-                    "Service is responding", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, text, "Service is responding",
+                    JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
 
@@ -1206,36 +1167,29 @@ public class QueryClientGui
     }
 
     /**
-     * Handler for the case that the user chooses an example.
-     * Updates the GUI with the example
+     * Handler for the case that the user chooses an example. Updates the GUI
+     * with the example
      */
     private void examplesChanged() {
         int selected = ewExampleList.getSelectedIndex();
         if (selected >= 0) {
-            Query ex =
-                    (Query) exampleQueries.examples
-                            .get(selected);
+            Query ex = (Query) exampleQueries.getExamples().get(selected);
             mwObjectEventsCheckBox.setSelected(ex.getReturnObjectEvents());
-            mwAggregationEventsCheckBox
-                    .setSelected(ex.getReturnAggregationEvents());
-            mwQuantityEventsCheckBox
-                    .setSelected(ex.getReturnQuantityEvents());
-            mwTransactionEventsCheckBox
-                    .setSelected(ex.getReturnTransactionEvents());
+            mwAggregationEventsCheckBox.setSelected(ex.getReturnAggregationEvents());
+            mwQuantityEventsCheckBox.setSelected(ex.getReturnQuantityEvents());
+            mwTransactionEventsCheckBox.setSelected(ex.getReturnTransactionEvents());
 
             QueryItem toAddItem = null;
             int i = 0;
-            for (QueryParam item : ex.getQueryParametersVector()) {
-                toAddItem =  null;
+            for (QueryParam item : ex.getQueryParameters()) {
+                toAddItem = null;
                 toAddItem = queryParamsQueryText.get(item.getName());
                 if (toAddItem == null) {
                     dwOutputTextArea.append("bugbug: Query example "
                             + "uses unknown queryParam");
                 } else {
-                    ((JComboBox) mwQuerySelectComboBoxes.get(i))
-                            .setSelectedItem(toAddItem.getUserText());
-                    ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i))
-                            .setText((String) item.getValue());
+                    ((JComboBox) mwQuerySelectComboBoxes.get(i)).setSelectedItem(toAddItem.getUserText());
+                    ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).setText((String) item.getValue());
                 }
                 i++;
             }
@@ -1243,8 +1197,7 @@ public class QueryClientGui
             /* set the not necessary rows to "ignore" which will delete them */
             int tobedeleted = mwQuerySelectComboBoxes.size() - 1 - i;
             for (int j = 0; j < tobedeleted; j++) {
-                ((JComboBox) mwQuerySelectComboBoxes.get(i))
-                        .setSelectedIndex(0);
+                ((JComboBox) mwQuerySelectComboBoxes.get(i)).setSelectedIndex(0);
             }
 
             exampleWindow.setVisible(false);
@@ -1252,10 +1205,11 @@ public class QueryClientGui
     }
 
     /**
-     * Removes the row ith row of the query parameters list and
-     * updates constraints of the others.
-     * Only used by queryselect_changed()
+     * Removes the row ith row of the query parameters list and updates
+     * constraints of the others. Only used by queryselect_changed()
+     * 
      * @param i
+     *            The index of the row to be removed.
      */
     private void removeArgumentRow(final int i) {
         mwQueryArgsPanel.remove((JComboBox) mwQuerySelectComboBoxes.get(i));
@@ -1264,18 +1218,17 @@ public class QueryClientGui
         mwQuerySelectComboBoxes.remove(i);
         mwQueryArgumentTextFields.remove(i);
 
-        /* Update constraints*/
+        /* Update constraints */
         GridBagLayout layout = (GridBagLayout) mwQueryArgsPanel.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10,5,5,0);
+        c.insets = new Insets(10, 5, 5, 0);
         for (int j = i; j < mwQuerySelectComboBoxes.size(); j++) {
             c.weightx = 0;
             c.gridx = 0;
             c.gridy = j;
             c.ipadx = 0;
-            layout.setConstraints(
-                    (JComboBox) mwQuerySelectComboBoxes.get(j), c);
+            layout.setConstraints((JComboBox) mwQuerySelectComboBoxes.get(j), c);
             c.weightx = 1;
             c.gridx = 1;
             c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
@@ -1284,20 +1237,21 @@ public class QueryClientGui
         }
         /* update graphics */
         mainWindow.pack();
-        //mainWindow.setSize(mainWindow.getSize().width,
-        //        mainWindow.getSize().height - mw_heightdiff);
+        // mainWindow.setSize(mainWindow.getSize().width,
+        // mainWindow.getSize().height - mw_heightdiff);
     }
 
     /**
-     * Adds another row at the end of the query parameters list.
-     * Only used by queryselect_changed()
+     * Adds another row at the end of the query parameters list. Only used by
+     * queryselect_changed()
+     * 
      * @param i
+     *            The index of the row to be added.
      */
     private void addArgumentRow(final int i) {
 
         mwQuerySelectComboBoxes.add(new JComboBox(queryParameterUsertext));
-        ((JComboBox) mwQuerySelectComboBoxes.getLast())
-                .addActionListener(this);
+        ((JComboBox) mwQuerySelectComboBoxes.getLast()).addActionListener(this);
         mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15,
                 queryParamsUserText.get("ignore")));
 
@@ -1307,8 +1261,7 @@ public class QueryClientGui
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = i + 1;
-        mwQueryArgsPanel.add(
-                (JComboBox) mwQuerySelectComboBoxes.getLast(), c);
+        mwQueryArgsPanel.add((JComboBox) mwQuerySelectComboBoxes.getLast(), c);
         c.weightx = 1;
         c.gridx = 1;
         c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
@@ -1317,19 +1270,20 @@ public class QueryClientGui
 
         /* update tooltip of TextField */
         JComboBox cb = (JComboBox) mwQuerySelectComboBoxes.get(i);
-        ((JTextFieldEnhanced)mwQueryArgumentTextFields.get(i)).setQueryItem(
-                queryParamsUserText.get(queryParameterUsertext[cb.getSelectedIndex()])
-        );
+        ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).setQueryItem(queryParamsUserText.get(queryParameterUsertext[cb.getSelectedIndex()]));
 
         /* update graphics */
         mainWindow.pack();
-        //mainWindow.setSize(mainWindow.getSize().width,
-        //        mainWindow.getSize().height + mw_heightdiff);
+        // mainWindow.setSize(mainWindow.getSize().width,
+        // mainWindow.getSize().height + mw_heightdiff);
     }
 
     /**
      * Event handler for window manager closing events. Overrides the default,
      * empty method.
+     * 
+     * @param e
+     *            The WindowEvent.
      */
     public void windowClosing(final WindowEvent e) {
         if (e.getSource() == debugWindow) {
@@ -1345,19 +1299,22 @@ public class QueryClientGui
     public class JTextFieldEnhanced extends JTextField {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = -8874871130001273285L;
+         * 
+         */
+        private static final long serialVersionUID = -8874871130001273285L;
 
-		/**
+        /**
          * The stored QueryItem.
          */
-        public QueryItem queryItem;
+        private QueryItem queryItem;
 
         /**
          * Constructro which assigns a QueryItem.
-         * @param columns for the length of the JTextField
-         * @param item which should be stored
+         * 
+         * @param columns
+         *            for the length of the JTextField
+         * @param item
+         *            which should be stored
          */
         public JTextFieldEnhanced(final int columns, final QueryItem item) {
             super(columns);
@@ -1366,7 +1323,9 @@ public class QueryClientGui
 
         /**
          * Default Constructor.
-         * @param columns for the length of the JTextField
+         * 
+         * @param columns
+         *            for the length of the JTextField
          */
         public JTextFieldEnhanced(final int columns) {
             super(columns);
@@ -1381,7 +1340,9 @@ public class QueryClientGui
 
         /**
          * Sets another QueryItem an does the update of the Tooltip.
-         * @param item the new QueryItem
+         * 
+         * @param item
+         *            the new QueryItem
          */
         public void setQueryItem(final QueryItem item) {
             this.queryItem = item;
@@ -1390,8 +1351,7 @@ public class QueryClientGui
     }
 
     /**
-     * A new class for a QueryItem which can store all its
-     * specific features.
+     * A new class for a QueryItem which can store all its specific features.
      */
     public class QueryItem {
 
@@ -1413,9 +1373,10 @@ public class QueryClientGui
         }
 
         /**
-         * @param description the description to set
+         * @param description
+         *            the description to set
          */
-        public void setDescription(String description) {
+        public void setDescription(final String description) {
             this.description = description;
         }
 
@@ -1427,9 +1388,10 @@ public class QueryClientGui
         }
 
         /**
-         * @param paramType the paramType to set
+         * @param paramType
+         *            the paramType to set
          */
-        public void setParamType(ParameterType paramType) {
+        public void setParamType(final ParameterType paramType) {
             this.paramType = paramType;
         }
 
@@ -1441,9 +1403,10 @@ public class QueryClientGui
         }
 
         /**
-         * @param queryText the queryText to set
+         * @param queryText
+         *            the queryText to set
          */
-        public void setQueryText(String queryText) {
+        public void setQueryText(final String queryText) {
             this.queryText = queryText;
         }
 
@@ -1455,9 +1418,10 @@ public class QueryClientGui
         }
 
         /**
-         * @param required the required to set
+         * @param required
+         *            the required to set
          */
-        public void setRequired(Boolean required) {
+        public void setRequired(final Boolean required) {
             this.required = required;
         }
 
@@ -1469,23 +1433,25 @@ public class QueryClientGui
         }
 
         /**
-         * @param userText the userText to set
+         * @param userText
+         *            the userText to set
          */
-        public void setUserText(String userText) {
+        public void setUserText(final String userText) {
             this.userText = userText;
         }
     }
 
     /**
-     * Constructor. Tries to set a look-and-feel that matches the current
-     * operating system; then creates the GUI.
-     *
+     * Instantiates a new QueryClientGui and sets its look-and-feel to the one
+     * matching the current operating system.
+     * 
      * @param args
+     *            The address to which the QueryClient should send the queries
+     *            to. If omitted, a default address will be provided.
      */
     public static void main(final String[] args) {
         try {
-            UIManager.setLookAndFeel(UIManager
-                    .getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             System.out.println(e.getStackTrace());
         }

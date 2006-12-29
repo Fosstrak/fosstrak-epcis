@@ -1,13 +1,14 @@
 package org.accada.epcis.queryclient;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.accada.epcis.soapapi.QueryParam;
 
 /**
  * Implements an example query object for the EPCIS Query Interface Client.
+ * 
  * @author David Gubler
- *
  */
 public class Query {
     /**
@@ -38,11 +39,13 @@ public class Query {
     /**
      * Vector that holds all other query parameters.
      */
-    private Vector<QueryParam> queryParameters = new Vector<QueryParam>();
+    private List<QueryParam> queryParameters = new ArrayList<QueryParam>();
 
     /**
      * Sets the description.
+     * 
      * @param description
+     *            The describtion for the query.
      */
     public void setDescription(final String description) {
         desc = description;
@@ -50,7 +53,8 @@ public class Query {
 
     /**
      * Gets the description.
-     * @return
+     * 
+     * @return The description of the query.
      */
     public String getDescription() {
         return desc;
@@ -58,7 +62,10 @@ public class Query {
 
     /**
      * Sets if object events should be returned or not.
+     * 
      * @param objectEvents
+     *            <code>true</code> if object events should be returned,
+     *            <code>false</code> otherwise.
      */
     public void setReturnObjectEvents(final boolean objectEvents) {
         returnObjectEvents = objectEvents;
@@ -66,7 +73,9 @@ public class Query {
 
     /**
      * Gets if object events should be returned or not.
-     * @return
+     * 
+     * @return <code>true</code> if the query service will return object
+     *         events, <code>false</code> otherwise.
      */
     public boolean getReturnObjectEvents() {
         return returnObjectEvents;
@@ -74,7 +83,10 @@ public class Query {
 
     /**
      * Sets if aggregation events should be returned or not.
+     * 
      * @param aggregationEvents
+     *            <code>true</code> if aggregation events should be returned,
+     *            <code>false</code> otherwise.
      */
     public void setReturnAggregationEvents(final boolean aggregationEvents) {
         returnAggregationEvents = aggregationEvents;
@@ -82,7 +94,9 @@ public class Query {
 
     /**
      * Gets if aggregation events should be returned or not.
-     * @return
+     * 
+     * @return <code>true</code> if the query service will return aggregation
+     *         events, <code>false</code> otherwise.
      */
     public boolean getReturnAggregationEvents() {
         return returnAggregationEvents;
@@ -90,7 +104,10 @@ public class Query {
 
     /**
      * Sets if quantity events should be returned or not.
+     * 
      * @param quantityEvents
+     *            <code>true</code> if quantity events should be returned,
+     *            <code>false</code> otherwise.
      */
     public void setReturnQuantityEvents(final boolean quantityEvents) {
         returnQuantityEvents = quantityEvents;
@@ -98,7 +115,9 @@ public class Query {
 
     /**
      * Gets if quantity events should be returned or not.
-     * @return
+     * 
+     * @return <code>true</code> if the query service will return quantity
+     *         events, <code>false</code> otherwise.
      */
     public boolean getReturnQuantityEvents() {
         return returnQuantityEvents;
@@ -106,7 +125,10 @@ public class Query {
 
     /**
      * Sets if transaction events should be returned or not.
+     * 
      * @param transactionEvents
+     *            <code>true</code> if transaction events should be returned,
+     *            <code>false</code> otherwise.
      */
     public void setReturnTransactionEvents(final boolean transactionEvents) {
         returnTransactionEvents = transactionEvents;
@@ -114,7 +136,9 @@ public class Query {
 
     /**
      * Gets if transaction events should be returned or not.
-     * @return
+     * 
+     * @return <code>true</code> if the query service will return transaction
+     *         events, <code>false</code> otherwise.
      */
     public boolean getReturnTransactionEvents() {
         return returnTransactionEvents;
@@ -122,9 +146,10 @@ public class Query {
 
     /**
      * Gets the vector that holds all other query parameters.
-     * @return
+     * 
+     * @return The List containing the query parameters.
      */
-    public Vector<QueryParam> getQueryParametersVector() {
+    public List<QueryParam> getQueryParameters() {
         return queryParameters;
     }
 }
