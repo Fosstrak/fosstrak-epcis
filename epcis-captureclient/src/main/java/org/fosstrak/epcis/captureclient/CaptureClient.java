@@ -13,10 +13,7 @@ import java.net.URL;
  * existing class with this name should be renamed to CaptureInterfaceClientGui.
  * maybe also rename CaptureInterfaceClientSwingGui to
  * CaptureInterfaceClientWindow -> it should use this CaptureInterfaceClient
- * (has-a relation).
- * 
- * also these classes should not be in directory capturingGUI.
- * 
+ * (has-a relation). also these classes should not be in directory capturingGUI.
  * This client provides access to the EPCIS Capture Interface.
  * 
  * @author Marco Steybe
@@ -26,9 +23,11 @@ public class CaptureClient {
     // TODO LOG4J
 
     // TODO properties file to hold url
-    private static final String CAPTURE_INTERFACE_URL =
-            "http://localhost:8080/capturing/servlet/capture";
+    private static final String CAPTURE_INTERFACE_URL = "http://localhost:8080/capturing/servlet/capture";
 
+    /**
+     * Empty Constructor.
+     */
     public CaptureClient() {
     }
 
@@ -42,20 +41,28 @@ public class CaptureClient {
      * @throws IOException
      *             If an I/O Exception on the transport layer (HTTP) occurred.
      */
-    public String sendEvent(String eventXml) throws IOException {
+    public String sendEvent(final String eventXml) throws IOException {
         byte[] data = ("event=" + eventXml).getBytes();
         return postData(data);
     }
 
-    private String postData(byte[] data) throws IOException {
+    /**
+     * Sends data to the capture interface using HTTP POST.
+     * 
+     * @param data
+     *            The data to send.
+     * @return The response from the capture interface.
+     * @throws IOException
+     *             If an underlying HTTP connection error occured.
+     */
+    private String postData(final byte[] data) throws IOException {
         String response;
 
         // the url where the capture interface listens
         URL serviceUrl = new URL(CAPTURE_INTERFACE_URL);
 
         // open an http connection
-        HttpURLConnection connection =
-                (HttpURLConnection) serviceUrl.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
 
         // post the data
         connection.setDoOutput(true);
@@ -66,9 +73,8 @@ public class CaptureClient {
 
         // check for http error
         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            response =
-                    "Error " + connection.getResponseCode() + " "
-                            + connection.getResponseMessage() + ": ";
+            response = "Error " + connection.getResponseCode() + " "
+                    + connection.getResponseMessage() + ": ";
         } else {
             response = "200 OK: ";
         }

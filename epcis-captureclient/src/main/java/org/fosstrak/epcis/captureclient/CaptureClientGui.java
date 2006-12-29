@@ -84,19 +84,25 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     /**
      * The possible values for the "actions" parameter.
      */
-    private final String[] actions = { "ADD", "OBSERVE", "DELETE" };
+    private final String[] actions = {
+            "ADD", "OBSERVE", "DELETE"
+    };
 
     /**
      * The four possible event types, in human readable form.
      */
-    private final String[] eventTypes = { "Object event", "Aggregation event",
-                                         "Quantity event", "Transaction event" };
+    private final String[] eventTypes = {
+            "Object event", "Aggregation event", "Quantity event",
+            "Transaction event"
+    };
 
     /**
      * The four possible event types, used for XML creation.
      */
-    private final String[] xmlEventNode = { "ObjectEvent", "AggregationEvent",
-                                           "QuantityEvent", "TransactionEvent" };
+    private final String[] xmlEventNode = {
+            "ObjectEvent", "AggregationEvent", "QuantityEvent",
+            "TransactionEvent"
+    };
 
     /**
      * Holds all the examples.
@@ -193,15 +199,28 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     private JPanel dwButtonPanel;
     private JButton dwClearButton;
 
+    /**
+     * Constructs a new CaptureClientGui initialized with a default address.
+     */
     public CaptureClientGui() {
         initWindow();
     }
 
-    public CaptureClientGui(String address) {
+    /**
+     * Constructs a new CaptureClientGui initialized with the given address.
+     * 
+     * @param address
+     *            The address to which the CaptureClient should sent its capture
+     *            events.
+     */
+    public CaptureClientGui(final String address) {
         this.defaultUrl = address;
         initWindow();
     }
 
+    /**
+     * Initializes the GUI window.
+     */
     private void initWindow() {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
@@ -297,6 +316,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         mwBizTransactionLabel = new JLabel("business transaction");
         mwBizTransactionTextField = new JTextField();
+        mwBizTransactionTextField.setToolTipText(toolTipUri + toolTipOptional);
 
         mwEpcListLabel = new JLabel("EPCs");
         mwEpcListTextField = new JTextField();
@@ -1080,15 +1100,13 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
     /**
      * Adds the Quantity to the XML-File. Possible for the QuantityEvent
-     * (required)
+     * (required).
      * 
-     * @param frame
-     *            where the Error-Message can be displaied
      * @param document
-     *            the DOM-Tree where is has to inserted
+     *            The DOM-Tree where is has to inserted.
      * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
+     *            The element, where it has to be added.
+     * @return If the value had been set in the GUI.
      */
     private Boolean addQuantity(final Document document, final Element root) {
         Element element;
@@ -1105,13 +1123,13 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
     /**
      * Adds the ChildEPCList to the XML-File. Possible for the QuantityEvent
-     * (required)
+     * (required).
      * 
      * @param document
-     *            the DOM-Tree where is has to inserted
+     *            The DOM-Tree where is has to inserted.
      * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
+     *            The element, where it has to be added.
+     * @return If the value had been set in the GUI.
      */
     private Boolean addEpcClass(final Document document, final Element root) {
         if (!mwEpcClassTextField.getText().equals("")) {
@@ -1283,10 +1301,9 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      * QuantityEvent.
      * 
      * @param document
-     *            the DOM-Tree where is has to inserted
+     *            The DOM-Tree where is has to inserted.
      * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
+     *            The element, where it has to be added.
      */
     private void addAction(final Document document, final Element root) {
         Element element;
@@ -1376,9 +1393,10 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      * empty method.
      * 
      * @param e
-     *            for the WindowEvent
+     *            The WindowEvent.
+     * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
      */
-    public void windowClosing(WindowEvent e) {
+    public void windowClosing(final WindowEvent e) {
         if (e.getSource() == debugWindow) {
             mwShowDebugWindowCheckBox.setSelected(false);
             return;
@@ -1387,8 +1405,6 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
     /**
      * Adds another row at the end of the Business Transactions.
-     * 
-     * @param i
      */
     private void addBizTransactionRow() {
         JTextField bizTransID = new JTextField();
@@ -1413,7 +1429,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      * Removes a row from the Business Transactions.
      * 
      * @param button
-     *            which generated the event
+     *            The JButton which generated the event.
      */
     private void removeBizTransactionRow(final JButton button) {
         int toRemove = Integer.parseInt(button.getName().substring(
@@ -1494,8 +1510,12 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
     /**
      * Loads ImageIcon from either JAR or filesystem.
+     * 
+     * @param filename
+     *            The name of the file holding the image icon.
+     * @return The ImageIcon.
      */
-    private ImageIcon getImageIcon(String filename) {
+    private ImageIcon getImageIcon(final String filename) {
         // try loading image from JAR (Web Start environment)
         ClassLoader classLoader = this.getClass().getClassLoader();
         URL url = classLoader.getResource("gui/" + filename);
@@ -1506,18 +1526,20 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             // can be called in either Eclipse or shell environment
             ImageIcon ii;
             ii = new ImageIcon("./tools/capturingGUI/media/" + filename);
-            if (ii.getImageLoadStatus() != java.awt.MediaTracker.COMPLETE) ii = new ImageIcon(
-                    "./gui/" + filename);
+            if (ii.getImageLoadStatus() != java.awt.MediaTracker.COMPLETE) {
+                ii = new ImageIcon("./gui/" + filename);
+            }
             return ii;
         }
     }
 
     /**
-     * Tries to set a look-and-feel that matches the operating system and
-     * creates the GUI.
+     * Instantiates a new CaptureClientGui using a look-and-feel that matches
+     * the operating system.
      * 
      * @param args
-     *            for the input-Arguments
+     *            The address to which the CaptureClient should send the capture
+     *            events. If omitted, a default address will be provided.
      */
     public static void main(final String[] args) {
         try {
