@@ -4,7 +4,6 @@
  * 
  * @author David Gubler, Alain Remund
  */
-
 package org.accada.epcis.repository;
 
 import java.io.ByteArrayInputStream;
@@ -12,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -67,14 +65,19 @@ public class EpcisCaptureInterface extends HttpServlet {
     private static final Logger LOG = Logger.getLogger(EpcisCaptureInterface.class);
 
     /**
-     * Wheter we should insert new vocabulary or throw an error message.
-     */
-    private boolean insertMissingVoc = true;
-
-    /**
      * The XML-Validator which validates the incoming messages.
      */
     private static Validator validator = null;
+
+    /**
+     * SAX needs a static document variable.
+     */
+    private static Document document = null;
+
+    /**
+     * Wheter we should insert new vocabulary or throw an error message.
+     */
+    private boolean insertMissingVoc = true;
 
     /**
      * The ObjectEvent-query without data.
@@ -119,15 +122,19 @@ public class EpcisCaptureInterface extends HttpServlet {
     private DataSource db = null;
 
     /**
-     * SAX needs a static document variable.
-     */
-    private static Document document = null;
-
-    /**
      * Returns a simple information page.
+     * 
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse)
+     * @param req
+     *            The HttpServletRequest.
+     * @param rsp
+     *            The HttpServletResponse.
+     * @throws IOException
+     *             If an error occured while writing the response.
      */
     public void doGet(final HttpServletRequest req,
-            final HttpServletResponse rsp) throws ServletException, IOException {
+            final HttpServletResponse rsp) throws IOException {
         rsp.setContentType("text/html");
         final PrintWriter out = rsp.getWriter();
 
@@ -153,9 +160,17 @@ public class EpcisCaptureInterface extends HttpServlet {
      * plaintext error messages via HTTP. Note: Currently there is no validation
      * against the EPCglobal schema files, however this application takes care
      * of invalid XML docments.
+     * 
+     * @param req
+     *            The HttpServletRequest.
+     * @param rsp
+     *            The HttpServletResponse.
+     * @throws IOException
+     *             If an error occured while validating the request or writing
+     *             the response.
      */
     public void doPost(final HttpServletRequest req,
-            final HttpServletResponse rsp) throws ServletException, IOException {
+            final HttpServletResponse rsp) throws IOException {
         LOG.info("EPCIS Capture Interface invoked.");
         rsp.setContentType("text/plain");
         final PrintWriter out = rsp.getWriter();
@@ -245,6 +260,8 @@ public class EpcisCaptureInterface extends HttpServlet {
 
     /**
      * @see javax.servlet.GenericServlet#init()
+     * @throws ServletException
+     *             If the context could not be loaded.
      */
     public void init() throws ServletException {
         // read configuration and set up database source
@@ -304,7 +321,9 @@ public class EpcisCaptureInterface extends HttpServlet {
      * Parses the entire document and handles the supplied events.
      * 
      * @throws SQLException
+     *             If an error with the database occured.
      * @throws SAXException
+     *             If an error parsing the document occured.
      */
     private void parseDocument() throws SQLException, SAXException {
         NodeList eventList = document.getElementsByTagName("EventList");
@@ -342,7 +361,8 @@ public class EpcisCaptureInterface extends HttpServlet {
      * @throws SQLException
      *             If an error connecting to the DB occurs.
      */
-    private void handleEvent(Node eventNode) throws SAXException, SQLException {
+    private void handleEvent(final Node eventNode) throws SAXException,
+            SQLException {
         if (eventNode != null && eventNode.getChildNodes().getLength() == 0) {
             throw new SAXException("Event element '" + eventNode.getNodeName()
                     + "' has no children elements.");
@@ -584,7 +604,8 @@ public class EpcisCaptureInterface extends HttpServlet {
      * @throws SQLException
      *             If an SQL problem with the database ocurred.
      */
-    private long getLastAutoIncrementedId(String tableName) throws SQLException {
+    private long getLastAutoIncrementedId(final String tableName)
+            throws SQLException {
         String stmt = "SELECT LAST_INSERT_ID() as id " + "FROM " + tableName;
         PreparedStatement ps = dbconnection.prepareStatement(stmt);
         final ResultSet rs = ps.executeQuery();
@@ -609,7 +630,7 @@ public class EpcisCaptureInterface extends HttpServlet {
      *             If an SQL problem with the database ocurred or if we are not
      *             allowed to insert a missing vocabulary.
      */
-    private long insertVocabulary(String tableName, Vocabulary uri)
+    private long insertVocabulary(final String tableName, final Vocabulary uri)
             throws SQLException {
         String stmt = "SELECT id FROM " + tableName + " WHERE uri=?";
         PreparedStatement ps = dbconnection.prepareStatement(stmt);
@@ -645,7 +666,7 @@ public class EpcisCaptureInterface extends HttpServlet {
      * @param epcNode
      *            The parent Node from which EPC URIs should be extracted.
      * @return An array of Voci containing all the URIs found in the given node.
-     * @throws URISyntaxException
+     * @throws VociSyntaxException
      *             If a string is not parsable as URI.
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
@@ -683,7 +704,7 @@ public class EpcisCaptureInterface extends HttpServlet {
      *            The parent Node from which BizTransaction URIs should be
      *            extracted.
      * @return A List of BizTransaction.
-     * @throws URISyntaxException
+     * @throws VociSyntaxException
      *             If a string is not parsable as URI.
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.

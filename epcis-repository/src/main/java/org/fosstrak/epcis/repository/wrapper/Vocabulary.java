@@ -5,10 +5,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-
 /**
  * The URI class is final and cant be extended. Therefore, following the
- * Adapter-Pattern, we created this new Class Voci which adapts the URI
+ * Adapter-Pattern, we created this new class Vocabulary which adapts the URI
  * Class.
  * 
  * @author Alain Remund
@@ -38,8 +37,8 @@ public class Vocabulary {
         }
     }
 
-    public Vocabulary(final String scheme, final String ssp, final String fragment)
-            throws VociSyntaxException {
+    public Vocabulary(final String scheme, final String ssp,
+            final String fragment) throws VociSyntaxException {
         try {
             holder = new URI(scheme, ssp, fragment);
         } catch (final URISyntaxException e) {
@@ -61,8 +60,9 @@ public class Vocabulary {
         }
     }
 
-    public Vocabulary(final String scheme, final String host, final String path,
-            final String fragment) throws VociSyntaxException {
+    public Vocabulary(final String scheme, final String host,
+            final String path, final String fragment)
+            throws VociSyntaxException {
         try {
             holder = new URI(scheme, host, path, fragment);
         } catch (final URISyntaxException e) {

@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
  */
 public class EventFieldExtension {
 
+    private static final Logger LOG = Logger.getLogger(EventFieldExtension.class);
+
     private String prefix = null;
     private String namespace = null;
     private String localname = null;
@@ -23,16 +25,26 @@ public class EventFieldExtension {
     private Timestamp dateValue = null;
     private String strValue = null;
 
-    private static final Logger LOG = Logger.getLogger(EventFieldExtension.class);
-
-    public EventFieldExtension(String prefix, String namespace,
-            String localname, String value) {
+    /**
+     * Constructs a new EventFieldExtension from the parameters.
+     * 
+     * @param prefix
+     *            The prefix of the event field.
+     * @param namespace
+     *            The namespace for the prefix.
+     * @param localname
+     *            The localname (tag name) of the event field.
+     * @param value
+     *            The value of the event field.
+     */
+    public EventFieldExtension(final String prefix, final String namespace,
+            final String localname, final String value) {
         this.localname = localname;
         this.prefix = prefix;
         this.namespace = namespace;
         this.fieldname = namespace + "#" + localname;
         LOG.info("Resolved fieldname of extension tag to '" + fieldname + "'");
-        strValue = value;
+        this.strValue = value;
         // try parsing the value
         try {
             this.intValue = new Integer(strValue);

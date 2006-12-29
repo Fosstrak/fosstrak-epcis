@@ -30,36 +30,42 @@ import org.apache.log4j.Logger;
  * supported formats is:
  * 
  * <pre>
- *         &amp;plusmnYYYY-MM-DDThh:mm:ss[.SSS]TZD
+ *           &amp;plusmnYYYY-MM-DDThh:mm:ss[.SSS]TZD
  * </pre>
  * 
  * where:
  * 
  * <pre>
- *         &amp;plusmnYYYY = four-digit year with optional sign where values &lt;= 0 are
- *                 denoting years BCE and values &gt; 0 are denoting years CE,
- *                 e.g. -0001 denotes the year 2 BCE, 0000 denotes the year 1 BCE,
- *                 0001 denotes the year 1 CE, and so on...
- *         MM    = two-digit month (01=January, etc.)
- *         DD    = two-digit day of month (01 through 31)
- *         hh    = two digits of hour (00 through 23) (am/pm NOT allowed)
- *         mm    = two digits of minute (00 through 59)
- *         ss    = two digits of second (00 through 59)
- *         SSS   = optional three digits of milliseconds (000 through 999)
- *         TZD   = time zone designator, Z for Zulu (i.e. UTC) or an offset from UTC
- *                 in the form of +hh:mm or -hh:mm
+ *           &amp;plusmnYYYY = four-digit year with optional sign where values &lt;= 0 are
+ *                   denoting years BCE and values &gt; 0 are denoting years CE,
+ *                   e.g. -0001 denotes the year 2 BCE, 0000 denotes the year 1 BCE,
+ *                   0001 denotes the year 1 CE, and so on...
+ *           MM    = two-digit month (01=January, etc.)
+ *           DD    = two-digit day of month (01 through 31)
+ *           hh    = two digits of hour (00 through 23) (am/pm NOT allowed)
+ *           mm    = two digits of minute (00 through 59)
+ *           ss    = two digits of second (00 through 59)
+ *           SSS   = optional three digits of milliseconds (000 through 999)
+ *           TZD   = time zone designator, Z for Zulu (i.e. UTC) or an offset from UTC
+ *                   in the form of +hh:mm or -hh:mm
  * </pre>
  */
 public final class TimeParser {
 
-    private static Logger LOG = Logger.getLogger(TimeParser.class);
+    private static final Logger LOG = Logger.getLogger(TimeParser.class);
 
     /**
-     * miscellaneous numeric formats used in formatting
+     * Miscellaneous numeric formats used in formatting.
      */
     private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
     private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
     private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
+
+    /**
+     * Empty private constructor to hide default constructor.
+     */
+    private TimeParser() {
+    }
 
     /**
      * Parses an ISO8601-compliant date/time string into a <code>Calendar</code>.
@@ -69,10 +75,8 @@ public final class TimeParser {
      * @return A <code>Calendar</code> representing the date/time.
      * @throws ParseException
      *             If the date/time could not be parsed.
-     * @throws IllegalArgumentException
-     *             if a <code>null</code> argument is passed
      */
-    public static Calendar parseAsCalendar(String text) throws ParseException {
+    public static Calendar parseAsCalendar(final String text) throws ParseException {
         return parse(text);
     }
 
@@ -84,10 +88,8 @@ public final class TimeParser {
      * @return A <code>Date</code> representing the date/time.
      * @throws ParseException
      *             If the date/time could not be parsed.
-     * @throws IllegalArgumentException
-     *             if a <code>null</code> argument is passed
      */
-    public static Date parseAsDate(String text) throws ParseException {
+    public static Date parseAsDate(final String text) throws ParseException {
         return parse(text).getTime();
     }
 
@@ -100,19 +102,25 @@ public final class TimeParser {
      * @return A <code>Timestamp</code> representing the date/time.
      * @throws ParseException
      *             If the date/time could not be parsed.
-     * @throws IllegalArgumentException
-     *             if a <code>null</code> argument is passed
      */
-    public static Timestamp parseAsTimestamp(String text) throws ParseException {
+    public static Timestamp parseAsTimestamp(final String text) throws ParseException {
         return new Timestamp(parse(text).getTimeInMillis());
     }
 
-    private static Calendar parse(String text) throws ParseException {
+    /**
+     * Parses an ISO8601-compliant date/time string into a
+     * <code>Calendar</code>.
+     * 
+     * @param text
+     *            The date/time string to be parsed.
+     * @return A <code>Calendar</code> representing the date/time.
+     * @throws ParseException
+     *             If the date/time could not be parsed.
+     */
+    private static Calendar parse(final String text) throws ParseException {
         if (text == null) {
             throw new IllegalArgumentException("argument may not be null");
         }
-
-        // check optional leading sign
         char sign;
         int curPos;
         if (text.startsWith("-")) {
@@ -129,7 +137,6 @@ public final class TimeParser {
         int year, month, day, hour, min, sec, ms;
         String tzID;
         char delimiter;
-        // year (YYYY)
         try {
             year = Integer.parseInt(text.substring(curPos, curPos + 4));
         } catch (NumberFormatException e) {
@@ -143,7 +150,6 @@ public final class TimeParser {
                     + "' at position " + curPos, curPos);
         }
         curPos++;
-        // month (MM)
         try {
             month = Integer.parseInt(text.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -157,7 +163,6 @@ public final class TimeParser {
                     + "' at position " + curPos, curPos);
         }
         curPos++;
-        // day (DD)
         try {
             day = Integer.parseInt(text.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -171,7 +176,6 @@ public final class TimeParser {
                     + "' at position " + curPos, curPos);
         }
         curPos++;
-        // hour (hh)
         try {
             hour = Integer.parseInt(text.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -185,7 +189,6 @@ public final class TimeParser {
                     + "' at position " + curPos, curPos);
         }
         curPos++;
-        // minute (mm)
         try {
             min = Integer.parseInt(text.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -199,7 +202,6 @@ public final class TimeParser {
                     + "' at position " + curPos, curPos);
         }
         curPos++;
-        // second (ss)
         try {
             sec = Integer.parseInt(text.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -210,7 +212,6 @@ public final class TimeParser {
         delimiter = '.';
         if (curPos < text.length() && text.charAt(curPos) == '.') {
             curPos++;
-            // millisecond (SSS)
             try {
                 ms = Integer.parseInt(text.substring(curPos, curPos + 3));
             } catch (NumberFormatException e) {
@@ -226,8 +227,7 @@ public final class TimeParser {
                 && (text.charAt(curPos) == '+' || text.charAt(curPos) == '-')) {
             // offset to UTC specified in the format +00:00/-00:00
             tzID = "GMT" + text.substring(curPos);
-        } else if (curPos < text.length()
-                && text.substring(curPos).equals("Z")) {
+        } else if (curPos < text.length() && text.substring(curPos).equals("Z")) {
             tzID = "GMT";
         } else {
             // throw new ParseException("invalid time zone designator", curPos);
@@ -245,7 +245,6 @@ public final class TimeParser {
         // initialize Calendar object
         Calendar cal = Calendar.getInstance(tz);
         cal.setLenient(false);
-        // year and era
         if (sign == '-' || year == 0) {
             // not CE, need to set era (BCE) and adjust year
             cal.set(Calendar.YEAR, year + 1);
@@ -254,23 +253,15 @@ public final class TimeParser {
             cal.set(Calendar.YEAR, year);
             cal.set(Calendar.ERA, GregorianCalendar.AD);
         }
-        // month (0-based!)
-        cal.set(Calendar.MONTH, month - 1);
-        // day of month
+        cal.set(Calendar.MONTH, month - 1); // month is 0-based
         cal.set(Calendar.DAY_OF_MONTH, day);
-        // hour
         cal.set(Calendar.HOUR_OF_DAY, hour);
-        // minute
         cal.set(Calendar.MINUTE, min);
-        // second
         cal.set(Calendar.SECOND, sec);
-        // millisecond
         cal.set(Calendar.MILLISECOND, ms);
 
-        /**
-         * the following call will trigger an IllegalArgumentException if any of
-         * the set values are illegal or out of range
-         */
+        // the following will trigger an IllegalArgumentException if any of
+        // the set values are illegal or out of range
         cal.getTime();
 
         return cal;
@@ -280,13 +271,11 @@ public final class TimeParser {
      * Formats a <code>Date</code> value into an ISO8601-compliant date/time
      * string.
      * 
-     * @param ts
+     * @param date
      *            The time value to be formatted into a date/time string.
      * @return The formatted date/time string.
-     * @throws IllegalArgumentException
-     *             if a <code>null</code> argument is passed
      */
-    public static String format(Date date) {
+    public static String format(final Date date) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTimeInMillis(date.getTime());
         return format(cal);
@@ -299,10 +288,8 @@ public final class TimeParser {
      * @param ts
      *            The time value to be formatted into a date/time string.
      * @return The formatted date/time string.
-     * @throws IllegalArgumentException
-     *             if a <code>null</code> argument is passed
      */
-    public static String format(Timestamp ts) {
+    public static String format(final Timestamp ts) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTimeInMillis(ts.getTime());
         return format(cal);
@@ -315,10 +302,8 @@ public final class TimeParser {
      * @param cal
      *            The time value to be formatted into a date/time string.
      * @return The formatted date/time string.
-     * @throws IllegalArgumentException
-     *             if a <code>null</code> argument is passed
      */
-    public static String format(Calendar cal) {
+    public static String format(final Calendar cal) {
         if (cal == null) {
             throw new IllegalArgumentException("argument can not be null");
         }

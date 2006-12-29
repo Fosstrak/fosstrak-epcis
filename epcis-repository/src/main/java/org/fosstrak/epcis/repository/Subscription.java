@@ -1,13 +1,8 @@
-/* Copyright (c) 2006 ETH Zurich, Switzerland.
- * All rights reserved.
- *
- * For copying and distribution information, please see the file
- * LICENSE.
+/*
+ * Copyright (c) 2006 ETH Zurich, Switzerland. All rights reserved. For copying
+ * and distribution information, please see the file LICENSE.
  */
 
-/**
- *
- */
 package org.accada.epcis.repository;
 
 import java.io.OutputStream;
@@ -20,6 +15,7 @@ import java.util.Vector;
 
 import org.apache.axis.encoding.SerializationContext;
 import org.apache.axis.message.NullAttributes;
+import org.apache.axis.types.URI;
 import org.accada.epcis.soapapi.EPCISQueryBodyType;
 import org.accada.epcis.soapapi.EPCISQueryDocumentType;
 import org.accada.epcis.soapapi.EPCISServicePortType;
@@ -31,18 +27,23 @@ import org.accada.epcis.soapapi.QueryParam;
 import org.accada.epcis.soapapi.QueryResults;
 
 /**
- * Implements a subscription to a query. Created upon
- * using subscribe() on the querying interface side.
- *
+ * Implements a subscription to a query. Created upon using subscribe() on the
+ * querying interface side.
+ * 
  * @author Alain Remund, Arthur van Dorp
  */
 public class Subscription implements Serializable {
 
     /**
-     * Generated ID for serialization. Adapt if you change
-     * this class in a backwards incompatible way.
+     * Generated ID for serialization. Adapt if you change this class in a
+     * backwards incompatible way.
      */
     private static final long serialVersionUID = -7695867884113548051L;
+
+    /**
+     * SubscriptionID.
+     */
+    protected String subscriptionID;
 
     /**
      * Query parameters.
@@ -52,7 +53,7 @@ public class Subscription implements Serializable {
     /**
      * Destination URI to send results to.
      */
-    private org.apache.axis.types.URI dest;
+    private URI dest;
 
     /**
      * Initial record time.
@@ -65,39 +66,39 @@ public class Subscription implements Serializable {
     private Boolean reportIfEmpty;
 
     /**
-     * SubscriptionID.
-     */
-    protected String subscriptionID;
-
-    /**
      * queryName.
      */
     private String queryName;
 
     /**
-     * Last time the query got executed.
-     * Used to restrict results to new ones.
+     * Last time the query got executed. Used to restrict results to new ones.
      */
     private GregorianCalendar lastTimeQueryExecuted;
 
     /**
-     * Constructor to be used when recreating from
-     * storage.
-     * @param subscriptionID subscriptionID.
-     * @param queryParams Query parameters.
-     * @param dest Destination URI.
-     * @param reportIfEmpty Whether to report when nothing changed.
-     * @param initialRecordTime Time from when on events should be
-     * reported on first execution.
-     * @param queryName queryName.
+     * Constructor to be used when recreating from storage.
+     * 
+     * @param subscriptionID
+     *            subscriptionID.
+     * @param queryParams
+     *            Query parameters.
+     * @param dest
+     *            Destination URI.
+     * @param reportIfEmpty
+     *            Whether to report when nothing changed.
+     * @param initialRecordTime
+     *            Time from when on events should be reported on first
+     *            execution.
+     * @param lastTimeExecuted
+     *            Last time the query got executed.
+     * @param queryName
+     *            queryName.
      */
-    public Subscription(String subscriptionID,
-            QueryParam[] queryParams,
-            org.apache.axis.types.URI dest,
-            Boolean reportIfEmpty,
-            GregorianCalendar initialRecordTime,
-            GregorianCalendar lastTimeExecuted,
-            String queryName) {
+    public Subscription(final String subscriptionID,
+            final QueryParam[] queryParams, final URI dest,
+            final Boolean reportIfEmpty,
+            final GregorianCalendar initialRecordTime,
+            final GregorianCalendar lastTimeExecuted, final String queryName) {
         this.subscriptionID = subscriptionID;
         this.queryParams = queryParams;
         this.dest = dest;
@@ -108,9 +109,10 @@ public class Subscription implements Serializable {
     }
 
     /**
-     * Runs the query assigned to this subscription.
-     * Advances lastTimeExecuted.
-     * @throws ImplementationException For various reasons.
+     * Runs the query assigned to this subscription. Advances lastTimeExecuted.
+     * 
+     * @throws ImplementationException
+     *             For various reasons.
      */
     public void executeQuery() throws ImplementationException {
         QueryResults queryResults;
@@ -137,43 +139,33 @@ public class Subscription implements Serializable {
         lastTimeQueryExecuted = new GregorianCalendar();
         try {
 
-
-
             // Get a nice XML representation
 
-            EPCISServicePortType EPCservice
-                 = new EpcisQueryInterface();
+            EPCISServicePortType epcisQueryService = new EpcisQueryInterface();
 
-            queryResults = EPCservice.poll(pollParams);
-            EventListType qEvList
-                = queryResults.getResultsBody().getEventList();
+            queryResults = epcisQueryService.poll(pollParams);
+            EventListType qEvList = queryResults.getResultsBody().getEventList();
             if (!reportIfEmpty
-             && (null == qEvList || qEvList.getAggregationEvent().length == 0)
-             && (null == qEvList || qEvList.getObjectEvent().length == 0)
-             && (null == qEvList || qEvList.getQuantityEvent().length == 0)
-             && (null == qEvList || qEvList.getTransactionEvent().length == 0)
-                    )
-            {
+                    && (null == qEvList || qEvList.getAggregationEvent().length == 0)
+                    && (null == qEvList || qEvList.getObjectEvent().length == 0)
+                    && (null == qEvList || qEvList.getQuantityEvent().length == 0)
+                    && (null == qEvList || qEvList.getTransactionEvent().length == 0)) {
                 System.out.println("No results. Not sending anything.");
                 return;
             }
 
-            javax.xml.namespace.QName queryDocXMLType =
-                EPCISQueryDocumentType.getTypeDesc().getXmlType();
+            javax.xml.namespace.QName queryDocXMLType = EPCISQueryDocumentType.getTypeDesc().getXmlType();
 
             URL serviceUrl = new URL(dest.toString());
-            HttpURLConnection connection = (HttpURLConnection) serviceUrl
-                    .openConnection();
+            HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             OutputStream httpOut = connection.getOutputStream();
 
-
             OutputStreamWriter oWriter = new OutputStreamWriter(httpOut);
 
-            SerializationContext serContext
-                = new SerializationContext(oWriter);
+            SerializationContext serContext = new SerializationContext(oWriter);
             serContext.setWriteXMLType(queryDocXMLType);
 
             queryResults.setQueryName(queryName);
@@ -181,12 +173,9 @@ public class Subscription implements Serializable {
             queryBody.setQueryResults(queryResults);
             queryDoc.setEPCISBody(queryBody);
 
-            serContext.serialize(
-                    queryDocXMLType,
-                    new NullAttributes(),
-                    queryDoc,
-                    queryDocXMLType,
-                    EPCISQueryDocumentType.class, false, true);
+            serContext.serialize(queryDocXMLType, new NullAttributes(),
+                    queryDoc, queryDocXMLType, EPCISQueryDocumentType.class,
+                    false, true);
 
             // Send the result to dest
 
@@ -207,14 +196,14 @@ public class Subscription implements Serializable {
             ImplementationException ie = new ImplementationException(
                     "Exception in executeQuery occured: " + e.getMessage(),
                     ImplementationExceptionSeverity.fromString("ERROR"),
-                    queryName,
-                    subscriptionID);
+                    queryName, subscriptionID);
             throw ie;
         }
     }
 
     /**
      * Returns the initial record time.
+     * 
      * @return The initial record time.
      */
     public GregorianCalendar getInitialRecordTime() {
