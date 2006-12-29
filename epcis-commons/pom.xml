@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- POM basics  -->
+  <groupId>org.accada.epcis</groupId>
+  <artifactId>epcis-commons</artifactId>
+  <version>0.2.0-SNAPSHOT</version>
+  <parent>
+    <artifactId>epcis</artifactId>
+    <groupId>org.accada.epcis</groupId>
+    <version>0.2.0-SNAPSHOT</version>
+  </parent>
+  <packaging>jar</packaging>
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Dependencies -->
+  <dependencies>
+    <dependency>
+      <groupId>axis</groupId>
+      <artifactId>axis</artifactId>
+      <version>1.3</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>axis</groupId>
+      <artifactId>axis-jaxrpc</artifactId>
+      <version>1.3</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>axis</groupId>
+      <artifactId>axis-saaj</artifactId>
+      <version>1.3</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.12</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+  <!-- Additional project information -->
+  <name>epcis-commons</name>
+
+</project>
