@@ -9,6 +9,7 @@
 
   <!-- Modules -->
   <modules>
+    <module>epcis-commons</module>
     <module>epcis-repository</module>
     <module>epcis-queryclient</module>
     <module>epcis-captureclient</module>
@@ -97,14 +98,14 @@
   </issueManagement>
   <mailingLists>
     <mailingList>
-      <name>Filtering and Collection user mailing list</name>
+      <name>EPC Information System user mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</unsubscribe>
       <post>accada-epcis-user@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum=accada-epcis-user</archive>
     </mailingList>
     <mailingList>
-      <name>Filtering and Collection developer mailing list</name>
+      <name>EPC Information System developer mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
       <post>accada-epcis-developer@lists.sourceforge.net</post>
@@ -122,8 +123,66 @@
     </license>
   </licenses>
   <developers>
+    <developer>
+      <id>steybem</id>
+      <name>Marco Steybe</name>
+      <email>steybem@student.ethz.ch</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>andreagr</id>
+      <name>Andrea Groessbauer</name>
+      <email>andreagr@student.ethz.ch</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
   <contributors>
+    <contributor>
+      <name>Alain Remund</name>
+      <email>remunda@student.ethz.ch</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </contributor>
+    <contributor>
+      <name>Arthur Van Dorp</name>
+      <email>vandorpa@student.ethz.ch</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </contributor>
+    <contributor>
+      <name>David Gubler</name>
+      <email>dgubler@student.ethz.ch</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </contributor>
   </contributors>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <includes>**/*.java</includes>
+          <excludes>org/accada/epcis/soapapi/*.*</excludes>
+          <configLocation>epcis_checks.xml</configLocation>
+          <linkXRef>false</linkXRef>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>
