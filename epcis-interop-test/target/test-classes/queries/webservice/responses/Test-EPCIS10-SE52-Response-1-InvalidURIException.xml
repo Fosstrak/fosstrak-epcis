@@ -1,0 +1,3 @@
+<epcisq:InvalidURIException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>The URI scheme 'htto' is invalid.</reason>
+</epcisq:InvalidURIException>

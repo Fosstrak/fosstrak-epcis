@@ -1,0 +1,9 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>LE_quantity</name>
+			<value>3</value>
+		</param>
+	</params>
+</epcisq:poll>

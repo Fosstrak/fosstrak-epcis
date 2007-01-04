@@ -1,0 +1,3 @@
+<epcisq:QueryParameterException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>The query parameter 'EQ_abcd' is invalid.</reason>
+</epcisq:QueryParameterException>

@@ -1,0 +1,32 @@
+<epcisq:QueryResults  xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleMasterDataQuery</queryName>
+	<resultsBody>
+		<VocabularyList>
+			<Vocabulary type="urn:epcglobal:epcis:vtype:BusinessLocation">
+				<VocabularyElementList>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468">
+						<attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
+						<children>
+							<id>urn:epcglobal:fmcg:loc:0614141073468.1</id>
+							<id>urn:epcglobal:fmcg:loc:0614141073468.2</id>
+							<id>urn:epcglobal:fmcg:loc:0614141073468.3</id>
+						</children>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.1">
+						<attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
+						<attribute id="urn:epcglobal:fmcg:mda:sslt">209</attribute>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.2">
+						<attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
+						<attribute id="urn:epcglobal:fmcg:mda:sslt">299</attribute>
+						<attribute id="urn:epcglobal:fmcg:mda:sslta">422</attribute>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.3">
+						<attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
+						<attribute id="urn:epcglobal:fmcg:mda:sslt">210</attribute>
+					</VocabularyElement>
+				</VocabularyElementList>
+			</Vocabulary>
+		</VocabularyList>
+	</resultsBody>
+</epcisq:QueryResults>

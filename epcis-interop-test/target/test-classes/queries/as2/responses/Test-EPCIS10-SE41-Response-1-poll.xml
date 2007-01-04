@@ -1,0 +1,3 @@
+<epcisq:QueryParameterException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>The parameters 'eventCountLimit' and 'maxEventCount' are mutually exclusive.</reason>
+</epcisq:QueryParameterException>

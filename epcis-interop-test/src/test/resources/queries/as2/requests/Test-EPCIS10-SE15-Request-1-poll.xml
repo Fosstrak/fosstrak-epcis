@@ -1,0 +1,11 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>EQ_disposition</name>
+			<value>
+				<string>urn:epcglobal:fmcg:disp:sellable_available</string>
+			</value>
+		</param>
+	</params>
+</epcisq:poll>

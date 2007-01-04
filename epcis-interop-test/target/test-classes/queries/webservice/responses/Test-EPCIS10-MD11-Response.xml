@@ -1,0 +1,3 @@
+<epcisq:QueryResults  xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleMasterDataQuery</queryName>
+</epcisq:QueryResults>

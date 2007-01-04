@@ -1,0 +1,15 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>EQ_bizStep</name>
+			<value>
+				<string>urn:epcglobal:hls:bizstep:commissioning</string>
+			</value>
+		</param>
+		<param>
+			<name>maxEventCount</name>
+			<value>10</value>
+		</param>
+	</params>
+</epcisq:poll>

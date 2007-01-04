@@ -1,0 +1,39 @@
+<epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+
+    <queryName>QueryX</queryName>
+
+    <params>
+        <param>
+            <name>eventType</name>
+            <value>
+                <string>ObjectEvent</string>
+            </value>
+        </param>
+        <param>
+            <name>EQ_bizStep</name>
+            <value>
+                <string>urn:epcglobal:fmcg:bizstep:receiving</string>
+            </value>
+        </param>
+        <param>
+            <name>EQ_bizLocation</name>
+            <value>
+                <string>urn:epcglobal:fmcg:loc:0614141073468.1</string>
+            </value>
+        </param>
+    </params>
+
+    <dest>uri:dummy</dest>
+
+    <controls>
+        <schedule>
+            <second>0</second>
+            <minute>0</minute>
+        </schedule>
+        <initialRecordTime>2000-07-05T00:00:00.0Z</initialRecordTime>
+        <reportIfEmpty>false</reportIfEmpty>
+    </controls>
+
+    <subscriptionID>QuerySE7</subscriptionID>
+
+</epcisq:Subscribe>

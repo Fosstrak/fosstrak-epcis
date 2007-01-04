@@ -1,0 +1,39 @@
+<epcisq:QueryResults  xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleMasterDataQuery</queryName>
+	<resultsBody>
+		<VocabularyList>
+			<Vocabulary type="urn:epcglobal:epcis:vtype:BusinessLocation">
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073467">
+						<children>
+							<id>urn:epcglobal:fmcg:loc:0614141073467.1</id>
+						</children>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073467.1">
+						<attribute id="urn:epcglobal:fmcg:mda:sslta">422</attribute>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468">
+						<children>
+							<id>urn:epcglobal:fmcg:loc:0614141073468.3</id>
+							<id>urn:epcglobal:fmcg:loc:0614141073468.2</id>
+							<id>urn:epcglobal:fmcg:loc:0614141073468.1</id>
+						</children>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.1"/>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.2">
+						<attribute id="urn:epcglobal:fmcg:mda:sslta">422</attribute>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.3"/>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073469">
+						<children>
+							<id>urn:epcglobal:fmcg:loc:0614141073469.2</id>
+							<id>urn:epcglobal:fmcg:loc:0614141073469.1</id>
+						</children>
+					</VocabularyElement>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073469.1"/>
+					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073469.2"/>
+			</Vocabulary>
+		</VocabularyList>
+	</resultsBody>
+</epcisq:QueryResults>
+
+

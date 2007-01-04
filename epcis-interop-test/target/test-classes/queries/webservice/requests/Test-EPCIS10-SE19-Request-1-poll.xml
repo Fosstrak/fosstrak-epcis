@@ -1,0 +1,11 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>WD_bizLocation</name>
+			<value>
+				<string>urn:epcglobal:fmcg:loc:0614141073468</string>
+			</value>
+		</param>
+	</params>
+</epcisq:poll>

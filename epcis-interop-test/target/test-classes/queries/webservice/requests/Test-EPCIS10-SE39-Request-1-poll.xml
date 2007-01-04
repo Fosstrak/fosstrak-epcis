@@ -1,0 +1,24 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>EQ_bizStep</name>
+			<value>
+				<string>urn:epcglobal:hls:bizstep:commissioning</string>
+			</value>
+		</param>
+		<param>
+			<name>eventCountLimit</name>
+			<value>5</value>
+		</param>
+		<param>
+			<name>orderBy</name>
+			<value>eventTime</value>
+		</param>
+		<param>
+			<name>orderDirection</name>
+			<value>ASC</value>
+		</param>
+
+	</params>
+</epcisq:poll>

@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------------
+Test set: org.accada.epcis.repository.test.EventFieldExtensionTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.04 sec <<< FAILURE!
+testExtension(org.accada.epcis.repository.test.EventFieldExtensionTest)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.<init>(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.EventFieldExtensionTest.testExtension(EventFieldExtensionTest.java:37)
+

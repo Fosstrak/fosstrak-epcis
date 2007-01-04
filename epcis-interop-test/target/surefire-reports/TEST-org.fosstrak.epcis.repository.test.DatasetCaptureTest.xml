@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="8" skipped="0" tests="8" time="0.1" failures="0" name="org.accada.epcis.repository.test.DatasetCaptureTest">
+  <properties>
+    <property value="Java(TM) 2 Runtime Environment, Standard Edition" name="java.runtime.name"/>
+    <property value="C:\Program Files\Java\jdk1.5.0_02\jre\bin" name="sun.boot.library.path"/>
+    <property value="1.5.0_02-b09" name="java.vm.version"/>
+    <property value="Sun Microsystems Inc." name="java.vm.vendor"/>
+    <property value="http://java.sun.com/" name="java.vendor.url"/>
+    <property value=";" name="path.separator"/>
+    <property value="Java HotSpot(TM) Client VM" name="java.vm.name"/>
+    <property value="sun.io" name="file.encoding.pkg"/>
+    <property value="CH" name="user.country"/>
+    <property value="Service Pack 2" name="sun.os.patch.level"/>
+    <property value="Java Virtual Machine Specification" name="java.vm.specification.name"/>
+    <property value="D:\EPCIS\epcisMaven\epcis-interop-test" name="user.dir"/>
+    <property value="1.5.0_02-b09" name="java.runtime.version"/>
+    <property value="sun.awt.Win32GraphicsEnvironment" name="java.awt.graphicsenv"/>
+    <property value="D:\EPCIS\epcisMaven\epcis-interop-test" name="basedir"/>
+    <property value="C:\Program Files\Java\jdk1.5.0_02\jre\lib\endorsed" name="java.endorsed.dirs"/>
+    <property value="x86" name="os.arch"/>
+    <property value="C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\" name="java.io.tmpdir"/>
+    <property value="
+" name="line.separator"/>
+    <property value="Sun Microsystems Inc." name="java.vm.specification.vendor"/>
+    <property value="" name="user.variant"/>
+    <property value="Windows XP" name="os.name"/>
+    <property value="Cp1252" name="sun.jnu.encoding"/>
+    <property value="C:\Program Files\Java\jdk1.5.0_02\bin;.;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\MiKTeX-2.4.1705\texmf\miktex\bin\;D:\eclipse\eclipse;D:\EPCIS\xampp\tomcat\bin;D:\EPCIS\xampp\tomcat\common\lib;D:\EPCIS\xampp\tomcat\webapps\axis\WEB-INF\lib;C:\Program Files\Java\jdk1.5.0_02\bin;C:\Perl\bin\;C:\PROGRAM FILES\THINKPAD\UTILITIES;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\;C:\Program Files\Common Files\GTK\2.0\bin\;C:\Program Files\OpenAFS\Common;C:\Program Files\OpenAFS\Client\Program;C:\Program Files\Ghostgum\gsview;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\IBM ThinkVantage\Client Security Solution;%GOBO%\bin;D:\Lookup\Microsoft.NET_SDK\v2.0\Bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;C:\Program Files\Microsoft Visual Studio 8\VC\bin;C:\Program Files\Microsoft Visual Studio 8\Common7\IDE;C:\Program Files\Microsoft Visual Studio 8\VC\vcpackages;D:\Lookup\PSDK\Bin;C:\ant\bin;C:\Program Files\SSH Communications Security\SSH Secure Shell\;C:\Program Files\lcc\bin;C:\Program Files\maven-2.0.4\bin;D:\Lookup\Eiffel\gobo\bin;D:\Lookup\Eiffel\studio\spec\windows\bin;C:\Program Files\cygwin\bin" name="java.library.path"/>
+    <property value="Java Platform API Specification" name="java.specification.name"/>
+    <property value="49.0" name="java.class.version"/>
+    <property value="HotSpot Client Compiler" name="sun.management.compiler"/>
+    <property value="5.1" name="os.version"/>
+    <property value="C:\Documents and Settings\Administrator" name="user.home"/>
+    <property value="Europe/Berlin" name="user.timezone"/>
+    <property value="sun.awt.windows.WPrinterJob" name="java.awt.printerjob"/>
+    <property value="Cp1252" name="file.encoding"/>
+    <property value="1.5" name="java.specification.version"/>
+    <property value="Administrator" name="user.name"/>
+    <property value="C:\Documents and Settings\Administrator\.m2\repository\org\apache\maven\surefire\surefire-api\2.0\surefire-api-2.0.jar;C:\Documents and Settings\Administrator\.m2\repository\org\codehaus\plexus\plexus-utils\1.1\plexus-utils-1.1.jar;C:\Documents and Settings\Administrator\.m2\repository\org\apache\maven\surefire\surefire-booter\2.0\surefire-booter-2.0.jar" name="java.class.path"/>
+    <property value="1.0" name="java.vm.specification.version"/>
+    <property value="32" name="sun.arch.data.model"/>
+    <property value="C:\Program Files\Java\jdk1.5.0_02\jre" name="java.home"/>
+    <property value="Sun Microsystems Inc." name="java.specification.vendor"/>
+    <property value="de" name="user.language"/>
+    <property value="sun.awt.windows.WToolkit" name="awt.toolkit"/>
+    <property value="mixed mode, sharing" name="java.vm.info"/>
+    <property value="1.5.0_02" name="java.version"/>
+    <property value="C:\Program Files\Java\jdk1.5.0_02\jre\lib\ext" name="java.ext.dirs"/>
+    <property value="C:\Program Files\Java\jdk1.5.0_02\jre\lib\rt.jar;C:\Program Files\Java\jdk1.5.0_02\jre\lib\i18n.jar;C:\Program Files\Java\jdk1.5.0_02\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.5.0_02\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.5.0_02\jre\lib\jce.jar;C:\Program Files\Java\jdk1.5.0_02\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.5.0_02\jre\classes" name="sun.boot.class.path"/>
+    <property value="Sun Microsystems Inc." name="java.vendor"/>
+    <property value="C:\Documents and Settings\Administrator\.m2\repository" name="localRepository"/>
+    <property value="\" name="file.separator"/>
+    <property value="http://java.sun.com/cgi-bin/bugreport.cgi" name="java.vendor.url.bug"/>
+    <property value="little" name="sun.cpu.endian"/>
+    <property value="UnicodeLittle" name="sun.io.unicode.encoding"/>
+    <property value="windows" name="sun.desktop"/>
+    <property value="pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86" name="sun.cpu.isalist"/>
+  </properties>
+  <testcase time="0.03" name="testCommissionCases">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+  <testcase time="0.01" name="testCommissionPallets">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+  <testcase time="0" name="testPackCases">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+  <testcase time="0.01" name="testReceivePallets">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+  <testcase time="0" name="testPickOrder">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+  <testcase time="0" name="testShipOrder">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+  <testcase time="0.01" name="testReceiveOrder">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+  <testcase time="0.01" name="testStoreInventory">
+    <error type="java.lang.RuntimeException" message="Unable to load properties from file src\main\resources\application.properties">java.lang.RuntimeException: Unable to load properties from file src\main\resources\application.properties
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:61)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.&amp;init&amp;(CaptureInterfaceClient.java:48)
+	at org.accada.epcis.repository.test.DatasetCaptureTest.setUp(DatasetCaptureTest.java:49)
+	at junit.framework.TestCase.runBare(TestCase.java:125)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:210)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:135)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:122)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:129)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:225)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:747)
+Caused by: java.io.FileNotFoundException: src\main\resources\application.properties (The system cannot find the path specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.&amp;init&amp;(FileInputStream.java:106)
+	at org.accada.epcis.captureclient.CaptureInterfaceClient.init(CaptureInterfaceClient.java:59)
+	... 23 more
+</error>
+  </testcase>
+</testsuite>

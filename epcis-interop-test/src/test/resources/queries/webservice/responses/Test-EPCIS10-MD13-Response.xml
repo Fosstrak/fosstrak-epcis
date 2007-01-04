@@ -1,0 +1,3 @@
+<epcisq:SubscribeNotPermittedException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>Subscription not allowed for SimpleMasterDataQuery</reason>
+</epcisq:SubscribeNotPermittedException>

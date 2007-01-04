@@ -1,0 +1,15 @@
+<epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleMasterDataQuery</queryName>
+	<params>
+		<param>
+			<name>vocabularyName</name>
+			<value>
+				<string>urn:epcglobal:epcis:vtype:ReadPoint</string>
+			</value>
+		</param>
+		<param>
+			<name>includeAttributes</name>
+			<value>true</value>
+		</param>
+	</params>
+</epcisq:Poll>

@@ -1,0 +1,3 @@
+<epcisq:NoSuchSubscriptionException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>The subscription ID 'QuerySE54-2' does not exist.</reason>
+</epcisq:NoSuchSubscriptionException>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epcisq:EPCISQueryDocument
+    xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1"
+    xmlns:sbdh="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
+    xmlns:epcismd="urn:epcglobal:epcis-masterdata:xsd:1"
+    xmlns:epcis="urn:epcglobal:epcis:xsd:1"
+    xmlns:epcglobal="urn:epcglobal:xsd:1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    creationDate="2006-07-05T14:37:40.0Z"
+    schemaVersion="1.0">
+    <EPCISHeader>
+        <sbdh:StandardBusinessDocumentHeader>
+            <sbdh:HeaderVersion>1.0</sbdh:HeaderVersion>
+            <sbdh:Sender>
+                <sbdh:Identifier Authority="EAN.UCC">0614141107340</sbdh:Identifier>
+            </sbdh:Sender>
+            <sbdh:Receiver>
+                <sbdh:Identifier Authority="EAN.UCC">0614141107340</sbdh:Identifier>
+            </sbdh:Receiver>
+            <sbdh:DocumentIdentification>
+                <sbdh:Standard>EPCIS</sbdh:Standard>
+                <sbdh:TypeVersion>1.0</sbdh:TypeVersion>
+                <sbdh:InstanceIdentifier>Test-EPCIS10-MD1-AS2-Request</sbdh:InstanceIdentifier>
+                <sbdh:Type>EPCIS Queries</sbdh:Type>
+                <sbdh:CreationDateAndTime>2006-06-07T05:30:00.0Z</sbdh:CreationDateAndTime>
+            </sbdh:DocumentIdentification>
+        </sbdh:StandardBusinessDocumentHeader>
+    </EPCISHeader>
+    <EPCISBody>
+        <epcisq:Subscribe>
+            <queryName>SimpleEventQuery</queryName>
+
+            <params>
+                <param>
+                    <name>eventType</name>
+                    <value>
+                        <string>QuantityEvent</string>
+                    </value>
+                </param>
+                <param>
+                    <name>EQ_bizStep</name>
+                    <value>
+                        <string>urn:epcglobal:fmcg:bizstep:receiving</string>
+                    </value>
+                </param>
+                <param>
+                    <name>EQ_bizLocation</name>
+                    <value>
+                        <string>urn:epcglobal:fmcg:loc:0614141073469.2</string>
+                    </value>
+                </param>
+            </params>
+
+            <dest>uri:dummy</dest>
+
+            <controls>
+                <schedule>
+                    <second>0</second>
+                    <minute>0,30</minute>
+                </schedule>
+                <initialRecordTime>2000-07-05T00:00:00.0Z</initialRecordTime>
+                <reportIfEmpty>false</reportIfEmpty>
+            </controls>
+
+            <subscriptionID>QuerySE9</subscriptionID>
+
+        </epcisq:Subscribe>
+    </EPCISBody>
+</epcisq:EPCISQueryDocument>

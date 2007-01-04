@@ -1,0 +1,3 @@
+<epcisq:QueryParameterException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>The parameter value '3.1459' for GE_quantity is invalid.</reason>
+</epcisq:QueryParameterException>

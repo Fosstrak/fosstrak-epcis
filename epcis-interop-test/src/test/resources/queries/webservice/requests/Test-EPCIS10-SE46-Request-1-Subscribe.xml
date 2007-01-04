@@ -1,0 +1,24 @@
+<epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>EQ_bizStep</name>
+			<value>
+				<string>urn:epcglobal:fmcg:bizstep:receiving</string>
+			</value>
+		</param>
+	</params>
+	<dest>http://192.168.0.1:8080/notificationReceiver</dest>
+	<controls>
+		<schedule>
+			<second>0</second>
+		</schedule>
+		<!-- FIXME -->
+		<!-- Candidate spec of EPCIS 1.0 does not allow omission of 
+			initialRecordTime.  The initialRecordTime element is for
+			avoiding XML validation errors. -->
+		<initialRecordTime>2006-07-25T09:00:00.000Z</initialRecordTime>
+		<reportIfEmpty>false</reportIfEmpty>
+	</controls>
+	<subscriptionID>QuerySE46-1</subscriptionID>
+</epcisq:Subscribe>

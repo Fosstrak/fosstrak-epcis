@@ -1,0 +1,3 @@
+<epcisq:QueryTooComplexException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>Reason string for the QueryTooComplexException.</reason>
+</epcisq:QueryTooComplexException>

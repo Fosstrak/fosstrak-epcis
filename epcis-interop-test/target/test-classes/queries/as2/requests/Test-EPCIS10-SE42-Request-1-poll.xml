@@ -1,0 +1,12 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>EQ_bizStep</name>
+			<value>
+				<string>urn:epcglobal:fmcg:bizstep:receiving</string>
+				<string>urn:epcglobal:fmcg:bizstep:picking</string>
+			</value>
+		</param>
+	</params>
+</epcisq:poll>

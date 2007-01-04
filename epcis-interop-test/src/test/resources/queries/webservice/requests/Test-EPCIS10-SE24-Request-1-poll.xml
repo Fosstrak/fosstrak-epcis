@@ -1,0 +1,11 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>MATCH_epcClass</name>
+			<value>
+				<string>urn:epc:idpat:sgtin:0614141.107342.*</string>
+			</value>
+		</param>
+	</params>
+</epcisq:poll>

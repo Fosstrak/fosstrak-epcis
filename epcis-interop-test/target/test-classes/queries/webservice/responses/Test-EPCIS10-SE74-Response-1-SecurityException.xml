@@ -1,0 +1,3 @@
+<epcisq:SecurityException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>Reason string for the SecurityException.</reason>
+</epcisq:SecurityException>

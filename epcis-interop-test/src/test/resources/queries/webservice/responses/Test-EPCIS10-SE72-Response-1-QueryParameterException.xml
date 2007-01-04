@@ -1,0 +1,3 @@
+<epcisq:QueryParameterException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>Two or more query parameters have the same parameter name.</reason>
+</epcisq:QueryParameterException>

@@ -1,0 +1,33 @@
+<epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" xmlns:fmcg="urn:epcglobal:fmcg:xsd:1">
+  	<queryName>SimpleEventQuery</queryName>
+	<resultsBody>
+		<EventList>
+
+ 			<QuantityEvent>
+				<eventTime>2006-06-25T09:34:00Z</eventTime>
+				<eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+<recordTime>2006-06-25T09:34:00Z</recordTime>
+				<epcClass>urn:epc:idpat:sgtin:0614142.107348.*</epcClass>
+				<quantity>9</quantity>
+				<bizStep>urn:epcglobal:fmcg:bizstep:receiving</bizStep>
+				<disposition>urn:epcglobal:hls:disp:active</disposition>
+				<bizLocation>
+					<id>urn:epcglobal:fmcg:loc:0614141073469.2</id>
+				</bizLocation>
+			</QuantityEvent>
+			<QuantityEvent>
+				<eventTime>2006-06-25T09:35:00Z</eventTime>
+				<eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+<recordTime>2006-06-25T09:35:00Z</recordTime>
+				<epcClass>urn:epc:idpat:sgtin:0614142.107349.*</epcClass>
+				<quantity>10</quantity>
+				<bizStep>urn:epcglobal:fmcg:bizstep:receiving</bizStep>
+				<disposition>urn:epcglobal:hls:disp:active</disposition>
+				<bizLocation>
+					<id>urn:epcglobal:fmcg:loc:0614141073469.2</id>
+				</bizLocation>
+			</QuantityEvent>
+     
+		</EventList>
+	</resultsBody>
+</epcisq:QueryResults>

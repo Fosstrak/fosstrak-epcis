@@ -1,0 +1,9 @@
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<queryName>SimpleEventQuery</queryName>
+	<params>
+		<param>
+			<name>GE_recordTime</name>
+			<value>2006-06-25T05:10:05Z</value>
+		</param>
+	</params>
+</epcisq:poll>

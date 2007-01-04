@@ -1,0 +1,3 @@
+<epcisq:SubscriptionControlsException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+	<reason>The value for 'hour' is invalid in the query schedule.</reason>
+</epcisq:SubscriptionControlsException>
