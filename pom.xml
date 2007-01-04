@@ -45,6 +45,20 @@
             <target>1.5</target>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <!--
+            By default, the surefire plugin automatically includes all test classes
+            with following wildcard patterns:
+            **/Test*.java
+            **/*Test.java
+            **/*TestCase.java
+          -->
+          <configuration>
+            <testFailureIgnore>true</testFailureIgnore>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -180,8 +194,19 @@
           <includes>**/*.java</includes>
           <excludes>org/accada/epcis/soapapi/*.*</excludes>
           <configLocation>epcis_checks.xml</configLocation>
-          <linkXRef>false</linkXRef>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
       </plugin>
     </plugins>
   </reporting>
