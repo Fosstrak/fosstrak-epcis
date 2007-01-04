@@ -1,9 +1,0 @@
-<epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<params>
-		<param>
-			<name>EQ_abcd</name>
-			<value>X</value>
-		</param>
-	</params>
-</epcisq:Poll>

@@ -1,3 +1,0 @@
-<epcisq:SubscriptionControlsException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>The value for 'minute' is out of range in the query schedule.</reason>
-</epcisq:SubscriptionControlsException>

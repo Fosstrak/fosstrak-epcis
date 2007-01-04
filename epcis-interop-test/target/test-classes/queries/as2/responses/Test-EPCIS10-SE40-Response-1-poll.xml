@@ -1,3 +1,0 @@
-<epcisq:QueryTooLargeException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>Reason string for the QueryTooLargeException.</reason>
-</epcisq:QueryTooLargeException>

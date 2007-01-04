@@ -1,3 +1,0 @@
-<epcisq:SecurityException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>(dummy reason text) User not authenticated/authorized</reason>
-</epcisq:SecurityException>

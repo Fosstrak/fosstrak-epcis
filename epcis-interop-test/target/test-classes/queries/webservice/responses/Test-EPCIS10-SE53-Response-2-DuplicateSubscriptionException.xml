@@ -1,3 +1,0 @@
-<epcisq:DuplicateSubscriptionException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>The subscription ID 'QuerySE53' is already used.</reason>
-</epcisq:DuplicateSubscriptionException>

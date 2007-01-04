@@ -1,4 +1,0 @@
-<epcisq:QueryTooLargeException  xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>Response exceeded maxElementCount</reason>
-	<queryName>SimpleMasterDataQuery</queryName>
-</epcisq:QueryTooLargeException>

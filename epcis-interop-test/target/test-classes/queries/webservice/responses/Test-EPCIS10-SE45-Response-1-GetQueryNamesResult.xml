@@ -1,4 +1,0 @@
-<epcisq:GetQueryNamesResult xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<string>SimpleEventQuery</string>
-	<string>SimpleMasterDataQuery</string>
-</epcisq:GetQueryNamesResult>

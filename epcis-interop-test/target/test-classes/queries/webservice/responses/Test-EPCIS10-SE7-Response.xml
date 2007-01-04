@@ -1,3 +1,0 @@
-<epcisq:NoSuchNameException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>No such query (dummy reason text)</reason>
-</epcisq:NoSuchNameException>

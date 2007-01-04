@@ -1,9 +1,0 @@
-<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<params>
-		<param>
-			<name>GT_http://schema.hls.com/extension#temperature</name>
-			<value>25</value>
-		</param>
-	</params>
-</epcisq:poll>
