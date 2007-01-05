@@ -1,13 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <!-- POM basics  -->
+
+  <!-- =========================================================== -->
+  <!-- POM basics                                                  -->
+  <!-- =========================================================== -->
+
   <groupId>org.accada.epcis</groupId>
   <artifactId>epcis</artifactId>
   <version>0.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Modules -->
+
+  <!-- =========================================================== -->
+  <!-- Modules                                                     -->
+  <!-- =========================================================== -->
+
   <modules>
     <module>epcis-commons</module>
     <module>epcis-repository</module>
@@ -16,7 +24,11 @@
     <module>epcis-interop-test</module>
   </modules>
 
-  <!-- Dependencies -->
+
+  <!-- =========================================================== -->
+  <!-- Dependencies                                                -->
+  <!-- =========================================================== -->
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -26,7 +38,35 @@
     </dependency>
   </dependencies>
 
-  <!-- Build settings -->
+
+  <!-- =========================================================== -->
+  <!-- Repositories                                                  -->
+  <!-- =========================================================== -->
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>accada-repository</id>
+      <name>Accada repository</name>
+      <!-- change url to www.accada.org/repository/... as soon as server
+           migration is completed. -->
+      <url>http://accada.inf.ethz.ch/repository/releases</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+
+  <!-- =========================================================== -->
+  <!-- Building                                                    -->
+  <!-- =========================================================== -->
+
   <build>
     <pluginManagement>
       <plugins>
@@ -43,6 +83,12 @@
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <configuration>
+            <locales>en</locales>
           </configuration>
         </plugin>
         <plugin>
@@ -63,27 +109,11 @@
     </pluginManagement>
   </build>
 
-  <!-- Repositories -->
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>accada-repository</id>
-      <name>Accada repository</name>
-      <!-- change url to www.accada.org/repository/... as soon as server
-           migration is completed. -->
-      <url>http://accada.inf.ethz.ch/repository/releases</url>
-      <layout>default</layout>
-    </repository>
-  </repositories>
 
-  <!-- Infrastructure -->
+  <!-- =========================================================== -->
+  <!-- Infrastructure                                              -->
+  <!-- =========================================================== -->
+  
   <scm>
     <!-- keep empty tags here to avoid release:prepare crashes -->
     <connection></connection>
@@ -128,7 +158,50 @@
     </mailingList>
   </mailingLists>
 
-  <!-- Additional project information -->
+
+  <!-- =========================================================== -->
+  <!-- Reporting                                                   -->
+  <!-- =========================================================== -->
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <includes>**/*.java</includes>
+          <excludes>org/accada/epcis/soapapi/*.*</excludes>
+          <configLocation>epcis_checks.xml</configLocation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+
+  <!-- =========================================================== -->
+  <!-- Project Information                                         -->
+  <!-- =========================================================== -->
+
   <name>epcis</name>
   <url>http://www.accada.org/epcis</url>
   <licenses>
@@ -183,32 +256,5 @@
       <timezone>+1</timezone>
     </contributor>
   </contributors>
-  
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.0</version>
-        <configuration>
-          <includes>**/*.java</includes>
-          <excludes>org/accada/epcis/soapapi/*.*</excludes>
-          <configLocation>epcis_checks.xml</configLocation>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting>
 
 </project>

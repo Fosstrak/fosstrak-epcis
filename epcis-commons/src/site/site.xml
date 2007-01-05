@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Accada">
+  <body>
+  
+    <menu ref="parent"/>
+    
+    <menu name="epcis-commons">
+      <item name="Overview" href="index.html"/>
+    </menu>
+    
+    <menu ref="reports"/>
+    
+  </body>
+</project>
