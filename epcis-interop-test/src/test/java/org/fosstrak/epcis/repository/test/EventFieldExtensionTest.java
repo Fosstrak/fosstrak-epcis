@@ -22,20 +22,15 @@ import org.accada.epcis.queryclient.QueryClientSoapImpl;
  */
 public class EventFieldExtensionTest extends TestCase {
 
-    private static final String captureUrl = "http://localhost:8888/epcis-repository/capture";
-    private static final String queryUrl = "http://localhost:8888/epcis-repository/query/EPCglobalEPCISService";
-
     private static String event1 = null;
     private static String event2 = null;
     private static String query = null;
     private static String response = null;
 
-
     public void testExtension() throws IOException, ServiceException {
 
         // send event1
-        CaptureInterfaceClient captureClient = new CaptureInterfaceClient(
-                captureUrl);
+        CaptureInterfaceClient captureClient = new CaptureInterfaceClient();
         String resp = captureClient.sendEvent(event1);
         System.out.println(resp);
         assertEquals("200 OK: Request succeeded.", resp);
@@ -46,14 +41,16 @@ public class EventFieldExtensionTest extends TestCase {
         assertEquals("200 OK: Request succeeded.", resp);
 
         // send query
-        QueryClientInterface queryClient = new QueryClientSoapImpl(queryUrl);
+        QueryClientInterface queryClient = new QueryClientSoapImpl();
         queryClient.runQuery(new ByteArrayInputStream(query.getBytes()));
 
         System.out.println("Check response in TCPMonitor. Should contain the following ObjectEvent:\n");
         System.out.println(response);
     }
 
-
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
     public void setUp() {
         StringBuilder sb = new StringBuilder();
         sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");

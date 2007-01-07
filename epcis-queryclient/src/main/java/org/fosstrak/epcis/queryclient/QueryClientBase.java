@@ -3,7 +3,10 @@
  */
 package org.accada.epcis.queryclient;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
+import java.util.Properties;
 
 import javax.xml.rpc.ServiceException;
 
@@ -27,7 +30,12 @@ import org.apache.log4j.Logger;
  * @author Marco Steybe
  */
 public abstract class QueryClientBase implements QueryClientInterface {
-    private static Logger LOG = Logger.getLogger(QueryClientBase.class);
+
+    private static final Logger LOG = Logger.getLogger(QueryClientBase.class);
+
+    private static final String PROPERTY_FILE = "/queryclient.properties";
+
+    private static final String PROPERTY_QUERY_URL = "default.url";
 
     /**
      * Holds the locator for the service.
@@ -42,6 +50,23 @@ public abstract class QueryClientBase implements QueryClientInterface {
      */
     QueryClientBase() {
         service = new EPCglobalEPCISServiceLocator();
+        InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
+        if (is == null) {
+            throw new RuntimeException("Unable to load properties from file "
+                    + PROPERTY_FILE);
+        }
+        try {
+            Properties props = new Properties();
+            props.load(is);
+            String queryUrl = props.getProperty(PROPERTY_QUERY_URL);
+            service.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load properties from file "
+                    + PROPERTY_FILE);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Reading property file from " + PROPERTY_FILE);
+        }
     }
 
     /**
@@ -70,10 +95,9 @@ public abstract class QueryClientBase implements QueryClientInterface {
      * @see org.accada.epcis.queryclient.QueryClientInterface#queryNames()
      */
     public String[] queryNames() throws ServiceException,
-                                ImplementationException, ValidationException,
-                                SecurityException, RemoteException {
-        EPCISServiceBindingStub stub =
-                (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
+            ImplementationException, ValidationException, SecurityException,
+            RemoteException {
+        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
         ArrayOfString temp = stub.getQueryNames(new EmptyParms());
 
         return temp.getString();
@@ -83,11 +107,9 @@ public abstract class QueryClientBase implements QueryClientInterface {
      * @see org.accada.epcis.queryclient.QueryClientInterface#queryStandardVersion()
      */
     public String queryStandardVersion() throws ServiceException,
-                                        ImplementationException,
-                                        ValidationException, SecurityException,
-                                        RemoteException {
-        EPCISServiceBindingStub stub =
-                (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
+            ImplementationException, ValidationException, SecurityException,
+            RemoteException {
+        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
 
         return stub.getStandardVersion(null);
     }
@@ -96,10 +118,8 @@ public abstract class QueryClientBase implements QueryClientInterface {
      * @see org.accada.epcis.queryclient.QueryClientInterface#querySubscriptionIds()
      */
     public String[] querySubscriptionIds() throws ServiceException,
-                                          ImplementationException,
-                                          ValidationException,
-                                          SecurityException,
-                                          NoSuchNameException, RemoteException {
+            ImplementationException, ValidationException, SecurityException,
+            NoSuchNameException, RemoteException {
         EPCISServiceBindingStub stub;
         stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
 
@@ -115,11 +135,9 @@ public abstract class QueryClientBase implements QueryClientInterface {
      * @see org.accada.epcis.queryclient.QueryClientInterface#queryVendorVersion()
      */
     public String queryVendorVersion() throws ServiceException,
-                                      ImplementationException,
-                                      ValidationException, SecurityException,
-                                      RemoteException {
-        EPCISServiceBindingStub stub =
-                (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
+            ImplementationException, ValidationException, SecurityException,
+            RemoteException {
+        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
 
         return stub.getVendorVersion(null);
     }
@@ -128,12 +146,9 @@ public abstract class QueryClientBase implements QueryClientInterface {
      * @see org.accada.epcis.queryclient.QueryClientInterface#unsubscribeQuery(java.lang.String)
      */
     public void unsubscribeQuery(String subscriptionId)
-                                                       throws ServiceException,
-                                                       ImplementationException,
-                                                       NoSuchSubscriptionException,
-                                                       ValidationException,
-                                                       SecurityException,
-                                                       RemoteException {
+            throws ServiceException, ImplementationException,
+            NoSuchSubscriptionException, ValidationException,
+            SecurityException, RemoteException {
 
         EPCISServiceBindingStub stub;
         stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();

@@ -30,37 +30,27 @@ import org.apache.log4j.PropertyConfigurator;
 
 /**
  * @author Marco Steybe
- *
  */
 public class SimpleEventQueryTest extends TestCase {
 
-    private static Logger LOG = Logger.getLogger(SimpleEventQueryTest.class);
+    private static final Logger LOG = Logger.getLogger(SimpleEventQueryTest.class);
 
     QueryClientInterface client;
 
     static String pathToQueries = "src/test/resources/queries/webservice/requests/";
-
     static String queryPrefix = "Test-EPCIS10-SE";
-
     static String querySuffix = "-Request-1-poll.xml";
-
     static String pathToResp = "src/test/resources/queries/webservice/responses/";
-
     static String respPrefix = "Test-EPCIS10-SE";
-
     static String respSuffix = "-Response-1-poll.xml";
-
+    
     /**
-     * Setup.
+     * @see junit.framework.TestCase#setUp()
      */
-
     public void setUp() {
         PropertyConfigurator.configure("src/test/resources/conf/log4j.properties");
-        client =
-                new QueryClientSoapImpl(
-                                        "http://localhost:8888/epcis-repository/query/EPCglobalEPCISService");
+        client = new QueryClientSoapImpl();
     }
-
 
     public void testSE10() throws IOException, ServiceException {
         int testNr = 10;
@@ -73,12 +63,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE11() throws IOException, ServiceException {
         int testNr = 11;
@@ -91,12 +79,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE12() throws IOException, ServiceException {
         int testNr = 12;
@@ -109,12 +95,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE13() throws IOException, ServiceException {
         int testNr = 13;
@@ -127,12 +111,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE14() throws IOException, ServiceException {
         int testNr = 14;
@@ -145,12 +127,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE15() throws IOException, ServiceException {
         int testNr = 15;
@@ -163,12 +143,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE16() throws IOException, ServiceException {
         int testNr = 16;
@@ -181,12 +159,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE17() throws IOException, ServiceException {
         int testNr = 17;
@@ -199,12 +175,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE18() throws IOException, ServiceException {
         int testNr = 18;
@@ -217,12 +191,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE19() throws IOException, ServiceException {
         int testNr = 19;
@@ -235,12 +207,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE20() throws IOException, ServiceException {
         int testNr = 20;
@@ -253,12 +223,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE21() throws IOException, ServiceException {
         int testNr = 21;
@@ -271,12 +239,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE22() throws IOException, ServiceException {
         int testNr = 22;
@@ -289,12 +255,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE23() throws IOException, ServiceException {
         int testNr = 23;
@@ -307,12 +271,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE24() throws IOException, ServiceException {
         int testNr = 24;
@@ -325,12 +287,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE25() throws IOException, ServiceException {
         int testNr = 25;
@@ -343,12 +303,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE26() throws IOException, ServiceException {
         int testNr = 26;
@@ -361,12 +319,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE27() throws IOException, ServiceException {
         int testNr = 27;
@@ -379,12 +335,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE28() throws IOException, ServiceException {
         int testNr = 28;
@@ -397,12 +351,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE29() throws IOException, ServiceException {
         int testNr = 29;
@@ -415,12 +367,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE30() throws IOException, ServiceException {
         int testNr = 30;
@@ -433,12 +383,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE31() throws IOException, ServiceException {
         int testNr = 31;
@@ -451,12 +399,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE32() throws IOException, ServiceException {
         int testNr = 32;
@@ -469,12 +415,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE33() throws IOException, ServiceException {
         int testNr = 33;
@@ -487,12 +431,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE34() throws IOException, ServiceException {
         int testNr = 34;
@@ -505,12 +447,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE35() throws IOException, ServiceException {
         int testNr = 35;
@@ -523,12 +463,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE36() throws IOException, ServiceException {
         int testNr = 36;
@@ -541,12 +479,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE37() throws IOException, ServiceException {
         int testNr = 37;
@@ -559,12 +495,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE38() throws IOException, ServiceException {
         int testNr = 38;
@@ -577,12 +511,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE39() throws IOException, ServiceException {
         int testNr = 39;
@@ -595,12 +527,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE40() throws IOException, ServiceException {
         int testNr = 40;
@@ -616,7 +546,6 @@ public class SimpleEventQueryTest extends TestCase {
         fis.close();
     }
 
-
     public void testSE41() throws IOException, ServiceException {
         int testNr = 41;
         String query = pathToQueries + queryPrefix + testNr + querySuffix;
@@ -631,7 +560,6 @@ public class SimpleEventQueryTest extends TestCase {
         fis.close();
     }
 
-
     public void testSE42() throws IOException, ServiceException {
         int testNr = 42;
         String query = pathToQueries + queryPrefix + testNr + querySuffix;
@@ -643,12 +571,10 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
-
 
     public void testSE43() throws IOException, ServiceException {
         int testNr = 43;
@@ -661,8 +587,7 @@ public class SimpleEventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults =
-                ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -694,7 +619,7 @@ public class SimpleEventQueryTest extends TestCase {
         assertEquals(expResults.getExtension(), actResults.getExtension());
         assertEquals(expResults.getQueryName(), actResults.getQueryName());
         assertEquals(expResults.getSubscriptionID(),
-                     actResults.getSubscriptionID());
+                actResults.getSubscriptionID());
 
         EventListType actEvents = actResults.getResultsBody().getEventList();
         EventListType expEvents = expResults.getResultsBody().getEventList();
@@ -708,28 +633,23 @@ public class SimpleEventQueryTest extends TestCase {
             assertEquals(expObjectEvent.length, actObjectEvent.length);
             for (int i = 0; i < actObjectEvent.length; i++) {
                 assertEquals(expObjectEvent[i].get_any(),
-                             actObjectEvent[i].get_any());
+                        actObjectEvent[i].get_any());
                 assertEquals(expObjectEvent[i].getAction(),
-                             actObjectEvent[i].getAction());
+                        actObjectEvent[i].getAction());
                 assertEquals(expObjectEvent[i].getBaseExtension(),
-                             actObjectEvent[i].getBaseExtension());
+                        actObjectEvent[i].getBaseExtension());
                 assertEquals(expObjectEvent[i].getBizLocation(),
-                             actObjectEvent[i].getBizLocation());
+                        actObjectEvent[i].getBizLocation());
                 assertEquals(expObjectEvent[i].getBizStep(),
-                             actObjectEvent[i].getBizStep());
+                        actObjectEvent[i].getBizStep());
                 assertEquals(expObjectEvent[i].getDisposition(),
-                             actObjectEvent[i].getDisposition());
-                assertEquals(
-                             expObjectEvent[i]
-                                              .getEventTime()
-                                              .compareTo(
-                                                         actObjectEvent[i]
-                                                                          .getEventTime()),
-                             0);
+                        actObjectEvent[i].getDisposition());
+                assertEquals(expObjectEvent[i].getEventTime().compareTo(
+                        actObjectEvent[i].getEventTime()), 0);
                 assertEquals(expObjectEvent[i].getExtension(),
-                             actObjectEvent[i].getExtension());
+                        actObjectEvent[i].getExtension());
                 assertEquals(expObjectEvent[i].getReadPoint(),
-                             actObjectEvent[i].getReadPoint());
+                        actObjectEvent[i].getReadPoint());
                 // assertEquals(expObjectEvent[i].getRecordTime(),
                 // actObjectEvent[i].getRecordTime());
 
@@ -740,14 +660,12 @@ public class SimpleEventQueryTest extends TestCase {
                     assertEquals(expEpcs[j].get_value(), actEpcs[j].get_value());
                 }
 
-                BusinessTransactionType[] actBizTrans =
-                        actObjectEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans =
-                        expObjectEvent[i].getBizTransactionList();
+                BusinessTransactionType[] actBizTrans = actObjectEvent[i].getBizTransactionList();
+                BusinessTransactionType[] expBizTrans = expObjectEvent[i].getBizTransactionList();
                 assertEquals(expBizTrans.length, actBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
                     assertEquals(expBizTrans[j].getType(),
-                                 actBizTrans[j].getType());
+                            actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }
@@ -763,30 +681,25 @@ public class SimpleEventQueryTest extends TestCase {
             assertEquals(expAggrEvent.length, actAggrEvent.length);
             for (int i = 0; i < actAggrEvent.length; i++) {
                 assertEquals(expAggrEvent[i].get_any(),
-                             actAggrEvent[i].get_any());
+                        actAggrEvent[i].get_any());
                 assertEquals(expAggrEvent[i].getAction(),
-                             actAggrEvent[i].getAction());
+                        actAggrEvent[i].getAction());
                 assertEquals(expAggrEvent[i].getBaseExtension(),
-                             actAggrEvent[i].getBaseExtension());
+                        actAggrEvent[i].getBaseExtension());
                 assertEquals(expAggrEvent[i].getBizLocation(),
-                             actAggrEvent[i].getBizLocation());
+                        actAggrEvent[i].getBizLocation());
                 assertEquals(expAggrEvent[i].getBizStep(),
-                             actAggrEvent[i].getBizStep());
+                        actAggrEvent[i].getBizStep());
                 assertEquals(expAggrEvent[i].getDisposition(),
-                             actAggrEvent[i].getDisposition());
-                assertEquals(
-                             expAggrEvent[i]
-                                            .getEventTime()
-                                            .compareTo(
-                                                       actAggrEvent[i]
-                                                                      .getEventTime()),
-                             0);
+                        actAggrEvent[i].getDisposition());
+                assertEquals(expAggrEvent[i].getEventTime().compareTo(
+                        actAggrEvent[i].getEventTime()), 0);
                 assertEquals(expAggrEvent[i].getExtension(),
-                             actAggrEvent[i].getExtension());
+                        actAggrEvent[i].getExtension());
                 assertEquals(expAggrEvent[i].getParentID(),
-                             actAggrEvent[i].getParentID());
+                        actAggrEvent[i].getParentID());
                 assertEquals(expAggrEvent[i].getReadPoint(),
-                             actAggrEvent[i].getReadPoint());
+                        actAggrEvent[i].getReadPoint());
                 // assertEquals(expObjectEvent[i].getRecordTime(),
                 // actObjectEvent[i].getRecordTime());
 
@@ -797,14 +710,12 @@ public class SimpleEventQueryTest extends TestCase {
                     assertEquals(expEpcs[j].get_value(), actEpcs[j].get_value());
                 }
 
-                BusinessTransactionType[] actBizTrans =
-                        actAggrEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans =
-                        expAggrEvent[i].getBizTransactionList();
+                BusinessTransactionType[] actBizTrans = actAggrEvent[i].getBizTransactionList();
+                BusinessTransactionType[] expBizTrans = expAggrEvent[i].getBizTransactionList();
                 assertEquals(actBizTrans.length, expBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
                     assertEquals(expBizTrans[j].getType(),
-                                 actBizTrans[j].getType());
+                            actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }
@@ -820,30 +731,25 @@ public class SimpleEventQueryTest extends TestCase {
             assertEquals(expTransEvent.length, actTransEvent.length);
             for (int i = 0; i < actTransEvent.length; i++) {
                 assertEquals(expTransEvent[i].get_any(),
-                             actTransEvent[i].get_any());
+                        actTransEvent[i].get_any());
                 assertEquals(expTransEvent[i].getAction(),
-                             actTransEvent[i].getAction());
+                        actTransEvent[i].getAction());
                 assertEquals(expTransEvent[i].getBaseExtension(),
-                             actTransEvent[i].getBaseExtension());
+                        actTransEvent[i].getBaseExtension());
                 assertEquals(expTransEvent[i].getBizLocation(),
-                             actTransEvent[i].getBizLocation());
+                        actTransEvent[i].getBizLocation());
                 assertEquals(expTransEvent[i].getBizStep(),
-                             actTransEvent[i].getBizStep());
+                        actTransEvent[i].getBizStep());
                 assertEquals(expTransEvent[i].getDisposition(),
-                             actTransEvent[i].getDisposition());
-                assertEquals(
-                             expTransEvent[i]
-                                             .getEventTime()
-                                             .compareTo(
-                                                        actTransEvent[i]
-                                                                        .getEventTime()),
-                             0);
+                        actTransEvent[i].getDisposition());
+                assertEquals(expTransEvent[i].getEventTime().compareTo(
+                        actTransEvent[i].getEventTime()), 0);
                 assertEquals(expTransEvent[i].getExtension(),
-                             actTransEvent[i].getExtension());
+                        actTransEvent[i].getExtension());
                 assertEquals(expTransEvent[i].getParentID(),
-                             actTransEvent[i].getParentID());
+                        actTransEvent[i].getParentID());
                 assertEquals(expTransEvent[i].getReadPoint(),
-                             actTransEvent[i].getReadPoint());
+                        actTransEvent[i].getReadPoint());
                 // assertEquals(expTransEvent[i].getRecordTime(),
                 // actTransEvent[i].getRecordTime());
 
@@ -854,14 +760,12 @@ public class SimpleEventQueryTest extends TestCase {
                     assertEquals(expEpcs[j].get_value(), actEpcs[j].get_value());
                 }
 
-                BusinessTransactionType[] actBizTrans =
-                        actTransEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans =
-                        expTransEvent[i].getBizTransactionList();
+                BusinessTransactionType[] actBizTrans = actTransEvent[i].getBizTransactionList();
+                BusinessTransactionType[] expBizTrans = expTransEvent[i].getBizTransactionList();
                 assertEquals(actBizTrans.length, expBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
                     assertEquals(expBizTrans[j].getType(),
-                                 actBizTrans[j].getType());
+                            actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }
@@ -877,41 +781,34 @@ public class SimpleEventQueryTest extends TestCase {
             assertEquals(expQuantEvent.length, actQuantEvent.length);
             for (int i = 0; i < actQuantEvent.length; i++) {
                 assertEquals(expQuantEvent[i].get_any(),
-                             actQuantEvent[i].get_any());
+                        actQuantEvent[i].get_any());
                 assertEquals(expQuantEvent[i].getBaseExtension(),
-                             actQuantEvent[i].getBaseExtension());
+                        actQuantEvent[i].getBaseExtension());
                 assertEquals(expQuantEvent[i].getBizLocation(),
-                             actQuantEvent[i].getBizLocation());
+                        actQuantEvent[i].getBizLocation());
                 assertEquals(expQuantEvent[i].getBizStep(),
-                             actQuantEvent[i].getBizStep());
+                        actQuantEvent[i].getBizStep());
                 assertEquals(expQuantEvent[i].getDisposition(),
-                             actQuantEvent[i].getDisposition());
-                assertEquals(
-                             expQuantEvent[i]
-                                             .getEventTime()
-                                             .compareTo(
-                                                        actQuantEvent[i]
-                                                                        .getEventTime()),
-                             0);
+                        actQuantEvent[i].getDisposition());
+                assertEquals(expQuantEvent[i].getEventTime().compareTo(
+                        actQuantEvent[i].getEventTime()), 0);
                 assertEquals(expQuantEvent[i].getEpcClass(),
-                             actQuantEvent[i].getEpcClass());
+                        actQuantEvent[i].getEpcClass());
                 assertEquals(expQuantEvent[i].getExtension(),
-                             actQuantEvent[i].getExtension());
+                        actQuantEvent[i].getExtension());
                 assertEquals(expQuantEvent[i].getQuantity(),
-                             actQuantEvent[i].getQuantity());
+                        actQuantEvent[i].getQuantity());
                 assertEquals(expQuantEvent[i].getReadPoint(),
-                             actQuantEvent[i].getReadPoint());
+                        actQuantEvent[i].getReadPoint());
                 // assertEquals(expQuantEvent[i].getRecordTime(),
                 // actQuantEvent[i].getRecordTime());
 
-                BusinessTransactionType[] actBizTrans =
-                        actQuantEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans =
-                        expQuantEvent[i].getBizTransactionList();
+                BusinessTransactionType[] actBizTrans = actQuantEvent[i].getBizTransactionList();
+                BusinessTransactionType[] expBizTrans = expQuantEvent[i].getBizTransactionList();
                 assertEquals(actBizTrans.length, expBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
                     assertEquals(expBizTrans[j].getType(),
-                                 actBizTrans[j].getType());
+                            actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }

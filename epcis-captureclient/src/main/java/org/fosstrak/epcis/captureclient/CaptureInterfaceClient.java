@@ -1,8 +1,6 @@
 package org.accada.epcis.captureclient;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,17 +13,16 @@ import org.apache.log4j.Logger;
 
 /**
  * This client provides access to the EPCIS Capture Interface.
- *
+ * 
  * @author Marco Steybe
  */
 public class CaptureInterfaceClient {
 
-    private static final Logger LOG =
-            Logger.getLogger(CaptureInterfaceClient.class);
+    private static final Logger LOG = Logger.getLogger(CaptureInterfaceClient.class);
 
-    private static final String PROPERTY_FILE = "src/main/resources/application.properties";
+    private static final String PROPERTY_FILE = "/captureclient.properties";
 
-    private static final String PROPERTY_CAPTURE_URL = "default.url.capture";
+    private static final String PROPERTY_CAPTURE_URL = "default.url";
 
     private String captureUrl;
 
@@ -43,53 +40,67 @@ public class CaptureInterfaceClient {
     /**
      * Constructs a new CaptureClient which connects to the EPCIS capture
      * interface listening at the given URL.
+     * 
+     * @param url
+     *            The URL at wwhich the capture service listens.
      */
-    public CaptureInterfaceClient(String url) {
+    public CaptureInterfaceClient(final String url) {
         init();
         captureUrl = url;
     }
 
     /**
-     * Reads the property file.
+     * Read the property file.
      */
     private void init() {
-        File f = null;
+        InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
+        if (is == null) {
+            throw new RuntimeException("Unable to load properties from file "
+                    + PROPERTY_FILE);
+        }
         try {
-            f = new File(PROPERTY_FILE);
-            props.load(new FileInputStream(f));
+            props.load(is);
         } catch (IOException e) {
             throw new RuntimeException("Unable to load properties from file "
-                    + f, e);
+                    + PROPERTY_FILE);
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Reading property file from " + f);
+            LOG.debug("Reading property file from " + PROPERTY_FILE);
         }
     }
 
     /**
      * Sends an EPCIS ObjectEvent to the EPCIS Capture Interface using an HTTP
      * POST request.
-     *
+     * 
      * @param eventXml
      *            The XML containing the EventObject.
      * @return The response from the EPCIS Capture Interface
      * @throws IOException
      *             If an I/O Exception on the transport layer (HTTP) occurred.
      */
-    public String sendEvent(String eventXml) throws IOException {
+    public String sendEvent(final String eventXml) throws IOException {
         byte[] data = ("event=" + eventXml).getBytes();
         return postData(data);
     }
 
-    private String postData(byte[] data) throws IOException {
+    /**
+     * Send data to the capture service using HTTP POST.
+     * 
+     * @param data
+     *            The data to send.
+     * @return The HTTP response message
+     * @throws IOException
+     *             If an error on the HTTP layer occured.
+     */
+    private String postData(final byte[] data) throws IOException {
         String response;
 
         // the url where the capture interface listens
         URL serviceUrl = new URL(captureUrl);
 
         // open an http connection
-        HttpURLConnection connection =
-                (HttpURLConnection) serviceUrl.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
 
         // post the data
         connection.setDoOutput(true);
@@ -100,9 +111,8 @@ public class CaptureInterfaceClient {
 
         // check for http error
         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            response =
-                    "Error " + connection.getResponseCode() + " "
-                            + connection.getResponseMessage() + ": ";
+            response = "Error " + connection.getResponseCode() + " "
+                    + connection.getResponseMessage() + ": ";
         } else {
             response = "200 OK: ";
         }

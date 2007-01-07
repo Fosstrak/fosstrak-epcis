@@ -16,43 +16,35 @@ import org.apache.log4j.PropertyConfigurator;
 
 /**
  * TestSuite for Errors SE49 - SE74.
- *
+ * 
  * @author Andrea Grössbauer
- *
  */
 public class SubscriptionTest extends TestCase {
-    private static Logger LOG = Logger.getLogger(ErrorMessagesTest.class);
+
+    private static final Logger LOG = Logger.getLogger(ErrorMessagesTest.class);
 
     QueryClientInterface client;
 
     static String pathToQueries = "src/test/resources/queries/webservice/requests/";
-
     static String testPrefix = "Test-EPCIS10-SE";
-
     static String pathToResp = "src/test/resources/queries/webservice/responses/";
-
     static String req = "-Request-";
-
     static String resp = "-Response-";
 
     /**
-     * Setup.
+     * @see junit.framework.TestCase#setUp()
      */
-
     public void setUp() {
         PropertyConfigurator.configure("src/test/resources/conf/log4j.properties");
-        client =
-                new QueryClientSoapImpl(
-                                        "http://localhost:8888/epcis-repository/query/EPCglobalEPCISService");
+        client = new QueryClientSoapImpl();
     }
-
 
     public void testSE44() throws IOException, ServiceException {
         int testNr = 44;
 
         // subscribe a query
-        String subscr =
-                pathToQueries + testPrefix + testNr + req + "1-Subscribe.xml";
+        String subscr = pathToQueries + testPrefix + testNr + req
+                + "1-Subscribe.xml";
         LOG.info("query taken from " + subscr);
         InputStream fis = new FileInputStream(subscr);
         client.subscribeQuery(fis);
@@ -70,12 +62,12 @@ public class SubscriptionTest extends TestCase {
         // TODO
 
         // unsubscribe the query
-        String unsubscr =
-                pathToQueries + testPrefix + testNr + req + "2-Unsubscribe.xml";
+        String unsubscr = pathToQueries + testPrefix + testNr + req
+                + "2-Unsubscribe.xml";
         LOG.info("query taken from " + unsubscr);
         fis = new FileInputStream(unsubscr);
         client.subscribeQuery(fis);
-      // Andrea: Marco nicht unsubscribe ?
+        // Andrea: Marco nicht unsubscribe ?
         fis.close();
 
         // wait for 1 minute
@@ -90,28 +82,25 @@ public class SubscriptionTest extends TestCase {
         // TODO
 
         // TODO compare expected and actual results
-        String resp1 = pathToResp + testPrefix + testNr + resp + "1-SubscribeResult.xml";
+        String resp1 = pathToResp + testPrefix + testNr + resp
+                + "1-SubscribeResult.xml";
         LOG.info("response taken from " + resp1);
         fis = new FileInputStream(resp1);
-        QueryResults expResults1 =
-                ((QueryClientSoapImpl) client)
-                                                   .convertXmlToQueryResults(fis);
+        QueryResults expResults1 = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
 
-        String resp2 = pathToResp + testPrefix + testNr + resp + "2-QueryResults.xml";
+        String resp2 = pathToResp + testPrefix + testNr + resp
+                + "2-QueryResults.xml";
         LOG.info("response taken from " + resp2);
         fis = new FileInputStream(resp2);
-        QueryResults expResults2 =
-                ((QueryClientSoapImpl) client)
-                                                   .convertXmlToQueryResults(fis);
+        QueryResults expResults2 = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
 
-        String resp3 = pathToResp + testPrefix + testNr + resp + "UnsubscribeResult.xml";
+        String resp3 = pathToResp + testPrefix + testNr + resp
+                + "UnsubscribeResult.xml";
         LOG.info("response taken from " + resp3);
         fis = new FileInputStream(resp3);
-        QueryResults expResults3 =
-                ((QueryClientSoapImpl) client)
-                                                   .convertXmlToQueryResults(fis);
+        QueryResults expResults3 = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
 
     }
