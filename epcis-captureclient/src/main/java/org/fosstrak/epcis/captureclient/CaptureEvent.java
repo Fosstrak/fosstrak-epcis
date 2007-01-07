@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 /**
  * Implements an example event object for the EPCIS Query Interface Client.
+ * 
  * @author David Gubler
- *
  */
 public class CaptureEvent {
     /**
@@ -14,25 +14,24 @@ public class CaptureEvent {
     private String desc = null;
 
     /**
-     * Type of the event.
-     * 0 = ObjectEvent
-     * 1 = AggregationEvent
-     * 2 = QuantityEvent
+     * Type of the event.<br>
+     * 0 = ObjectEvent<br>
+     * 1 = AggregationEvent<br>
+     * 2 = QuantityEvent<br>
      * 3 = TransactionEvent
      */
     private int type = 0;
 
     /**
-     * The time at which the event occured.
-     * Null will insert the time when the example is selected.
-     * Used by all events.
+     * The time at which the event occured. Null will insert the time when the
+     * example is selected. Used by all events.
      */
     private String eventTime = null;
 
     /**
-     * Action value. Not used for QuantityEvent.
-     * 0 = ADD
-     * 1 = OBSERVE
+     * Action value. Not used for QuantityEvent.<br>
+     * 0 = ADD<br>
+     * 1 = OBSERVE<br>
      * 2 = DELETE
      */
     private int action = 1;
@@ -63,8 +62,8 @@ public class CaptureEvent {
     private ArrayList<BizTransaction> businessTransactions = new ArrayList<BizTransaction>();
 
     /**
-     * List of EPCs. Mandatory for ObjectEvent and used by TransactionEvent,
-     * not used by other events.
+     * List of EPCs. Mandatory for ObjectEvent and used by TransactionEvent, not
+     * used by other events.
      */
     private String epcList = "";
 
@@ -92,261 +91,239 @@ public class CaptureEvent {
     private int quantity = 0;
 
     /**
-     * Sets the description.
      * @param description
+     *            Sets the description.
      */
     public void setDescription(final String description) {
         desc = description;
     }
 
     /**
-     * Gets the description.
-     * @return Desctiption
+     * @return The description of the event.
      */
     public String getDescription() {
         return desc;
     }
 
     /**
-     * Sets the event type.
-     * 0 = ObjectEvent
-     * 1 = AggregationEvent
-     * 2 = QuantityEvent
-     * 3 = TransactionEvent
      * @param type
+     *            Sets the event type.<br>
+     *            0 = ObjectEvent<br>
+     *            1 = AggregationEvent<br>
+     *            2 = QuantityEvent<br>
+     *            3 = TransactionEvent
      */
-    public void setType(final int t) {
-        type = t;
+    public void setType(final int type) {
+        this.type = type;
     }
 
     /**
-     * Gets the event type.
-     * 0 = ObjectEvent
-     * 1 = AggregationEvent
-     * 2 = QuantityEvent
-     * 3 = TransactionEvent
-     * @return type
+     * @return The type of the event.<br>
+     *         0 = ObjectEvent<br>
+     *         1 = AggregationEvent<br>
+     *         2 = QuantityEvent<br>
+     *         3 = TransactionEvent
      */
     public int getType() {
         return type;
     }
 
     /**
-     * Sets the event time.
-     * Use ISO8601, i.e.
-     * 2006-05-23T17:45:25
      * @param time
+     *            Sets the event time. Use ISO8601, i.e. 2006-05-23T17:45:25
      */
     public void setEventTime(final String time) {
         eventTime = time;
     }
 
     /**
-     * Gets the event time.
-     * @return time
+     * @return The time of the event.
      */
     public String getEventTime() {
         return eventTime;
     }
 
     /**
-     * Sets the action value.
-     * 0 = ADD
-     * 1 = OBSERVE
-     * 2 = DELETE
      * @param action
+     *            Sets the action value.<br>
+     *            0 = ADD<br>
+     *            1 = OBSERVE<br>
+     *            2 = DELETE
      */
-    public void setAction(final int a) {
-        action = a;
+    public void setAction(final int action) {
+        this.action = action;
     }
 
     /**
-     * Gets the action value.
-     * 0 = ADD
-     * 1 = OBSERVE
-     * 2 = DELETE
-     * @return action
+     * @return The action value.<br>
+     *         0 = ADD<br>
+     *         1 = OBSERVE<br>
+     *         2 = DELETE
      */
     public int getAction() {
         return action;
     }
 
     /**
-     * Sets the business step.
      * @param step
+     *            Sets the business step.
      */
     public void setBizStep(final String step) {
         bizStep = step;
     }
 
     /**
-     * Gets the business step.
-     * @return step
+     * @return The business step.
      */
     public String getBizStep() {
         return bizStep;
     }
 
     /**
-     * Sets the disposition.
      * @param disp
+     *            Sets the disposition.
      */
     public void setDisposition(final String disp) {
         disposition = disp;
     }
 
     /**
-     * Gets the disposition.
-     * @return disp
+     * @return The disposition.
      */
     public String getDisposition() {
         return disposition;
     }
 
     /**
-     * Sets the read point.
      * @param readp
+     *            Sets the read point.
      */
     public void setReadPoint(final String readp) {
         readPoint = readp;
     }
 
     /**
-     * Gets the read point.
-     * @return readp
+     * @return The read point.
      */
     public String getReadPoint() {
         return readPoint;
     }
 
     /**
-     * Sets the business location.
      * @param location
+     *            Sets the business location.
      */
     public void setBizLocation(final String location) {
         bizLocation = location;
     }
 
     /**
-     * Gets the business location.
-     * @return location
+     * @return The business location.
      */
     public String getBizLocation() {
         return bizLocation;
     }
 
-    /*
-     * from here a have to adapt it to the new version
-     */
-
     /**
      * Sets the business transaction.
-     * @param transaction
+     * 
+     * @param t
+     *            The type of the business transaction.
+     * @param id
+     *            The id of the business transaction.
      */
-    public void setBizTransaction(final String type, final String id) {
-        BizTransaction bizTrans = new BizTransaction(type, id);
+    public void setBizTransaction(final String t, final String id) {
+        BizTransaction bizTrans = new BizTransaction(t, id);
         businessTransactions.add(bizTrans);
     }
 
     /**
-     * Gets the business transaction.
-     * @return transaction
+     * @return The business transaction.
      */
     public ArrayList<BizTransaction> getBizTransaction() {
         return businessTransactions;
     }
 
-    /*
-     * up to here
-     */
-
-
     /**
-     * Sets the list of EPCs (for object and transaction events).
      * @param list
+     *            Sets the list of EPCs (for object and transaction events).
      */
     public void setEpcList(final String list) {
         epcList = list;
     }
 
     /**
-     * Gets the list of EPCs (for object and transaction events).
-     * @return list
+     * @return list The list of EPCs (for object and transaction events).
      */
     public String getEpcList() {
         return epcList;
     }
 
     /**
-     * Sets the list of children EPCs (for aggregation events).
      * @param epcs
+     *            Sets the list of children EPCs (for aggregation events).
      */
     public void setChildEPCs(final String epcs) {
         childEPCs = epcs;
     }
 
     /**
-     * Gets the list of children EPCs (for aggregation events).
-     * @return epcs
+     * @return epcs The list of children EPCs (for aggregation events).
      */
     public String getChildEPCs() {
         return childEPCs;
     }
 
     /**
-     * Sets the id of the parent object (for aggregation events).
      * @param id
+     *            Sets the id of the parent object (for aggregation events).
      */
     public void setParentID(final String id) {
         parentID = id;
     }
 
     /**
-     * Gets the id of the parent object (for aggregation events).
-     * @return id
+     * @return id The id of the parent object (for aggregation events).
      */
     public String getParentID() {
         return parentID;
     }
 
     /**
-     * Sets the EPC class (for quantity events).
      * @param cls
+     *            Sets the EPC class (for quantity events).
      */
     public void setEpcClass(final String cls) {
         epcClass = cls;
     }
 
     /**
-     * Gets the EPC class (for quantity events).
-     * @return cls
+     * @return cls The EPC class (for quantity events).
      */
     public String getEpcClass() {
         return epcClass;
     }
 
     /**
-     * Sets the quantity (for quantity events).
      * @param n
+     *            Sets the quantity (for quantity events).
      */
     public void setQuantity(final int n) {
         quantity = n;
     }
 
     /**
-     * Gets the quantity (for quantity events).
-     * @return quantity
+     * @return quantity The quantity (for quantity events).
      */
     public int getQuantity() {
         return quantity;
     }
 
     /**
-     * A BusinessTransaction conists of two elements, the BizTransTypeID and
-     * the BizTransID which are Vocabularies.
-     *
+     * A BusinessTransaction conists of two elements, the BizTransTypeID and the
+     * BizTransID which are Vocabularies.
+     * 
      * @author Alain Remund
-     *
      */
     public class BizTransaction {
         /**
@@ -361,7 +338,7 @@ public class CaptureEvent {
 
         /**
          * Constructor for a new BusinessTransaction.
-         *
+         * 
          * @param aType
          *            with the value of the BizTransTypeID.
          * @param aId
