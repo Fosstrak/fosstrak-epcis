@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * The <code>TimeParser</code> utility class provides helper methods to deal
  * with date/time formatting using a specific ISO8601-compliant format (see <a
  * href="http://www.w3.org/TR/NOTE-datetime">ISO 8601</a>). <p/> The currently
- * supported formats is:
+ * supported format is:
  * 
  * <pre>
  *           &amp;plusmnYYYY-MM-DDThh:mm:ss[.SSS]TZD
@@ -117,10 +117,11 @@ public final class TimeParser {
      * @throws ParseException
      *             If the date/time could not be parsed.
      */
-    private static Calendar parse(final String text) throws ParseException {
+    private static Calendar parse(String text) throws ParseException {
         if (text == null) {
             throw new IllegalArgumentException("argument may not be null");
         }
+        text = text.trim();
         char sign;
         int curPos;
         if (text.startsWith("-")) {
@@ -231,7 +232,7 @@ public final class TimeParser {
             tzID = "GMT";
         } else {
             // throw new ParseException("invalid time zone designator", curPos);
-            LOG.warn("No timezon designator found!", new ParseException(
+            LOG.warn("No time zone designator found!", new ParseException(
                     "invalid time zone designator", curPos));
             tzID = "GMT";
         }

@@ -393,7 +393,7 @@ public class EpcisCaptureInterface extends HttpServlet {
             for (int i = 0; i < eventNode.getChildNodes().getLength(); i++) {
                 curEventNode = eventNode.getChildNodes().item(i);
                 String nodeName = curEventNode.getNodeName();
-                LOG.info("Handling XML tag: " + nodeName);
+                LOG.debug("Handling XML tag: " + nodeName);
 
                 if (nodeName.equals("eventTime")) {
                     String xmlTime = curEventNode.getTextContent();
