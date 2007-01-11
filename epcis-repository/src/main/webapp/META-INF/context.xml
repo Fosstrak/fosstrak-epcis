@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Context docBase="${catalina.home}/webapps/epcis-repository" path="/epcis-repository" reloadable="true">
-  <Environment name="InsertMissingVoc" value="true" type="java.lang.Boolean"/>
+
+  <Parameter name="insertMissingVoc" value="true"/>
+
+  <Parameter name="schemaPath" value="WEB-INF/classes/wsdl"/>
+  <Parameter name="schemaFile" value="EPCglobal-epcis-1_0.xsd"/>
+
+  <Parameter name="log4jConfigFile" value="META-INF/log4j.properties"/>
 
   <Resource
     name="jdbc/EPCISDB"

@@ -8,15 +8,8 @@
 
 
   <display-name>EPCIS Repository</display-name>
-  <description>
-    TODO description ...
-    Through the EPCIS Capture Interface an EPCIS Capture Client
-    may send HTTP POST requests in order to interact with the
-    EPCIS repository.
-  </description>
 
   <session-config>
-    <!-- Default to 5 minute session timeouts -->
     <session-timeout>5</session-timeout>
   </session-config>
 
@@ -50,7 +43,7 @@
   <servlet>
     <servlet-name>EpcisCaptureInterface</servlet-name>
     <description>
-      This servlet captures EPCIS events sent by HTTP POST requests. The POST
+      This servlet captures EPCIS events sent in HTTP POST requests. The POST
       parameter name is "event", the data is an XML representation of an
       ObjectEvent, AggregationEvent, QuantityEvent or TransactionEvent.
     </description>
@@ -60,7 +53,9 @@
 
   <!--
     the servlet will be available at the following URL:
-    http://localhost:8080/{context-path}/capture
+    http://{url:port}/{context-path}/capture
+    e.g.
+    http://localhost:8080/epcis-repository-0.2.0-SNAPSHOT/capture
   -->
   <servlet-mapping>
     <servlet-name>EpcisCaptureInterface</servlet-name>
@@ -68,59 +63,8 @@
   </servlet-mapping>
 
 
-
   <!-- ====================================================================== -->
-  <!--                     EPCIS Query Interface                              -->
-  <!-- ====================================================================== -->
-
-  <servlet>
-    <servlet-name>EpcisQueryInterface</servlet-name>
-    <description>
-      This servlet listens for EPCIS queries sent by HTTP POST requests. The
-      request must contain a valid SOAP message with the query beeing in the
-      SOAP body.
-    </description>
-    <servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
-  </servlet>
-
-
-  <!--
-    the servlet will be available at the following URL:
-    http://localhost:8080/{context-path}/query
-  -->
-  <servlet-mapping>
-    <servlet-name>EpcisQueryInterface</servlet-name>
-    <url-pattern>/query/*</url-pattern>
-  </servlet-mapping>
-
-
-
-  <!-- ====================================================================== -->
-  <!--                     Initilization Servlet                              -->
-  <!-- ====================================================================== -->
-
-<!--
-  <servlet>
-    <servlet-name>InitServlet</servlet-name>
-    <description>
-      This servlet is used for initialization purposes.
-    </description>
-    <servlet-class>org.accada.epcis.repository.InitServlet</servlet-class>
-    <init-param>
-      <param-name>log4jConfigFile</param-name>
-      <param-value>META-INF/log4j.properties</param-value>
-    </init-param>
-    <init-param>
-      <param-name>propertiesFile</param-name>
-      <param-value>META-INF/application.properties</param-value>
-    </init-param>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
--->
-
-
-  <!-- ====================================================================== -->
-  <!--                     Axis Service                                       -->
+  <!--                     Axis Service (EPCIS Query Interface)               -->
   <!-- ====================================================================== -->
 
   <listener>
@@ -184,7 +128,6 @@
     <url-pattern>/servlet/AdminServlet</url-pattern>
   </servlet-mapping>
   -->
-
 
 
 </web-app>
