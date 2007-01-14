@@ -32,6 +32,8 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  * TestSuite for Errors. SE44 -SE74
  * 
+ * TODO !!!!!
+ * 
  * @author Andrea Grössbauer
  */
 public class ErrorMessagesTest extends TestCase {
@@ -62,24 +64,6 @@ public class ErrorMessagesTest extends TestCase {
     public void setUp() {
         PropertyConfigurator.configure("src/test/resources/conf/log4j.properties");
         queryClient = new QueryClientSoapImpl();
-    }
-
-    public void testSE45() throws Exception {
-        String[] names = {};
-        names = queryClient.queryNames();
-        if (names.length == 2) {
-            assertEquals(names[0], "SimpleEventQuery");
-            assertEquals(names[1], "MasterDataQuery");
-        } else {
-            fail("Two names as Result expected. Received : " + names.length);
-        }
-    }
-
-    public void testSE47() throws ImplementationException, ValidationException,
-            SecurityException, RemoteException, ServiceException {
-        String version = queryClient.queryStandardVersion();
-        LOG.info("Version received: " + version);
-        assertEquals(version, "1.0");
     }
 
     public void testSE49() throws ImplementationException,
@@ -129,11 +113,6 @@ public class ErrorMessagesTest extends TestCase {
             LOG.info("Severity value received:" + e.getSeverity().toString());
             assertEquals(e.getSeverity().toString(), "SEVERE");
         }
-    }
-
-    public void testSE67() throws Exception {
-        String version = queryClient.queryVendorVersion();
-        assertEquals(version, "http://www.accada.org/releases/0.2/");
     }
 
     public void testSE70() throws QueryTooComplexException,
