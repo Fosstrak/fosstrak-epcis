@@ -36,6 +36,8 @@ public abstract class QueryClientBase implements QueryClientInterface {
     private static final String PROPERTY_FILE = "/queryclient.properties";
 
     private static final String PROPERTY_QUERY_URL = "default.url";
+    
+    String queryUrl = null;
 
     /**
      * Holds the locator for the service.
@@ -58,7 +60,7 @@ public abstract class QueryClientBase implements QueryClientInterface {
         try {
             Properties props = new Properties();
             props.load(is);
-            String queryUrl = props.getProperty(PROPERTY_QUERY_URL);
+            queryUrl = props.getProperty(PROPERTY_QUERY_URL);
             service.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
         } catch (IOException e) {
             throw new RuntimeException("Unable to load properties from file "

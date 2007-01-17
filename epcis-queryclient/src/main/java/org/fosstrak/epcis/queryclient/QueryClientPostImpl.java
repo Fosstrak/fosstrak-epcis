@@ -1,7 +1,6 @@
 package org.accada.epcis.queryclient;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +9,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.Properties;
 
 import javax.xml.rpc.ServiceException;
 
@@ -28,66 +26,35 @@ import org.apache.log4j.Logger;
 
 /**
  * This client provides access to the EPCIS Capture Interface.
- *
+ * 
  * @author Marco Steybe
  */
 public class QueryClientPostImpl extends QueryClientBase {
 
-    private static final Logger LOG =
-            Logger.getLogger(QueryClientPostImpl.class);
-
-    private static final String PROPERTY_FILE =
-            "src/main/resources/application.properties";
-
-    private static final String PROPERTY_QUERY_URL = "default.url.query";
-
-    private Properties props = new Properties();
-
-    private String url = null;
+    private static final Logger LOG = Logger.getLogger(QueryClientPostImpl.class);
 
     /**
-     * Constructs a new QueryInterfaceClient which connects to the EPCIS query
-     * interface listening at the default URL.
+     * Constructs a new QueryClientSoapImpl.
      */
     public QueryClientPostImpl() {
         super();
-        init();
-        url = props.getProperty(PROPERTY_QUERY_URL);
-        setAddress(url);
     }
 
     /**
-     * Constructs a new QueryInterfaceClient which connects to the EPCIS query
-     * interface listening at the given URL.
+     * Constructs a new QueryClientPostImpl.
+     * 
+     * @param address
+     *            The address at which the query service listens.
      */
-    public QueryClientPostImpl(String url) {
-        super(url);
-        this.url = url;
-        init();
-    }
-
-    /**
-     * Reads the property file.
-     */
-    private void init() {
-        File f = null;
-        try {
-            f = new File(PROPERTY_FILE);
-            props.load(new FileInputStream(f));
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load properties from file "
-                    + f.getAbsolutePath(), e);
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Reading property file from " + f.getAbsolutePath());
-        }
+    public QueryClientPostImpl(final String address) {
+        super(address);
     }
 
     /**
      * Sends an EPCIS query to the EPCIS Query Interface using an HTTP POST
      * request. The query will be wrapped into a SOAP message; the response will
      * be unwrapped from the SOAP response message.
-     *
+     * 
      * @param queryXml
      *            The XML containing the query.
      * @return The response XML from the EPCIS Query Interface
@@ -128,7 +95,13 @@ public class QueryClientPostImpl extends QueryClientBase {
     /**
      * @see org.accada.epcis.queryclient.QueryClientInterface#subscribeQuery(java.io.InputStream)
      */
-    public void subscribeQuery(InputStream xmlQuery) throws ServiceException, QueryTooComplexException, ImplementationException, InvalidURIException, SubscribeNotPermittedException, SubscriptionControlsException, QueryParameterException, ValidationException, SecurityException, DuplicateSubscriptionException, NoSuchNameException, RemoteException, IOException {
+    public void subscribeQuery(InputStream xmlQuery) throws ServiceException,
+            QueryTooComplexException, ImplementationException,
+            InvalidURIException, SubscribeNotPermittedException,
+            SubscriptionControlsException, QueryParameterException,
+            ValidationException, SecurityException,
+            DuplicateSubscriptionException, NoSuchNameException,
+            RemoteException, IOException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("not yet implemented");
     }
@@ -137,11 +110,9 @@ public class QueryClientPostImpl extends QueryClientBase {
         StringBuffer soap = new StringBuffer();
         soap.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         soap.append("<soapenv:Envelope ");
-        soap
-            .append("xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ");
+        soap.append("xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ");
         soap.append("xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" ");
-        soap
-            .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
+        soap.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
         soap.append("<soapenv:Body>");
         soap.append(queryXml);
         soap.append("</soapenv:Body>\n");
@@ -150,8 +121,8 @@ public class QueryClientPostImpl extends QueryClientBase {
     }
 
     private String unwrapFromSoap(String soapResp) {
-        int beginIndex =
-                soapResp.indexOf("<soapenv:Body>") + "<soapenv:Body>".length();
+        int beginIndex = soapResp.indexOf("<soapenv:Body>")
+                + "<soapenv:Body>".length();
         int endIndex = soapResp.lastIndexOf("</soapenv:Body>");
         return soapResp.substring(beginIndex, endIndex);
     }
@@ -159,12 +130,11 @@ public class QueryClientPostImpl extends QueryClientBase {
     private String postData(byte[] data) throws IOException {
         String response;
 
-        // the url where the capture interface listens
-        URL serviceUrl = new URL(url);
+        // the url where the query interface listens
+        URL serviceUrl = new URL(queryUrl);
 
         // open an http connection
-        HttpURLConnection connection =
-                (HttpURLConnection) serviceUrl.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
 
         // post the data
         connection.setDoOutput(true);
@@ -176,9 +146,8 @@ public class QueryClientPostImpl extends QueryClientBase {
 
         // check for http error
         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            response =
-                    "Error " + connection.getResponseCode() + " "
-                            + connection.getResponseMessage() + ": ";
+            response = "Error " + connection.getResponseCode() + " "
+                    + connection.getResponseMessage() + ": ";
         } else {
             response = "200 OK: ";
         }
@@ -200,12 +169,13 @@ public class QueryClientPostImpl extends QueryClientBase {
 
     /**
      * Only for testing purposes!
-     *
+     * 
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        QueryClientPostImpl client = new QueryClientPostImpl("http://localhost:8080/epcis-repository/query/EPCglobalEPCISService");
+        QueryClientPostImpl client = new QueryClientPostImpl(
+                "http://localhost:8080/epcis-repository/services/EPCglobalEPCISService");
         String query = "JUDIHUI";
         System.out.println("query to be sent:");
         System.out.println(query);
@@ -221,8 +191,18 @@ public class QueryClientPostImpl extends QueryClientBase {
         System.out.println(soapResp);
 
         // testing the actual query service
-        FileInputStream fis = new FileInputStream("test/data/queries/webservice/requests/Test-EPCIS10-SE10-Request-1-poll_mod.xml");
-        //String queryXml = "<Poll xmlns=\"urn:epcglobal:epcis-query:xsd:1\"><queryName xmlns=\"\">SimpleEventQuery</queryName><params xmlns=\"\"><param><name>eventType</name><value xsi:type=\"ns1:ArrayOfString\" xmlns:ns1=\"urn:epcglobal:epcis-query:xsd:1\"><string>AggregationEvent</string></value></param><param><name>EQ_action</name><value xsi:type=\"ns2:ArrayOfString\" xmlns:ns2=\"urn:epcglobal:epcis-query:xsd:1\"><string>ADD</string></value></param><param><name>MATCH_parentID</name><value xsi:type=\"ns3:ArrayOfString\" xmlns:ns3=\"urn:epcglobal:epcis-query:xsd:1\"><string>urn:x:bar:5:036544:007325</string></value></param></params></Poll>";
+        FileInputStream fis = new FileInputStream(
+                "test/data/queries/webservice/requests/Test-EPCIS10-SE10-Request-1-poll_mod.xml");
+        // String queryXml = "<Poll
+        // xmlns=\"urn:epcglobal:epcis-query:xsd:1\"><queryName
+        // xmlns=\"\">SimpleEventQuery</queryName><params
+        // xmlns=\"\"><param><name>eventType</name><value
+        // xsi:type=\"ns1:ArrayOfString\"
+        // xmlns:ns1=\"urn:epcglobal:epcis-query:xsd:1\"><string>AggregationEvent</string></value></param><param><name>EQ_action</name><value
+        // xsi:type=\"ns2:ArrayOfString\"
+        // xmlns:ns2=\"urn:epcglobal:epcis-query:xsd:1\"><string>ADD</string></value></param><param><name>MATCH_parentID</name><value
+        // xsi:type=\"ns3:ArrayOfString\"
+        // xmlns:ns3=\"urn:epcglobal:epcis-query:xsd:1\"><string>urn:x:bar:5:036544:007325</string></value></param></params></Poll>";
         String resp = client.runQuery(fis);
         System.out.println(resp);
     }
