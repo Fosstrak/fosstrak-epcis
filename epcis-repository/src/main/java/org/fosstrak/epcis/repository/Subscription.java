@@ -145,14 +145,28 @@ public class Subscription implements Serializable {
 
             queryResults = epcisQueryService.poll(pollParams);
             EventListType qEvList = queryResults.getResultsBody().getEventList();
+            
+            int numOfAggrEv = qEvList.getAggregationEvent().length;
+            int numOfObjectEv = qEvList.getObjectEvent().length;
+            int numOfQuantityEv = qEvList.getQuantityEvent().length;
+            int numOfTransEv = qEvList.getTransactionEvent().length;
+            
             if (!reportIfEmpty
-                    && (null == qEvList || qEvList.getAggregationEvent().length == 0)
-                    && (null == qEvList || qEvList.getObjectEvent().length == 0)
-                    && (null == qEvList || qEvList.getQuantityEvent().length == 0)
-                    && (null == qEvList || qEvList.getTransactionEvent().length == 0)) {
+                    && (null == qEvList || numOfAggrEv == 0)
+                    && (null == qEvList || numOfObjectEv == 0)
+                    && (null == qEvList || numOfQuantityEv == 0)
+                    && (null == qEvList || numOfTransEv == 0)) {
                 System.out.println("No results. Not sending anything.");
                 return;
-            }
+                
+            } 
+//			TODO queryTooLargeException            
+//                else if (!reportIfEmpty
+//            		&& ! (null == qEvList) && ()) 
+//            	{
+//            	
+//            }
+            
 
             javax.xml.namespace.QName queryDocXMLType = EPCISQueryDocumentType.getTypeDesc().getXmlType();
 
