@@ -42,7 +42,7 @@ public class ErrorMessagesTest extends TestCase {
     }
 
     /**
-     * Tests if QueryTooComplexException is raised.
+     * Tests if QueryTooComplexException is raised. 
      * 
      * @throws RemoteException
      *             If an Axis error occured.
@@ -133,9 +133,8 @@ public class ErrorMessagesTest extends TestCase {
             client.unsubscribeQuery("QuerySE52"); // clean up
             fail("InvalidURIException expected");
         } catch (InvalidURIException e) {
-            // ok
             fis.close();
-            client.unsubscribeQuery("QuerySE52"); // clean up
+            assertEquals(e.getReason(),"unknown protocol: htto");
         }
     }
 
@@ -167,9 +166,10 @@ public class ErrorMessagesTest extends TestCase {
             client.unsubscribeQuery("QuerySE53"); // clean up
             fail("DuplicateSubscriptionException expected");
         } catch (DuplicateSubscriptionException e) {
-            // ok
+            assertEquals(e.getReason(),"QuerySE53 already exists. Choose a different subscriptionID.");
             fis.close();
             client.unsubscribeQuery("QuerySE53"); // clean up
+            
         }
     }
 
@@ -198,7 +198,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (NoSuchSubscriptionException e) {
             // ok
-            client.unsubscribeQuery("QuerySE54-1"); // clean up
+        	client.unsubscribeQuery("QuerySE54-1");
+            assertEquals(e.getReason(), "There is no subscription with ID 'QuerySE54-2'");
         }
     }
 
@@ -225,10 +226,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value for 'second' is out of range in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE55"); // clean up
         }
     }
 
@@ -255,10 +254,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value for 'second' is out of range in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE56"); // clean up
         }
     }
 
@@ -280,14 +277,12 @@ public class ErrorMessagesTest extends TestCase {
             client.subscribeQuery(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE575"); // clean up
+            client.unsubscribeQuery("QuerySE57"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value 'a' for parameter 'second' is invalid in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE57"); // clean up
         }
     }
 
@@ -314,10 +309,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value for 'DayOfWeek' is out of range in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE58"); // clean up
         }
     }
 
@@ -344,10 +337,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value 'x' for parameter 'DayOfWeek' is invalid in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE59"); // clean up
         }
     }
 
@@ -374,10 +365,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value for 'minute' is out of range in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE60"); // clean up
         }
     }
 
@@ -404,10 +393,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value for 'minute' is out of range in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE61"); // clean up
         }
     }
 
@@ -433,10 +420,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value 'a' for parameter 'minute' is invalid in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE62"); // clean up
         }
     }
 
@@ -463,10 +448,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value for 'hour' is out of range in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE63"); // clean up
         }
     }
 
@@ -493,10 +476,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value for 'hour' is out of range in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE64"); // clean up
         }
     }
 
@@ -523,10 +504,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-            System.out.println("TODO: check for correct error msg: '"
-                    + e.getReason() + "'");
+        	assertEquals(e.getReason(), "The value 'a' for parameter 'hour' is invalid in the query schedule.");
             fis.close();
-            client.unsubscribeQuery("QuerySE65"); // clean up
         }
     }
 
@@ -540,20 +519,19 @@ public class ErrorMessagesTest extends TestCase {
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE68() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE68() throws RemoteException, ServiceException, IOException {
         // subscribe query
         final String query = "Test-EPCIS10-SE68-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
+        client.subscribeQuery(fis);
         fis.close();
-
+        
         // wait for response (1 min)
-        String resp = subscription.waitForNotification(60 * 1000 + 1);
-        assertNotNull(resp);
-        System.out.println("TODO: check response: should contain QueryTooLargeException: ");
-        System.out.println(resp);
-
+        String resp = subscription.waitForNotification(120 * 1000 + 1);
         client.unsubscribeQuery("QuerySE68"); // clean up
+        System.out.println("TODO SE68: check response: should contain QueryTooLargeException: ");
+        System.out.println(resp);
+        assertNotNull(resp);
     }
 
     /**
@@ -571,15 +549,19 @@ public class ErrorMessagesTest extends TestCase {
         // subscribe query
         final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
+        
+        client.subscribeQuery(fis);   
         fis.close();
 
         // wait for response (1 min)
-        String resp = subscription.waitForNotification(60 * 1000 + 1);
-        assertNotNull(resp);
-        System.out.println("TODO: check response: should contain ImplementationException: ");
+        String resp = subscription.waitForNotification(60 * 1000 + 2);
+        client.unsubscribeQuery("QuerySE69"); // clean up
+        System.out.println("TODO SE69: check response: should contain ImplementationException: ");
         System.out.println(resp);
 
-        client.unsubscribeQuery("QuerySE69"); // clean up
+        assertNotNull(resp);
+        
+        
     }
 
     /**
