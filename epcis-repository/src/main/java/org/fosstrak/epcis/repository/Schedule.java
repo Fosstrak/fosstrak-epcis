@@ -17,7 +17,9 @@ import static java.util.Calendar.SECOND;
 import static java.util.Calendar.YEAR;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -116,22 +118,22 @@ public class Schedule implements Serializable {
         String[] month = schedule.getMonth().split(",");
         String[] dayOfWeek = schedule.getDayOfWeek().split(",");
         // Check and parse numbers and ranges
-        Object[] sec = parseValuesAndRanges(second);
+        Object[] sec = parseValuesAndRanges(second,"second");
         addSecondValues((Integer[]) sec[0]);
         addSecondRanges((Integer[][]) sec[1]);
-        Object[] min = parseValuesAndRanges(minute);
+        Object[] min = parseValuesAndRanges(minute,"minute");
         addMinuteValues((Integer[]) min[0]);
         addMinuteRanges((Integer[][]) min[1]);
-        Object[] h = parseValuesAndRanges(hour);
+        Object[] h = parseValuesAndRanges(hour,"hour");
         addHourValues((Integer[]) h[0]);
         addHourRanges((Integer[][]) h[1]);
-        Object[] daysM = parseValuesAndRanges(dayOfMonth);
+        Object[] daysM = parseValuesAndRanges(dayOfMonth,"DayOfMonth");
         addDayOfMonthValues((Integer[]) daysM[0]);
         addDayOfMonthRanges((Integer[][]) daysM[1]);
-        Object[] mon = parseValuesAndRanges(month);
+        Object[] mon = parseValuesAndRanges(month,"month");
         addMonthValues((Integer[]) mon[0]);
         addMonthRanges((Integer[][]) mon[1]);
-        Object[] daysW = parseValuesAndRanges(dayOfWeek);
+        Object[] daysW = parseValuesAndRanges(dayOfWeek,"DayOfWeek");
         addDayOfWeekValues((Integer[]) daysW[0]);
         addDayOfWeekRanges((Integer[][]) daysW[1]);
 
@@ -552,10 +554,10 @@ public class Schedule implements Serializable {
      *         the number values and the second element is an array of arrays
      *         which denote the ranges.
      */
-    private Object[] parseValuesAndRanges(final String[] values)
+    private Object[] parseValuesAndRanges(final String[] values, final String parameter)
             throws SubscriptionControlsException {
-        Vector<Integer> nums = new Vector<Integer>();
-        Vector<Integer[]> ranges = new Vector<Integer[]>();
+        List<Integer> nums = new ArrayList<Integer>();
+        List<Integer[]> ranges = new ArrayList<Integer[]>();
         for (String v : values) {
             try {
                 if (v.startsWith("[")) {
@@ -570,12 +572,10 @@ public class Schedule implements Serializable {
                 }
             } catch (IndexOutOfBoundsException aie) {
                 throw new SubscriptionControlsException(
-                        "Parse error on number or range in: " + v + "\n"
-                                + aie.getMessage());
+                        "The value '"+ v +"' for parameter '" + parameter +"' is invalid in the query schedule \n");
             } catch (NumberFormatException ne) {
                 throw new SubscriptionControlsException(
-                        "Parse error on number or range in: " + v + "\n"
-                                + ne.getMessage());
+                        "The value '"+ v +"' for parameter '" + parameter +"' is invalid in the query schedule \n");
             }
         }
         return new Object[] {
@@ -598,11 +598,11 @@ public class Schedule implements Serializable {
      *             If illegal range encountered.
      */
     private void checkRanges(final Integer[][] rangesArray, final int min,
-            final int max) throws SubscriptionControlsException {
+            final int max, final String parameter) throws SubscriptionControlsException {
         for (Integer[] r : rangesArray) {
             if (r[0] < min || r[1] > max || r[0] > r[1]) {
                 throw new SubscriptionControlsException(
-                        "Illegal range encountered.");
+                        "The value for '"+parameter+"' is out of range in the query schedule.");
             }
         }
     }
@@ -620,11 +620,11 @@ public class Schedule implements Serializable {
      *             If illegal range encountered.
      */
     private void checkNums(final Integer[] numsArray, final int min,
-            final int max) throws SubscriptionControlsException {
+            final int max, final String parameter) throws SubscriptionControlsException {
         for (Integer n : numsArray) {
             if (n < min || n > max) {
                 throw new SubscriptionControlsException(
-                        "Illegal number encountered.");
+                        "The value for '"+parameter+"' is out of range in the query schedule.");
             }
         }
     }
@@ -671,7 +671,7 @@ public class Schedule implements Serializable {
      */
     public void addDayOfMonthRanges(final Integer[][] dayOfMonthRanges)
             throws SubscriptionControlsException {
-        checkRanges(dayOfMonthRanges, 1, 31);
+        checkRanges(dayOfMonthRanges, 1, 31, "DayOfMonth");
         addRangesToTreeSets(dayOfMonthRanges, daysOfMonth);
     }
 
@@ -685,7 +685,7 @@ public class Schedule implements Serializable {
      */
     public void addDayOfMonthValues(final Integer[] dayOfMonthValues)
             throws SubscriptionControlsException {
-        checkNums(dayOfMonthValues, 1, 31);
+        checkNums(dayOfMonthValues, 1, 31,"DayOfMonth");
         addValuesToTreeSets(dayOfMonthValues, daysOfMonth);
     }
 
@@ -699,7 +699,7 @@ public class Schedule implements Serializable {
      */
     public void addDayOfWeekRanges(final Integer[][] dayOfWeekRanges)
             throws SubscriptionControlsException {
-        checkRanges(dayOfWeekRanges, 1, 7);
+        checkRanges(dayOfWeekRanges, 1, 7, "DayOfWeek");
         // Weekdays start one earlier in Java.
         TreeSet<Integer> temp = new TreeSet<Integer>();
         addRangesToTreeSets(dayOfWeekRanges, temp);
@@ -718,7 +718,7 @@ public class Schedule implements Serializable {
      */
     public void addDayOfWeekValues(final Integer[] dayOfWeekValues)
             throws SubscriptionControlsException {
-        checkNums(dayOfWeekValues, 1, 7);
+        checkNums(dayOfWeekValues, 1, 7,"DayOfWeek");
         // Weekdays start one earlier in Java.
         TreeSet<Integer> temp = new TreeSet<Integer>();
         addValuesToTreeSets(dayOfWeekValues, temp);
@@ -737,7 +737,7 @@ public class Schedule implements Serializable {
      */
     public void addHourRanges(final Integer[][] hourRanges)
             throws SubscriptionControlsException {
-        checkRanges(hourRanges, 0, 23);
+        checkRanges(hourRanges, 0, 23,"hour");
         addRangesToTreeSets(hourRanges, hours);
     }
 
@@ -751,7 +751,7 @@ public class Schedule implements Serializable {
      */
     public void addHourValues(final Integer[] hourValues)
             throws SubscriptionControlsException {
-        checkNums(hourValues, 0, 23);
+        checkNums(hourValues, 0, 23,"hour");
         addValuesToTreeSets(hourValues, hours);
     }
 
@@ -765,7 +765,7 @@ public class Schedule implements Serializable {
      */
     public void addMinuteRanges(final Integer[][] minuteRanges)
             throws SubscriptionControlsException {
-        checkRanges(minuteRanges, 0, 59);
+        checkRanges(minuteRanges, 0, 59, "minute");
         addRangesToTreeSets(minuteRanges, minutes);
     }
 
@@ -779,7 +779,7 @@ public class Schedule implements Serializable {
      */
     public void addMinuteValues(final Integer[] minuteValues)
             throws SubscriptionControlsException {
-        checkNums(minuteValues, 0, 59);
+        checkNums(minuteValues, 0, 59, "minute");
         addValuesToTreeSets(minuteValues, minutes);
     }
 
@@ -793,7 +793,7 @@ public class Schedule implements Serializable {
      */
     public void addMonthRanges(final Integer[][] monthRanges)
             throws SubscriptionControlsException {
-        checkRanges(monthRanges, 1, 12);
+        checkRanges(monthRanges, 1, 12,"month");
         // Months start with 0 in Java.
         TreeSet<Integer> temp = new TreeSet<Integer>();
         addRangesToTreeSets(monthRanges, temp);
@@ -812,7 +812,7 @@ public class Schedule implements Serializable {
      */
     public void addMonthValues(final Integer[] monthValues)
             throws SubscriptionControlsException {
-        checkNums(monthValues, 1, 12);
+        checkNums(monthValues, 1, 12, "month");
         // Months start with 0 in Java.
         TreeSet<Integer> temp = new TreeSet<Integer>();
         addValuesToTreeSets(monthValues, temp);
@@ -831,7 +831,7 @@ public class Schedule implements Serializable {
      */
     public void addSecondRanges(final Integer[][] secondRanges)
             throws SubscriptionControlsException {
-        checkRanges(secondRanges, 0, 59);
+        checkRanges(secondRanges, 0, 59,"second");
         addRangesToTreeSets(secondRanges, seconds);
     }
 
@@ -845,7 +845,7 @@ public class Schedule implements Serializable {
      */
     public void addSecondValues(final Integer[] secondValues)
             throws SubscriptionControlsException {
-        checkNums(secondValues, 0, 59);
+        checkNums(secondValues, 0, 59, "second");
         addValuesToTreeSets(secondValues, seconds);
     }
 
