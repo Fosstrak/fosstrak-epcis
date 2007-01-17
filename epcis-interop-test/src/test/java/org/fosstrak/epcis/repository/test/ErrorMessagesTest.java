@@ -11,373 +11,658 @@ import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryClientInterface;
 import org.accada.epcis.queryclient.QueryClientSoapImpl;
-import org.accada.epcis.soapapi.AggregationEventType;
-import org.accada.epcis.soapapi.BusinessTransactionType;
-import org.accada.epcis.soapapi.EPC;
-import org.accada.epcis.soapapi.EventListType;
+import org.accada.epcis.soapapi.DuplicateSubscriptionException;
 import org.accada.epcis.soapapi.ImplementationException;
-import org.accada.epcis.soapapi.NoSuchNameException;
-import org.accada.epcis.soapapi.ObjectEventType;
-import org.accada.epcis.soapapi.QuantityEventType;
+import org.accada.epcis.soapapi.InvalidURIException;
+import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.QueryParameterException;
-import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooComplexException;
 import org.accada.epcis.soapapi.QueryTooLargeException;
-import org.accada.epcis.soapapi.SecurityException;
-import org.accada.epcis.soapapi.TransactionEventType;
-import org.accada.epcis.soapapi.ValidationException;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.accada.epcis.soapapi.SubscriptionControlsException;
 
 /**
- * TestSuite for Errors. SE44 -SE74
- * 
- * TODO !!!!!
+ * Tests for exceptions and error messages (SE49-SE65, SE68-SE72, SE74)
  * 
  * @author Andrea Grössbauer
+ * @author Marco Steybe
  */
 public class ErrorMessagesTest extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(ErrorMessagesTest.class);
+    private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    QueryClientInterface queryClient;
-
-    static String pathToQueries = "src/test/resources/queries/webservice/requests/";
-    static String queryPrefix = "Test-EPCIS10-SE";
-    static String querySuffix = "-Request-1-poll.xml";
-
-    static String requ1 = "-Request-1-";
-    static String requ2 = "-Request-2-";
-
-    static String querySuffixSubsc = "Subscribe.xml";
-    static String querySuffixUnsubscr = "Unsubscribe.xml";
-    static String pathToResp = "src/test/resources/queries/webservice/responses/";
-    static String respPrefix = "Test-EPCIS10-SE";
-    static String respSuffix = "-Response-1-poll.xml";
-
-    static int startIndex = 44;
-    static int endIndex = 74;
+    private QueryClientInterface client;
+    private SubscriptionNotification subscription;
 
     /**
      * @see junit.framework.TestCase#setUp()
      */
     public void setUp() {
-        PropertyConfigurator.configure("src/test/resources/conf/log4j.properties");
-        queryClient = new QueryClientSoapImpl();
+        client = new QueryClientSoapImpl();
+        subscription = new SubscriptionNotification();
     }
 
-    public void testSE49() throws ImplementationException,
-            QueryTooLargeException, QueryParameterException,
-            ValidationException, SecurityException, NoSuchNameException,
-            RemoteException, ServiceException, IOException {
-        int testNr = 16;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+    /**
+     * Tests if QueryTooComplexException is raised.
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE49() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE49-Request-1-Poll.xml";
+        InputStream fis = new FileInputStream(PATH + query);
         try {
-            InputStream fis = new FileInputStream(query);
-            queryClient.runQuery(fis);
+            client.runQuery(fis);
+            fis.close();
             fail("QueryTooComplexException expected");
         } catch (QueryTooComplexException e) {
-            LOG.info("Test49 succeeded");
+            // ok
+            fis.close();
         }
     }
 
-    public void testSE50() throws QueryTooComplexException,
-            ImplementationException, QueryParameterException,
-            ValidationException, SecurityException, NoSuchNameException,
-            RemoteException, ServiceException, IOException {
-        int testNr = 50;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+    /**
+     * Tests if QueryTooLargeException is raised.
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE50() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE50-Request-1-Poll.xml";
+        InputStream fis = new FileInputStream(PATH + query);
         try {
-            InputStream fis = new FileInputStream(query);
-            queryClient.runQuery(fis);
+            client.runQuery(fis);
+            fis.close();
             fail("QueryTooLargeException expected");
         } catch (QueryTooLargeException e) {
-            LOG.info("Test50 succeeded");
+            // ok
+            fis.close();
         }
     }
 
-    public void testSE51() throws QueryTooComplexException,
-            QueryTooLargeException, QueryParameterException,
-            ValidationException, SecurityException, NoSuchNameException,
-            RemoteException, ServiceException, IOException {
-        int testNr = 51;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+    /**
+     * Tests if ImplementationException is raised.
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE51() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE51-Request-1-Poll.xml";
+        InputStream fis = new FileInputStream(PATH + query);
         try {
-            InputStream fis = new FileInputStream(query);
-            queryClient.runQuery(fis);
+            client.runQuery(fis);
+            fis.close();
             fail("ImplementationException expected");
         } catch (ImplementationException e) {
-            LOG.info("Severity value received:" + e.getSeverity().toString());
-            assertEquals(e.getSeverity().toString(), "SEVERE");
+            // ok
+            fis.close();
         }
     }
 
-    public void testSE70() throws QueryTooComplexException,
-            ImplementationException, QueryTooLargeException,
-            ValidationException, SecurityException, NoSuchNameException,
-            RemoteException, ServiceException, IOException {
-        int testNr = 70;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+    /**
+     * Tests if InvalidURIException is raised.
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE52() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE52-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
         try {
-            InputStream fis = new FileInputStream(query);
-            queryClient.runQuery(fis);
-            fail("QueryParameterException expected");
-        } catch (QueryParameterException e) {
-            LOG.info("Test70 succeeded");
+            client.subscribeQuery(fis);
+            fis.close();
+            client.unsubscribeQuery("QuerySE52"); // clean up
+            fail("InvalidURIException expected");
+        } catch (InvalidURIException e) {
+            // ok
+            fis.close();
+            client.unsubscribeQuery("QuerySE52"); // clean up
         }
     }
 
-    public void testSE71() throws QueryTooComplexException,
-            ImplementationException, QueryTooLargeException,
-            ValidationException, SecurityException, NoSuchNameException,
-            RemoteException, ServiceException, IOException {
-        int testNr = 71;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        try {
-            InputStream fis = new FileInputStream(query);
-            queryClient.runQuery(fis);
-            fail("QueryParameterException expected");
-        } catch (QueryParameterException e) {
-            LOG.info("Test71 succeeded");
-        }
-    }
-
-    public void testSE72() throws QueryTooComplexException,
-            ImplementationException, QueryTooLargeException,
-            ValidationException, SecurityException, NoSuchNameException,
-            RemoteException, ServiceException, IOException {
-        int testNr = 72;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        try {
-            InputStream fis = new FileInputStream(query);
-            queryClient.runQuery(fis);
-            fail("QueryParameterException expected");
-        } catch (QueryParameterException e) {
-            LOG.info("Test72 succeeded");
-        }
-    }
-
-    public void testSE73() throws Exception {
-        int testNr = 73;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) queryClient.runQuery(fis);
+    /**
+     * Tests if DuplicateSubscriptionException is raised.
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE53() throws RemoteException, ServiceException,
+            IOException {
+        // subscribe first query
+        final String query = "Test-EPCIS10-SE53-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        client.subscribeQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) queryClient).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
+        // subscribe second query
+        final String query2 = "Test-EPCIS10-SE53-Request-2-Subscribe.xml";
+        fis = new FileInputStream(PATH + query2);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE53"); // clean up
+            fail("DuplicateSubscriptionException expected");
+        } catch (DuplicateSubscriptionException e) {
+            // ok
+            fis.close();
+            client.unsubscribeQuery("QuerySE53"); // clean up
+        }
     }
 
-    private void compareResults(QueryResults expResults, QueryResults actResults) {
-        assertEquals(expResults.get_any(), actResults.get_any());
-        assertEquals(expResults.getExtension(), actResults.getExtension());
-        assertEquals(expResults.getQueryName(), actResults.getQueryName());
-        assertEquals(expResults.getSubscriptionID(),
-                actResults.getSubscriptionID());
+    /**
+     * Tests if NoSuchSubscriptionException is raised.
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE54() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE54-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        client.subscribeQuery(fis);
+        fis.close();
 
-        EventListType actEvents = actResults.getResultsBody().getEventList();
-        EventListType expEvents = expResults.getResultsBody().getEventList();
-
-        // compare ObjectEvent
-        ObjectEventType[] actObjectEvent = actEvents.getObjectEvent();
-        ObjectEventType[] expObjectEvent = expEvents.getObjectEvent();
-
-        assertEquals(expObjectEvent == null, actObjectEvent == null);
-        if (actObjectEvent != null) {
-            assertEquals(expObjectEvent.length, actObjectEvent.length);
-            for (int i = 0; i < actObjectEvent.length; i++) {
-                assertEquals(expObjectEvent[i].get_any(),
-                        actObjectEvent[i].get_any());
-                assertEquals(expObjectEvent[i].getAction(),
-                        actObjectEvent[i].getAction());
-                assertEquals(expObjectEvent[i].getBaseExtension(),
-                        actObjectEvent[i].getBaseExtension());
-                assertEquals(expObjectEvent[i].getBizLocation(),
-                        actObjectEvent[i].getBizLocation());
-                assertEquals(expObjectEvent[i].getBizStep(),
-                        actObjectEvent[i].getBizStep());
-                assertEquals(expObjectEvent[i].getDisposition(),
-                        actObjectEvent[i].getDisposition());
-                assertEquals(expObjectEvent[i].getEventTime().compareTo(
-                        actObjectEvent[i].getEventTime()), 0);
-                assertEquals(expObjectEvent[i].getExtension(),
-                        actObjectEvent[i].getExtension());
-                assertEquals(expObjectEvent[i].getReadPoint(),
-                        actObjectEvent[i].getReadPoint());
-                // assertEquals(expObjectEvent[i].getRecordTime(),
-                // actObjectEvent[i].getRecordTime());
-
-                EPC[] actEpcs = actObjectEvent[i].getEpcList();
-                EPC[] expEpcs = expObjectEvent[i].getEpcList();
-                assertEquals(expEpcs.length, actEpcs.length);
-                for (int j = 0; j < actEpcs.length; j++) {
-                    assertEquals(expEpcs[j].get_value(), actEpcs[j].get_value());
-                }
-
-                BusinessTransactionType[] actBizTrans = actObjectEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans = expObjectEvent[i].getBizTransactionList();
-                assertEquals(expBizTrans.length, actBizTrans.length);
-                for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
-                    // assertEquals(expBizTrans[j].getValue(),
-                    // actBizTrans[j].getValue());
-                }
-            }
+        // try to unsubscribe a non existing query
+        try {
+            client.unsubscribeQuery("QuerySE54-2");
+            // fail
+            client.unsubscribeQuery("QuerySE54-1"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (NoSuchSubscriptionException e) {
+            // ok
+            client.unsubscribeQuery("QuerySE54-1"); // clean up
         }
+    }
 
-        // compare AggregationEvent
-        AggregationEventType[] actAggrEvent = actEvents.getAggregationEvent();
-        AggregationEventType[] expAggrEvent = expEvents.getAggregationEvent();
-
-        assertEquals(expAggrEvent == null, actAggrEvent == null);
-        if (actAggrEvent != null) {
-            assertEquals(expAggrEvent.length, actAggrEvent.length);
-            for (int i = 0; i < actAggrEvent.length; i++) {
-                assertEquals(expAggrEvent[i].get_any(),
-                        actAggrEvent[i].get_any());
-                assertEquals(expAggrEvent[i].getAction(),
-                        actAggrEvent[i].getAction());
-                assertEquals(expAggrEvent[i].getBaseExtension(),
-                        actAggrEvent[i].getBaseExtension());
-                assertEquals(expAggrEvent[i].getBizLocation(),
-                        actAggrEvent[i].getBizLocation());
-                assertEquals(expAggrEvent[i].getBizStep(),
-                        actAggrEvent[i].getBizStep());
-                assertEquals(expAggrEvent[i].getDisposition(),
-                        actAggrEvent[i].getDisposition());
-                assertEquals(expAggrEvent[i].getEventTime().compareTo(
-                        actAggrEvent[i].getEventTime()), 0);
-                assertEquals(expAggrEvent[i].getExtension(),
-                        actAggrEvent[i].getExtension());
-                assertEquals(expAggrEvent[i].getParentID(),
-                        actAggrEvent[i].getParentID());
-                assertEquals(expAggrEvent[i].getReadPoint(),
-                        actAggrEvent[i].getReadPoint());
-                // assertEquals(expObjectEvent[i].getRecordTime(),
-                // actObjectEvent[i].getRecordTime());
-
-                EPC[] actEpcs = actAggrEvent[i].getChildEPCs();
-                EPC[] expEpcs = expAggrEvent[i].getChildEPCs();
-                assertEquals(expEpcs.length, actEpcs.length);
-                for (int j = 0; j < actEpcs.length; j++) {
-                    assertEquals(expEpcs[j].get_value(), actEpcs[j].get_value());
-                }
-
-                BusinessTransactionType[] actBizTrans = actAggrEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans = expAggrEvent[i].getBizTransactionList();
-                assertEquals(actBizTrans.length, expBizTrans.length);
-                for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
-                    // assertEquals(expBizTrans[j].getValue(),
-                    // actBizTrans[j].getValue());
-                }
-            }
+    /**
+     * Tests if SubscriptionControlsException is raised (second value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE55() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE55-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE55"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE55"); // clean up
         }
+    }
 
-        // compare TransactionEvent
-        TransactionEventType[] actTransEvent = actEvents.getTransactionEvent();
-        TransactionEventType[] expTransEvent = expEvents.getTransactionEvent();
-
-        assertEquals(expTransEvent == null, actTransEvent == null);
-        if (actTransEvent != null) {
-            assertEquals(expTransEvent.length, actTransEvent.length);
-            for (int i = 0; i < actTransEvent.length; i++) {
-                assertEquals(expTransEvent[i].get_any(),
-                        actTransEvent[i].get_any());
-                assertEquals(expTransEvent[i].getAction(),
-                        actTransEvent[i].getAction());
-                assertEquals(expTransEvent[i].getBaseExtension(),
-                        actTransEvent[i].getBaseExtension());
-                assertEquals(expTransEvent[i].getBizLocation(),
-                        actTransEvent[i].getBizLocation());
-                assertEquals(expTransEvent[i].getBizStep(),
-                        actTransEvent[i].getBizStep());
-                assertEquals(expTransEvent[i].getDisposition(),
-                        actTransEvent[i].getDisposition());
-                assertEquals(expTransEvent[i].getEventTime().compareTo(
-                        actTransEvent[i].getEventTime()), 0);
-                assertEquals(expTransEvent[i].getExtension(),
-                        actTransEvent[i].getExtension());
-                assertEquals(expTransEvent[i].getParentID(),
-                        actTransEvent[i].getParentID());
-                assertEquals(expTransEvent[i].getReadPoint(),
-                        actTransEvent[i].getReadPoint());
-                // assertEquals(expTransEvent[i].getRecordTime(),
-                // actTransEvent[i].getRecordTime());
-
-                EPC[] actEpcs = actTransEvent[i].getEpcList();
-                EPC[] expEpcs = expTransEvent[i].getEpcList();
-                assertEquals(expEpcs.length, actEpcs.length);
-                for (int j = 0; j < actEpcs.length; j++) {
-                    assertEquals(expEpcs[j].get_value(), actEpcs[j].get_value());
-                }
-
-                BusinessTransactionType[] actBizTrans = actTransEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans = expTransEvent[i].getBizTransactionList();
-                assertEquals(actBizTrans.length, expBizTrans.length);
-                for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
-                    // assertEquals(expBizTrans[j].getValue(),
-                    // actBizTrans[j].getValue());
-                }
-            }
+    /**
+     * Tests if SubscriptionControlsException is raised (second value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE56() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE56-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE56"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE56"); // clean up
         }
+    }
 
-        // compare QuantityEvent
-        QuantityEventType[] actQuantEvent = actEvents.getQuantityEvent();
-        QuantityEventType[] expQuantEvent = expEvents.getQuantityEvent();
-
-        assertEquals(expQuantEvent == null, actQuantEvent == null);
-        if (actQuantEvent != null) {
-            assertEquals(expQuantEvent.length, actQuantEvent.length);
-            for (int i = 0; i < actQuantEvent.length; i++) {
-                assertEquals(expQuantEvent[i].get_any(),
-                        actQuantEvent[i].get_any());
-                assertEquals(expQuantEvent[i].getBaseExtension(),
-                        actQuantEvent[i].getBaseExtension());
-                assertEquals(expQuantEvent[i].getBizLocation(),
-                        actQuantEvent[i].getBizLocation());
-                assertEquals(expQuantEvent[i].getBizStep(),
-                        actQuantEvent[i].getBizStep());
-                assertEquals(expQuantEvent[i].getDisposition(),
-                        actQuantEvent[i].getDisposition());
-                assertEquals(expQuantEvent[i].getEventTime().compareTo(
-                        actQuantEvent[i].getEventTime()), 0);
-                assertEquals(expQuantEvent[i].getEpcClass(),
-                        actQuantEvent[i].getEpcClass());
-                assertEquals(expQuantEvent[i].getExtension(),
-                        actQuantEvent[i].getExtension());
-                assertEquals(expQuantEvent[i].getQuantity(),
-                        actQuantEvent[i].getQuantity());
-                assertEquals(expQuantEvent[i].getReadPoint(),
-                        actQuantEvent[i].getReadPoint());
-                // assertEquals(expQuantEvent[i].getRecordTime(),
-                // actQuantEvent[i].getRecordTime());
-
-                BusinessTransactionType[] actBizTrans = actQuantEvent[i].getBizTransactionList();
-                BusinessTransactionType[] expBizTrans = expQuantEvent[i].getBizTransactionList();
-                assertEquals(actBizTrans.length, expBizTrans.length);
-                for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
-                    // assertEquals(expBizTrans[j].getValue(),
-                    // actBizTrans[j].getValue());
-                }
-            }
+    /**
+     * Tests if SubscriptionControlsException is raised (second value invalid).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE57() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE57-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE575"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE57"); // clean up
         }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (dayOfWeek value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE58() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE58-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE58"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE58"); // clean up
+        }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (dayOfWeek value
+     * invalid).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE59() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE59-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE59"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE59"); // clean up
+        }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (minute value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE60() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE60-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE60"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE60"); // clean up
+        }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (minute value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE61() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE61-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE61"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE61"); // clean up
+        }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (minute value invalid).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE62() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE62-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE62"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE62"); // clean up
+        }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (hour value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE63() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE63-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE63"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE63"); // clean up
+        }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (hour value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE64() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE64-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE64"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE64"); // clean up
+        }
+    }
+
+    /**
+     * Tests if SubscriptionControlsException is raised (hour value out of
+     * range).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE65() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE65-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.subscribeQuery(fis);
+            // fail
+            fis.close();
+            client.unsubscribeQuery("QuerySE65"); // clean up
+            fail("NoSuchSubscriptionException expected");
+        } catch (SubscriptionControlsException e) {
+            // ok
+            System.out.println("TODO: check for correct error msg: '"
+                    + e.getReason() + "'");
+            fis.close();
+            client.unsubscribeQuery("QuerySE65"); // clean up
+        }
+    }
+
+    /**
+     * Tests if QueryTooLargeException is raised (callback).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE68() throws RemoteException, ServiceException,
+            IOException {
+        // subscribe query
+        final String query = "Test-EPCIS10-SE68-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        fis.close();
+
+        // wait for response (1 min)
+        String resp = subscription.waitForNotification(60 * 1000 + 1);
+        assertNotNull(resp);
+        System.out.println("TODO: check response: should contain QueryTooLargeException: ");
+        System.out.println(resp);
+
+        client.unsubscribeQuery("QuerySE68"); // clean up
+    }
+
+    /**
+     * Tests if ImplementationException is raised (callback).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE69() throws RemoteException, ServiceException,
+            IOException {
+        // subscribe query
+        final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        fis.close();
+
+        // wait for response (1 min)
+        String resp = subscription.waitForNotification(60 * 1000 + 1);
+        assertNotNull(resp);
+        System.out.println("TODO: check response: should contain ImplementationException: ");
+        System.out.println(resp);
+
+        client.unsubscribeQuery("QuerySE69"); // clean up
+    }
+
+    /**
+     * Tests if QueryParameterException is raised (parameter name not defined).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE70() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE70-Request-1-Poll.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.runQuery(fis);
+            // fail
+            fis.close();
+            fail("QueryParameterException expected");
+        } catch (QueryParameterException e) {
+            // ok
+            fis.close();
+        }
+    }
+
+    /**
+     * Tests if QueryParameterException is raised (invalid parameter value).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE71() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE71-Request-1-Poll.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.runQuery(fis);
+            // fail
+            fis.close();
+            fail("QueryParameterException expected");
+        } catch (QueryParameterException e) {
+            // ok
+            fis.close();
+        }
+    }
+
+    /**
+     * Tests if QueryParameterException is raised (multiple occurences of same
+     * parameter).
+     * 
+     * @throws RemoteException
+     *             If an Axis error occured.
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE72() throws RemoteException, ServiceException,
+            IOException {
+        final String query = "Test-EPCIS10-SE72-Request-1-Poll.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        try {
+            client.runQuery(fis);
+            // fail
+            fis.close();
+            fail("QueryParameterException expected");
+        } catch (QueryParameterException e) {
+            // ok
+            fis.close();
+        }
+    }
+
+    /**
+     * Tests if SecurityException is raised.
+     */
+    public void testSE74() {
+        fail("No security implemented!");
     }
 
 }

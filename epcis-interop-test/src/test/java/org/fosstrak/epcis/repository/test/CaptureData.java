@@ -14,7 +14,7 @@ import org.apache.log4j.PropertyConfigurator;
  * @author Marco Steybe
  * @author Andrea Groessbauer
  */
-public class DatasetCaptureTest extends TestCase {
+public class CaptureData extends TestCase {
 
     /**
      * The XML files from which the capture events are taken.
@@ -31,7 +31,7 @@ public class DatasetCaptureTest extends TestCase {
     /**
      * The logger for this class.
      */
-    private static Logger LOG = Logger.getLogger(DatasetCaptureTest.class);
+    private static Logger LOG = Logger.getLogger(CaptureData.class);
 
     private static final String LOG4J_CONFIG_FILE = "src/test/resources/conf/log4j.properties";
 

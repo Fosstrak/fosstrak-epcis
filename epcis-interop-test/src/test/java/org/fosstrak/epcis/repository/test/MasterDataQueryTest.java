@@ -3,9 +3,7 @@
  */
 package org.accada.epcis.repository.test;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,7 +19,6 @@ import org.accada.epcis.soapapi.EPC;
 import org.accada.epcis.soapapi.EventListType;
 import org.accada.epcis.soapapi.ObjectEventType;
 import org.accada.epcis.soapapi.QuantityEventType;
-import org.accada.epcis.soapapi.QueryParameterException;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.TransactionEventType;
@@ -31,19 +28,19 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  * @author Marco Steybe
  */
-public class SimpleEventQueryTest extends TestCase {
+public class MasterDataQueryTest extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(SimpleEventQueryTest.class);
+    private static final Logger LOG = Logger.getLogger(MasterDataQueryTest.class);
 
     QueryClientInterface client;
 
     static String pathToQueries = "src/test/resources/queries/webservice/requests/";
-    static String queryPrefix = "Test-EPCIS10-SE";
-    static String querySuffix = "-Request-1-poll.xml";
+    static String queryPrefix = "Test-EPCIS10-MD";
+    static String querySuffix = "-Request.xml";
     static String pathToResp = "src/test/resources/queries/webservice/responses/";
-    static String respPrefix = "Test-EPCIS10-SE";
-    static String respSuffix = "-Response-1-poll.xml";
-    
+    static String respPrefix = "Test-EPCIS10-MD";
+    static String respSuffix = "-Response.xml";
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
@@ -52,7 +49,152 @@ public class SimpleEventQueryTest extends TestCase {
         client = new QueryClientSoapImpl();
     }
 
-    public void testSE10() throws IOException, ServiceException {
+    public void testMD1() throws IOException, ServiceException {
+        int testNr = 1;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD2() throws IOException, ServiceException {
+        int testNr = 2;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD3() throws IOException, ServiceException {
+        int testNr = 3;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD4() throws IOException, ServiceException {
+        int testNr = 4;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD5() throws IOException, ServiceException {
+        int testNr = 5;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD6() throws IOException, ServiceException {
+        int testNr = 6;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD7() throws IOException, ServiceException {
+        int testNr = 7;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD8() throws IOException, ServiceException {
+        int testNr = 8;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+
+        try {
+            client.runQuery(fis);
+            // fail
+            fis.close();
+            fail("QueryTooLargeException expected!");
+        } catch (QueryTooLargeException e) {
+            // ok
+            fis.close();
+        }
+    }
+
+    public void testMD9() throws IOException, ServiceException {
+        int testNr = 9;
+        String query = pathToQueries + queryPrefix + testNr + querySuffix;
+        LOG.info("query taken from " + query);
+        InputStream fis = new FileInputStream(query);
+        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        fis.close();
+
+        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        LOG.info("response taken from " + resp);
+        fis = new FileInputStream(resp);
+        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        fis.close();
+        compareResults(expResults, actResults);
+    }
+
+    public void testMD10() throws IOException, ServiceException {
         int testNr = 10;
         String query = pathToQueries + queryPrefix + testNr + querySuffix;
         LOG.info("query taken from " + query);
@@ -68,7 +210,7 @@ public class SimpleEventQueryTest extends TestCase {
         compareResults(expResults, actResults);
     }
 
-    public void testSE11() throws IOException, ServiceException {
+    public void testMD11() throws IOException, ServiceException {
         int testNr = 11;
         String query = pathToQueries + queryPrefix + testNr + querySuffix;
         LOG.info("query taken from " + query);
@@ -84,7 +226,7 @@ public class SimpleEventQueryTest extends TestCase {
         compareResults(expResults, actResults);
     }
 
-    public void testSE12() throws IOException, ServiceException {
+    public void testMD12() throws IOException, ServiceException {
         int testNr = 12;
         String query = pathToQueries + queryPrefix + testNr + querySuffix;
         LOG.info("query taken from " + query);
@@ -100,7 +242,7 @@ public class SimpleEventQueryTest extends TestCase {
         compareResults(expResults, actResults);
     }
 
-    public void testSE13() throws IOException, ServiceException {
+    public void testMD13() throws IOException, ServiceException {
         int testNr = 13;
         String query = pathToQueries + queryPrefix + testNr + querySuffix;
         LOG.info("query taken from " + query);
@@ -114,504 +256,6 @@ public class SimpleEventQueryTest extends TestCase {
         QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
-    }
-
-    public void testSE14() throws IOException, ServiceException {
-        int testNr = 14;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE15() throws IOException, ServiceException {
-        int testNr = 15;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE16() throws IOException, ServiceException {
-        int testNr = 16;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE17() throws IOException, ServiceException {
-        int testNr = 17;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE18() throws IOException, ServiceException {
-        int testNr = 18;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE19() throws IOException, ServiceException {
-        int testNr = 19;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE20() throws IOException, ServiceException {
-        int testNr = 20;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE21() throws IOException, ServiceException {
-        int testNr = 21;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE22() throws IOException, ServiceException {
-        int testNr = 22;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE23() throws IOException, ServiceException {
-        int testNr = 23;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE24() throws IOException, ServiceException {
-        int testNr = 24;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE25() throws IOException, ServiceException {
-        int testNr = 25;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE26() throws IOException, ServiceException {
-        int testNr = 26;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE27() throws IOException, ServiceException {
-        int testNr = 27;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE28() throws IOException, ServiceException {
-        int testNr = 28;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE29() throws IOException, ServiceException {
-        int testNr = 29;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE30() throws IOException, ServiceException {
-        int testNr = 30;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE31() throws IOException, ServiceException {
-        int testNr = 31;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE32() throws IOException, ServiceException {
-        int testNr = 32;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE33() throws IOException, ServiceException {
-        int testNr = 33;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE34() throws IOException, ServiceException {
-        int testNr = 34;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE35() throws IOException, ServiceException {
-        int testNr = 35;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE36() throws IOException, ServiceException {
-        int testNr = 36;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE37() throws IOException, ServiceException {
-        int testNr = 37;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE38() throws IOException, ServiceException {
-        int testNr = 38;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE39() throws IOException, ServiceException {
-        int testNr = 39;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE40() throws IOException, ServiceException {
-        int testNr = 40;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        try {
-            client.runQuery(fis);
-            fail("should raise a QueryTooLargeException");
-        } catch (QueryTooLargeException e) {
-            // success
-        }
-        fis.close();
-    }
-
-    public void testSE41() throws IOException, ServiceException {
-        int testNr = 41;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        try {
-            client.runQuery(fis);
-            fail("should raise a QueryParameterException");
-        } catch (QueryParameterException e) {
-            // success
-        }
-        fis.close();
-    }
-
-    public void testSE42() throws IOException, ServiceException {
-        int testNr = 42;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    public void testSE43() throws IOException, ServiceException {
-        int testNr = 43;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
-        InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
-        fis.close();
-
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
-    }
-
-    class XmlFileFilter implements FilenameFilter {
-
-        private String prefix = null;
-
-        private String suffix = null;
-
-        public XmlFileFilter(String prefix, String suffix) {
-            this.prefix = prefix;
-            this.suffix = suffix;
-        }
-
-        /**
-         * @see java.io.FilenameFilter#accept(java.io.File, java.lang.String)
-         */
-        public boolean accept(File dir, String name) {
-            if (name.endsWith(suffix) && name.startsWith(prefix)) {
-                return true;
-            }
-            return false;
-        }
     }
 
     private void compareResults(QueryResults expResults, QueryResults actResults) {
