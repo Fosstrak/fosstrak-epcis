@@ -11,6 +11,8 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,6 +49,7 @@ import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
 import org.accada.epcis.soapapi.InvalidURIException;
 import org.accada.epcis.soapapi.NoSuchNameException;
+import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.ObjectEventType;
 import org.accada.epcis.soapapi.Poll;
 import org.accada.epcis.soapapi.QuantityEventType;
@@ -1347,13 +1350,20 @@ public class EpcisQueryInterface implements EPCISServicePortType {
         try {
             // A few input sanity checks
 
-            // dest may be null or empty. But we don't support pre-arranged
+            // URL checks
+        	// dest may be null or empty. But we don't support pre-arranged
             // destinations and throw a InvalidURIException according to the
             // standard.
             if (dest == null || dest.toString().equals("")) {
                 throw new InvalidURIException("Destination URI empty.\n"
                         + "This implementation doesn't "
                         + "support pre-arranged destinations.");
+            } else {
+            	try {
+					URL url = new URL (dest.toString());
+				} catch (MalformedURLException e) {
+					throw new InvalidURIException(e.getMessage());
+				}
             }
 
             // query type must be implemented...
@@ -1552,9 +1562,10 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      * @return Nothing.
      * @throws ImplementationException
      *             If a problem with the EPCIS implementation occured.
+     * @throws NoSuchSubscriptionException 
      */
     public VoidHolder unsubscribe(final Unsubscribe parms)
-            throws ImplementationException {
+            throws ImplementationException, NoSuchSubscriptionException {
 
         Map<String, SubscriptionScheduled> subscribedMap = getSubscriptions();
 
@@ -1581,6 +1592,8 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             toDelete.stopSubscription();
             subscribedMap.remove(parms.getSubscriptionID());
             setSubscriptions(subscribedMap);
+        } else {
+        	throw new NoSuchSubscriptionException("There is no subscription with ID '"+parms.getSubscriptionID()+"'");
         }
         return new VoidHolder();
     }
