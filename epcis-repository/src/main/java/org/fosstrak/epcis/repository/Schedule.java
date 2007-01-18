@@ -572,10 +572,10 @@ public class Schedule implements Serializable {
                 }
             } catch (IndexOutOfBoundsException aie) {
                 throw new SubscriptionControlsException(
-                        "The value '"+ v +"' for parameter '" + parameter +"' is invalid in the query schedule \n");
+                        "The value '"+ v +"' for parameter '" + parameter +"' is invalid in the query schedule.");
             } catch (NumberFormatException ne) {
                 throw new SubscriptionControlsException(
-                        "The value '"+ v +"' for parameter '" + parameter +"' is invalid in the query schedule \n");
+                        "The value '"+ v +"' for parameter '" + parameter +"' is invalid in the query schedule.");
             }
         }
         return new Object[] {
