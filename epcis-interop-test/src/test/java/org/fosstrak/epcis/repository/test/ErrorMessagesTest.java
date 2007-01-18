@@ -584,7 +584,8 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             fail("QueryParameterException expected");
         } catch (QueryParameterException e) {
-            // ok
+        	//ok
+            assertEquals(e.getReason(),"The parameter EQ_abcd cannot be recognised.");
             fis.close();
         }
     }
@@ -610,6 +611,7 @@ public class ErrorMessagesTest extends TestCase {
             fail("QueryParameterException expected");
         } catch (QueryParameterException e) {
             // ok
+        	assertEquals(e.getReason(),"The input value for parameter GE_quantity: 3.1459 of the eventType QuantityEvent is not of the type required.");
             fis.close();
         }
     }
@@ -636,8 +638,13 @@ public class ErrorMessagesTest extends TestCase {
             fail("QueryParameterException expected");
         } catch (QueryParameterException e) {
             // ok
+        	assertEquals(e.getReason(),"Two or more inputs are provided for the same parameter : EQ_bizStep");
             fis.close();
         }
+    }
+    
+    public void testSE73() {
+    	fail("Implemented in suite EventQueryTest!");
     }
 
     /**
