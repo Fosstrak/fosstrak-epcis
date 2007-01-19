@@ -23,7 +23,7 @@
         </param>
     </params>
 
-    <dest>uri:dummy</dest>
+    <dest>http://127.0.0.1:10000/</dest>
 
     <controls>
         <schedule>

@@ -20,7 +20,7 @@
 			</value>
 		</param>
 	</params>
-	<dest>http://192.168.0.1:8080/notificationReceiver</dest>
+	<dest>http://127.0.0.1:10000/</dest>
 	<controls>
 		<schedule>
 			<second>61</second>
