@@ -3,9 +3,7 @@
  */
 package org.accada.epcis.repository.test;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,6 +23,8 @@ import org.accada.epcis.soapapi.QueryParameterException;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.TransactionEventType;
+import org.accada.epcis.utils.QueryResultsParser;
+import org.apache.axis.message.MessageElement;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -63,7 +63,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -79,7 +79,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -95,7 +95,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -111,7 +111,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -127,7 +127,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -143,7 +143,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -159,7 +159,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -175,7 +175,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -191,7 +191,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -207,7 +207,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -223,7 +223,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -239,7 +239,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -255,7 +255,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -271,7 +271,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -287,7 +287,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -303,7 +303,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -319,7 +319,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -335,7 +335,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -351,7 +351,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -367,7 +367,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -383,7 +383,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -399,7 +399,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -415,7 +415,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -431,7 +431,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -447,7 +447,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -463,7 +463,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -479,7 +479,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -495,7 +495,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -511,7 +511,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -527,7 +527,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -571,7 +571,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -587,7 +587,7 @@ public class EventQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -602,31 +602,9 @@ public class EventQueryTest extends TestCase {
 
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
-    }
-
-    class XmlFileFilter implements FilenameFilter {
-
-        private String prefix = null;
-
-        private String suffix = null;
-
-        public XmlFileFilter(String prefix, String suffix) {
-            this.prefix = prefix;
-            this.suffix = suffix;
-        }
-
-        /**
-         * @see java.io.FilenameFilter#accept(java.io.File, java.lang.String)
-         */
-        public boolean accept(File dir, String name) {
-            if (name.endsWith(suffix) && name.startsWith(prefix)) {
-                return true;
-            }
-            return false;
-        }
     }
 
     private void compareResults(QueryResults expResults, QueryResults actResults) {
@@ -647,8 +625,6 @@ public class EventQueryTest extends TestCase {
         if (actObjectEvent != null) {
             assertEquals(expObjectEvent.length, actObjectEvent.length);
             for (int i = 0; i < actObjectEvent.length; i++) {
-                assertEquals(expObjectEvent[i].get_any(),
-                        actObjectEvent[i].get_any());
                 assertEquals(expObjectEvent[i].getAction(),
                         actObjectEvent[i].getAction());
                 assertEquals(expObjectEvent[i].getBaseExtension(),
@@ -667,6 +643,18 @@ public class EventQueryTest extends TestCase {
                         actObjectEvent[i].getReadPoint());
                 // assertEquals(expObjectEvent[i].getRecordTime(),
                 // actObjectEvent[i].getRecordTime());
+
+                MessageElement[] actME = actObjectEvent[i].get_any();
+                MessageElement[] expME = expObjectEvent[i].get_any();
+                assertEquals(expME.length, actME.length);
+                for (int j = 0; j < actME.length; j++) {
+                    assertEquals(expME[j].getValue(), actME[j].getValue());
+                    assertEquals(expME[j].getNamespaceURI(),
+                            actME[j].getNamespaceURI());
+                    assertEquals(expME[j].getPrefix(), actME[j].getPrefix());
+                    assertEquals(expME[j].getLocalName(),
+                            actME[j].getLocalName());
+                }
 
                 EPC[] actEpcs = actObjectEvent[i].getEpcList();
                 EPC[] expEpcs = expObjectEvent[i].getEpcList();

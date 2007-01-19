@@ -22,6 +22,7 @@ import org.accada.epcis.soapapi.QuantityEventType;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.TransactionEventType;
+import org.accada.epcis.utils.QueryResultsParser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -60,7 +61,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -76,7 +77,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -92,7 +93,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -108,7 +109,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -124,7 +125,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -140,7 +141,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -156,7 +157,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -189,7 +190,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -205,7 +206,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -221,7 +222,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -237,7 +238,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
@@ -253,7 +254,7 @@ public class MasterDataQueryTest extends TestCase {
         String resp = pathToResp + respPrefix + testNr + respSuffix;
         LOG.info("response taken from " + resp);
         fis = new FileInputStream(resp);
-        QueryResults expResults = ((QueryClientSoapImpl) client).convertXmlToQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
         compareResults(expResults, actResults);
     }
