@@ -11,28 +11,25 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServlet;
-import javax.sql.DataSource;
 
 import org.accada.epcis.soapapi.ActionType;
 import org.accada.epcis.soapapi.AggregationEventType;
@@ -67,6 +64,7 @@ import org.accada.epcis.soapapi.TransactionEventType;
 import org.accada.epcis.soapapi.Unsubscribe;
 import org.accada.epcis.soapapi.ValidationException;
 import org.accada.epcis.soapapi.VoidHolder;
+import org.accada.epcis.utils.TimeParser;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.transport.http.HTTPConstants;
@@ -91,1791 +89,1676 @@ import org.apache.log4j.Logger;
  */
 public class EpcisQueryInterface implements EPCISServicePortType {
 
-	private static final Logger LOG = Logger
-			.getLogger(EpcisQueryInterface.class);
-
-	/**
-	 * The version of the standard that this service is supposed to implement.
-	 * See page 59 of the last call working draw for 1.0
-	 */
-	private final String stdVersion = "1.0";
-
-	/**
-	 * The version URI of this service.
-	 */
-	// TODO: Put up appropriate web page.
-	private final String version = "http://www.accada.org/releases/0.2/";
-
-	/**
-	 * The connection to the database.
-	 */
-	private Connection dbconnection;
-
-	/**
-	 * The database dependent identifier quotation sign.
-	 */
-	private String q;
-
-	/**
-	 * Before returning the Results of the query, it checks if the set is too
-	 * large. This value can be set by Query-Parameters.
-	 */
-	private int maxEventCount;
-
-	/**
-	 * ISO 8601 SimpleDateFormat. Use it like this for current time:
-	 * isoDateFormat.format(now)
-	 */
-	private final SimpleDateFormat isoDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss.SSS");
-
-	/**
-	 * The names of all the implemented queries.
-	 */
-	private final HashSet<String> queryNames = new HashSet<String>() {
-		private static final long serialVersionUID = -3868728341409854448L;
-		{
-			add("SimpleEventQuery");
-		}
-	};
-
-	// TODO: Add SimpleMasterDataQuery once implemented.
-
-	/**
-	 * Basic SQL query string for object events.
-	 */
-	private String objectEventQueryBase = "SELECT DISTINCT "
-			+ "`event_ObjectEvent`.id, eventTime, recordTime, eventTimeZoneOffset, action, "
-			+ "`voc_BizStep`.uri as `bizStep`, "
-			+ "`voc_Disposition`.uri as disposition, "
-			+ "`voc_ReadPoint`.uri as `readPoint`, "
-			+ "`voc_BizLoc`.uri as `bizLocation` "
-			+ "FROM `event_ObjectEvent` "
-			+ "LEFT JOIN `voc_BizStep` ON `event_ObjectEvent`.`bizStep` = `voc_BizStep`.id "
-			+ "LEFT JOIN `voc_Disposition` ON `event_ObjectEvent`.disposition = `voc_Disposition`.id "
-			+ "LEFT JOIN `voc_ReadPoint` ON `event_ObjectEvent`.`readPoint` = `voc_ReadPoint`.id "
-			+ "LEFT JOIN `voc_BizLoc` ON `event_ObjectEvent`.`bizLocation` = `voc_BizLoc`.id "
-			+ "LEFT JOIN `event_ObjectEvent_extensions` ON `event_ObjectEvent`.`id` = `event_ObjectEvent_extensions`.event_id "
-			+ "WHERE 1 ";
-
-	/**
-	 * Basic SQL query string for aggregation events. TODO marco: rest of
-	 * queries as above!
-	 */
-	private String aggregationEventQueryBase = new String("SELECT DISTINCT "
-			+ "`event_AggregationEvent`.id as id, "
-			+ "`eventTime`, `recordTime`, `eventTimeZoneOffset`, "
-			+ "`parentID`, action, " + "`voc_BizStep`.uri     as `bizStep`, "
-			+ "`voc_Disposition`.uri as disposition, "
-			+ "`voc_ReadPoint`.uri   as `readPoint`, "
-			+ "`voc_BizLoc`.uri      as `bizLocation` "
-			+ "FROM `event_AggregationEvent` " + "LEFT JOIN `voc_BizStep` "
-			+ "ON `event_AggregationEvent`.`bizStep` " + " = `voc_BizStep`.id "
-			+ "LEFT JOIN `voc_Disposition` "
-			+ "ON `event_AggregationEvent`.disposition "
-			+ " = `voc_Disposition`.id " + "LEFT JOIN `voc_ReadPoint` "
-			+ "ON `event_AggregationEvent`.`readPoint` "
-			+ " = `voc_ReadPoint`.id " + "LEFT JOIN `voc_BizLoc` "
-			+ "ON `event_AggregationEvent`.`bizLocation` "
-			+ " = `voc_BizLoc`.id " + "WHERE 1 ");
-
-	/**
-	 * Basic SQL query string for quantity events.
-	 */
-	private String quantityEventQueryBase = new String("SELECT DISTINCT "
-			+ "`event_QuantityEvent`.id as id, "
-			+ "`eventTime`, `recordTime`, `eventTimeZoneOffset`, "
-			+ "`voc_EPCClass`.`uri`  as `epcClass`, " + "quantity, "
-			+ "`voc_BizStep`.uri     as `bizStep`, "
-			+ "`voc_Disposition`.uri as disposition, "
-			+ "`voc_ReadPoint`.uri   as readPoint, "
-			+ "`voc_BizLoc`.uri      as bizLocation "
-			+ "FROM `event_QuantityEvent` " + "LEFT JOIN `voc_BizStep` "
-			+ "ON `event_QuantityEvent`.`bizStep` " + " = `voc_BizStep`.id "
-			+ "LEFT JOIN `voc_Disposition` "
-			+ "ON `event_QuantityEvent`.disposition"
-			+ " = `voc_Disposition`.id " + "LEFT JOIN `voc_ReadPoint` "
-			+ "ON `event_QuantityEvent`.`readPoint`  "
-			+ " = `voc_ReadPoint`.id " + "LEFT JOIN `voc_BizLoc` "
-			+ "ON `event_QuantityEvent`.`bizLocation`" + " = `voc_BizLoc`.id "
-			+ "LEFT JOIN `voc_EPCClass` "
-			+ "ON `event_QuantityEvent`.`epcClass`" + " = `voc_EPCClass`.id "
-			+ "WHERE 1 ");
-
-	/**
-	 * 
-	 */
-	private String transactionEventQueryBase = new String("SELECT DISTINCT "
-			+ "`event_TransactionEvent`.id as id, "
-			+ "`eventTime`, `recordTime`, `eventTimeZoneOffset`, "
-			+ "action, `parentId`, " + "`voc_BizStep`.uri     as `bizStep`, "
-			+ "`voc_Disposition`.uri as disposition, "
-			+ "`voc_ReadPoint`.uri   as `readPoint`, "
-			+ "`voc_BizLoc`.uri      as `bizLocation` "
-			+ "FROM `event_TransactionEvent` " + "LEFT JOIN `voc_BizStep` "
-			+ "ON `event_TransactionEvent`.`bizStep` " + " = `voc_BizStep`.id "
-			+ "LEFT JOIN `voc_Disposition` "
-			+ "ON `event_TransactionEvent`.disposition"
-			+ " = `voc_Disposition`.id " + "LEFT JOIN `voc_ReadPoint` "
-			+ "ON `event_TransactionEvent`.`readPoint` "
-			+ " = `voc_ReadPoint`.id " + "LEFT JOIN `voc_BizLoc` "
-			+ "ON `event_TransactionEvent`.`bizLocation`"
-			+ " = `voc_BizLoc`.id " + "WHERE 1 ");
-
-	/**
-	 * Opens a connection to the database server. Uses the global variables
-	 * dbserver, dbuser, dbpassword and sets dbconnection. BEWARE OF CODE
-	 * DUPLICATION: this method is also implemented in the package
-	 * org.autoidlabs.epcnet.epcisrep.querying2.subscribeclasses class
-	 * SubscriptionScheduled!
-	 * 
-	 * @throws ImplementationException
-	 *             Matching various exception to one.
-	 */
-	private void connectDB() throws ImplementationException {
-		try {
-			Context initContext = new InitialContext();
-			Context env = (Context) initContext.lookup("java:comp/env");
-			DataSource dataSource = (DataSource) env.lookup("jdbc/EPCISDB");
-
-			dbconnection = dataSource.getConnection();
-			q = dbconnection.getMetaData().getIdentifierQuoteString();
-		} catch (NamingException ne) {
-			ImplementationExceptionSeverity severity = ImplementationExceptionSeverity
-					.fromString("ERROR");
-			ImplementationException iex = new ImplementationException();
-			iex.setReason("Could not get DataSource, check "
-					+ "META-INF/context.xml and "
-					+ "WEB-INF/web.xml (on server side) "
-					+ "for configuration errors (" + ne.getMessage() + ")");
-			iex.setSeverity(severity);
-			throw iex;
-		} catch (SQLException e) {
-			ImplementationExceptionSeverity severity = ImplementationExceptionSeverity
-					.fromString("ERROR");
-			ImplementationException iex = new ImplementationException();
-			iex.setReason("could not connect to the database ("
-					+ e.getMessage() + ")");
-			iex.setSeverity(severity);
-			throw iex;
-		}
-	}
-
-	/**
-	 * Returns whether subscriptionID already exists in DB.
-	 * 
-	 * @param subcriptionID
-	 *            The id to be looked up.
-	 * @return <code>true</code> if subscriptionID already exists in DB,
-	 *         <code>false</code> otherwise.
-	 * @throws SQLException
-	 *             If a problem with the database occured.
-	 * @throws ImplementationException
-	 *             If a problem with the EPCIS implementation occured.
-	 */
-	private Boolean doesExistSubscriptionID(final String subcriptionID)
-			throws SQLException, ImplementationException {
-		connectDB();
-
-		ResultSet rs;
-		String query = "SELECT EXISTS("
-				+ "SELECT subscriptionid FROM subscription WHERE subscriptionid = (?))";
-
-		PreparedStatement pstmt = dbconnection.prepareStatement(query);
-		pstmt.setString(1, subcriptionID);
-		rs = pstmt.executeQuery();
-		rs.first();
-		Boolean result = rs.getBoolean(1);
-		rs.close();
-		dbconnection.close();
-		return result;
-	}
-
-	/**
-	 * Returns all EPCs associated to a certain event_id.
-	 * 
-	 * @param tableName
-	 *            The SQL name of the table to be searched
-	 * @param eventId
-	 *            is typically an 64bit integer. We use string here to avoid
-	 *            java vs. SQL type problems.
-	 * @return EPCs beloning to event_id
-	 * @throws SQLException
-	 *             Database troubles.
-	 */
-	private EPC[] getChildEPCs(final String tableName, final int eventId)
-			throws SQLException {
-		Statement stmt = dbconnection.createStatement();
-		ResultSet rs;
-		Vector<EPC> epcVector = new Vector<EPC>();
-		EPC epcElement;
-
-		String query = "SELECT DISTINCT epc FROM " + q + tableName + q
-				+ " WHERE " + q + "event_id" + q + " = " + eventId;
-		// System.out.println("getChildEPCs:\n" + query);
-		rs = stmt.executeQuery(query);
-
-		while (rs.next()) {
-			epcElement = new EPC(rs.getString("epc"));
-			epcVector.add(epcElement);
-		}
-
-		EPC[] epcs = {};
-		epcs = epcVector.toArray(epcs);
-
-		return epcs;
-	}
-
-	/**
-	 * Returns all bizTransactions associated to a certain event_id.
-	 * 
-	 * @param tableName
-	 *            The SQL name of the table to be searched.
-	 * @param eventId
-	 *            Typically an 64bit integer to identify the event.
-	 * @return bizTransactions associated to event_id
-	 * @throws SQLException
-	 *             DB problem.
-	 * @throws ImplementationException
-	 *             Several problems get matched to this exception.
-	 */
-	private BusinessTransactionType[] getbizTransactions(
-			final String tableName, final int eventId) throws SQLException,
-			ImplementationException {
-		Statement stmt = dbconnection.createStatement();
-		ResultSet rs;
-		BusinessTransactionType btrans;
-
-		Vector<BusinessTransactionType> bizTransVector = new Vector<BusinessTransactionType>();
-
-		// SELECT DISTINCT "voc_BizTrans".uri AS uri,
-		// "voc_BizTransType".uri AS typeuri
-		// FROM ((
-		// "BizTransaction" JOIN "event_AggregationEvent_bizTrans"
-		// ON "BizTransaction".id
-		// ="event_AggregationEvent_bizTrans"."bizTrans_id")
-		// JOIN "voc_BizTrans" ON
-		// "BizTransaction"."bizTrans"="voc_BizTrans".id)
-		// LEFT OUTER JOIN "voc_BizTransType"
-		// ON "BizTransaction".type="voc_BizTransType".id
-		// WHERE "event_AggregationEvent_bizTrans"."event_id" = 0;
-
-		// String to quote identifiers in SQL stmt.
-
-		String query = "SELECT DISTINCT\n" + "`voc_BizTrans`.uri AS uri,\n"
-				+ "`voc_BizTransType`.uri AS typeuri\n" + "FROM ((\n"
-				+ "`BizTransaction` JOIN `" + tableName + "` \n"
-				+ "ON `BizTransaction`.id\n" + "=`" + tableName
-				+ "`.`bizTrans_id`)\n" + "JOIN `voc_BizTrans` ON\n"
-				+ "`BizTransaction`.`bizTrans`" + "=`voc_BizTrans`.id)\n"
-				+ "LEFT OUTER JOIN `voc_BizTransType`\n"
-				+ "ON `BizTransaction`.type=" + "`voc_BizTransType`.id\n"
-				+ "WHERE `" + tableName + "`.`" + "event_id` = " + eventId;
-
-		// TODO: Make this a prepared stmt.
-
-		// System.out.println("Ugly getbizTransactions query:\n" + query);
-
-		rs = stmt.executeQuery(query.replace("`", q));
-
-		while (rs.next()) {
-			try {
-				btrans = new BusinessTransactionType(new URI(rs
-						.getString("uri")));
-				if (rs.getString("typeuri") != null) {
-					btrans.setType(new URI(rs.getString("typeuri")));
-				}
-			} catch (URI.MalformedURIException mue) {
-				ImplementationExceptionSeverity severity = ImplementationExceptionSeverity
-						.fromString("ERROR");
-				ImplementationException iex = new ImplementationException();
-				iex.setReason("A URI in the db has a syntax error.");
-				iex.setSeverity(severity);
-				throw iex;
-			}
-			bizTransVector.add(btrans);
-		}
-
-		BusinessTransactionType[] bizTrans = {};
-		bizTrans = bizTransVector.toArray(bizTrans);
-
-		return bizTrans;
-	}
-
-	/**
-	 * Convert a string to a URI. Exceptions are caught and a meaningful
-	 * ImplementationException is thrown instead. This method works on axis
-	 * URIs, not Java URIs. Make sure you have the right imports.
-	 * 
-	 * @param uriString
-	 *            String to convert to URI
-	 * @return URI
-	 * @throws ImplementationException
-	 *             Thrown when string not in URI format.
-	 */
-	private URI stringToURI(final String uriString)
-			throws ImplementationException {
-		try {
-			if (uriString == null) {
-				return null;
-			}
-			URI uri = new URI(uriString);
-			return uri;
-		} catch (URI.MalformedURIException e) {
-			ImplementationExceptionSeverity severity = ImplementationExceptionSeverity
-					.fromString("ERROR");
-			ImplementationException iex = new ImplementationException();
-			iex.setReason("URI value in the database had no URI format"
-					+ " - database possibly corrupted. Invalid URI:\n"
-					+ uriString);
-			iex.setSeverity(severity);
-			throw iex;
-		}
-	}
-
-	/**
-	 * Executes a SQL Query and returns an array of ObjectEventType.
-	 * 
-	 * @param objectEventQuery
-	 *            Query. Supposed to be created by createEventQuery.
-	 * @return ObjectEventType[]
-	 * @throws SQLException
-	 *             Problem on db backend. The Query must return ObjectEvents,
-	 *             otherwise this leads to an SQLException as well. is thrown.
-	 * @throws ImplementationException
-	 *             Problem with data or on implementation side. (i.e. uri value
-	 *             in DB is actually not an uri)
-	 */
-	private ObjectEventType[] runObjectEventQuery(
-			final PreparedStatement objectEventQuery) throws SQLException,
-			ImplementationException {
-		if (objectEventQuery == null) {
-			return null;
-		}
-		ResultSet rs;
-
-		// some objects that we need for conversion
-		Calendar cal = Calendar.getInstance();
-		ActionType action;
-
-		// get ObjectEvents
-
-		rs = objectEventQuery.executeQuery();
-
-		Vector<ObjectEventType> objectEventVector = new Vector<ObjectEventType>();
-		ObjectEventType objectEvent;
-
-		while (rs.next()) {
-			objectEvent = new ObjectEventType();
-			// set EventTime
-			cal.setTime(rs.getTimestamp("eventTime"));
-			objectEvent.setEventTime((Calendar) cal.clone());
-
-			// set RecordTime
-			cal.setTime(rs.getTimestamp("recordTime"));
-			objectEvent.setRecordTime((Calendar) cal.clone());
-
-			objectEvent.setEventTimeZoneOffset(rs
-					.getString("eventTimeZoneOffset"));
-
-			// set action
-			action = ActionType.fromString(rs.getString("action"));
-			objectEvent.setAction(action);
-
-			// set all URIs
-			objectEvent.setBizStep(stringToURI(rs.getString("bizStep")));
-			objectEvent
-					.setDisposition(stringToURI(rs.getString("disposition")));
-			if (rs.getString("readPoint") != null) {
-				ReadPointType rp = new ReadPointType(stringToURI(rs
-						.getString("readPoint")), null, null);
-				objectEvent.setReadPoint(rp);
-			}
-			if (rs.getString("bizLocation") != null) {
-				BusinessLocationType bl = new BusinessLocationType(
-						stringToURI(rs.getString("bizLocation")), null, null);
-				objectEvent.setBizLocation(bl);
-			}
-
-			objectEvent.setBizTransactionList(getbizTransactions(
-					"event_ObjectEvent_bizTrans", rs.getInt("id")));
-
-			// get all EPCs
-			objectEvent.setEpcList(getChildEPCs("event_ObjectEvent_EPCs", rs
-					.getInt("id")));
-			// System.out.println("search for EPCs finnished");
-
-			// TODO marco: check this, when ok -> do for all events
-			Statement stmt = dbconnection.createStatement();
-			String query = "SELECT * FROM `event_ObjectEvent_extensions` "
-					+ "WHERE event_id=" + rs.getInt("id");
-			LOG.debug("Query for getting field extensions: " + query);
-			ResultSet rs2 = stmt.executeQuery(query.replace("`", q));
-			List<MessageElement> meList = new ArrayList<MessageElement>();
-			while (rs2.next()) {
-				String fieldname = rs2.getString("fieldname");
-				String[] parts = fieldname.split("#");
-				if (parts.length != 2) {
-					throw new SQLException("Column 'fieldname' in table "
-							+ "'event_ObjectEvent_extensions' has invalid "
-							+ "format (fieldname = concatenation of namespace "
-							+ "URI for field extension, #, and the name of "
-							+ "the extension field).");
-				}
-				String namespace = parts[0];
-				String localPart = parts[1];
-				String prefix = rs2.getString("prefix");
-				String value = rs2.getString("intValue");
-				if (value == null) {
-					value = rs2.getString("floatValue");
-				}
-				if (value == null) {
-					value = rs2.getString("strValue");
-				}
-				if (value == null) {
-					value = rs2.getString("dateValue");
-				}
-				if (value == null) {
-					throw new SQLException("All of the value columns in "
-							+ "table 'event_ObjectEvent_extensions' "
-							+ "are null.");
-				}
-				MessageElement me = new MessageElement(localPart, prefix,
-						namespace);
-				me.setValue(value);
-				LOG.debug("Adding message element " + me.toString());
-				meList.add(me);
-			}
-			MessageElement[] any = {};
-			any = meList.toArray(any);
-			objectEvent.set_any(any);
-
-			// add to vector
-			objectEventVector.add(objectEvent);
-		}
-		rs.close();
-		ObjectEventType[] objectEvents = {};
-		objectEvents = objectEventVector.toArray(objectEvents);
-
-		return objectEvents;
-	}
-
-	/**
-	 * Executes a SQL Query and returns an array of AggregationEventType.
-	 * 
-	 * @param aggregationEventQuery
-	 *            The Query is supposed to be created by createEventQuery(...,
-	 *            "AggregationEvent").
-	 * @return AggregationEventType[]
-	 * @throws SQLException
-	 *             Must return AggregationEvents, otherwise an SQLException is
-	 *             thrown.
-	 * @throws ImplementationException
-	 *             May throw ImplementationException for various reasons (i.e.
-	 *             uri value in DB is actually not an uri)
-	 */
-	private AggregationEventType[] runAggregationEventQuery(
-			final PreparedStatement aggregationEventQuery) throws SQLException,
-			ImplementationException {
-		if (aggregationEventQuery == null) {
-			return null;
-		}
-		ResultSet rs;
-
-		// some objects that we need for conversion
-		Calendar cal = Calendar.getInstance();
-		ActionType action;
-
-		// get ObjectEvents
-
-		rs = aggregationEventQuery.executeQuery();
-
-		Vector<AggregationEventType> aggregationEventVector = new Vector<AggregationEventType>();
-		AggregationEventType aggregationEvent;
-
-		while (rs.next()) {
-			aggregationEvent = new AggregationEventType();
-
-			// set EventTime
-
-			cal.setTime(rs.getTimestamp("eventTime"));
-			aggregationEvent.setEventTime((Calendar) cal.clone());
-
-			// set RecordTime
-			cal.setTime(rs.getTimestamp("recordTime"));
-			aggregationEvent.setRecordTime((Calendar) cal.clone());
-
-			aggregationEvent.setEventTimeZoneOffset(rs
-					.getString("eventTimeZoneOffset"));
-
-			// set action
-			action = ActionType.fromString(rs.getString("action"));
-			aggregationEvent.setAction(action);
-
-			// set all URIs
-			aggregationEvent.setParentID(stringToURI(rs.getString("parentID")));
-			aggregationEvent.setBizStep(stringToURI(rs.getString("bizStep")));
-			aggregationEvent.setDisposition(stringToURI(rs
-					.getString("disposition")));
-			if (rs.getString("readPoint") != null) {
-				ReadPointType rp = new ReadPointType(stringToURI(rs
-						.getString("readPoint")), null, null);
-				aggregationEvent.setReadPoint(rp);
-			}
-			if (rs.getString("bizLocation") != null) {
-				BusinessLocationType bl = new BusinessLocationType(
-						stringToURI(rs.getString("bizLocation")), null, null);
-				aggregationEvent.setBizLocation(bl);
-			}
-
-			aggregationEvent.setBizTransactionList(getbizTransactions(
-					"event_AggregationEvent_bizTrans", rs.getInt("id")));
-
-			// get the associated EPCs
-			aggregationEvent.setChildEPCs(getChildEPCs(
-					"event_AggregationEvent_EPCs", rs.getInt("id")));
-
-			// add to vector
-			aggregationEventVector.add(aggregationEvent);
-		}
-		rs.close();
-		AggregationEventType[] aggregationEvents = {};
-		aggregationEvents = aggregationEventVector.toArray(aggregationEvents);
-		return aggregationEvents;
-	}
-
-	/**
-	 * Executes a SQL Query and returns an array of QuantityEventType.
-	 * 
-	 * @param quantityEventQuery
-	 *            The Query is supposed to be created by createEventQuery(...,
-	 *            "QuantityEvent").
-	 * @return QuantityEventType[]
-	 * @throws SQLException
-	 *             The Query must return QuantityEvents, otherwise an
-	 *             SQLException is thrown.
-	 * @throws ImplementationException
-	 *             May throw ImplementationException for various reasons (i.e.
-	 *             uri value in DB is actually not an uri)
-	 */
-	private QuantityEventType[] runQuantityEventQuery(
-			final PreparedStatement quantityEventQuery) throws SQLException,
-			ImplementationException {
-		if (quantityEventQuery == null) {
-			return null;
-		}
-		ResultSet rs;
-
-		// some objects that we need for conversion
-		Calendar cal = Calendar.getInstance();
-
-		// get ObjectEvents
-
-		rs = quantityEventQuery.executeQuery();
-		Vector<QuantityEventType> quantityEventVector = new Vector<QuantityEventType>();
-		QuantityEventType quantityEvent;
-
-		while (rs.next()) {
-			quantityEvent = new QuantityEventType();
-
-			// set EventTime
-			cal.setTime(rs.getTimestamp("eventTime"));
-			quantityEvent.setEventTime((Calendar) cal.clone());
-
-			// set RecordTime
-			cal.setTime(rs.getTimestamp("recordTime"));
-			quantityEvent.setRecordTime((Calendar) cal.clone());
-
-			quantityEvent.setEventTimeZoneOffset(rs
-					.getString("eventTimeZoneOffset"));
-
-			// set EPCClass
-			quantityEvent.setEpcClass(stringToURI(rs.getString("epcClass")));
-
-			// set quantity
-			quantityEvent.setQuantity(rs.getInt("quantity"));
-
-			// set all URIs
-			quantityEvent.setBizStep(stringToURI(rs.getString("bizStep")));
-			quantityEvent.setDisposition(stringToURI(rs
-					.getString("disposition")));
-			if (rs.getString("readPoint") != null) {
-				ReadPointType rp = new ReadPointType(stringToURI(rs
-						.getString("readPoint")), null, null);
-				quantityEvent.setReadPoint(rp);
-			}
-			if (rs.getString("bizLocation") != null) {
-				BusinessLocationType bl = new BusinessLocationType(
-						stringToURI(rs.getString("bizLocation")), null, null);
-				quantityEvent.setBizLocation(bl);
-			}
-
-			quantityEvent.setBizTransactionList(getbizTransactions(
-					"event_QuantityEvent_bizTrans", rs.getInt("id")));
-
-			// add to vector
-			quantityEventVector.add(quantityEvent);
-		}
-		rs.close();
-
-		QuantityEventType[] quantityEvents = {};
-		quantityEvents = quantityEventVector.toArray(quantityEvents);
-
-		return quantityEvents;
-	}
-
-	/**
-	 * Executes a SQL Query and returns an array of TransactionEventType.
-	 * 
-	 * @param transactionEventQuery
-	 *            The Query is supposed to be created by createEventQuery(...,
-	 *            "TransactionEvent").
-	 * @return AggregationEventType[]
-	 * @throws SQLException
-	 *             The Query must return TransactionEvents, otherwise an
-	 *             SQLException is thrown.
-	 * @throws ImplementationException
-	 *             May throw ImplementationException for various reasons (i.e.
-	 *             uri value in DB is actually not an uri)
-	 */
-	private TransactionEventType[] runTransactionEventQuery(
-			final PreparedStatement transactionEventQuery) throws SQLException,
-			ImplementationException {
-		if (transactionEventQuery == null) {
-			return null;
-		}
-		ResultSet rs;
-
-		// some objects that we need for conversion
-		Calendar cal = Calendar.getInstance();
-		ActionType action;
-
-		// get ObjectEvents
-		rs = transactionEventQuery.executeQuery();
-		Vector<TransactionEventType> transactionEventVector = new Vector<TransactionEventType>();
-		TransactionEventType transactionEvent;
-
-		while (rs.next()) {
-			transactionEvent = new TransactionEventType();
-
-			// set EventTime
-
-			cal.setTime(rs.getTimestamp("eventTime"));
-			transactionEvent.setEventTime((Calendar) cal.clone());
-
-			// set RecordTime
-			cal.setTime(rs.getTimestamp("recordTime"));
-			transactionEvent.setRecordTime((Calendar) cal.clone());
-
-			transactionEvent.setEventTimeZoneOffset(rs
-					.getString("eventTimeZoneOffset"));
-
-			// set action
-			action = ActionType.fromString(rs.getString("action"));
-			transactionEvent.setAction(action);
-
-			// set all URIs
-			transactionEvent.setParentID(stringToURI(rs.getString("parentID")));
-			transactionEvent.setBizStep(stringToURI(rs.getString("bizStep")));
-			transactionEvent.setDisposition(stringToURI(rs
-					.getString("disposition")));
-			if (rs.getString("readPoint") != null) {
-				ReadPointType rp = new ReadPointType(stringToURI(rs
-						.getString("readPoint")), null, null);
-				transactionEvent.setReadPoint(rp);
-			}
-			if (rs.getString("bizLocation") != null) {
-				BusinessLocationType bl = new BusinessLocationType(
-						stringToURI(rs.getString("bizLocation")), null, null);
-				transactionEvent.setBizLocation(bl);
-			}
-
-			transactionEvent.setBizTransactionList(getbizTransactions(
-					"event_TransactionEvent_bizTrans", rs.getInt("id")));
-
-			// get the associated EPCs
-			transactionEvent.setEpcList(getChildEPCs(
-					"event_TransactionEvent_EPCs", rs.getInt("id")));
-
-			// add to vector
-			transactionEventVector.add(transactionEvent);
-		}
-		rs.close();
-
-		TransactionEventType[] transactionEvents = {};
-		transactionEvents = transactionEventVector.toArray(transactionEvents);
-
-		return transactionEvents;
-	}
-
-	/**
-	 * Transforms an array of strings into sql IN (...) notation. Takes the
-	 * string array, the query string and the argument vector This function is
-	 * designed to be used with PreparedStatement
-	 * 
-	 * @param strings
-	 *            Array of strings to be added to sql IN (...) expression.
-	 * @param query
-	 *            The query which will be appended with the appropriate amounts
-	 *            of question marks for the parameters.
-	 * @param queryArgs
-	 *            The queryArgs vector which will take the additional query
-	 *            parameters specified in 'strings'.
-	 */
-	private void stringArrayToSQL(final String[] strings,
-			final StringBuffer query, final Vector<String> queryArgs) {
-		int j = 0;
-		while (j < strings.length - 1) {
-			query.append("?,");
-			queryArgs.add(strings[j]);
-			j++;
-		}
-		if (strings.length > 0) {
-			query.append("?");
-			queryArgs.add(strings[j]);
-		}
-	}
-
-	/**
-	 * Create an SQL query string from a list of Query Parameters.
-	 * 
-	 * @param queryParams
-	 *            The query parameters.
-	 * @param eventType
-	 *            Has to be one of the four basic event types "ObjectEvent",
-	 *            "AggregationEvent", "QuantityEvent", "TransactionEvent".
-	 * @return The prepared sql statement.
-	 * @throws SQLException
-	 *             Whenever something goes wrong when querying the db.
-	 * @throws QueryParameterException
-	 *             If one of the given QueryParam is invalid.
-	 */
-	private PreparedStatement createEventQuery(final QueryParam[] queryParams,
-			final String eventType) throws SQLException,
-			QueryParameterException {
-		StringBuffer query;
-		Vector<String> queryArgs;
-		String[] arglist;
-		PreparedStatement ps;
-
-		queryArgs = new Vector<String>();
-
-		if (eventType == "ObjectEvent") {
-			query = new StringBuffer(objectEventQueryBase);
-		} else if (eventType == "AggregationEvent") {
-			query = new StringBuffer(aggregationEventQueryBase);
-		} else if (eventType == "QuantityEvent") {
-			query = new StringBuffer(quantityEventQueryBase);
-		} else if (eventType == "TransactionEvent") {
-			query = new StringBuffer(transactionEventQueryBase);
-		} else {
-			System.out
-					.println("createEventQuery called with bad eventType parameter");
-			return null;
-		}
-
-		String orderBy = "";
-		String orderDirection = "";
-		int limit = -1;
-		int maxEvent = -1;
-		//need to check the params we already recorded
-		Map<String,Object> paramRecord= new HashMap<String,Object>();
-		for (int i = 0; i < queryParams.length; i++) {
-			
-			String param = queryParams[i].getName();
-			if (! paramRecord.containsKey(param) ) {
-				paramRecord.put(param, queryParams[i].getValue());
-			} else {
-				throw new QueryParameterException ("Two or more inputs are provided for the same parameter : " + param);
-			}
-			
-			LOG.info("query parameter " + i + ": [" + param + ", "
-					+ paramRecord.get(param) + "]");
-			try {
-
-				if (param.equals("eventType")) {
-					// search for the eventType in the list of arguments.
-					// If it does not appear, this eventType is not asked for
-					// and we return null as the query string
-					arglist = ((ArrayOfString) paramRecord.get(param))
-							.getString();
-					int j = 0;
-
-					while (arglist != null && (j < arglist.length)
-							&& (!arglist[j].equals(eventType))) {
-						j++;
-					}
-					if (arglist != null && arglist.length > 0
-							&& j == arglist.length) {
-						// System.out.println("don't search for " + eventType);
-						return null;
-					}
-				} else if (param.equals("GE_eventTime")) {
-					// Note: we do not check the date format here. If it does
-					// not
-					// conform to something mysql understands, running the query
-					// will return with an SqlException. MySQL understands ISO
-					// 8601,
-					// so this conforms to the standard.
-					query.append(" AND (`eventTime` >= ?) ");
-					Calendar cal = (Calendar) paramRecord.get(param);
-					queryArgs.add(isoDateFormat.format(cal.getTime()));
-
-				} else if (param.equals("LT_eventTime")) {
-					query.append(" AND (`eventTime` < ?) ");
-					Calendar cal = (Calendar) paramRecord.get(param);
-					queryArgs.add(isoDateFormat.format(cal.getTime()));
-
-				} else if (param.equals("GE_recordTime")) {
-					query.append(" AND (`recordTime` >= ?) ");
-					Calendar cal = (Calendar) paramRecord.get(param);
-					queryArgs.add(isoDateFormat.format(cal.getTime()));
-
-				} else if (param.equals("LT_recordTime")) {
-					query.append(" AND (`recordTime` < ?) ");
-					Calendar cal = (Calendar) paramRecord.get(param);
-					queryArgs.add(isoDateFormat.format(cal.getTime()));
-
-				} else if (param.equals("EQ_action")) {
-					// Note: as with dates, we don't check values here in this
-					// version
-					if (!eventType.equals("QuantityEvent")) {
-						query.append(" AND (action IN (");
-						stringArrayToSQL(((ArrayOfString) queryParams[i]
-								.getValue()).getString(), query, queryArgs);
-						query.append(")) ");
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("EQ_bizStep")) {
-					query.append(" AND (`voc_BizStep`.uri IN (");
-					stringArrayToSQL(
-							((ArrayOfString) paramRecord.get(param))
-									.getString(), query, queryArgs);
-					query.append(")) ");
-
-				} else if (param.equals("EQ_disposition")) {
-					query.append(" AND (`voc_Disposition`.uri IN (");
-					stringArrayToSQL(
-							((ArrayOfString) paramRecord.get(param))
-									.getString(), query, queryArgs);
-					query.append(")) ");
-
-				} else if (param.equals("EQ_readPoint")) {
-					query.append(" AND (`voc_ReadPoint`.uri IN (");
-					stringArrayToSQL(
-							((ArrayOfString) paramRecord.get(param))
-									.getString(), query, queryArgs);
-					query.append(")) ");
-
-				} else if (param.equals("WD_readPoint")) {
-					// the % allows any possible ending, which should implement
-					// the
-					// semantics of "With Descendant"
-					String[] readPoints = ((ArrayOfString) queryParams[i]
-							.getValue()).getString();
-					for (int j = 0; j < readPoints.length; j++) {
-						readPoints[j] = readPoints[j] + "%";
-					}
-					query.append(" AND (");
-
-					int j = 0;
-					while (j < readPoints.length - 1) {
-						query.append("`voc_ReadPoint`.uri LIKE ? OR ");
-						queryArgs.add(readPoints[j]);
-						j++;
-					}
-					if (readPoints.length > 0) {
-						query.append("`voc_ReadPoint`.uri LIKE ?");
-						queryArgs.add(readPoints[j]);
-					}
-
-					query.append(") ");
-
-				} else if (param.equals("EQ_bizLocation")) {
-					query.append(" AND (`voc_BizLoc`.uri IN (");
-					stringArrayToSQL(
-							((ArrayOfString) paramRecord.get(param))
-									.getString(), query, queryArgs);
-					query.append(")) ");
-
-				} else if (param.equals("WD_bizLocation")) {
-					String[] bizLocations = null;
-					try {
-						bizLocations = ((ArrayOfString) queryParams[i]
-								.getValue()).getString();
-					} catch (ClassCastException e) {
-						// we have the URI directly (no ArrayOfString wrapper)
-						bizLocations = new String[1];
-						bizLocations[0] = paramRecord.get(param).toString();
-					}
-					for (int j = 0; j < bizLocations.length; j++) {
-						bizLocations[j] = bizLocations[j] + "%";
-					}
-					query.append(" AND (");
-
-					int j = 0;
-					while (j < bizLocations.length - 1) {
-						query.append("`voc_BizLoc`.uri LIKE ? OR ");
-						queryArgs.add(bizLocations[j]);
-						j++;
-					}
-					if (bizLocations.length > 0) {
-						query.append("`voc_BizLoc`.uri LIKE ?");
-						queryArgs.add(bizLocations[j]);
-					}
-
-					query.append(") ");
-
-				} else if (param.startsWith("EQ_bizTransaction_")) {
-
-					// Get type from parameter name
-					String type = param.substring(18);
-
-					/*
-					 * This does a SQL subquery which joins the relation from
-					 * event to voc_bizTrans with voc_bizTrans and searches for
-					 * the bizTransaction-URIs specified. The subquery finally
-					 * returns the ids of the corresponding events. In other
-					 * words, this returns the ids of events that have at least
-					 * one of the bizTransactions associated. Finally it checks
-					 * if the event_id is in this set. This is the new
-					 * implementation for multiple bizTransactions per event -
-					 * not yet used.
-					 */
-					query.append("AND (`event_" + eventType + "`.id IN ("
-							+ "SELECT `event_id` AS id FROM (" + "`event_"
-							+ eventType + "_bizTrans` " + "JOIN (("
-							+ "SELECT id FROM `voc_BizTransType` "
-							+ "WHERE uri = \"" + type + "\") "
-							+ "NATURAL JOIN "
-							+ "(SELECT id FROM `voc_BizTrans WHERE "
-							+ "`voc_BizTrans`.id IN (");
-					stringArrayToSQL(
-							((ArrayOfString) paramRecord.get(param))
-									.getString(), query, queryArgs);
-					query
-							.append("))"
-									+ "ON `event_"
-									+ eventType
-									+ "_bizTrans`.`bizTrans_id` = `voc_BizTransType`.id)"
-									+ ")");
-
-				} else if (param.equals("MATCH_epc")) {
-					/*
-					 * This does a SQL subquery to search for event-IDs that
-					 * occur in a set of EPCs According to the specs, this
-					 * should only apply to ObjectEvent Note: -We think that the
-					 * Standard is not consistent so we enable it to do the
-					 * MATCH_epc also on TransactionEvents. -The current
-					 * implementation only returns events if the EPC equals one
-					 * of the EPCs associated to the event. [TDS1.3].
-					 * http://www.epcglobalinc.org/standards_technology/Ratified%20Spec%20March%208%202006.pdf
-					 */
-					if (eventType.equals("ObjectEvent")) {
-						query.append(" AND (`event_ObjectEvent`.id IN (");
-						query.append("SELECT `event_id` FROM"
-								+ " `event_ObjectEvent_EPCs` WHERE epc IN (");
-						stringArrayToSQL(((ArrayOfString) queryParams[i]
-								.getValue()).getString(), query, queryArgs);
-						query.append("))) ");
-					} else if (eventType.equals("TransactionEvent")) {
-						query.append(" AND (`event_TransactionEvent`.id IN (");
-						query
-								.append("SELECT `event_id` FROM"
-										+ " `event_TransactionEvent_EPCs` WHERE epc IN (");
-						stringArrayToSQL(((ArrayOfString) queryParams[i]
-								.getValue()).getString(), query, queryArgs);
-						query.append("))) ");
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("MATCH_parentID")) {
-					if (eventType.equals("AggregationEvent")
-							|| eventType.equals("TransactionEvent")) {
-						query.append(" AND (`parentID` IN (");
-						stringArrayToSQL(((ArrayOfString) queryParams[i]
-								.getValue()).getString(), query, queryArgs);
-						query.append(")) ");
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("MATCH_childEPC")) {
-					if (eventType.equals("AggregationEvent")) {
-						query.append(" AND (`event_AggregationEvent`.id IN (");
-						query
-								.append("SELECT `event_id` FROM `event_AggregationEvent_EPCs` "
-										+ "WHERE epc IN (");
-						stringArrayToSQL(((ArrayOfString) queryParams[i]
-								.getValue()).getString(), query, queryArgs);
-						query.append("))) ");
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("MATCH_epcClass")) {
-					if (eventType.equals("QuantityEvent")) {
-						query.append(" AND (`epcClass` IN (");
-						query.append("SELECT `id` FROM `voc_EPCClass` "
-								+ "WHERE `uri` IN (");
-						stringArrayToSQL(((ArrayOfString) queryParams[i]
-								.getValue()).getString(), query, queryArgs);
-						query.append("))) ");
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("EQ_quantity")) {
-					if (eventType.equals("QuantityEvent")) {
-						query.append(" AND (quantity = ?) ");
-						queryArgs.add(((Integer) paramRecord.get(param))
-								.toString());
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("GT_quantity")) {
-					if (eventType.equals("QuantityEvent")) {
-						query.append("AND (quantity > ?) ");
-						queryArgs.add(((Integer) paramRecord.get(param))
-								.toString());
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("GE_quantity")) {
-					if (eventType.equals("QuantityEvent")) {
-						query.append("AND (quantity >= ?) ");
-						queryArgs.add(((Integer) paramRecord.get(param))
-								.toString());
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("LT_quantity")) {
-					if (eventType.equals("QuantityEvent")) {
-						query.append("AND (quantity < ?) ");
-						queryArgs.add(((Integer) paramRecord.get(param))
-								.toString());
-					} else {
-						query.append(" AND 0 ");
-					}
-
-				} else if (param.equals("LE_quantity")) {
-					if (eventType.equals("QuantityEvent")) {
-						query.append("AND (quantity <= ?) ");
-						queryArgs.add(((Integer) paramRecord.get(param))
-								.toString());
-					} else {
-						query.append(" AND 0 ");
-					}
-					/*
-					 * EQ_fieldname with type ListOfString EQ_fieldname with
-					 * type Int, Float, Time GT_fieldname with type Int, Float,
-					 * Time GE_fieldname with type Int, Float, Time LT_fieldname
-					 * with type Int, Float, Time LE_fieldname with type Int,
-					 * Float, Time we do not support because we do not store any
-					 * fieldnames and therefore it is not needed.
-					 */
-				} else if (param.startsWith("GT_")) {
-					// TODO: marco: check this and implement it for all events
-					final int index = 3;
-					String fieldname = param.substring(index);
-					String where;
-					Object val = paramRecord.get(param);
-					try {
-						Integer intVal = (Integer) paramRecord.get(param);
-						where = "intValue > " + intVal;
-					} catch (ClassCastException e1) {
-						try {
-							Float floatVal = (Float) paramRecord.get(param);
-							where = "floatValue > " + floatVal;
-						} catch (ClassCastException e2) {
-							try {
-								Calendar cal = TimeParser.parseAsCalendar(val
-										.toString());
-								String dateVal = TimeParser.format(cal);
-								where = "dateValue>`" + dateVal + "`";
-							} catch (Exception e3) {
-								String strVal = val.toString();
-								where = "strValue>`" + strVal + "`";
-							}
-						}
-					}
-					if (eventType.equals("ObjectEvent")) {
-						query.append("AND `event_ObjectEvent_extensions`."
-								+ where);
-					} else {
-						query.append(" AND 0");
-					}
-
-				} else if (param.startsWith("EXISTS_")) {
-
-					// Get type from parameter name
-					final int index = 7;
-					String type = param.substring(index);
-
-					if (type.equals("childEPCs")) {
-						if (eventType.equals("AggregationEvent")) {
-							query
-									.append("AND (`event_AggregationEvent`.id IN ("
-											+ "SELECT `event_id` "
-											+ "FROM event_AggregationEvent_EPCs "
-											+ ")");
-						} else {
-							query.append(" AND 0");
-						}
-					} else if (type.equals("epcList")) {
-						query.append("AND (`event_" + eventType + "`.id IN ("
-								+ "SELECT `event_id` " + "FROM event_"
-								+ eventType + "_EPCs " + ")");
-					} else if (type.equals("bizTransactionList")) {
-						query.append("AND (`event_" + eventType + ".`id` IN ("
-								+ "SELECT `event_id` FROM " + "`event"
-								+ eventType + "_bizTrans" + ")");
-					} else {
-						query.append("AND (?) ");
-						queryArgs.add(type);
-					}
-					// This is not needed because the fields in the tables
-					// are named according to the standard.
-					// if (type.equals("eventTime")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("eventTime");
-					// } else if (type.equals("recordTime")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("recordTime");
-					// } else if (type.equals("action")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("action");
-					// } else if (type.equals("bizStep")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("bizStep");
-					// } else if (type.equals("disposition")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("disposition");
-					// } else if (type.equals("readPoint")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("readPoint");
-					// } else if (type.equals("bizLocation")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("bizLocation");
-					// } else if (type.equals("parentID")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("parentID");
-					// } else if (type.equals("epcClass")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("epcClass");
-					// } else if (type.equals("quantity")) {
-					// query.append("AND (?) ");
-					// queryArgs.add("quantity");
-					// }
-
-				} else if (param.startsWith("HASATTR_")) {
-					// TODO:
-				} else if (param.startsWith("EQATTR_")) {
-					// TODO:
-				} else if (param.equals("orderBy")) {
-					// Does only work correct if we choose only one Event-Type
-					// to
-					// query. Other wise, the Results are ordered by Event-Types
-					// and
-					// second according to the orderBy-Parameter
-					orderBy = (String) paramRecord.get(param);
-				} else if (param.equals("orderDirection")) {
-					// Does only work correct if we choose only one Event-Type
-					// to
-					// query. Other wise, the Results are ordered by Event-Types
-					// and
-					// second according to the orderBy-Parameter
-					orderDirection = (String) paramRecord.get(param);
-				} else if (param.equals("eventCountLimit")) {
-					// Does only work properly if we choose only one type to
-					// query.
-					limit = (Integer) paramRecord.get(param);
-				} else if (param.equals("maxEventCount")) {
-					maxEventCount = (Integer) paramRecord.get(param);
-				} else {
-					throw new QueryParameterException("The parameter " + param
-							+ " cannot be recognised.");
-				}
-			} catch (ClassCastException e) {
-				throw new QueryParameterException(
-						"The input value for parameter " + param + ": "
-								+ paramRecord.get(param)
-								+ " of the eventType " + eventType
-								+ " is not of the type required.");
-			}
-		}
-
-		if (maxEvent > -1 && limit > -1) {
-			throw new QueryParameterException(
-					"The maxEventCount and the eventCountLimit "
-							+ "are mutually exclusive.");
-		}
-
-		if (orderBy.equals("") && limit > -1) {
-			throw new QueryParameterException(
-					"eventCountLimit may only be used when"
-							+ " orderBy is specified.");
-		}
-
-		if (!orderBy.equals("")) {
-			query.append(" ORDER BY (?)");
-			queryArgs.add(orderBy);
-			if (orderDirection.equals("ASC")) {
-				query.append(" ASC");
-			} else {
-				query.append(" DESC");
-			}
-		}
-
-		if (limit > -1) {
-			query.append(" LIMIT " + ((Integer) limit).toString());
-		}
-
-		LOG.info("Main query:\n" + query.toString().replace("`", q));
-		ps = dbconnection.prepareStatement(query.toString().replace("`", q));
-		for (int i = 0; i < queryArgs.size(); i++) {
-			ps.setString(i + 1, (String) queryArgs.get(i));
-			LOG.info("Argument " + (i + 1) + ": " + queryArgs.get(i));
-		}
-
-		return ps;
-	}
-
-	/**
-	 * @see org.accada.epcis.soapapi.EPCISServicePortType#getQueryNames(org.accada.epcis.soapapi.EmptyParms)
-	 * @param parms
-	 *            An empty parameter.
-	 * @return An ArrayOfString containing all the subscrubed query names.
-	 */
-	public ArrayOfString getQueryNames(final EmptyParms parms) {
-		ArrayOfString qNames = new ArrayOfString();
-		String[] qNamesArray = {};
-		qNamesArray = queryNames.toArray(qNamesArray);
-		qNames.setString(qNamesArray);
-		return qNames;
-	}
-
-	/**
-	 * Subscribes a query.
-	 * 
-	 * @see org.accada.epcis.soapapi.EPCISServicePortType#subscribe(org.accada.epcis.soapapi.Subscribe)
-	 * @param parms
-	 *            A Subscribe object containing the query to be subscribed..
-	 * @return Nothing.
-	 * @throws ImplementationException
-	 *             If a problem with the EPCIS implementation occured.
-	 * @throws InvalidURIException
-	 *             If an invalid URI where the query results should be posted is
-	 *             provided.
-	 * @throws SubscribeNotPermittedException
-	 *             If a SimpleMasterDataQuery is provided which is only valid
-	 *             for polling.
-	 * @throws SubscriptionControlsException
-	 *             If one of the SubscriptionControls parameters is not set.
-	 * @throws ValidationException
-	 *             If the query is not valid.
-	 * @throws DuplicateSubscriptionException
-	 *             If a query with the given ID is already subscribed.
-	 * @throws NoSuchNameException
-	 *             If a query name is not implemented yet.
-	 */
-	public VoidHolder subscribe(final Subscribe parms)
-			throws ImplementationException, InvalidURIException,
-			SubscribeNotPermittedException, SubscriptionControlsException,
-			ValidationException, DuplicateSubscriptionException,
-			NoSuchNameException {
-		QueryParam[] qParams = parms.getParams();
-		URI dest = parms.getDest();
-		String subscriptionID = parms.getSubscriptionID();
-		SubscriptionControls controls = parms.getControls();
-		String queryName = parms.getQueryName();
-		GregorianCalendar initialRecordTime = (GregorianCalendar) parms
-				.getControls().getInitialRecordTime();
-		if (initialRecordTime == null) {
-			initialRecordTime = new GregorianCalendar();
-		}
-
-		try {
-			// A few input sanity checks
-
-			// URL checks
-			// dest may be null or empty. But we don't support pre-arranged
-			// destinations and throw a InvalidURIException according to the
-			// standard.
-			if (dest == null || dest.toString().equals("")) {
-				throw new InvalidURIException("Destination URI empty.\n"
-						+ "This implementation doesn't "
-						+ "support pre-arranged destinations.");
-			} else {
-				try {
-					URL url = new URL(dest.toString());
-				} catch (MalformedURLException e) {
-					throw new InvalidURIException(e.getMessage());
-				}
-			}
-
-			// query type must be implemented...
-			if (!queryNames.contains(queryName)) {
-				throw new NoSuchNameException(queryName + " isn't implemented.");
-			}
-
-			// ... and it mustn't be a SimpleMasterDataQuery,
-			// which would only be valid for polling.
-			if (queryName.equals("SimpleMasterDataQuery")) {
-				throw new SubscribeNotPermittedException(
-						queryName
-								+ " is not permitted for use with subscribe, only with poll.");
-			}
-
-			// subscriptionID mustn't be empty.
-			if (null == subscriptionID || subscriptionID.equals("")) {
-				throw new ValidationException(
-						"SubscriptionID is empty. Choose a valid subscription id.");
-			}
-
-			// subscriptionID mustn't exist yet.
-			if (doesExistSubscriptionID(subscriptionID)) {
-				throw new DuplicateSubscriptionException(subscriptionID
-						+ " already exists. Choose a different subscriptionID.");
-			}
-
-			// Check controls
-			// Not both trigger and schedule together may be used,
-			// but one must be set.
-			if (controls.getSchedule() != null && controls.getTrigger() != null) {
-				throw new SubscriptionControlsException(
-						"Schedule and trigger mustn't be used together.");
-			}
-
-			if (controls.getSchedule() == null && controls.getTrigger() == null) {
-				throw new SubscriptionControlsException(
-						"Either schedule or trigger has to be set.");
-			}
-
-			// Parse query schedule
-			if (controls.getSchedule() == null && controls.getTrigger() != null) {
-				throw new SubscriptionControlsException(
-						"We do not support triggers.");
-			}
-
-			Schedule schedule = new Schedule(controls.getSchedule());
-
-			HttpServlet servlet = (HttpServlet) MessageContext
-					.getCurrentContext().getProperty(
-							HTTPConstants.MC_HTTP_SERVLET);
-			Map<String, SubscriptionScheduled> subscribedMap;
-			if (servlet.getServletContext().getAttribute("subscribedMap") == null) {
-				subscribedMap = reloadQueries();
-			} else {
-				subscribedMap = getSubscriptions();
-			}
-
-			// store the new Query into the HashMap
-			SubscriptionScheduled newSubscription = new SubscriptionScheduled(
-					subscriptionID, qParams, dest, controls.isReportIfEmpty(),
-					initialRecordTime, initialRecordTime, schedule, queryName);
-			subscribedMap.put(subscriptionID, newSubscription);
-
-			// store the Query into the database
-			connectDB();
-			String insert = "INSERT INTO subscription (subscriptionid, "
-					+ "params, dest, sched, trigg, initialrecordingtime, "
-					+ "exportifempty, queryname, lastexecuted) VALUES "
-					+ "((?), (?), (?), (?), (?), (?), (?), (?), (?))";
-			PreparedStatement stmt = dbconnection.prepareStatement(insert);
-
-			try {
-				stmt.setString(1, subscriptionID);
-
-				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-				ObjectOutput out = new ObjectOutputStream(outStream);
-				out.writeObject(qParams);
-				ByteArrayInputStream inStream = new ByteArrayInputStream(
-						outStream.toByteArray());
-				stmt.setBinaryStream(2, inStream, inStream.available());
-
-				stmt.setString(3, dest.toString());
-
-				outStream = new ByteArrayOutputStream();
-				out = new ObjectOutputStream(outStream);
-				out.writeObject(schedule);
-				inStream = new ByteArrayInputStream(outStream.toByteArray());
-				stmt.setBinaryStream(4, inStream, inStream.available());
-
-				stmt.setString(5, "");
-				stmt.setString(6, isoDateFormat.format(newSubscription
-						.getInitialRecordTime().getTime()));
-				stmt.setBoolean(7, controls.isReportIfEmpty());
-				stmt.setString(8, queryName);
-				stmt.setString(9, isoDateFormat.format(newSubscription
-						.getInitialRecordTime().getTime()));
-
-				if (stmt.executeUpdate() == 0) {
-					System.out.println("Ups, something went wrong by"
-							+ " inserting a Query.");
-				}
-				dbconnection.close();
-			} catch (IOException e) {
-				System.out.println("I'm so sorry, it didn't work: ");
-				ImplementationExceptionSeverity severity = ImplementationExceptionSeverity
-						.fromString("ERROR");
-				throw new ImplementationException("SQLException occured: "
-						+ e.getMessage(), severity, queryName, subscriptionID);
-			}
-
-			// store the HasMap into the ServletContext
-			servlet.getServletContext().setAttribute("subscribedMap",
-					subscribedMap);
-			System.out.println("Subscribed a new Query");
-
-			// Either we throw some exception or we return successfully:
-			return new VoidHolder();
-		} catch (SQLException sqe) {
-			ImplementationExceptionSeverity severity = ImplementationExceptionSeverity
-					.fromString("ERROR");
-			throw new ImplementationException("SQLException occured: "
-					+ sqe.getMessage(), severity, queryName, subscriptionID);
-		}
-	}
-
-	/**
-	 * This method loads all the stored queries from the database, starts them
-	 * again and stores everything in a HasMap.
-	 * 
-	 * @return A HashMap mapping query names to scheduled query subscriptions.
-	 * @throws SQLException
-	 *             If a problem with the database occured.
-	 * @throws ImplementationException
-	 *             If a problem with the EPCIS implementation occured.
-	 */
-	private Map<String, SubscriptionScheduled> reloadQueries()
-			throws SQLException, ImplementationException {
-		Map<String, SubscriptionScheduled> subscribedMap = new HashMap<String, SubscriptionScheduled>();
-
-		connectDB();
-		ResultSet rs;
-		Statement stmt = dbconnection.createStatement();
-		String query = "SELECT * FROM subscription";
-		rs = stmt.executeQuery(query);
-
-		SubscriptionScheduled newSubscription;
-		String subscriptionid;
-		QueryParam[] params;
-		URI dest;
-		Schedule sched;
-		GregorianCalendar initrectime = new GregorianCalendar();
-		boolean exportifempty;
-		ObjectInput in;
-
-		while (rs.next()) {
-			try {
-				subscriptionid = rs.getString("subscriptionid");
-
-				in = new ObjectInputStream(rs.getBinaryStream("params"));
-
-				params = (QueryParam[]) in.readObject();
-				dest = new URI(rs.getString("dest"));
-
-				in = new ObjectInputStream(rs.getBinaryStream("sched"));
-				sched = (Schedule) in.readObject();
-
-				initrectime.setTime(rs.getTimestamp("initialrecordingtime"));
-
-				exportifempty = rs.getBoolean("exportifempty");
-
-				String queryName = rs.getString("queryname");
-
-				newSubscription = new SubscriptionScheduled(subscriptionid,
-						params, dest, exportifempty, initrectime,
-						new GregorianCalendar(), sched, queryName);
-				subscribedMap.put(subscriptionid, newSubscription);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		rs.close();
-		dbconnection.close();
-		// System.out.println("Subscribed Queries are now working");
-		return subscribedMap;
-	}
-
-	/**
-	 * Stops a subscribed query from further invocations.
-	 * 
-	 * @see org.accada.epcis.soapapi.EPCISServicePortType#unsubscribe(org.accada.epcis.soapapi.Unsubscribe)
-	 * @param parms
-	 *            An Unsubscribe object containing the ID of the query to be
-	 *            unsubscribed.
-	 * @return Nothing.
-	 * @throws ImplementationException
-	 *             If a problem with the EPCIS implementation occured.
-	 * @throws NoSuchSubscriptionException
-	 */
-	public VoidHolder unsubscribe(final Unsubscribe parms)
-			throws ImplementationException, NoSuchSubscriptionException {
-
-		Map<String, SubscriptionScheduled> subscribedMap = getSubscriptions();
-
-		try {
-			connectDB();
-			String delete = "DELETE FROM subscription WHERE "
-					+ "subscriptionid = (?)";
-			PreparedStatement stmt;
-			stmt = dbconnection.prepareStatement(delete);
-			stmt.setString(1, parms.getSubscriptionID());
-			if (stmt.executeUpdate() == 0) {
-				System.out.println("Ups, something went wrong by"
-						+ " deleting a Query. Maby this subscriptionID "
-						+ "doesn't exist.");
-			}
-			dbconnection.close();
-		} catch (Exception e) {
-			ImplementationException iex = new ImplementationException();
-			iex
-					.setReason("SQL error during query execution: "
-							+ e.getMessage());
-		}
-
-		if (subscribedMap.containsKey(parms.getSubscriptionID())) {
-			SubscriptionScheduled toDelete = subscribedMap.get(parms
-					.getSubscriptionID());
-			toDelete.stopSubscription();
-			subscribedMap.remove(parms.getSubscriptionID());
-			setSubscriptions(subscribedMap);
-		} else {
-			throw new NoSuchSubscriptionException(
-					"There is no subscription with ID '"
-							+ parms.getSubscriptionID() + "'");
-		}
-		return new VoidHolder();
-	}
-
-	/**
-	 * Saves the map with the subscriptions to the servlet context.
-	 * 
-	 * @param subscribedMap
-	 *            The map with the subscriptions.
-	 */
-	private void setSubscriptions(
-			final Map<String, SubscriptionScheduled> subscribedMap) {
-		HttpServlet servlet = (HttpServlet) MessageContext.getCurrentContext()
-				.getProperty(HTTPConstants.MC_HTTP_SERVLET);
-		servlet.getServletContext()
-				.setAttribute("subscribedMap", subscribedMap);
-	}
-
-	/**
-	 * Retrieves the map with the subscriptions from the servlet context.
-	 * 
-	 * @return The map with the subscriptions.
-	 * @throws ImplementationException
-	 *             If the map could not be reloaded.
-	 */
-	private Map<String, SubscriptionScheduled> getSubscriptions()
-			throws ImplementationException {
-		HttpServlet servlet = (HttpServlet) MessageContext.getCurrentContext()
-				.getProperty(HTTPConstants.MC_HTTP_SERVLET);
-		Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) servlet
-				.getServletContext().getAttribute("subscribedMap");
-		if (subscribedMap == null) {
-			try {
-				subscribedMap = reloadQueries();
-				setSubscriptions(subscribedMap);
-			} catch (SQLException e) {
-				ImplementationException iex = new ImplementationException();
-				iex.setReason("SQL error during query execution: "
-						+ e.getMessage());
-				throw iex;
-			}
-		}
-		return subscribedMap;
-	}
-
-	/**
-	 * Returns an ArrayOfString containing IDs of all subscribed queries.
-	 * 
-	 * @see org.accada.epcis.soapapi.EPCISServicePortType#getSubscriptionIDs(org.accada.epcis.soapapi.GetSubscriptionIDs)
-	 * @param parms
-	 *            An empty parameter.
-	 * @return An ArrayOfString containing IDs of all subscribed queries.
-	 * @throws ImplementationException
-	 *             If a problem with the EPCIS implementation occured.
-	 */
-	public ArrayOfString getSubscriptionIDs(final GetSubscriptionIDs parms)
-			throws ImplementationException {
-
-		Map<String, SubscriptionScheduled> subscribedMap = getSubscriptions();
-		String[] temp = {};
-		temp = subscribedMap.keySet().toArray(temp);
-		ArrayOfString arrOfStr = new ArrayOfString();
-		arrOfStr.setString(temp);
-		return arrOfStr;
-	}
-
-	/**
-	 * Runs (polls) a query.
-	 * 
-	 * @see org.accada.epcis.soapapi.EPCISServicePortType#poll(org.accada.epcis.soapapi.Poll)
-	 * @param parms
-	 *            The query to poll.
-	 * @return A QueryResults object containing the result of the query.
-	 * @throws ImplementationException
-	 *             If a problem with the EPCIS implementation occured.
-	 * @throws QueryTooLargeException
-	 *             If the query is too large.
-	 * @throws QueryParameterException
-	 *             If one of the query parameters is invalid.
-	 * @throws NoSuchNameException
-	 *             If an invalid query type was provided.
-	 */
-	public QueryResults poll(final Poll parms) throws ImplementationException,
-			QueryTooLargeException, QueryParameterException,
-			NoSuchNameException {
-
-		// query type must be implemented.
-		if (!queryNames.contains(parms.getQueryName())) {
-			throw new NoSuchNameException();
-		}
-
-		if (parms.getQueryName().equals("SimpleEventQuery")) {
-			try {
-				connectDB();
-
-				Integer count = 0;
-				maxEventCount = -1;
-
-				QueryParam[] queryParams = parms.getParams();
-
-				EventListType eventList = new EventListType();
-
-				ObjectEventType[] tempObjectEvent = runObjectEventQuery(createEventQuery(
-						queryParams, "ObjectEvent"));
-				if (tempObjectEvent != null) {
-					count += tempObjectEvent.length;
-				}
-				eventList.setObjectEvent(tempObjectEvent);
-				// System.out.println("objectEventQuery done");
-
-				AggregationEventType[] tempAggregationEvent = runAggregationEventQuery(createEventQuery(
-						queryParams, "AggregationEvent"));
-				if (tempAggregationEvent != null) {
-					count += tempAggregationEvent.length;
-				}
-				eventList.setAggregationEvent(tempAggregationEvent);
-				// System.out.println("aggregationEventQuery done");
-
-				QuantityEventType[] tempQuantityEvent = runQuantityEventQuery(createEventQuery(
-						queryParams, "QuantityEvent"));
-				if (tempQuantityEvent != null) {
-					count += tempQuantityEvent.length;
-				}
-				eventList.setQuantityEvent(tempQuantityEvent);
-				// System.out.println("quantityEventQuery done");
-
-				TransactionEventType[] tempTransactionEvent = runTransactionEventQuery(createEventQuery(
-						queryParams, "TransactionEvent"));
-				if (tempTransactionEvent != null) {
-					count += tempTransactionEvent.length;
-				}
-				eventList.setTransactionEvent(tempTransactionEvent);
-				// System.out.println("transactionEventQuery done");
-				dbconnection.close();
-
-				if (maxEventCount > -1 && maxEventCount < count) {
-					throw new QueryTooLargeException(
-							"The Result set is larger then"
-									+ " the maxEventCount value. MaxEventCount is set to "
-									+ maxEventCount + " and the query has "
-									+ count + " items.", null, null);
-				}
-
-				QueryResultsBody resultsBody = new QueryResultsBody();
-
-				QueryResults results = new QueryResults();
-
-				resultsBody.setEventList(eventList);
-				results.setResultsBody(resultsBody);
-				results.setQueryName("SimpleEventQuery");
-				LOG.info("poll request for '" + results.getQueryName()
-						+ "' succeeded");
-				// LOG.info("biz transaction:");
-				// LOG.info(results.getResultsBody().getEventList().getObjectEvent(0).getBizTransactionList()[0]);
-				return results;
-			} catch (ImplementationException ie) {
-				// no matter what exception occured, try to close the data base
-				// connection
-				if (dbconnection != null) {
-					try {
-						dbconnection.close();
-					} catch (SQLException se) {
-						LOG.warn("Error closing the database: ", se);
-					}
-				}
-				throw ie;
-
-			} catch (SQLException e) {
-				if (dbconnection != null) {
-					try {
-						dbconnection.close();
-					} catch (SQLException se) {
-						LOG.warn("Unable to cloase the db connection.", se);
-					}
-				}
-				ImplementationExceptionSeverity severity = ImplementationExceptionSeverity
-						.fromString("ERROR");
-				ImplementationException iex = new ImplementationException();
-				iex.setReason("SQL error during query execution: "
-						+ e.getMessage());
-				e.printStackTrace(System.out);
-				iex.setSeverity(severity);
-				throw iex;
-			} catch (RuntimeException e) {
-				// Get a stack trace into catalina.out.
-				System.out.println("Runtime Exception:\n" + e.getMessage());
-				e.printStackTrace(System.out);
-				throw e;
-			}
-		} else if (parms.getQueryName().equals("SimpleMasterDataQuery")) {
-			// TODO: implement SimpleMasterDataQuery here.
-			return null;
-		} else {
-			// We shouldn't ever reach this point... iXohbai7
-			System.out.println("Reached unreachable point.\n"
-					+ "Search for iXohbai7");
-			throw new NoSuchNameException();
-		}
-	}
-
-	/**
-	 * Returns the standard version.
-	 * 
-	 * @see org.accada.epcis.soapapi.EPCISServicePortType#getStandardVersion(org.accada.epcis.soapapi.EmptyParms)
-	 * @param parms
-	 *            An empty parameter.
-	 * @return The standard version.
-	 */
-	public String getStandardVersion(final EmptyParms parms) {
-		return stdVersion;
-	}
-
-	/**
-	 * Returns the vendor version.
-	 * 
-	 * @see org.accada.epcis.soapapi.EPCISServicePortType#getVendorVersion(org.accada.epcis.soapapi.EmptyParms)
-	 * @param parms
-	 *            An empty parameter.
-	 * @return The vendor version.
-	 */
-	public String getVendorVersion(final EmptyParms parms) {
-		return version;
-	}
+    private static final Logger LOG = Logger.getLogger(EpcisQueryInterface.class);
+
+    /**
+     * The version of the standard that this service is implementing.
+     */
+    private final String stdVersion = "1.0";
+
+    /**
+     * The version of this service implementation.
+     */
+    private final String version = "http://www.accada.org/releases/0.2/";
+
+    /**
+     * The connection to the database.
+     */
+    private Connection dbconnection = null;
+
+    /**
+     * The database dependent identifier quotation sign.
+     */
+    private String delimiter;
+
+    /**
+     * Before returning the Results of the query, it checks if the set is too
+     * large. This value can be set by Query-Parameters.
+     */
+    private int maxEventCount;
+
+    /**
+     * ISO 8601 SimpleDateFormat. Use it like this for current time:
+     * isoDateFormat.format(now)
+     */
+    private final SimpleDateFormat isoDateFormat = new SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS");
+
+    /**
+     * The names of all the implemented queries.
+     */
+    // TODO: Add SimpleMasterDataQuery once implemented.
+    private final Set<String> queryNames = new HashSet<String>() {
+        private static final long serialVersionUID = -3868728341409854448L;
+        {
+            add("SimpleEventQuery");
+        }
+    };
+
+    /**
+     * Basic SQL query string for object events.
+     */
+    private String objectEventQueryBase = "SELECT DISTINCT "
+            + "`event_ObjectEvent`.`id`, `eventTime`, `recordTime`, "
+            + "`eventTimeZoneOffset`, `action`, "
+            + "`voc_BizStep`.`uri` AS `bizStep`, "
+            + "`voc_Disposition`.`uri` AS `disposition`, "
+            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
+            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "FROM `event_ObjectEvent` "
+            + "LEFT JOIN `voc_BizStep` ON `event_ObjectEvent`.`bizStep` = `voc_BizStep`.`id` "
+            + "LEFT JOIN `voc_Disposition` ON `event_ObjectEvent`.`disposition` = `voc_Disposition`.`id` "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_ObjectEvent`.`readPoint` = `voc_ReadPoint`.`id` "
+            + "LEFT JOIN `voc_BizLoc` ON `event_ObjectEvent`.`bizLocation` = `voc_BizLoc`.`id` "
+            + "LEFT JOIN `event_ObjectEvent_extensions` ON `event_ObjectEvent`.`id` = `event_ObjectEvent_extensions`.`event_id` "
+            + "WHERE 1 ";
+
+    /**
+     * Basic SQL query string for aggregation events.
+     */
+    // TODO marco: query as for objectevent (extensions)!
+    private String aggregationEventQueryBase = "SELECT DISTINCT "
+            + "`event_AggregationEvent`.`id`, `eventTime`, `recordTime`, "
+            + "`eventTimeZoneOffset`, `parentID`, `action`, "
+            + "`voc_BizStep`.`uri` AS `bizStep`, "
+            + "`voc_Disposition`.`uri` AS `disposition`, "
+            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
+            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "FROM `event_AggregationEvent` "
+            + "LEFT JOIN `voc_BizStep` ON `event_AggregationEvent`.`bizStep` = `voc_BizStep`.`id` "
+            + "LEFT JOIN `voc_Disposition` ON `event_AggregationEvent`.`disposition`  = `voc_Disposition`.`id` "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_AggregationEvent`.`readPoint` = `voc_ReadPoint`.`id` "
+            + "LEFT JOIN `voc_BizLoc` ON `event_AggregationEvent`.`bizLocation` = `voc_BizLoc`.`id` "
+            + "WHERE 1 ";
+
+    /**
+     * Basic SQL query string for quantity events.
+     */
+    // TODO marco: query as for objectevent (extensions)!
+    private String quantityEventQueryBase = "SELECT DISTINCT "
+            + "`event_QuantityEvent`.`id`, `eventTime`, `recordTime`, `eventTimeZoneOffset`, "
+            + "`voc_EPCClass`.`uri` AS `epcClass`, `quantity`, "
+            + "`voc_BizStep`.`uri` AS `bizStep`, "
+            + "`voc_Disposition`.`uri` AS `disposition`, "
+            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
+            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "FROM `event_QuantityEvent` "
+            + "LEFT JOIN `voc_BizStep` ON `event_QuantityEvent`.`bizStep` = `voc_BizStep`.`id` "
+            + "LEFT JOIN `voc_Disposition` ON `event_QuantityEvent`.`disposition` = `voc_Disposition`.`id` "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_QuantityEvent`.`readPoint` = `voc_ReadPoint`.`id` "
+            + "LEFT JOIN `voc_BizLoc` ON `event_QuantityEvent`.`bizLocation` = `voc_BizLoc`.`id` "
+            + "LEFT JOIN `voc_EPCClass` ON `event_QuantityEvent`.`epcClass` = `voc_EPCClass`.`id` "
+            + "WHERE 1 ";
+
+    /**
+     * Basic SQL query string for transaction events.
+     */
+    // TODO marco: query as for objectevent (extensions)!
+    private String transactionEventQueryBase = "SELECT DISTINCT "
+            + "`event_TransactionEvent`.`id`, `eventTime`, `recordTime`, "
+            + "`eventTimeZoneOffset`, `action`, `parentId`, "
+            + "`voc_BizStep`.`uri` AS `bizStep`, "
+            + "`voc_Disposition`.`uri` AS `disposition`, "
+            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
+            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "FROM `event_TransactionEvent` "
+            + "LEFT JOIN `voc_BizStep` ON `event_TransactionEvent`.`bizStep` = `voc_BizStep`.`id` "
+            + "LEFT JOIN `voc_Disposition` ON `event_TransactionEvent`.`disposition` = `voc_Disposition`.`id` "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_TransactionEvent`.`readPoint` = `voc_ReadPoint`.`id` "
+            + "LEFT JOIN `voc_BizLoc` ON `event_TransactionEvent`.`bizLocation` = `voc_BizLoc`.`id` "
+            + "WHERE 1 ";
+
+    public EpcisQueryInterface() {
+        LOG.info("EpcisQueryInterface invoked.");
+        MessageContext msgContext = MessageContext.getCurrentContext();
+        delimiter = (String) msgContext.getProperty("delimiter");
+        dbconnection = (Connection) msgContext.getProperty("dbconnection");
+    }
+
+    // /**
+    // * Opens a connection to the database server. Uses the global variables
+    // * dbserver, dbuser, dbpassword and sets dbconnection.<br>
+    // * BEWARE OF CODE DUPLICATION: this method is also implemented in class
+    // * SubscriptionScheduled!
+    // *
+    // * @throws ImplementationException
+    // * If the Database variables could not be read, or the database
+    // * could not be opened.
+    // */
+    // private void connectDB() throws ImplementationException {
+    // try {
+    // Context initContext = new InitialContext();
+    // Context env = (Context) initContext.lookup("java:comp/env");
+    // db = (DataSource) env.lookup("jdbc/EPCISDB");
+    //
+    // Connection dbconnection = db.getConnection();
+    // delimiter = dbconnection.getMetaData().getIdentifierQuoteString();
+    // } catch (NamingException e) {
+    // ImplementationException iex = new ImplementationException();
+    // iex.setReason("Could not get DataSource, check "
+    // + "META-INF/context.xml and "
+    // + "WEB-INF/web.xml (on server side) "
+    // + "for configuration errors (" + e.getMessage() + ")");
+    // iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+    // throw iex;
+    // } catch (SQLException e) {
+    // ImplementationException iex = new ImplementationException();
+    // iex.setReason("could not connect to the database ("
+    // + e.getMessage() + ")");
+    // iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+    // throw iex;
+    // }
+    // }
+
+    /**
+     * Returns whether subscriptionID already exists in DB.
+     * 
+     * @param subscrId
+     *            The id to be looked up.
+     * @return <code>true</code> if subscriptionID already exists in DB,
+     *         <code>false</code> otherwise.
+     * @throws SQLException
+     *             If a problem with the database occured.
+     * @throws ImplementationException
+     *             If a problem with the EPCIS implementation occured.
+     */
+    private boolean fetchExistsSubscriptionId(final String subscrId)
+            throws SQLException, ImplementationException {
+        String query = "SELECT EXISTS(SELECT subscriptionid FROM subscription WHERE subscriptionid = (?))";
+        PreparedStatement pstmt = dbconnection.prepareStatement(query);
+        pstmt.setString(1, subscrId);
+        LOG.debug("QUERY: " + query);
+        LOG.debug("       query param 1: " + subscrId);
+
+        ResultSet rs = pstmt.executeQuery();
+        rs.first();
+        Boolean result = rs.getBoolean(1);
+        rs.close();
+
+        return result.booleanValue();
+    }
+
+    /**
+     * Returns all EPCs associated to a certain event_id.
+     * 
+     * @param tableName
+     *            The SQL name of the table to be searched
+     * @param eventId
+     *            is typically an 64bit integer. We use string here to avoid
+     *            java vs. SQL type problems.
+     * @return EPCs beloning to event_id
+     * @throws SQLException
+     *             Database troubles.
+     * @throws ImplementationException
+     */
+    private EPC[] fetchChildEPCs(final String tableName, final int eventId)
+            throws SQLException, ImplementationException {
+        String query = "SELECT DISTINCT epc FROM " + delimiter + tableName
+                + delimiter + " WHERE " + delimiter + "event_id" + delimiter
+                + " = " + eventId;
+        LOG.debug("QUERY: " + query);
+        Statement stmt = dbconnection.createStatement();
+
+        ResultSet rs = stmt.executeQuery(query);
+        List<EPC> epcList = new ArrayList<EPC>();
+        while (rs.next()) {
+            EPC epc = new EPC(rs.getString("epc"));
+            epcList.add(epc);
+        }
+
+        EPC[] epcs = new EPC[epcList.size()];
+        epcs = epcList.toArray(epcs);
+        return epcs;
+    }
+
+    /**
+     * Returns all bizTransactions associated to a certain event_id.
+     * 
+     * @param tableName
+     *            The SQL name of the table to be searched.
+     * @param eventId
+     *            Typically an 64bit integer to identify the event.
+     * @return bizTransactions associated to event_id
+     * @throws SQLException
+     *             DB problem.
+     * @throws ImplementationException
+     *             Several problems get matched to this exception.
+     */
+    private BusinessTransactionType[] fetchBizTransactions(
+            final String tableName, final int eventId) throws SQLException,
+            ImplementationException {
+        String query = "SELECT DISTINCT "
+                + "`voc_BizTrans`.`uri`, `voc_BizTransType`.`uri` AS `typeuri`"
+                + "FROM ((`BizTransaction` JOIN `"
+                + tableName
+                + "` ON `BizTransaction`.`id` = `"
+                + tableName
+                + "`.`bizTrans_id`)"
+                + "JOIN `voc_BizTrans` ON `BizTransaction`.`bizTrans` = `voc_BizTrans`.`id`)"
+                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.`type` = `voc_BizTransType`.`id`"
+                + " WHERE `" + tableName + "`.`event_id` = " + eventId;
+        LOG.debug("QUERY: " + query);
+        Statement stmt = dbconnection.createStatement();
+
+        ResultSet rs = stmt.executeQuery(query.replace("`", delimiter));
+        List<BusinessTransactionType> bizTransList = new ArrayList<BusinessTransactionType>();
+        while (rs.next()) {
+            String uriString = null;
+            uriString = rs.getString("uri");
+            URI uri = stringToUri(uriString);
+            BusinessTransactionType btrans = new BusinessTransactionType(uri);
+            uriString = rs.getString("typeuri");
+            if (uriString != null) {
+                uri = stringToUri(uriString);
+                btrans.setType(uri);
+            }
+            bizTransList.add(btrans);
+        }
+
+        BusinessTransactionType[] bizTrans = new BusinessTransactionType[bizTransList.size()];
+        bizTrans = bizTransList.toArray(bizTrans);
+        return bizTrans;
+    }
+
+    /**
+     * Convert a string to a URI. Exceptions are caught and a meaningful
+     * ImplementationException is thrown instead. This method works on axis
+     * URIs, not Java URIs. Make sure you have the right imports.
+     * 
+     * @param uriString
+     *            String to convert to URI
+     * @return URI
+     * @throws ImplementationException
+     *             Thrown when string not in URI format.
+     */
+    private URI stringToUri(final String uriString)
+            throws ImplementationException {
+        try {
+            if (uriString == null) {
+                return null;
+            }
+            URI uri = new URI(uriString);
+            return uri;
+        } catch (URI.MalformedURIException e) {
+            String msg = "Malformed URI value: " + uriString;
+            LOG.error(msg, e);
+            ImplementationException iex = new ImplementationException();
+            iex.setReason(msg);
+            iex.setStackTrace(e.getStackTrace());
+            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+            throw iex;
+        }
+    }
+
+    /**
+     * Executes an SQL query and returns an array of ObjectEventType.
+     * 
+     * @param objectEventQuery
+     *            Query. Supposed to be created by createEventQuery.
+     * @return ObjectEventType[]
+     * @throws SQLException
+     *             Problem on db backend. The Query must return ObjectEvents,
+     *             otherwise this leads to an SQLException as well. is thrown.
+     * @throws ImplementationException
+     *             Problem with data or on implementation side. (i.e. uri value
+     *             in DB is actually not an uri)
+     */
+    private ObjectEventType[] runObjectEventQuery(
+            final PreparedStatement objectEventQuery) throws SQLException,
+            ImplementationException {
+        if (objectEventQuery == null) {
+            return null;
+        }
+
+        // Calendar needed for converting timestamps
+        Calendar cal = Calendar.getInstance();
+
+        // run the query and get all ObjectEvents
+        ResultSet rs = objectEventQuery.executeQuery();
+
+        List<ObjectEventType> objectEventList = new ArrayList<ObjectEventType>();
+        while (rs.next()) {
+            ObjectEventType objectEvent = new ObjectEventType();
+            int eventId = rs.getInt("id");
+
+            // set EventTime, RecordTime, adn EventTimezoneOffset
+            cal.setTime(rs.getTimestamp("eventTime"));
+            objectEvent.setEventTime((Calendar) cal.clone());
+            cal.setTime(rs.getTimestamp("recordTime"));
+            objectEvent.setRecordTime((Calendar) cal.clone());
+            objectEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
+
+            // set action
+            ActionType action = ActionType.fromString(rs.getString("action"));
+            objectEvent.setAction(action);
+
+            // set all URIs
+            objectEvent.setBizStep(stringToUri(rs.getString("bizStep")));
+            objectEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            if (rs.getString("readPoint") != null) {
+                ReadPointType rp = new ReadPointType();
+                rp.setId(stringToUri(rs.getString("readPoint")));
+                objectEvent.setReadPoint(rp);
+            }
+            if (rs.getString("bizLocation") != null) {
+                BusinessLocationType blt = new BusinessLocationType();
+                blt.setId(stringToUri(rs.getString("bizLocation")));
+                objectEvent.setBizLocation(blt);
+            }
+
+            BusinessTransactionType[] btt = fetchBizTransactions(
+                    "event_ObjectEvent_bizTrans", eventId);
+            objectEvent.setBizTransactionList(btt);
+
+            // get all EPCs
+            EPC[] epcs = fetchChildEPCs("event_ObjectEvent_EPCs", eventId);
+            objectEvent.setEpcList(epcs);
+
+            // TODO: marco: check this, when ok -> do for all events
+            Statement stmt = dbconnection.createStatement();
+            String query = "SELECT * FROM `event_ObjectEvent_extensions` "
+                    + "WHERE event_id=" + eventId;
+            LOG.debug("Query for getting field extensions: " + query);
+            ResultSet rs2 = stmt.executeQuery(query.replace("`", delimiter));
+            List<MessageElement> meList = new ArrayList<MessageElement>();
+            while (rs2.next()) {
+                String fieldname = rs2.getString("fieldname");
+                String[] parts = fieldname.split("#");
+                if (parts.length != 2) {
+                    throw new SQLException("Column 'fieldname' in table "
+                            + "'event_ObjectEvent_extensions' has invalid "
+                            + "format (fieldname = concatenation of namespace "
+                            + "URI for field extension, '#', and the name of "
+                            + "the extension field).");
+                }
+                String namespace = parts[0];
+                String localPart = parts[1];
+                String prefix = rs2.getString("prefix");
+                String value = rs2.getString("intValue");
+                if (value == null) {
+                    value = rs2.getString("floatValue");
+                }
+                if (value == null) {
+                    value = rs2.getString("strValue");
+                }
+                if (value == null) {
+                    value = rs2.getString("dateValue");
+                }
+                if (value == null) {
+                    throw new SQLException("All of the value columns in "
+                            + "table 'event_ObjectEvent_extensions' "
+                            + "are null.");
+                }
+                MessageElement me = new MessageElement(localPart, prefix,
+                        namespace);
+                me.setValue(value);
+                LOG.debug("Adding message element " + me.toString());
+                meList.add(me);
+            }
+            MessageElement[] any = {};
+            any = meList.toArray(any);
+            objectEvent.set_any(any);
+
+            // add to vector
+            objectEventList.add(objectEvent);
+        }
+        rs.close();
+        ObjectEventType[] objectEvents = {};
+        objectEvents = objectEventList.toArray(objectEvents);
+
+        return objectEvents;
+    }
+
+    /**
+     * Executes a SQL Query and returns an array of AggregationEventType.
+     * 
+     * @param aggregationEventQuery
+     *            The Query is supposed to be created by createEventQuery(...,
+     *            "AggregationEvent").
+     * @return AggregationEventType[]
+     * @throws SQLException
+     *             Must return AggregationEvents, otherwise an SQLException is
+     *             thrown.
+     * @throws ImplementationException
+     *             May throw ImplementationException for various reasons (i.e.
+     *             uri value in DB is actually not an uri)
+     */
+    private AggregationEventType[] runAggregationEventQuery(
+            final PreparedStatement aggregationEventQuery) throws SQLException,
+            ImplementationException {
+        if (aggregationEventQuery == null) {
+            return null;
+        }
+        ResultSet rs;
+
+        // some objects that we need for conversion
+        Calendar cal = Calendar.getInstance();
+        ActionType action;
+
+        // get ObjectEvents
+
+        rs = aggregationEventQuery.executeQuery();
+
+        Vector<AggregationEventType> aggregationEventVector = new Vector<AggregationEventType>();
+        AggregationEventType aggregationEvent;
+
+        while (rs.next()) {
+            aggregationEvent = new AggregationEventType();
+
+            // set EventTime
+
+            cal.setTime(rs.getTimestamp("eventTime"));
+            aggregationEvent.setEventTime((Calendar) cal.clone());
+
+            // set RecordTime
+            cal.setTime(rs.getTimestamp("recordTime"));
+            aggregationEvent.setRecordTime((Calendar) cal.clone());
+
+            aggregationEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
+
+            // set action
+            action = ActionType.fromString(rs.getString("action"));
+            aggregationEvent.setAction(action);
+
+            // set all URIs
+            aggregationEvent.setParentID(stringToUri(rs.getString("parentID")));
+            aggregationEvent.setBizStep(stringToUri(rs.getString("bizStep")));
+            aggregationEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            if (rs.getString("readPoint") != null) {
+                ReadPointType rp = new ReadPointType(
+                        stringToUri(rs.getString("readPoint")), null, null);
+                aggregationEvent.setReadPoint(rp);
+            }
+            if (rs.getString("bizLocation") != null) {
+                BusinessLocationType bl = new BusinessLocationType(
+                        stringToUri(rs.getString("bizLocation")), null, null);
+                aggregationEvent.setBizLocation(bl);
+            }
+
+            aggregationEvent.setBizTransactionList(fetchBizTransactions(
+                    "event_AggregationEvent_bizTrans", rs.getInt("id")));
+
+            // get the associated EPCs
+            aggregationEvent.setChildEPCs(fetchChildEPCs(
+                    "event_AggregationEvent_EPCs", rs.getInt("id")));
+
+            // add to vector
+            aggregationEventVector.add(aggregationEvent);
+        }
+        rs.close();
+        AggregationEventType[] aggregationEvents = {};
+        aggregationEvents = aggregationEventVector.toArray(aggregationEvents);
+        return aggregationEvents;
+    }
+
+    /**
+     * Executes a SQL Query and returns an array of QuantityEventType.
+     * 
+     * @param quantityEventQuery
+     *            The Query is supposed to be created by createEventQuery(...,
+     *            "QuantityEvent").
+     * @return QuantityEventType[]
+     * @throws SQLException
+     *             The Query must return QuantityEvents, otherwise an
+     *             SQLException is thrown.
+     * @throws ImplementationException
+     *             May throw ImplementationException for various reasons (i.e.
+     *             uri value in DB is actually not an uri)
+     */
+    private QuantityEventType[] runQuantityEventQuery(
+            final PreparedStatement quantityEventQuery) throws SQLException,
+            ImplementationException {
+        if (quantityEventQuery == null) {
+            return null;
+        }
+        ResultSet rs;
+
+        // some objects that we need for conversion
+        Calendar cal = Calendar.getInstance();
+
+        // get ObjectEvents
+
+        rs = quantityEventQuery.executeQuery();
+        Vector<QuantityEventType> quantityEventVector = new Vector<QuantityEventType>();
+        QuantityEventType quantityEvent;
+
+        while (rs.next()) {
+            quantityEvent = new QuantityEventType();
+
+            // set EventTime
+            cal.setTime(rs.getTimestamp("eventTime"));
+            quantityEvent.setEventTime((Calendar) cal.clone());
+
+            // set RecordTime
+            cal.setTime(rs.getTimestamp("recordTime"));
+            quantityEvent.setRecordTime((Calendar) cal.clone());
+
+            quantityEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
+
+            // set EPCClass
+            quantityEvent.setEpcClass(stringToUri(rs.getString("epcClass")));
+
+            // set quantity
+            quantityEvent.setQuantity(rs.getInt("quantity"));
+
+            // set all URIs
+            quantityEvent.setBizStep(stringToUri(rs.getString("bizStep")));
+            quantityEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            if (rs.getString("readPoint") != null) {
+                ReadPointType rp = new ReadPointType(
+                        stringToUri(rs.getString("readPoint")), null, null);
+                quantityEvent.setReadPoint(rp);
+            }
+            if (rs.getString("bizLocation") != null) {
+                BusinessLocationType bl = new BusinessLocationType(
+                        stringToUri(rs.getString("bizLocation")), null, null);
+                quantityEvent.setBizLocation(bl);
+            }
+
+            quantityEvent.setBizTransactionList(fetchBizTransactions(
+                    "event_QuantityEvent_bizTrans", rs.getInt("id")));
+
+            // add to vector
+            quantityEventVector.add(quantityEvent);
+        }
+        rs.close();
+
+        QuantityEventType[] quantityEvents = {};
+        quantityEvents = quantityEventVector.toArray(quantityEvents);
+
+        return quantityEvents;
+    }
+
+    /**
+     * Executes a SQL Query and returns an array of TransactionEventType.
+     * 
+     * @param transactionEventQuery
+     *            The Query is supposed to be created by createEventQuery(...,
+     *            "TransactionEvent").
+     * @return AggregationEventType[]
+     * @throws SQLException
+     *             The Query must return TransactionEvents, otherwise an
+     *             SQLException is thrown.
+     * @throws ImplementationException
+     *             May throw ImplementationException for various reasons (i.e.
+     *             uri value in DB is actually not an uri)
+     */
+    private TransactionEventType[] runTransactionEventQuery(
+            final PreparedStatement transactionEventQuery) throws SQLException,
+            ImplementationException {
+        if (transactionEventQuery == null) {
+            return null;
+        }
+        ResultSet rs;
+
+        // some objects that we need for conversion
+        Calendar cal = Calendar.getInstance();
+        ActionType action;
+
+        // get ObjectEvents
+        rs = transactionEventQuery.executeQuery();
+        Vector<TransactionEventType> transactionEventVector = new Vector<TransactionEventType>();
+        TransactionEventType transactionEvent;
+
+        while (rs.next()) {
+            transactionEvent = new TransactionEventType();
+
+            // set EventTime
+
+            cal.setTime(rs.getTimestamp("eventTime"));
+            transactionEvent.setEventTime((Calendar) cal.clone());
+
+            // set RecordTime
+            cal.setTime(rs.getTimestamp("recordTime"));
+            transactionEvent.setRecordTime((Calendar) cal.clone());
+
+            transactionEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
+
+            // set action
+            action = ActionType.fromString(rs.getString("action"));
+            transactionEvent.setAction(action);
+
+            // set all URIs
+            transactionEvent.setParentID(stringToUri(rs.getString("parentID")));
+            transactionEvent.setBizStep(stringToUri(rs.getString("bizStep")));
+            transactionEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            if (rs.getString("readPoint") != null) {
+                ReadPointType rp = new ReadPointType(
+                        stringToUri(rs.getString("readPoint")), null, null);
+                transactionEvent.setReadPoint(rp);
+            }
+            if (rs.getString("bizLocation") != null) {
+                BusinessLocationType bl = new BusinessLocationType(
+                        stringToUri(rs.getString("bizLocation")), null, null);
+                transactionEvent.setBizLocation(bl);
+            }
+
+            transactionEvent.setBizTransactionList(fetchBizTransactions(
+                    "event_TransactionEvent_bizTrans", rs.getInt("id")));
+
+            // get the associated EPCs
+            transactionEvent.setEpcList(fetchChildEPCs(
+                    "event_TransactionEvent_EPCs", rs.getInt("id")));
+
+            // add to vector
+            transactionEventVector.add(transactionEvent);
+        }
+        rs.close();
+
+        TransactionEventType[] transactionEvents = {};
+        transactionEvents = transactionEventVector.toArray(transactionEvents);
+
+        return transactionEvents;
+    }
+
+    /**
+     * Transforms an array of strings into sql IN (...) notation. Takes the
+     * string array, the query string and the argument vector This function is
+     * designed to be used with PreparedStatement
+     * 
+     * @param strings
+     *            Array of strings to be added to sql IN (...) expression.
+     * @param query
+     *            The query which will be appended with the appropriate amounts
+     *            of question marks for the parameters.
+     * @param queryArgs
+     *            The queryArgs vector which will take the additional query
+     *            parameters specified in 'strings'.
+     */
+    private void stringArrayToSQL(final String[] strings,
+            final StringBuffer query, final List<String> queryArgs) {
+        int j = 0;
+        while (j < strings.length - 1) {
+            query.append("?,");
+            queryArgs.add(strings[j]);
+            j++;
+        }
+        if (strings.length > 0) {
+            query.append("?");
+            queryArgs.add(strings[j]);
+        }
+    }
+
+    /**
+     * Create an SQL query string from a list of Query Parameters.
+     * 
+     * @param queryParams
+     *            The query parameters.
+     * @param eventType
+     *            Has to be one of the four basic event types "ObjectEvent",
+     *            "AggregationEvent", "QuantityEvent", "TransactionEvent".
+     * @return The prepared sql statement.
+     * @throws SQLException
+     *             Whenever something goes wrong when querying the db.
+     * @throws QueryParameterException
+     *             If one of the given QueryParam is invalid.
+     * @throws ImplementationException
+     */
+    private PreparedStatement createEventQuery(final QueryParam[] queryParams,
+            final String eventType) throws SQLException,
+            QueryParameterException, ImplementationException {
+
+        StringBuffer query;
+        List<String> queryArgs = new ArrayList<String>();
+
+        if (eventType == "ObjectEvent") {
+            query = new StringBuffer(objectEventQueryBase);
+        } else if (eventType == "AggregationEvent") {
+            query = new StringBuffer(aggregationEventQueryBase);
+        } else if (eventType == "QuantityEvent") {
+            query = new StringBuffer(quantityEventQueryBase);
+        } else if (eventType == "TransactionEvent") {
+            query = new StringBuffer(transactionEventQueryBase);
+        } else {
+            System.out.println("createEventQuery called with bad eventType parameter");
+            return null;
+        }
+
+        String orderBy = "";
+        String orderDirection = "";
+        int limit = -1;
+        int maxEvent = -1;
+        List<String> params = new LinkedList<String>();
+        for (int i = 0; i < queryParams.length; i++) {
+            String paramName = queryParams[i].getName();
+            Object paramValue = queryParams[i].getValue();
+
+            // check if this parameter has already been provided
+            if (params.contains(paramName)) {
+                String msg = "Two or more inputs are provided for the same parameter "
+                        + paramName;
+                LOG.error(msg);
+                throw new QueryParameterException(msg);
+            }
+            params.add(paramName);
+            // LOG.info("query parameter " + i + ": [" +
+            // queryParams[i].getName()
+            // + ", " + queryParams[i].getValue() + "]");
+            try {
+                if (paramName.equals("eventType")) {
+                    // search for the eventType in the list of arguments.
+                    // If it does not appear, this eventType is not asked for
+                    // and we return null as the query string
+                    String[] arglist = ((ArrayOfString) paramValue).getString();
+                    int j = 0;
+
+                    while (arglist != null && (j < arglist.length)
+                            && (!arglist[j].equals(eventType))) {
+                        j++;
+                    }
+                    if (arglist != null && arglist.length > 0
+                            && j == arglist.length) {
+                        return null;
+                    }
+                } else if (paramName.equals("GE_eventTime")) {
+                    query.append(" AND (`eventTime` >= ?) ");
+                    Calendar cal = (Calendar) paramValue;
+                    Timestamp ts = new Timestamp(cal.getTimeInMillis());
+                    queryArgs.add(ts.toString());
+
+                } else if (paramName.equals("LT_eventTime")) {
+                    query.append(" AND (`eventTime` < ?) ");
+                    Calendar cal = (Calendar) paramValue;
+                    Timestamp ts = new Timestamp(cal.getTimeInMillis());
+                    queryArgs.add(ts.toString());
+
+                } else if (paramName.equals("GE_recordTime")) {
+                    query.append(" AND (`recordTime` >= ?) ");
+                    Calendar cal = (Calendar) paramValue;
+                    Timestamp ts = new Timestamp(cal.getTimeInMillis());
+                    queryArgs.add(ts.toString());
+
+                } else if (paramName.equals("LT_recordTime")) {
+                    query.append(" AND (`recordTime` < ?) ");
+                    Calendar cal = (Calendar) paramValue;
+                    Timestamp ts = new Timestamp(cal.getTimeInMillis());
+                    queryArgs.add(ts.toString());
+
+                } else if (paramName.equals("EQ_action")) {
+                    // Note: as with dates, we don't check values here in this
+                    // version
+                    if (!eventType.equals("QuantityEvent")) {
+                        query.append(" AND (action IN (");
+                        stringArrayToSQL(
+                                ((ArrayOfString) paramValue).getString(),
+                                query, queryArgs);
+                        query.append(")) ");
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("EQ_bizStep")) {
+                    query.append(" AND (`voc_BizStep`.uri IN (");
+                    stringArrayToSQL(((ArrayOfString) paramValue).getString(),
+                            query, queryArgs);
+                    query.append(")) ");
+
+                } else if (paramName.equals("EQ_disposition")) {
+                    query.append(" AND (`voc_Disposition`.uri IN (");
+                    stringArrayToSQL(((ArrayOfString) paramValue).getString(),
+                            query, queryArgs);
+                    query.append(")) ");
+
+                } else if (paramName.equals("EQ_readPoint")) {
+                    query.append(" AND (`voc_ReadPoint`.uri IN (");
+                    stringArrayToSQL(((ArrayOfString) paramValue).getString(),
+                            query, queryArgs);
+                    query.append(")) ");
+
+                } else if (paramName.equals("WD_readPoint")) {
+                    // the % allows any possible ending, which should implement
+                    // the
+                    // semantics of "With Descendant"
+                    String[] readPoints = ((ArrayOfString) paramValue).getString();
+                    for (int j = 0; j < readPoints.length; j++) {
+                        readPoints[j] = readPoints[j] + "%";
+                    }
+                    query.append(" AND (");
+
+                    int j = 0;
+                    while (j < readPoints.length - 1) {
+                        query.append("`voc_ReadPoint`.uri LIKE ? OR ");
+                        queryArgs.add(readPoints[j]);
+                        j++;
+                    }
+                    if (readPoints.length > 0) {
+                        query.append("`voc_ReadPoint`.uri LIKE ?");
+                        queryArgs.add(readPoints[j]);
+                    }
+
+                    query.append(") ");
+
+                } else if (paramName.equals("EQ_bizLocation")) {
+                    query.append(" AND (`voc_BizLoc`.uri IN (");
+                    stringArrayToSQL(((ArrayOfString) paramValue).getString(),
+                            query, queryArgs);
+                    query.append(")) ");
+
+                } else if (paramName.equals("WD_bizLocation")) {
+                    String[] bizLocations = null;
+                    try {
+                        bizLocations = ((ArrayOfString) paramValue).getString();
+                    } catch (ClassCastException e) {
+                        // we have the URI directly (no ArrayOfString wrapper)
+                        bizLocations = new String[1];
+                        bizLocations[0] = paramValue.toString();
+                    }
+                    for (int j = 0; j < bizLocations.length; j++) {
+                        bizLocations[j] = bizLocations[j] + "%";
+                    }
+                    query.append(" AND (");
+
+                    int j = 0;
+                    while (j < bizLocations.length - 1) {
+                        query.append("`voc_BizLoc`.uri LIKE ? OR ");
+                        queryArgs.add(bizLocations[j]);
+                        j++;
+                    }
+                    if (bizLocations.length > 0) {
+                        query.append("`voc_BizLoc`.uri LIKE ?");
+                        queryArgs.add(bizLocations[j]);
+                    }
+
+                    query.append(") ");
+
+                } else if (paramName.startsWith("EQ_bizTransaction_")) {
+
+                    // Get type from parameter name
+                    String type = paramName.substring(18);
+
+                    /*
+                     * This does a SQL subquery which joins the relation from
+                     * event to voc_bizTrans with voc_bizTrans and searches for
+                     * the bizTransaction-URIs specified. The subquery finally
+                     * returns the ids of the corresponding events. In other
+                     * words, this returns the ids of events that have at least
+                     * one of the bizTransactions associated. Finally it checks
+                     * if the event_id is in this set. This is the new
+                     * implementation for multiple bizTransactions per event -
+                     * not yet used.
+                     */
+                    query.append("AND (`event_" + eventType + "`.id IN ("
+                            + "SELECT `event_id` AS id FROM (" + "`event_"
+                            + eventType + "_bizTrans` " + "JOIN (("
+                            + "SELECT id FROM `voc_BizTransType` "
+                            + "WHERE uri = \"" + type + "\") "
+                            + "NATURAL JOIN "
+                            + "(SELECT id FROM `voc_BizTrans WHERE "
+                            + "`voc_BizTrans`.id IN (");
+                    stringArrayToSQL(((ArrayOfString) paramValue).getString(),
+                            query, queryArgs);
+                    query.append("))"
+                            + "ON `event_"
+                            + eventType
+                            + "_bizTrans`.`bizTrans_id` = `voc_BizTransType`.id)"
+                            + ")");
+
+                } else if (paramName.equals("MATCH_epc")) {
+                    /*
+                     * This does a SQL subquery to search for event-IDs that
+                     * occur in a set of EPCs According to the specs, this
+                     * should only apply to ObjectEvent Note: -We think that the
+                     * Standard is not consistent so we enable it to do the
+                     * MATCH_epc also on TransactionEvents. -The current
+                     * implementation only returns events if the EPC equals one
+                     * of the EPCs associated to the event. [TDS1.3].
+                     * http://www.epcglobalinc.org/standards_technology/Ratified%20Spec%20March%208%202006.pdf
+                     */
+                    if (eventType.equals("ObjectEvent")) {
+                        query.append(" AND (`event_ObjectEvent`.id IN (");
+                        query.append("SELECT `event_id` FROM"
+                                + " `event_ObjectEvent_EPCs` WHERE epc IN (");
+                        stringArrayToSQL(
+                                ((ArrayOfString) paramValue).getString(),
+                                query, queryArgs);
+                        query.append("))) ");
+                    } else if (eventType.equals("TransactionEvent")) {
+                        query.append(" AND (`event_TransactionEvent`.id IN (");
+                        query.append("SELECT `event_id` FROM"
+                                + " `event_TransactionEvent_EPCs` WHERE epc IN (");
+                        stringArrayToSQL(
+                                ((ArrayOfString) paramValue).getString(),
+                                query, queryArgs);
+                        query.append("))) ");
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("MATCH_parentID")) {
+                    if (eventType.equals("AggregationEvent")
+                            || eventType.equals("TransactionEvent")) {
+                        query.append(" AND (`parentID` IN (");
+                        stringArrayToSQL(
+                                ((ArrayOfString) paramValue).getString(),
+                                query, queryArgs);
+                        query.append(")) ");
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("MATCH_childEPC")) {
+                    if (eventType.equals("AggregationEvent")) {
+                        query.append(" AND (`event_AggregationEvent`.id IN (");
+                        query.append("SELECT `event_id` FROM `event_AggregationEvent_EPCs` "
+                                + "WHERE epc IN (");
+                        stringArrayToSQL(
+                                ((ArrayOfString) paramValue).getString(),
+                                query, queryArgs);
+                        query.append("))) ");
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("MATCH_epcClass")) {
+                    if (eventType.equals("QuantityEvent")) {
+                        query.append(" AND (`epcClass` IN (");
+                        query.append("SELECT `id` FROM `voc_EPCClass` "
+                                + "WHERE `uri` IN (");
+                        stringArrayToSQL(
+                                ((ArrayOfString) paramValue).getString(),
+                                query, queryArgs);
+                        query.append("))) ");
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("EQ_quantity")) {
+                    if (eventType.equals("QuantityEvent")) {
+                        query.append(" AND (quantity = ?) ");
+                        queryArgs.add(((Integer) paramValue).toString());
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("GT_quantity")) {
+                    if (eventType.equals("QuantityEvent")) {
+                        query.append("AND (quantity > ?) ");
+                        queryArgs.add(((Integer) paramValue).toString());
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("GE_quantity")) {
+                    if (eventType.equals("QuantityEvent")) {
+                        query.append("AND (quantity >= ?) ");
+                        queryArgs.add(((Integer) paramValue).toString());
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("LT_quantity")) {
+                    if (eventType.equals("QuantityEvent")) {
+                        query.append("AND (quantity < ?) ");
+                        queryArgs.add(((Integer) paramValue).toString());
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+
+                } else if (paramName.equals("LE_quantity")) {
+                    if (eventType.equals("QuantityEvent")) {
+                        query.append("AND (quantity <= ?) ");
+                        queryArgs.add(((Integer) paramValue).toString());
+                    } else {
+                        query.append(" AND 0 ");
+                    }
+                    /*
+                     * EQ_fieldname with type ListOfString EQ_fieldname with
+                     * type Int, Float, Time GT_fieldname with type Int, Float,
+                     * Time GE_fieldname with type Int, Float, Time LT_fieldname
+                     * with type Int, Float, Time LE_fieldname with type Int,
+                     * Float, Time we do not support because we do not store any
+                     * fieldnames and therefore it is not needed.
+                     */
+                } else if (paramName.startsWith("GT_")) {
+                    // TODO: marco: check this and implement it for all events
+                    final int index = 3;
+                    String fieldname = paramName.substring(index);
+                    String where;
+                    Object val = paramValue;
+                    try {
+                        Integer intVal = (Integer) paramValue;
+                        where = "intValue > " + intVal;
+                    } catch (ClassCastException e1) {
+                        try {
+                            Float floatVal = (Float) paramValue;
+                            where = "floatValue > " + floatVal;
+                        } catch (ClassCastException e2) {
+                            try {
+                                Calendar cal = TimeParser.parseAsCalendar(val.toString());
+                                String dateVal = TimeParser.format(cal);
+                                where = "dateValue>`" + dateVal + "`";
+                            } catch (Exception e3) {
+                                String strVal = val.toString();
+                                where = "strValue>`" + strVal + "`";
+                            }
+                        }
+                    }
+                    if (eventType.equals("ObjectEvent")) {
+                        query.append("AND `event_ObjectEvent_extensions`."
+                                + where);
+                    } else {
+                        query.append(" AND 0");
+                    }
+
+                } else if (paramName.startsWith("EXISTS_")) {
+
+                    // Get type from parameter name
+                    final int index = 7;
+                    String type = paramName.substring(index);
+
+                    if (type.equals("childEPCs")) {
+                        if (eventType.equals("AggregationEvent")) {
+                            query.append("AND (`event_AggregationEvent`.id IN ("
+                                    + "SELECT `event_id` "
+                                    + "FROM event_AggregationEvent_EPCs " + ")");
+                        } else {
+                            query.append(" AND 0");
+                        }
+                    } else if (type.equals("epcList")) {
+                        query.append("AND (`event_" + eventType + "`.id IN ("
+                                + "SELECT `event_id` " + "FROM event_"
+                                + eventType + "_EPCs " + ")");
+                    } else if (type.equals("bizTransactionList")) {
+                        query.append("AND (`event_" + eventType + ".`id` IN ("
+                                + "SELECT `event_id` FROM " + "`event"
+                                + eventType + "_bizTrans" + ")");
+                    } else {
+                        query.append("AND (?) ");
+                        queryArgs.add(type);
+                    }
+                } else if (paramName.startsWith("HASATTR_")) {
+                    // TODO:
+                } else if (paramName.startsWith("EQATTR_")) {
+                    // TODO:
+                } else if (paramName.equals("orderBy")) {
+                    // Does only work correct if we choose only one Event-Type
+                    // to
+                    // query. Other wise, the Results are ordered by Event-Types
+                    // and
+                    // second according to the orderBy-Parameter
+                    orderBy = (String) paramValue;
+                } else if (paramName.equals("orderDirection")) {
+                    // Does only work correct if we choose only one Event-Type
+                    // to
+                    // query. Other wise, the Results are ordered by Event-Types
+                    // and
+                    // second according to the orderBy-Parameter
+                    orderDirection = (String) paramValue;
+                } else if (paramName.equals("eventCountLimit")) {
+                    // Does only work properly if we choose only one type to
+                    // query.
+                    limit = (Integer) paramValue;
+                } else if (paramName.equals("maxEventCount")) {
+                    maxEventCount = (Integer) paramValue;
+                } else {
+                    throw new QueryParameterException("The parameter "
+                            + paramName + " cannot be recognised.");
+                }
+            } catch (ClassCastException e) {
+                String msg = "The input value for parameter " + paramName
+                        + " of eventType " + eventType
+                        + " is not of the type required.";
+                LOG.error(msg);
+                throw new QueryParameterException(msg);
+            }
+        }
+
+        if (maxEvent > -1 && limit > -1) {
+            String msg = "The maxEventCount and the eventCountLimit are mutually exclusive.";
+            LOG.error(msg);
+            throw new QueryParameterException(msg);
+        }
+
+        if (orderBy.equals("") && limit > -1) {
+            String msg = "eventCountLimit may only be used when orderBy is specified.";
+            LOG.error(msg);
+            throw new QueryParameterException(msg);
+        }
+
+        if (!orderBy.equals("")) {
+            query.append(" ORDER BY (?)");
+            queryArgs.add(orderBy);
+            if (orderDirection.equals("ASC")) {
+                query.append(" ASC");
+            } else {
+                query.append(" DESC");
+            }
+        }
+
+        if (limit > -1) {
+            query.append(" LIMIT " + ((Integer) limit).toString());
+        }
+
+        LOG.debug("QUERY: " + query.toString());
+        PreparedStatement ps = dbconnection.prepareStatement(query.toString().replace(
+                "`", delimiter));
+        for (int i = 0; i < queryArgs.size(); i++) {
+            ps.setString(i + 1, (String) queryArgs.get(i));
+            LOG.debug("       query param " + (i + 1) + ": " + queryArgs.get(i));
+        }
+
+        return ps;
+    }
+
+    /**
+     * @see org.accada.epcis.soapapi.EPCISServicePortType#getQueryNames(org.accada.epcis.soapapi.EmptyParms)
+     * @param parms
+     *            An empty parameter.
+     * @return An ArrayOfString containing the names of all implemented queries.
+     */
+    public ArrayOfString getQueryNames(final EmptyParms parms) {
+        ArrayOfString qNames = new ArrayOfString();
+        String[] qNamesArray = new String[queryNames.size()];
+        qNamesArray = queryNames.toArray(qNamesArray);
+        qNames.setString(qNamesArray);
+        return qNames;
+    }
+
+    /**
+     * Subscribes a query.
+     * 
+     * @see org.accada.epcis.soapapi.EPCISServicePortType#subscribe(org.accada.epcis.soapapi.Subscribe)
+     * @param parms
+     *            A Subscribe object containing the query to be subscribed..
+     * @return Nothing.
+     * @throws ImplementationException
+     *             If a problem with the EPCIS implementation occured.
+     * @throws InvalidURIException
+     *             If an invalid URI where the query results should be posted is
+     *             provided.
+     * @throws SubscribeNotPermittedException
+     *             If a SimpleMasterDataQuery is provided which is only valid
+     *             for polling.
+     * @throws SubscriptionControlsException
+     *             If one of the SubscriptionControls parameters is not set.
+     * @throws ValidationException
+     *             If the query is not valid.
+     * @throws DuplicateSubscriptionException
+     *             If a query with the given ID is already subscribed.
+     * @throws NoSuchNameException
+     *             If a query name is not implemented yet.
+     */
+    public VoidHolder subscribe(final Subscribe parms)
+            throws ImplementationException, InvalidURIException,
+            SubscribeNotPermittedException, SubscriptionControlsException,
+            ValidationException, DuplicateSubscriptionException,
+            NoSuchNameException {
+        QueryParam[] qParams = parms.getParams();
+        URI dest = parms.getDest();
+        String subscrId = parms.getSubscriptionID();
+        SubscriptionControls controls = parms.getControls();
+        String queryName = parms.getQueryName();
+        GregorianCalendar initialRecordTime = (GregorianCalendar) parms.getControls().getInitialRecordTime();
+        if (initialRecordTime == null) {
+            initialRecordTime = new GregorianCalendar();
+        }
+
+        try {
+            // A few input sanity checks
+
+            // dest may be null or empty. But we don't support pre-arranged
+            // destinations and throw an InvalidURIException according to the
+            // standard.
+            if (dest == null || dest.toString().equals("")) {
+                String msg = "Destination URI is empty. This implementation doesn't support pre-arranged destinations.";
+                LOG.info(msg);
+                throw new InvalidURIException(msg);
+            }
+
+            // check query name
+            if (!queryNames.contains(queryName)) {
+                String msg = "Illegal query name '" + queryName + "'.";
+                LOG.info(msg);
+                throw new NoSuchNameException(msg);
+            }
+
+            // SimpleMasterDataQuery only valid for polling
+            if (queryName.equals("SimpleMasterDataQuery")) {
+                String msg = "SimpleMasterDataQuery not permitted for use with subscribe, only with poll.";
+                LOG.info(msg);
+                throw new SubscribeNotPermittedException(msg);
+            }
+
+            // subscriptionID mustn't be empty.
+            if (subscrId == null || subscrId.equals("")) {
+                String msg = "SubscriptionID is empty. Choose a valid subscriptionID.";
+                LOG.info(msg);
+                throw new ValidationException(msg);
+            }
+
+            // subscriptionID mustn't exist yet.
+            if (fetchExistsSubscriptionId(subscrId)) {
+                String msg = "SubscriptionID '"
+                        + subscrId
+                        + "' already exists. Choose a different subscriptionID.";
+                LOG.info(msg);
+                throw new DuplicateSubscriptionException(msg);
+            }
+
+            // trigger and schedule may no be used together, but one of them
+            // must be set
+            if (controls.getSchedule() != null && controls.getTrigger() != null) {
+                String msg = "Schedule and trigger mustn't be used together.";
+                LOG.info(msg);
+                throw new SubscriptionControlsException(msg);
+            }
+            if (controls.getSchedule() == null && controls.getTrigger() == null) {
+                String msg = "Either schedule or trigger has to be set.";
+                LOG.info(msg);
+                throw new SubscriptionControlsException(msg);
+            }
+            if (controls.getSchedule() == null && controls.getTrigger() != null) {
+                String msg = "Triggers are not supported.";
+                LOG.info(msg);
+                throw new SubscriptionControlsException(msg);
+            }
+
+            // parse schedule
+            Schedule schedule = new Schedule(controls.getSchedule());
+
+            Map<String, SubscriptionScheduled> subscribedMap = loadSubscriptions();
+            // TODO: marco: comented stuff can be removed ...
+            // HttpServlet servlet = (HttpServlet)
+            // MessageContext.getCurrentContext().getProperty(
+            // HTTPConstants.MC_HTTP_SERVLET);
+            // Map<String, SubscriptionScheduled> subscribedMap;
+            // if (servlet.getServletContext().getAttribute("subscribedMap") ==
+            // null) {
+            // subscribedMap = fetchSubscriptions();
+            // } else {
+            // subscribedMap = loadSubscriptions();
+            // }
+
+            SubscriptionScheduled newSubscription = new SubscriptionScheduled(
+                    subscrId, qParams, dest, controls.isReportIfEmpty(),
+                    initialRecordTime, initialRecordTime, schedule, queryName);
+
+            // store the Query to the database
+            String insert = "INSERT INTO subscription (subscriptionid, "
+                    + "params, dest, sched, trigg, initialrecordingtime, "
+                    + "exportifempty, queryname, lastexecuted) VALUES "
+                    + "((?), (?), (?), (?), (?), (?), (?), (?), (?))";
+            PreparedStatement stmt = dbconnection.prepareStatement(insert);
+            LOG.debug("QUERY: " + insert);
+            try {
+                stmt.setString(1, subscrId);
+                LOG.debug("       query param 1: " + subscrId);
+
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                ObjectOutput out = new ObjectOutputStream(outStream);
+                out.writeObject(qParams);
+                ByteArrayInputStream inStream = new ByteArrayInputStream(
+                        outStream.toByteArray());
+                stmt.setBinaryStream(2, inStream, inStream.available());
+                LOG.debug("       query param 2: [" + inStream.available()
+                        + " bytes]");
+
+                stmt.setString(3, dest.toString());
+                LOG.debug("       query param 3: " + dest.toString());
+
+                outStream = new ByteArrayOutputStream();
+                out = new ObjectOutputStream(outStream);
+                out.writeObject(schedule);
+                inStream = new ByteArrayInputStream(outStream.toByteArray());
+                stmt.setBinaryStream(4, inStream, inStream.available());
+                LOG.debug("       query param 4: [" + inStream.available()
+                        + " bytes]");
+
+                stmt.setString(5, "");
+                LOG.debug("       query param 5: ");
+
+                String time = isoDateFormat.format(newSubscription.getInitialRecordTime().getTime());
+                stmt.setString(6, time);
+                LOG.debug("       query param 6: " + time);
+
+                stmt.setBoolean(7, controls.isReportIfEmpty());
+                LOG.debug("       query param 7: " + controls.isReportIfEmpty());
+
+                stmt.setString(8, queryName);
+                LOG.debug("       query param 8: " + time);
+
+                time = isoDateFormat.format(newSubscription.getInitialRecordTime().getTime());
+                stmt.setString(9, time);
+                LOG.debug("       query param 9: " + time);
+
+                stmt.executeUpdate();
+            } catch (IOException e) {
+                String msg = "Unable to store the subscription to the database: "
+                        + e.getMessage();
+                LOG.error(msg);
+                ImplementationException iex = new ImplementationException();
+                iex.setReason(msg);
+                iex.setStackTrace(e.getStackTrace());
+                iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+                throw iex;
+            }
+
+            // store the new Query to the HashMap
+            subscribedMap.put(subscrId, newSubscription);
+            storeSubscriptions(subscribedMap);
+
+            return new VoidHolder();
+        } catch (SQLException e) {
+            String msg = "SQL error during query execution: " + e.getMessage();
+            LOG.error(msg, e);
+            ImplementationException iex = new ImplementationException();
+            iex.setReason(msg);
+            iex.setStackTrace(e.getStackTrace());
+            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+            throw iex;
+        }
+    }
+
+    /**
+     * This method loads all the stored queries from the database, starts them
+     * again and stores everything in a HasMap.
+     * 
+     * @return A Map mapping query names to scheduled query subscriptions.
+     * @throws SQLException
+     *             If a problem with the database occured.
+     * @throws ImplementationException
+     *             If a problem with the EPCIS implementation occured.
+     */
+    private Map<String, SubscriptionScheduled> fetchSubscriptions()
+            throws SQLException, ImplementationException {
+        String query = "SELECT * FROM subscription";
+        LOG.debug("QUERY: " + query);
+        Statement stmt = dbconnection.createStatement();
+
+        GregorianCalendar initrectime = new GregorianCalendar();
+
+        ResultSet rs = stmt.executeQuery(query);
+        Map<String, SubscriptionScheduled> subscribedMap = new HashMap<String, SubscriptionScheduled>();
+        while (rs.next()) {
+            try {
+                String subscrId = rs.getString("subscriptionid");
+
+                ObjectInput in = new ObjectInputStream(
+                        rs.getBinaryStream("params"));
+
+                QueryParam[] params = (QueryParam[]) in.readObject();
+                URI dest = stringToUri(rs.getString("dest"));
+
+                in = new ObjectInputStream(rs.getBinaryStream("sched"));
+                Schedule sched = (Schedule) in.readObject();
+
+                initrectime.setTime(rs.getTimestamp("initialrecordingtime"));
+
+                boolean exportifempty = rs.getBoolean("exportifempty");
+
+                String queryName = rs.getString("queryname");
+
+                SubscriptionScheduled newSubscription = new SubscriptionScheduled(
+                        subscrId, params, dest, exportifempty, initrectime,
+                        new GregorianCalendar(), sched, queryName);
+                subscribedMap.put(subscrId, newSubscription);
+            } catch (SQLException e) {
+                // sql exceptions are passed on
+                throw e;
+            } catch (Exception e) {
+                String msg = "Unable to restore subscribed queries from the database.";
+                LOG.error(msg, e);
+                ImplementationException iex = new ImplementationException();
+                iex.setReason(msg);
+                iex.setStackTrace(e.getStackTrace());
+                iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+                throw iex;
+            }
+        }
+        rs.close();
+        return subscribedMap;
+    }
+
+    /**
+     * Stops a subscribed query from further invocations.
+     * 
+     * @see org.accada.epcis.soapapi.EPCISServicePortType#unsubscribe(org.accada.epcis.soapapi.Unsubscribe)
+     * @param parms
+     *            An Unsubscribe object containing the ID of the query to be
+     *            unsubscribed.
+     * @return Nothing.
+     * @throws ImplementationException
+     *             If a problem with the EPCIS implementation occured.
+     */
+    public VoidHolder unsubscribe(final Unsubscribe parms)
+            throws ImplementationException, NoSuchSubscriptionException {
+
+        Map<String, SubscriptionScheduled> subscribedMap = loadSubscriptions();
+        String subscrId = parms.getSubscriptionID();
+
+        if (subscribedMap.containsKey(subscrId)) {
+            // remove subscription from local hash map
+            SubscriptionScheduled toDelete = subscribedMap.get(subscrId);
+            toDelete.stopSubscription();
+            subscribedMap.remove(subscrId);
+            storeSubscriptions(subscribedMap);
+
+            // delete subscription from database
+            try {
+                String delete = "DELETE FROM subscription WHERE "
+                        + "subscriptionid = (?)";
+                PreparedStatement stmt = dbconnection.prepareStatement(delete);
+                stmt.setString(1, subscrId);
+                LOG.debug("QUERY: " + delete);
+                LOG.debug("        query param 1: " + subscrId);
+
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                String msg = "SQL error during query execution: "
+                        + e.getMessage();
+                LOG.error(msg, e);
+                ImplementationException iex = new ImplementationException();
+                iex.setReason(msg);
+                iex.setStackTrace(e.getStackTrace());
+                iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+                throw iex;
+            }
+        } else {
+            String msg = "A subscription with ID '" + subscrId
+                    + "' does not exist.";
+            LOG.info(msg);
+            throw new NoSuchSubscriptionException(msg);
+        }
+        return new VoidHolder();
+    }
+
+    /**
+     * Saves the map with the subscriptions to the servlet context.
+     * 
+     * @param subscribedMap
+     *            The map with the subscriptions.
+     */
+    private void storeSubscriptions(
+            final Map<String, SubscriptionScheduled> subscribedMap) {
+        HttpServlet servlet = (HttpServlet) MessageContext.getCurrentContext().getProperty(
+                HTTPConstants.MC_HTTP_SERVLET);
+        servlet.getServletContext().setAttribute("subscribedMap", subscribedMap);
+    }
+
+    /**
+     * Retrieves the map with the subscriptions from the servlet context.
+     * 
+     * @return The map with the subscriptions.
+     * @throws ImplementationException
+     *             If the map could not be reloaded.
+     */
+    private Map<String, SubscriptionScheduled> loadSubscriptions()
+            throws ImplementationException {
+        // HttpServlet servlet = (HttpServlet)
+        // MessageContext.getCurrentContext().getProperty(
+        // HTTPConstants.MC_HTTP_SERVLET);
+        // Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String,
+        // SubscriptionScheduled>) servlet.getServletContext().getAttribute(
+        // "subscribedMap");
+        MessageContext msgContext = MessageContext.getCurrentContext();
+        Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
+        if (subscribedMap == null) {
+            try {
+                subscribedMap = fetchSubscriptions();
+                storeSubscriptions(subscribedMap);
+            } catch (SQLException e) {
+                String msg = "SQL error during query execution: "
+                        + e.getMessage();
+                LOG.error(msg, e);
+                ImplementationException iex = new ImplementationException();
+                iex.setReason(msg);
+                iex.setStackTrace(e.getStackTrace());
+                iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+                throw iex;
+            }
+        }
+        return subscribedMap;
+    }
+
+    /**
+     * Returns an ArrayOfString containing IDs of all subscribed queries.
+     * 
+     * @see org.accada.epcis.soapapi.EPCISServicePortType#getSubscriptionIDs(org.accada.epcis.soapapi.GetSubscriptionIDs)
+     * @param parms
+     *            An empty parameter.
+     * @return An ArrayOfString containing IDs of all subscribed queries.
+     * @throws ImplementationException
+     *             If a problem with the EPCIS implementation occured.
+     */
+    public ArrayOfString getSubscriptionIDs(final GetSubscriptionIDs parms)
+            throws ImplementationException {
+        Map<String, SubscriptionScheduled> subscribedMap = loadSubscriptions();
+        String[] temp = {};
+        temp = subscribedMap.keySet().toArray(temp);
+        ArrayOfString arrOfStr = new ArrayOfString();
+        arrOfStr.setString(temp);
+        return arrOfStr;
+    }
+
+    /**
+     * Runs (polls) a query.
+     * 
+     * @see org.accada.epcis.soapapi.EPCISServicePortType#poll(org.accada.epcis.soapapi.Poll)
+     * @param parms
+     *            The query to poll.
+     * @return A QueryResults object containing the result of the query.
+     * @throws ImplementationException
+     *             If a problem with the EPCIS implementation occured.
+     * @throws QueryTooLargeException
+     *             If the query is too large.
+     * @throws QueryParameterException
+     *             If one of the query parameters is invalid.
+     * @throws NoSuchNameException
+     *             If an invalid query type was provided.
+     */
+    public QueryResults poll(final Poll parms) throws ImplementationException,
+            QueryTooLargeException, QueryParameterException,
+            NoSuchNameException {
+
+        // query type must be implemented.
+        if (!queryNames.contains(parms.getQueryName())) {
+            throw new NoSuchNameException();
+        }
+
+        if (parms.getQueryName().equals("SimpleEventQuery")) {
+            try {
+                Integer count = 0;
+                maxEventCount = -1;
+
+                QueryParam[] queryParams = parms.getParams();
+
+                EventListType eventList = new EventListType();
+
+                ObjectEventType[] tempObjectEvent = runObjectEventQuery(createEventQuery(
+                        queryParams, "ObjectEvent"));
+                if (tempObjectEvent != null) {
+                    count += tempObjectEvent.length;
+                }
+                eventList.setObjectEvent(tempObjectEvent);
+                // System.out.println("objectEventQuery done");
+
+                AggregationEventType[] tempAggregationEvent = runAggregationEventQuery(createEventQuery(
+                        queryParams, "AggregationEvent"));
+                if (tempAggregationEvent != null) {
+                    count += tempAggregationEvent.length;
+                }
+                eventList.setAggregationEvent(tempAggregationEvent);
+                // System.out.println("aggregationEventQuery done");
+
+                QuantityEventType[] tempQuantityEvent = runQuantityEventQuery(createEventQuery(
+                        queryParams, "QuantityEvent"));
+                if (tempQuantityEvent != null) {
+                    count += tempQuantityEvent.length;
+                }
+                eventList.setQuantityEvent(tempQuantityEvent);
+                // System.out.println("quantityEventQuery done");
+
+                TransactionEventType[] tempTransactionEvent = runTransactionEventQuery(createEventQuery(
+                        queryParams, "TransactionEvent"));
+                if (tempTransactionEvent != null) {
+                    count += tempTransactionEvent.length;
+                }
+                eventList.setTransactionEvent(tempTransactionEvent);
+
+                if (maxEventCount > -1 && maxEventCount < count) {
+                    throw new QueryTooLargeException(
+                            "The Result set is larger then"
+                                    + " the maxEventCount value. MaxEventCount is set to "
+                                    + maxEventCount + " and the query has "
+                                    + count + " items.", null, null);
+                }
+
+                QueryResultsBody resultsBody = new QueryResultsBody();
+
+                QueryResults results = new QueryResults();
+
+                resultsBody.setEventList(eventList);
+                results.setResultsBody(resultsBody);
+                results.setQueryName("SimpleEventQuery");
+                LOG.info("poll request for '" + results.getQueryName()
+                        + "' succeeded");
+                // LOG.info("biz transaction:");
+                // LOG.info(results.getResultsBody().getEventList().getObjectEvent(0).getBizTransactionList()[0]);
+                return results;
+            } catch (SQLException e) {
+                ImplementationException iex = new ImplementationException();
+                String msg = "SQL error during query execution: "
+                        + e.getMessage();
+                LOG.error(msg, e);
+                iex.setReason(msg);
+                iex.setStackTrace(e.getStackTrace());
+                iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+                throw iex;
+            }
+        } else if (parms.getQueryName().equals("SimpleMasterDataQuery")) {
+            // TODO: implement SimpleMasterDataQuery here.
+            return null;
+        } else {
+            // TODO: marco: some exception handling please!
+            // We shouldn't ever reach this point... iXohbai7
+            System.out.println("Reached unreachable point.\n"
+                    + "Search for iXohbai7");
+            throw new NoSuchNameException();
+        }
+    }
+
+    /**
+     * Returns the standard version.
+     * 
+     * @see org.accada.epcis.soapapi.EPCISServicePortType#getStandardVersion(org.accada.epcis.soapapi.EmptyParms)
+     * @param parms
+     *            An empty parameter.
+     * @return The standard version.
+     */
+    public String getStandardVersion(final EmptyParms parms) {
+        return stdVersion;
+    }
+
+    /**
+     * Returns the vendor version.
+     * 
+     * @see org.accada.epcis.soapapi.EPCISServicePortType#getVendorVersion(org.accada.epcis.soapapi.EmptyParms)
+     * @param parms
+     *            An empty parameter.
+     * @return The vendor version.
+     */
+    public String getVendorVersion(final EmptyParms parms) {
+        return version;
+    }
 
 }
