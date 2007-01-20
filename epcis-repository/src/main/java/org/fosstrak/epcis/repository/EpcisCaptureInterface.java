@@ -43,6 +43,7 @@ import org.accada.epcis.repository.wrapper.BusinessTransaction;
 import org.accada.epcis.repository.wrapper.EventFieldExtension;
 import org.accada.epcis.repository.wrapper.Vocabulary;
 import org.accada.epcis.repository.wrapper.Vocabulary.VociSyntaxException;
+import org.accada.epcis.utils.TimeParser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
@@ -141,12 +142,12 @@ public class EpcisCaptureInterface extends HttpServlet {
         out.println("<html>");
         out.println("<head><title>EPCIS Capture Service</title></head>");
         out.println("<body>");
-        out.println("<p>This service captures ECPIS events sent to it using ");
-        out.println("HTTP POST requests. Expected POST parameter name is \"event\", ");
-        out.println(" expected payload is an XML binding of an EPCISDocument");
-        out.println("containing ObjectEvents, AggregationEvents, QuantityEvents ");
-        out.println("and/or TransactionEvents.<br />");
-        out.println("For further information refer to the xml schema files or check the Example ");
+        out.println("<p>This service captures ECPIS events sent to it using <br />");
+        out.println("HTTP POST requests. Expected POST parameter name is \"event\", <br />");
+        out.println(" expected payload is an XML binding of an EPCISDocument <br />");
+        out.println("containing ObjectEvents, AggregationEvents, QuantityEvents <br />");
+        out.println("and/or TransactionEvents.</p>");
+        out.println("<p>For further information refer to the xml schema files or check the Example <br />");
         out.println("in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.</p>");
         out.println("</body>");
         out.println("</html>");
@@ -177,6 +178,7 @@ public class EpcisCaptureInterface extends HttpServlet {
 
         try {
             dbconnection = db.getConnection();
+            LOG.debug("DB connection opened.");
 
             // get POST data
             String event;
@@ -186,6 +188,7 @@ public class EpcisCaptureInterface extends HttpServlet {
                 throw new IOException(
                         "HTTP POST argument \"event=\" not found in request.");
             }
+            LOG.debug("incoming HTTP POST data: " + event.length() + " bytes");
 
             // parse the payload into a DOM tree
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -205,10 +208,12 @@ public class EpcisCaptureInterface extends HttpServlet {
                     rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.println(msg);
                 }
+            } else {
+                LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
             }
 
-            // parse the DOM tree
-            parseDocument();
+            // handle the dpcument
+            handleDocument();
 
             LOG.info("EPCIS Capture Interface request succeeded.");
             rsp.setStatus(HttpServletResponse.SC_OK);
@@ -270,7 +275,7 @@ public class EpcisCaptureInterface extends HttpServlet {
             Context env = (Context) initContext.lookup("java:comp/env");
             db = (DataSource) env.lookup("jdbc/EPCISDB");
         } catch (NamingException e) {
-            String msg = "Unable to read configuration.";
+            String msg = "Unable to read configuration, check META-INF/context.xml for Resource 'jdbc/EPCISDB'.";
             LOG.error(msg, e);
             throw new ServletException(msg, e);
         }
@@ -325,25 +330,25 @@ public class EpcisCaptureInterface extends HttpServlet {
      * @throws SAXException
      *             If an error parsing the document occured.
      */
-    private void parseDocument() throws SQLException, SAXException {
+    private void handleDocument() throws SQLException, SAXException {
         NodeList eventList = document.getElementsByTagName("EventList");
         NodeList events = eventList.item(0).getChildNodes();
 
         // walk through all supplied events
         for (int i = 0; i < events.getLength(); i++) {
             Node eventNode = events.item(i);
-            LOG.info("Processing event " + i + " '" + eventNode.getNodeName()
-                    + "'.");
+            String nodeName = eventNode.getNodeName();
 
-            if (eventNode.getNodeName().equals("ObjectEvent")
-                    || eventNode.getNodeName().equals("AggregationEvent")
-                    || eventNode.getNodeName().equals("QuantityEvent")
-                    || eventNode.getNodeName().equals("TransactionEvent")) {
+            if (nodeName.equals("ObjectEvent")
+                    || nodeName.equals("AggregationEvent")
+                    || nodeName.equals("QuantityEvent")
+                    || nodeName.equals("TransactionEvent")) {
+                LOG.debug("processing event " + i + ": '" + nodeName + "'.");
                 handleEvent(eventNode);
-            } else if (!eventNode.getNodeName().equals("#text")
-                    && !eventNode.getNodeName().equals("#comment")) {
-                throw new SAXException("Encountered unknown event '"
-                        + eventNode.getNodeName() + "'.");
+            } else if (!nodeName.equals("#text")
+                    && !nodeName.equals("#comment")) {
+                throw new SAXException("Encountered unknown event '" + nodeName
+                        + "'.");
             }
         }
     }
@@ -369,9 +374,9 @@ public class EpcisCaptureInterface extends HttpServlet {
         }
         Node curEventNode = null;
 
-        // A lot of the initialized varibles have type URI. This type isn't to
+        // A lot of the initialized variables have type URI. This type isn't to
         // compare with the URI-Type of the standard. In fact, most of the
-        // Variables having type URI are declared as Vocabularies in the
+        // variables having type URI are declared as Vocabularies in the
         // Standard. Commonly, we use String for the Standard-Type URI.
 
         Timestamp eventTime = null;
@@ -393,18 +398,25 @@ public class EpcisCaptureInterface extends HttpServlet {
             for (int i = 0; i < eventNode.getChildNodes().getLength(); i++) {
                 curEventNode = eventNode.getChildNodes().item(i);
                 String nodeName = curEventNode.getNodeName();
-                LOG.debug("Handling XML tag: " + nodeName);
 
+                if (nodeName.equals("#text") || nodeName.equals("#comment")) {
+                    // ignore text or comments
+                    LOG.debug("  ignoring text or comment: '"
+                            + curEventNode.getTextContent() + "'");
+                    continue;
+                }
+
+                LOG.debug("  handling event field: '" + nodeName + "'");
                 if (nodeName.equals("eventTime")) {
                     String xmlTime = curEventNode.getTextContent();
-                    LOG.info("time in xml is '" + xmlTime + "'");
+                    LOG.debug("    eventTime in xml is '" + xmlTime + "'");
                     try {
                         eventTime = TimeParser.parseAsTimestamp(xmlTime);
                     } catch (ParseException e) {
                         throw new SAXException(
                                 "Invalid date/time (must be ISO8601).", e);
                     }
-                    LOG.info("time parsed as '" + eventTime + "'");
+                    LOG.debug("    eventTime parsed as '" + eventTime + "'");
                 } else if (nodeName.equals("eventTimeZoneOffset")) {
                     eventTimeZoneOffset = curEventNode.getTextContent();
                 } else if (nodeName.equals("epcList")
@@ -417,8 +429,7 @@ public class EpcisCaptureInterface extends HttpServlet {
                     if (!action.equals("ADD") && !action.equals("OBSERVE")
                             && !action.equals("DELETE")) {
                         throw new SAXException(
-                                "Encountered illegal \"action\" value: "
-                                        + action);
+                                "Encountered illegal 'action' value: " + action);
                     }
                 } else if (nodeName.equals("bizStep")) {
                     bizStep = new Vocabulary(curEventNode.getTextContent());
@@ -439,33 +450,28 @@ public class EpcisCaptureInterface extends HttpServlet {
                 } else if (nodeName.equals("parentID")) {
                     parentID = curEventNode.getTextContent();
                 } else {
-                    if (!nodeName.equals("#text")
-                            && !nodeName.equals("#comment")) {
-
-                        String[] parts = nodeName.split(":");
-                        if (parts.length == 2) {
-                            LOG.info("Treating unknown XML tag '" + nodeName
-                                    + "' as extension.");
-                            String prefix = parts[0];
-                            String localname = parts[1];
-                            String namespace = document.getDocumentElement().getAttribute(
-                                    "xmlns:" + prefix);
-                            String value = curEventNode.getTextContent();
-                            fieldNameExtList.add(new EventFieldExtension(
-                                    prefix, namespace, localname, value));
-                        } else {
-                            // this is not a valid extension
-                            throw new SAXException(
-                                    "Encountered unknown XML tag '" + nodeName
-                                            + "'.");
-                        }
+                    String[] parts = nodeName.split(":");
+                    if (parts.length == 2) {
+                        LOG.debug("    treating unknown event field as extension.");
+                        String prefix = parts[0];
+                        String localname = parts[1];
+                        String namespace = document.getDocumentElement().getAttribute(
+                                "xmlns:" + prefix);
+                        String value = curEventNode.getTextContent();
+                        fieldNameExtList.add(new EventFieldExtension(prefix,
+                                namespace, localname, value));
+                    } else {
+                        // this is not a valid extension
+                        throw new SAXException(
+                                "    encountered unknown event field: '"
+                                        + nodeName + "'.");
                     }
                 }
             }
-        } catch (final VociSyntaxException e) {
-            throw new SAXException("'" + curEventNode.getNodeName()
-                    + "' is not of type URI: " + curEventNode.getTextContent(),
-                    e);
+        } catch (VociSyntaxException e) {
+            throw new SAXException("  event field '"
+                    + curEventNode.getNodeName() + "' is not of type URI: "
+                    + curEventNode.getTextContent(), e);
         }
 
         // preparing query
@@ -486,7 +492,10 @@ public class EpcisCaptureInterface extends HttpServlet {
 
         // parameters 1-7 of the sql query are shared by all events
         ps.setTimestamp(1, eventTime);
-        ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+        // TODO: marco: what value should recordTime be set to? current time,
+        // same as eventTime, value from request?
+        // ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+        ps.setTimestamp(2, eventTime);
         ps.setString(3, eventTimeZoneOffset);
         if (bizStep != null) {
             ps.setLong(4, insertVocabulary("voc_BizStep", bizStep));
@@ -538,23 +547,30 @@ public class EpcisCaptureInterface extends HttpServlet {
         if (!fieldNameExtList.isEmpty()) {
             for (EventFieldExtension ext : fieldNameExtList) {
 
-                /* preparing statement for insertion of associated EPCs */
-                ps = dbconnection.prepareStatement("INSERT INTO event_"
-                        + eventNode.getNodeName() + "_extensions "
-                        + "(event_id, fieldname, prefix, "
-                        + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)");
+                String insert = "INSERT INTO event_" + eventNode.getNodeName()
+                        + "_extensions " + "(event_id, fieldname, prefix, "
+                        + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)";
+                LOG.debug("QUERY: " + insert);
+                ps = dbconnection.prepareStatement(insert);
 
                 ps.setLong(1, eventId);
+                LOG.debug("       query param 1: " + eventId);
                 ps.setString(2, ext.getFieldname());
+                LOG.debug("       query param 2: " + ext.getFieldname());
                 ps.setString(3, ext.getPrefix());
+                LOG.debug("       query param 3: " + ext.getPrefix());
                 if (ext.getIntValue() != null) {
                     ps.setInt(4, ext.getIntValue());
+                    LOG.debug("       query param 4: " + ext.getIntValue());
                 } else if (ext.getFloatValue() != null) {
                     ps.setFloat(4, ext.getFloatValue());
+                    LOG.debug("       query param 4: " + ext.getFloatValue());
                 } else if (ext.getDateValue() != null) {
                     ps.setTimestamp(4, ext.getDateValue());
+                    LOG.debug("       query param 4: " + ext.getDateValue());
                 } else {
                     ps.setString(4, ext.getStrValue());
+                    LOG.debug("       query param 4: " + ext.getStrValue());
                 }
 
                 ps.executeUpdate();
@@ -564,14 +580,17 @@ public class EpcisCaptureInterface extends HttpServlet {
         // check if the event has any EPCs
         if (epcs != null && !nodeName.equals("QuantityEvent")) {
             // preparing statement for insertion of associated EPCs
-            String stmt = "INSERT INTO event_" + nodeName
+            String insert = "INSERT INTO event_" + nodeName
                     + "_EPCs (event_id, epc) VALUES (?, ?)";
-            ps = dbconnection.prepareStatement(stmt);
+            LOG.debug("QUERY: " + insert);
+            ps = dbconnection.prepareStatement(insert);
             ps.setLong(1, eventId);
+            LOG.debug("       query param 1: " + eventId);
 
             // insert all EPCs in the EPCs array
             for (int i = 0; i < epcs.length; i++) {
                 ps.setString(2, epcs[i].toString());
+                LOG.debug("       query param 2: " + epcs[i].toString());
                 ps.executeUpdate();
             }
         }
@@ -579,15 +598,19 @@ public class EpcisCaptureInterface extends HttpServlet {
         // check if the event has any bizTransactions
         if (bizTransactionList != null) {
             // preparing statement for insertion of associated EPCs
-            String stmt = "INSERT INTO event_" + nodeName
+            String insert = "INSERT INTO event_" + nodeName
                     + "_bizTrans (event_id, bizTrans_id) VALUES (?, ?)";
-            ps = dbconnection.prepareStatement(stmt);
+            LOG.debug("QUERY: " + insert);
+            ps = dbconnection.prepareStatement(insert);
             ps.setLong(1, eventId);
+            LOG.debug("       query param 1: " + eventId);
 
             // insert all BizTransactions into the BusinessTransaction-Table
             // and connect it with the "event_<event-name>_bizTrans"-Table
             for (final BusinessTransaction bizTrans : bizTransactionList) {
-                ps.setLong(2, insertBusinessTransaction(bizTrans));
+                Long bTrans = insertBusinessTransaction(bizTrans);
+                ps.setLong(2, bTrans);
+                LOG.debug("       query param 2: " + bTrans);
                 ps.executeUpdate();
             }
         }
