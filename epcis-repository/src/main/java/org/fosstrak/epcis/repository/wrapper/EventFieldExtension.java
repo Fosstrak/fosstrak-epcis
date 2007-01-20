@@ -5,7 +5,7 @@ package org.accada.epcis.repository.wrapper;
 
 import java.sql.Timestamp;
 
-import org.accada.epcis.repository.TimeParser;
+import org.accada.epcis.utils.TimeParser;
 import org.apache.log4j.Logger;
 
 /**
@@ -43,26 +43,26 @@ public class EventFieldExtension {
         this.prefix = prefix;
         this.namespace = namespace;
         this.fieldname = namespace + "#" + localname;
-        LOG.info("Resolved fieldname of extension tag to '" + fieldname + "'");
+        LOG.debug("    resolved fieldname of extension to '" + fieldname + "'");
         this.strValue = value;
         // try parsing the value
         try {
             this.intValue = new Integer(strValue);
             this.valueColumnName = "intValue";
-            LOG.info("Value of extension tag is of type Integer.");
+            LOG.debug("    value of extension is of type Integer.");
         } catch (NumberFormatException e1) {
             try {
                 this.floatValue = new Float(strValue);
                 this.valueColumnName = "floatValue";
-                LOG.info("Value of extension tag is of type Float.");
+                LOG.info("    value of extension is of type Float.");
             } catch (NumberFormatException e2) {
                 try {
                     this.dateValue = TimeParser.parseAsTimestamp(strValue);
                     this.valueColumnName = "dateValue";
-                    LOG.info("Value of extension tag is of type Date.");
+                    LOG.info("    value of extension is of type Date.");
                 } catch (Exception e3) {
                     // treat value as String
-                    LOG.info("Value of extension tag is of type String.");
+                    LOG.info("    value of extension is of type String.");
                     this.valueColumnName = "strValue";
                 }
             }
