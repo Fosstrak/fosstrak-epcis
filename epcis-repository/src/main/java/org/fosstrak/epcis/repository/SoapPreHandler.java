@@ -20,6 +20,7 @@ import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
@@ -28,8 +29,9 @@ import org.apache.log4j.PropertyConfigurator;
 public class SoapPreHandler extends BasicHandler {
 
     /**
-     * Invokes this SoapPreHandler which performs the initialization for the EPCIS
-     * query service, such as reading configuration and setting up the database.
+     * Invokes this SoapPreHandler which performs the initialization for the
+     * EPCIS query service, such as reading configuration and setting up the
+     * database.
      * 
      * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      * @param msgContext
@@ -41,13 +43,6 @@ public class SoapPreHandler extends BasicHandler {
     public void invoke(MessageContext msgContext)
             throws ImplementationException {
         try {
-            Context initContext = new InitialContext();
-            Context env = (Context) initContext.lookup("java:comp/env");
-            DataSource db = (DataSource) env.lookup("jdbc/EPCISDB");
-
-            Connection dbconnection = db.getConnection();
-            String delimiter = dbconnection.getMetaData().getIdentifierQuoteString();
-
             ServletContext ctx = ((HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext();
             String servletPath = ctx.getRealPath("/");
             String log4jConfigFile = ctx.getInitParameter("log4jConfigFile");
@@ -56,6 +51,17 @@ public class SoapPreHandler extends BasicHandler {
                 // to load it (the application runs without logging)
                 PropertyConfigurator.configure(servletPath + log4jConfigFile);
             }
+            final Logger LOG = Logger.getLogger("SoapPreHandler.class");
+
+            Context initContext = new InitialContext();
+            Context env = (Context) initContext.lookup("java:comp/env");
+            DataSource db = (DataSource) env.lookup("jdbc/EPCISDB");
+            Connection dbconnection = db.getConnection();
+            LOG.info("Connection to database successfully established.");
+
+            String delimiter = dbconnection.getMetaData().getIdentifierQuoteString();
+            LOG.info("Resolved string delimiter used to quote SQL identifiers as '"
+                    + delimiter + "'.");
 
             Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) ctx.getAttribute("subscribedMap");
 
