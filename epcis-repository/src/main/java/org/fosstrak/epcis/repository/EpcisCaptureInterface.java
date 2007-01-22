@@ -608,7 +608,7 @@ public class EpcisCaptureInterface extends HttpServlet {
             // insert all BizTransactions into the BusinessTransaction-Table
             // and connect it with the "event_<event-name>_bizTrans"-Table
             for (final BusinessTransaction bizTrans : bizTransactionList) {
-                Long bTrans = insertBusinessTransaction(bizTrans);
+                long bTrans = insertBusinessTransaction(bizTrans);
                 ps.setLong(2, bTrans);
                 LOG.debug("       query param 2: " + bTrans);
                 ps.executeUpdate();
@@ -669,6 +669,8 @@ public class EpcisCaptureInterface extends HttpServlet {
             // currently ignored here
             if (insertMissingVoc) {
                 stmt = "INSERT INTO " + tableName + " (uri) VALUES (?)";
+                LOG.debug("QUERY: " + stmt);
+                LOG.debug("       query param 1: " + uri.toString());
                 ps = dbconnection.prepareStatement(stmt);
                 ps.setString(1, uri.toString());
                 ps.executeUpdate();
@@ -696,8 +698,6 @@ public class EpcisCaptureInterface extends HttpServlet {
      */
     private Vocabulary[] handleEpcs(final Node epcNode)
             throws VociSyntaxException, SAXParseException {
-        // write EPCs into a list first, because we cannot yet safely say how
-        // many EPCs there will be
         List<Vocabulary> epcList = new ArrayList<Vocabulary>();
 
         for (int i = 0; i < epcNode.getChildNodes().getLength(); i++) {
@@ -734,16 +734,16 @@ public class EpcisCaptureInterface extends HttpServlet {
      */
     private List<BusinessTransaction> handleBizTransactions(final Node bizNode)
             throws VociSyntaxException, SAXParseException {
-        // write EPCs into a list first, because we cannot yet safely say how
-        // many EPCs there will be
         final List<BusinessTransaction> bizList = new ArrayList<BusinessTransaction>();
 
         for (int i = 0; i < bizNode.getChildNodes().getLength(); i++) {
             Node curNode = bizNode.getChildNodes().item(i);
             if (curNode.getNodeName().equals("bizTransaction")) {
-                bizList.add(new BusinessTransaction(new Vocabulary(
-                        curNode.getAttributes().item(0).getTextContent()),
-                        new Vocabulary(curNode.getTextContent())));
+                String bizTransType = curNode.getAttributes().item(0).getTextContent();
+                String bizTrans = curNode.getTextContent();
+                BusinessTransaction bt = new BusinessTransaction(
+                        new Vocabulary(bizTransType), new Vocabulary(bizTrans));
+                bizList.add(bt);
             } else {
                 if (!curNode.getNodeName().equals("#text")
                         && !curNode.getNodeName().equals("#comment")) {
@@ -765,7 +765,7 @@ public class EpcisCaptureInterface extends HttpServlet {
      * @throws SQLException
      *             If an SQL problem with the database ocurred.
      */
-    private Long insertBusinessTransaction(final BusinessTransaction bizTrans)
+    private long insertBusinessTransaction(final BusinessTransaction bizTrans)
             throws SQLException {
         final long id = insertVocabulary("voc_BizTrans",
                 bizTrans.getBizTransID());
@@ -784,6 +784,9 @@ public class EpcisCaptureInterface extends HttpServlet {
         } else {
             // insert the BusinessTransaction
             stmt = "INSERT INTO BizTransaction (bizTrans, type) VALUES (?, ?)";
+            LOG.debug("QUERY: " + stmt);
+            LOG.debug("       query param 1: " + id);
+            LOG.debug("       query param 2: " + type);
             ps = dbconnection.prepareStatement(stmt);
             ps.setLong(1, id);
             ps.setLong(2, type);
