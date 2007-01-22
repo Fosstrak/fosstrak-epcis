@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
@@ -25,7 +22,6 @@ import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.TransactionEventType;
 import org.accada.epcis.utils.QueryResultsParser;
 import org.apache.axis.message.MessageElement;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
@@ -33,16 +29,14 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class EventQueryTest extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(EventQueryTest.class);
+    private static final String REQ_PATH = "src/test/resources/queries/webservice/requests/";
+    private static final String REQ_PREFIX = "Test-EPCIS10-SE";
+    private static final String REQ_SUFFIX = "-Request-1-poll.xml";
+    private static final String RESP_PATH = "src/test/resources/queries/webservice/responses/";
+    private static final String RESP_PREFIX = "Test-EPCIS10-SE";
+    private static final String RESP_SUFFIX = "-Response-1-poll.xml";
 
     QueryClientInterface client;
-
-    static String pathToQueries = "src/test/resources/queries/webservice/requests/";
-    static String queryPrefix = "Test-EPCIS10-SE";
-    static String querySuffix = "-Request-1-poll.xml";
-    static String pathToResp = "src/test/resources/queries/webservice/responses/";
-    static String respPrefix = "Test-EPCIS10-SE";
-    static String respSuffix = "-Response-1-poll.xml";
 
     /**
      * @see junit.framework.TestCase#setUp()
@@ -54,14 +48,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE10() throws IOException, ServiceException {
         int testNr = 10;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -70,14 +62,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE11() throws IOException, ServiceException {
         int testNr = 11;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -86,14 +76,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE12() throws IOException, ServiceException {
         int testNr = 12;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -102,14 +90,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE13() throws IOException, ServiceException {
         int testNr = 13;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -118,14 +104,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE14() throws IOException, ServiceException {
         int testNr = 14;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -134,14 +118,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE15() throws IOException, ServiceException {
         int testNr = 15;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -150,14 +132,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE16() throws IOException, ServiceException {
         int testNr = 16;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -166,14 +146,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE17() throws IOException, ServiceException {
         int testNr = 17;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -182,14 +160,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE18() throws IOException, ServiceException {
         int testNr = 18;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -198,14 +174,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE19() throws IOException, ServiceException {
         int testNr = 19;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -214,14 +188,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE20() throws IOException, ServiceException {
         int testNr = 20;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -230,14 +202,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE21() throws IOException, ServiceException {
         int testNr = 21;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -246,14 +216,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE22() throws IOException, ServiceException {
         int testNr = 22;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -262,14 +230,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE23() throws IOException, ServiceException {
         int testNr = 23;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -278,14 +244,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE24() throws IOException, ServiceException {
         int testNr = 24;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -294,14 +258,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE25() throws IOException, ServiceException {
         int testNr = 25;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -310,14 +272,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE26() throws IOException, ServiceException {
         int testNr = 26;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -326,14 +286,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE27() throws IOException, ServiceException {
         int testNr = 27;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -342,14 +300,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE28() throws IOException, ServiceException {
         int testNr = 28;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -358,14 +314,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE29() throws IOException, ServiceException {
         int testNr = 29;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -374,14 +328,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE30() throws IOException, ServiceException {
         int testNr = 30;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -390,14 +342,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE31() throws IOException, ServiceException {
         int testNr = 31;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -406,14 +356,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE32() throws IOException, ServiceException {
         int testNr = 32;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -422,14 +370,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE33() throws IOException, ServiceException {
         int testNr = 33;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -438,14 +384,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE34() throws IOException, ServiceException {
         int testNr = 34;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -454,14 +398,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE35() throws IOException, ServiceException {
         int testNr = 35;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -470,14 +412,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE36() throws IOException, ServiceException {
         int testNr = 36;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -486,14 +426,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE37() throws IOException, ServiceException {
         int testNr = 37;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -502,14 +440,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE38() throws IOException, ServiceException {
         int testNr = 38;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -518,14 +454,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE39() throws IOException, ServiceException {
         int testNr = 39;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -534,8 +468,7 @@ public class EventQueryTest extends TestCase {
 
     public void testSE40() throws IOException, ServiceException {
         int testNr = 40;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         try {
             client.runQuery(fis);
@@ -548,8 +481,7 @@ public class EventQueryTest extends TestCase {
 
     public void testSE41() throws IOException, ServiceException {
         int testNr = 41;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         try {
             client.runQuery(fis);
@@ -562,14 +494,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE42() throws IOException, ServiceException {
         int testNr = 42;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -578,14 +508,12 @@ public class EventQueryTest extends TestCase {
 
     public void testSE43() throws IOException, ServiceException {
         int testNr = 43;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
+        String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
@@ -594,13 +522,13 @@ public class EventQueryTest extends TestCase {
 
     public void testSE73() throws Exception {
         int testNr = 73;
-        String query = pathToQueries + queryPrefix + testNr + querySuffix;
-        LOG.info("query taken from " + query);
+        String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = (QueryResults) client.runQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
+        String resp = RESP_PATH + RESP_PREFIX + testNr
+                + "-Response-1-QueryResults.xml";
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
