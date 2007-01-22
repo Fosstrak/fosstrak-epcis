@@ -128,36 +128,36 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      * Basic SQL query string for object events.
      */
     private String objectEventQueryBase = "SELECT DISTINCT "
-            + "`event_ObjectEvent`.`id`, `eventTime`, `recordTime`, "
-            + "`eventTimeZoneOffset`, `action`, "
-            + "`voc_BizStep`.`uri` AS `bizStep`, "
-            + "`voc_Disposition`.`uri` AS `disposition`, "
-            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
-            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "`event_ObjectEvent`.id, eventTime, recordTime, "
+            + "eventTimeZoneOffset, action, "
+            + "`voc_BizStep`.uri AS bizStep, "
+            + "`voc_Disposition`.uri AS disposition, "
+            + "`voc_ReadPoint`.uri AS readPoint, "
+            + "`voc_BizLoc`.uri AS bizLocation "
             + "FROM `event_ObjectEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_ObjectEvent`.`bizStep` = `voc_BizStep`.`id` "
-            + "LEFT JOIN `voc_Disposition` ON `event_ObjectEvent`.`disposition` = `voc_Disposition`.`id` "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_ObjectEvent`.`readPoint` = `voc_ReadPoint`.`id` "
-            + "LEFT JOIN `voc_BizLoc` ON `event_ObjectEvent`.`bizLocation` = `voc_BizLoc`.`id` "
-            + "LEFT JOIN `event_ObjectEvent_extensions` ON `event_ObjectEvent`.`id` = `event_ObjectEvent_extensions`.`event_id` "
-            + "WHERE 1 ";
+            + "LEFT JOIN `voc_BizStep` ON `event_ObjectEvent`.bizStep = `voc_BizStep`.id "
+            + "LEFT JOIN `voc_Disposition` ON `event_ObjectEvent`.disposition = `voc_Disposition`.id "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_ObjectEvent`.readPoint = `voc_ReadPoint`.id "
+            + "LEFT JOIN `voc_BizLoc` ON `event_ObjectEvent`.bizLocation = `voc_BizLoc`.id "
+            + "LEFT JOIN `event_ObjectEvent_extensions` ON `event_ObjectEvent`.id = `event_ObjectEvent_extensions`.event_id "
+            + "WHERE 1";
 
     /**
      * Basic SQL query string for aggregation events.
      */
     // TODO marco: query as for objectevent (extensions)!
     private String aggregationEventQueryBase = "SELECT DISTINCT "
-            + "`event_AggregationEvent`.`id`, `eventTime`, `recordTime`, "
-            + "`eventTimeZoneOffset`, `parentID`, `action`, "
-            + "`voc_BizStep`.`uri` AS `bizStep`, "
-            + "`voc_Disposition`.`uri` AS `disposition`, "
-            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
-            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "`event_AggregationEvent`.id, eventTime, recordTime, "
+            + "eventTimeZoneOffset, parentID, action, "
+            + "`voc_BizStep`.uri AS bizStep, "
+            + "`voc_Disposition`.uri AS disposition, "
+            + "`voc_ReadPoint`.uri AS readPoint, "
+            + "`voc_BizLoc`.uri AS bizLocation "
             + "FROM `event_AggregationEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_AggregationEvent`.`bizStep` = `voc_BizStep`.`id` "
-            + "LEFT JOIN `voc_Disposition` ON `event_AggregationEvent`.`disposition`  = `voc_Disposition`.`id` "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_AggregationEvent`.`readPoint` = `voc_ReadPoint`.`id` "
-            + "LEFT JOIN `voc_BizLoc` ON `event_AggregationEvent`.`bizLocation` = `voc_BizLoc`.`id` "
+            + "LEFT JOIN `voc_BizStep` ON `event_AggregationEvent`.bizStep = `voc_BizStep`.id "
+            + "LEFT JOIN `voc_Disposition` ON `event_AggregationEvent`.disposition  = `voc_Disposition`.id "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_AggregationEvent`.readPoint = `voc_ReadPoint`.id "
+            + "LEFT JOIN `voc_BizLoc` ON `event_AggregationEvent`.bizLocation = `voc_BizLoc`.id "
             + "WHERE 1 ";
 
     /**
@@ -165,18 +165,18 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      */
     // TODO marco: query as for objectevent (extensions)!
     private String quantityEventQueryBase = "SELECT DISTINCT "
-            + "`event_QuantityEvent`.`id`, `eventTime`, `recordTime`, `eventTimeZoneOffset`, "
-            + "`voc_EPCClass`.`uri` AS `epcClass`, `quantity`, "
-            + "`voc_BizStep`.`uri` AS `bizStep`, "
-            + "`voc_Disposition`.`uri` AS `disposition`, "
-            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
-            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "`event_QuantityEvent`.id, eventTime, recordTime, eventTimeZoneOffset, "
+            + "`voc_EPCClass`.uri AS epcClass, quantity, "
+            + "`voc_BizStep`.uri AS bizStep, "
+            + "`voc_Disposition`.uri AS disposition, "
+            + "`voc_ReadPoint`.uri AS readPoint, "
+            + "`voc_BizLoc`.uri AS bizLocation "
             + "FROM `event_QuantityEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_QuantityEvent`.`bizStep` = `voc_BizStep`.`id` "
-            + "LEFT JOIN `voc_Disposition` ON `event_QuantityEvent`.`disposition` = `voc_Disposition`.`id` "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_QuantityEvent`.`readPoint` = `voc_ReadPoint`.`id` "
-            + "LEFT JOIN `voc_BizLoc` ON `event_QuantityEvent`.`bizLocation` = `voc_BizLoc`.`id` "
-            + "LEFT JOIN `voc_EPCClass` ON `event_QuantityEvent`.`epcClass` = `voc_EPCClass`.`id` "
+            + "LEFT JOIN `voc_BizStep` ON `event_QuantityEvent`.bizStep = `voc_BizStep`.id "
+            + "LEFT JOIN `voc_Disposition` ON `event_QuantityEvent`.disposition = `voc_Disposition`.id "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_QuantityEvent`.readPoint = `voc_ReadPoint`.id "
+            + "LEFT JOIN `voc_BizLoc` ON `event_QuantityEvent`.bizLocation = `voc_BizLoc`.id "
+            + "LEFT JOIN `voc_EPCClass` ON `event_QuantityEvent`.epcClass = `voc_EPCClass`.id "
             + "WHERE 1 ";
 
     /**
@@ -184,17 +184,17 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      */
     // TODO marco: query as for objectevent (extensions)!
     private String transactionEventQueryBase = "SELECT DISTINCT "
-            + "`event_TransactionEvent`.`id`, `eventTime`, `recordTime`, "
-            + "`eventTimeZoneOffset`, `action`, `parentId`, "
-            + "`voc_BizStep`.`uri` AS `bizStep`, "
-            + "`voc_Disposition`.`uri` AS `disposition`, "
-            + "`voc_ReadPoint`.`uri` AS `readPoint`, "
-            + "`voc_BizLoc`.`uri` AS `bizLocation` "
+            + "`event_TransactionEvent`.id, eventTime, recordTime, "
+            + "eventTimeZoneOffset, action, parentID, "
+            + "`voc_BizStep`.uri AS bizStep, "
+            + "`voc_Disposition`.uri AS disposition, "
+            + "`voc_ReadPoint`.uri AS readPoint, "
+            + "`voc_BizLoc`.uri AS bizLocation "
             + "FROM `event_TransactionEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_TransactionEvent`.`bizStep` = `voc_BizStep`.`id` "
-            + "LEFT JOIN `voc_Disposition` ON `event_TransactionEvent`.`disposition` = `voc_Disposition`.`id` "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_TransactionEvent`.`readPoint` = `voc_ReadPoint`.`id` "
-            + "LEFT JOIN `voc_BizLoc` ON `event_TransactionEvent`.`bizLocation` = `voc_BizLoc`.`id` "
+            + "LEFT JOIN `voc_BizStep` ON `event_TransactionEvent`.bizStep = `voc_BizStep`.id "
+            + "LEFT JOIN `voc_Disposition` ON `event_TransactionEvent`.disposition = `voc_Disposition`.id "
+            + "LEFT JOIN `voc_ReadPoint` ON `event_TransactionEvent`.readPoint = `voc_ReadPoint`.id "
+            + "LEFT JOIN `voc_BizLoc` ON `event_TransactionEvent`.bizLocation = `voc_BizLoc`.id "
             + "WHERE 1 ";
 
     public EpcisQueryInterface() {
@@ -203,41 +203,6 @@ public class EpcisQueryInterface implements EPCISServicePortType {
         delimiter = (String) msgContext.getProperty("delimiter");
         dbconnection = (Connection) msgContext.getProperty("dbconnection");
     }
-
-    // /**
-    // * Opens a connection to the database server. Uses the global variables
-    // * dbserver, dbuser, dbpassword and sets dbconnection.<br>
-    // * BEWARE OF CODE DUPLICATION: this method is also implemented in class
-    // * SubscriptionScheduled!
-    // *
-    // * @throws ImplementationException
-    // * If the Database variables could not be read, or the database
-    // * could not be opened.
-    // */
-    // private void connectDB() throws ImplementationException {
-    // try {
-    // Context initContext = new InitialContext();
-    // Context env = (Context) initContext.lookup("java:comp/env");
-    // db = (DataSource) env.lookup("jdbc/EPCISDB");
-    //
-    // Connection dbconnection = db.getConnection();
-    // delimiter = dbconnection.getMetaData().getIdentifierQuoteString();
-    // } catch (NamingException e) {
-    // ImplementationException iex = new ImplementationException();
-    // iex.setReason("Could not get DataSource, check "
-    // + "META-INF/context.xml and "
-    // + "WEB-INF/web.xml (on server side) "
-    // + "for configuration errors (" + e.getMessage() + ")");
-    // iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-    // throw iex;
-    // } catch (SQLException e) {
-    // ImplementationException iex = new ImplementationException();
-    // iex.setReason("could not connect to the database ("
-    // + e.getMessage() + ")");
-    // iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-    // throw iex;
-    // }
-    // }
 
     /**
      * Returns whether subscriptionID already exists in DB.
@@ -373,19 +338,19 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             final String tableName, final int eventId) throws SQLException,
             ImplementationException {
         String query = "SELECT DISTINCT "
-                + "`voc_BizTrans`.`uri`, `voc_BizTransType`.`uri` AS `typeuri`"
+                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS `typeuri`"
                 + "FROM ((`BizTransaction` JOIN `"
                 + tableName
-                + "` ON `BizTransaction`.`id` = `"
+                + "` ON `BizTransaction`.id = `"
                 + tableName
                 + "`.`bizTrans_id`)"
-                + "JOIN `voc_BizTrans` ON `BizTransaction`.`bizTrans` = `voc_BizTrans`.`id`)"
-                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.`type` = `voc_BizTransType`.`id`"
-                + " WHERE `" + tableName + "`.`event_id` = " + eventId;
+                + "JOIN `voc_BizTrans` ON `BizTransaction`.`bizTrans` = `voc_BizTrans`.id)"
+                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.`type` = `voc_BizTransType`.id"
+                + " WHERE `" + tableName + "`.event_id = " + eventId;
         LOG.debug("QUERY: " + query);
         Statement stmt = dbconnection.createStatement();
 
-        ResultSet rs = stmt.executeQuery(query.replace("`", delimiter));
+        ResultSet rs = stmt.executeQuery(query.replaceAll("`", delimiter));
         List<BusinessTransactionType> bizTransList = new ArrayList<BusinessTransactionType>();
         while (rs.next()) {
             String uriString = null;
@@ -617,7 +582,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
         // run the query and get all QuantityEvents
         ResultSet rs = quantityEventQuery.executeQuery();
-        
+
         List<QuantityEventType> quantEventList = new ArrayList<QuantityEventType>();
         while (rs.next()) {
             QuantityEventType quantEvent = new QuantityEventType();
@@ -690,7 +655,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
         // run the query and get all TransactionEvents
         ResultSet rs = transactionEventQuery.executeQuery();
-        
+
         List<TransactionEventType> transEventList = new ArrayList<TransactionEventType>();
         while (rs.next()) {
             TransactionEventType transEvent = new TransactionEventType();
@@ -816,14 +781,25 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             String paramName = queryParams[i].getName();
             Object paramValue = queryParams[i].getValue();
 
+            // check parameter value
+            if (paramValue.toString().equals("")) {
+                LOG.info("USER ERROR: empty parameter value provided for parameter "
+                        + paramName);
+                // we do not throw an exception
+                // just ignore this parameter
+                continue;
+            }
+
             // check if this parameter has already been provided
             if (params.contains(paramName)) {
                 String msg = "Two or more inputs are provided for the same parameter "
                         + paramName;
                 LOG.error(msg);
                 throw new QueryParameterException(msg);
+            } else {
+                params.add(paramName);
             }
-            params.add(paramName);
+
             try {
                 if (paramName.equals("eventType")) {
                     // search for the eventType in the list of arguments.
@@ -840,25 +816,25 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                         return null;
                     }
                 } else if (paramName.equals("GE_eventTime")) {
-                    query.append(" AND (`eventTime` >= ?) ");
+                    query.append(" AND (eventTime >= ?) ");
                     Calendar cal = (Calendar) paramValue;
                     Timestamp ts = new Timestamp(cal.getTimeInMillis());
                     queryArgs.add(ts.toString());
 
                 } else if (paramName.equals("LT_eventTime")) {
-                    query.append(" AND (`eventTime` < ?) ");
+                    query.append(" AND (eventTime < ?) ");
                     Calendar cal = (Calendar) paramValue;
                     Timestamp ts = new Timestamp(cal.getTimeInMillis());
                     queryArgs.add(ts.toString());
 
                 } else if (paramName.equals("GE_recordTime")) {
-                    query.append(" AND (`recordTime` >= ?) ");
+                    query.append(" AND (recordTime >= ?) ");
                     Calendar cal = (Calendar) paramValue;
                     Timestamp ts = new Timestamp(cal.getTimeInMillis());
                     queryArgs.add(ts.toString());
 
                 } else if (paramName.equals("LT_recordTime")) {
-                    query.append(" AND (`recordTime` < ?) ");
+                    query.append(" AND (recordTime < ?) ");
                     Calendar cal = (Calendar) paramValue;
                     Timestamp ts = new Timestamp(cal.getTimeInMillis());
                     queryArgs.add(ts.toString());
@@ -897,19 +873,16 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                     // the % allows any possible ending, which should implement
                     // the semantics of "With Descendant"
                     String[] readPoints = ((ArrayOfString) paramValue).getString();
-                    for (int j = 0; j < readPoints.length; j++) {
-                        readPoints[j] = readPoints[j] + "%";
-                    }
-                    query.append(" AND (");
+                    query.append(" AND `voc_ReadPoint`.uri IS NOT NULL AND (");
                     int j = 0;
                     while (j < readPoints.length - 1) {
                         query.append("`voc_ReadPoint`.uri LIKE ? OR ");
-                        queryArgs.add(readPoints[j]);
+                        queryArgs.add(readPoints[j] + "%");
                         j++;
                     }
                     if (readPoints.length > 0) {
                         query.append("`voc_ReadPoint`.uri LIKE ?");
-                        queryArgs.add(readPoints[j]);
+                        queryArgs.add(readPoints[j] + "%");
                     }
                     query.append(") ");
 
@@ -945,36 +918,47 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                     query.append(") ");
 
                 } else if (paramName.startsWith("EQ_bizTransaction_")) {
+                    // this query is subdivided into several subqueries
 
-                    // Get type from parameter name
+                    // subquery for selecting IDs from voc_BizTransType
+                    // type extracted from parameter name
                     String type = paramName.substring(18);
+                    String vocBizTransTypeId = "SELECT id FROM `voc_BizTransType` WHERE uri=\""
+                            + type + "\"";
 
-                    /*
-                     * This does a SQL subquery which joins the relation from
-                     * event to voc_bizTrans with voc_bizTrans and searches for
-                     * the bizTransaction-URIs specified. The subquery finally
-                     * returns the ids of the corresponding events. In other
-                     * words, this returns the ids of events that have at least
-                     * one of the bizTransactions associated. Finally it checks
-                     * if the event_id is in this set. This is the new
-                     * implementation for multiple bizTransactions per event -
-                     * not yet used.
-                     */
-                    query.append("AND (`event_" + eventType + "`.id IN ("
-                            + "SELECT `event_id` AS id FROM (" + "`event_"
-                            + eventType + "_bizTrans` " + "JOIN (("
-                            + "SELECT id FROM `voc_BizTransType` "
-                            + "WHERE uri = \"" + type + "\") "
-                            + "NATURAL JOIN "
-                            + "(SELECT id FROM `voc_BizTrans WHERE "
-                            + "`voc_BizTrans`.id IN (");
-                    stringArrayToSQL(((ArrayOfString) paramValue).getString(),
-                            query, queryArgs);
-                    query.append("))"
-                            + "ON `event_"
-                            + eventType
-                            + "_bizTrans`.`bizTrans_id` = `voc_BizTransType`.id)"
-                            + ")");
+                    // subquery for selecting IDs from voc_BizTrans
+                    StringBuffer temp = new StringBuffer();
+                    temp.append("(SELECT id AS vocBizTransId FROM `voc_BizTrans` WHERE `voc_BizTrans`.uri IN (");
+                    String[] strings = ((ArrayOfString) paramValue).getString();
+                    int j = 0;
+                    while (j < strings.length - 1) {
+                        temp.append("\"" + strings[j] + "\",");
+                        j++;
+                    }
+                    if (strings.length > 0) {
+                        temp.append("\"" + strings[j] + "\"");
+                    }
+                    temp.append(")) AS SelectedVocBizTrans");
+                    String vocBizTransIds = temp.toString();
+
+                    // subquery for selecting IDs from BizTransaction
+                    String selectedBizTrans = "(SELECT id AS bizTransId, bizTrans FROM `BizTransaction` bt WHERE bt.type=("
+                            + vocBizTransTypeId + ")) AS SelectedBizTrans";
+                    String bizTransId = "SELECT bizTransId FROM "
+                            + vocBizTransIds
+                            + " INNER JOIN "
+                            + selectedBizTrans
+                            + " ON SelectedBizTrans.bizTrans=SelectedVocBizTrans.vocBizTransId";
+
+                    query.append(" AND (`event_" + eventType + "`.id IN (");
+                    query.append("SELECT event_id AS id ");
+                    query.append("FROM `event_" + eventType + "_bizTrans` ");
+                    query.append("INNER JOIN (");
+                    query.append(bizTransId);
+                    query.append(") AS BizTransIds ");
+                    query.append("ON BizTransIds.bizTransId=`event_"
+                            + eventType + "_bizTrans`.bizTrans_id");
+                    query.append("))");
 
                 } else if (paramName.equals("MATCH_epc")) {
                     /*
@@ -987,22 +971,22 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                      * of the EPCs associated to the event. [TDS1.3].
                      * http://www.epcglobalinc.org/standards_technology/Ratified%20Spec%20March%208%202006.pdf
                      */
+                    // FIXME: marco: this does not work correctly
+                    // see test SE21
                     if (eventType.equals("ObjectEvent")) {
                         query.append(" AND (`event_ObjectEvent`.id IN (");
-                        query.append("SELECT `event_id` FROM"
-                                + " `event_ObjectEvent_EPCs` WHERE epc IN (");
+                        query.append("SELECT event_id FROM `event_ObjectEvent_EPCs` WHERE epc IN (");
                         stringArrayToSQL(
                                 ((ArrayOfString) paramValue).getString(),
                                 query, queryArgs);
-                        query.append("))) ");
+                        query.append(")))");
                     } else if (eventType.equals("TransactionEvent")) {
                         query.append(" AND (`event_TransactionEvent`.id IN (");
-                        query.append("SELECT `event_id` FROM"
-                                + " `event_TransactionEvent_EPCs` WHERE epc IN (");
+                        query.append("SELECT event_id FROM `event_TransactionEvent_EPCs` WHERE epc IN (");
                         stringArrayToSQL(
                                 ((ArrayOfString) paramValue).getString(),
                                 query, queryArgs);
-                        query.append("))) ");
+                        query.append(")))");
                     } else {
                         query.append(" AND 0 ");
                     }
@@ -1010,11 +994,11 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                 } else if (paramName.equals("MATCH_parentID")) {
                     if (eventType.equals("AggregationEvent")
                             || eventType.equals("TransactionEvent")) {
-                        query.append(" AND (`parentID` IN (");
+                        query.append(" AND (parentID IN (");
                         stringArrayToSQL(
                                 ((ArrayOfString) paramValue).getString(),
                                 query, queryArgs);
-                        query.append(")) ");
+                        query.append("))");
                     } else {
                         query.append(" AND 0 ");
                     }
@@ -1022,25 +1006,23 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                 } else if (paramName.equals("MATCH_childEPC")) {
                     if (eventType.equals("AggregationEvent")) {
                         query.append(" AND (`event_AggregationEvent`.id IN (");
-                        query.append("SELECT `event_id` FROM `event_AggregationEvent_EPCs` "
-                                + "WHERE epc IN (");
+                        query.append("SELECT event_id FROM `event_AggregationEvent_EPCs` WHERE epc IN (");
                         stringArrayToSQL(
                                 ((ArrayOfString) paramValue).getString(),
                                 query, queryArgs);
-                        query.append("))) ");
+                        query.append(")))");
                     } else {
                         query.append(" AND 0 ");
                     }
 
                 } else if (paramName.equals("MATCH_epcClass")) {
                     if (eventType.equals("QuantityEvent")) {
-                        query.append(" AND (`epcClass` IN (");
-                        query.append("SELECT `id` FROM `voc_EPCClass` "
-                                + "WHERE `uri` IN (");
+                        query.append(" AND (epcClass IN (");
+                        query.append("SELECT id FROM `voc_EPCClass` WHERE uri IN (");
                         stringArrayToSQL(
                                 ((ArrayOfString) paramValue).getString(),
                                 query, queryArgs);
-                        query.append("))) ");
+                        query.append(")))");
                     } else {
                         query.append(" AND 0 ");
                     }
@@ -1055,7 +1037,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
                 } else if (paramName.equals("GT_quantity")) {
                     if (eventType.equals("QuantityEvent")) {
-                        query.append("AND (quantity > ?) ");
+                        query.append(" AND (quantity > ?) ");
                         queryArgs.add(((Integer) paramValue).toString());
                     } else {
                         query.append(" AND 0 ");
@@ -1063,7 +1045,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
                 } else if (paramName.equals("GE_quantity")) {
                     if (eventType.equals("QuantityEvent")) {
-                        query.append("AND (quantity >= ?) ");
+                        query.append(" AND (quantity >= ?) ");
                         queryArgs.add(((Integer) paramValue).toString());
                     } else {
                         query.append(" AND 0 ");
@@ -1071,7 +1053,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
                 } else if (paramName.equals("LT_quantity")) {
                     if (eventType.equals("QuantityEvent")) {
-                        query.append("AND (quantity < ?) ");
+                        query.append(" AND (quantity < ?) ");
                         queryArgs.add(((Integer) paramValue).toString());
                     } else {
                         query.append(" AND 0 ");
@@ -1079,7 +1061,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
                 } else if (paramName.equals("LE_quantity")) {
                     if (eventType.equals("QuantityEvent")) {
-                        query.append("AND (quantity <= ?) ");
+                        query.append(" AND (quantity <= ?) ");
                         queryArgs.add(((Integer) paramValue).toString());
                     } else {
                         query.append(" AND 0 ");
@@ -1088,7 +1070,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                         || paramName.startsWith("GE_")
                         || paramName.startsWith("EQ_")
                         || paramName.startsWith("LE_")
-                        || paramName.startsWith("LGT_")) {
+                        || paramName.startsWith("LT_")) {
                     String op = "=";
                     if (paramName.startsWith("GT_")) {
                         op = ">";
@@ -1096,7 +1078,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                         op = ">=";
                     } else if (paramName.startsWith("LE_")) {
                         op = "<=";
-                    } else if (paramName.startsWith("GT_")) {
+                    } else if (paramName.startsWith("LT_")) {
                         op = "<";
                     }
                     String where;
@@ -1113,19 +1095,22 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                                 Calendar cal = TimeParser.parseAsCalendar(val.toString());
                                 Timestamp ts = new Timestamp(
                                         cal.getTimeInMillis());
-                                where = "dateValue" + op + "`" + ts.toString()
-                                        + "`";
+                                where = "dateValue" + op + "\"" + ts.toString()
+                                        + "\"";
                             } catch (ParseException e) {
                                 String strVal = val.toString();
-                                where = "strValue" + op + "`" + strVal + "`";
+                                where = "strValue" + op + "\"" + strVal + "\"";
                             }
                         }
                     }
-
+                    String fieldname = paramName.substring(3);
                     // FIXME: marco: if db ready -> do this for all events
                     if (eventType.equals("ObjectEvent")) {
-                        query.append("AND `event_ObjectEvent_extensions`."
-                                + where);
+                        query.append(" AND `event_ObjectEvent_extensions`.");
+                        query.append(where);
+                        query.append(" AND `event_ObjectEvent_extensions`.fieldname=\"");
+                        query.append(fieldname);
+                        query.append("\"");
                     } else {
                         query.append(" AND 0");
                     }
@@ -1134,29 +1119,58 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                     String type = paramName.substring(7);
                     if (type.equals("childEPCs")) {
                         if (eventType.equals("AggregationEvent")) {
-                            query.append("AND (`event_AggregationEvent`.id IN ("
-                                    + "SELECT `event_id` "
-                                    + "FROM event_AggregationEvent_EPCs " + ")");
+                            query.append(" AND (`event_AggregationEvent`.id IN (");
+                            query.append("SELECT event_id FROM `event_AggregationEvent_EPCs`");
+                            query.append("))");
                         } else {
                             query.append(" AND 0");
                         }
                     } else if (type.equals("epcList")) {
-                        query.append("AND (`event_" + eventType + "`.id IN ("
-                                + "SELECT `event_id` " + "FROM event_"
-                                + eventType + "_EPCs " + ")");
+                        query.append(" AND (`event_" + eventType + "`.id IN (");
+                        query.append("SELECT event_id FROM `event_" + eventType
+                                + "_EPCs`");
+                        query.append("))");
                     } else if (type.equals("bizTransactionList")) {
-                        query.append("AND (`event_" + eventType + ".`id` IN ("
-                                + "SELECT `event_id` FROM " + "`event"
-                                + eventType + "_bizTrans" + ")");
+                        query.append(" AND (`event_" + eventType + ".id IN (");
+                        query.append("SELECT event_id FROM `event_" + eventType
+                                + "_bizTrans`");
+                        query.append("))");
                     } else {
-                        query.append("AND (?) ");
-                        queryArgs.add(type);
+                        // lets see if we have an extension fieldname
+                        String[] parts = type.split("#");
+                        if (parts.length != 2) {
+                            // nope, no extension fieldname, just check if
+                            // the given type exists
+                            query.append(" AND (?) ");
+                            queryArgs.add(type);
+                        } else {
+                            // yep, extension fieldname: check extension table
+                            // FIXME: marco: if db ready -> do this for all
+                            // events
+                            // just remove the if-else
+                            if (eventType.equals("ObjectEvent")) {
+                                query.append(" AND (`event_" + eventType
+                                        + "`.id IN (");
+                                query.append("SELECT event_id FROM `event_"
+                                        + eventType + "_extensions` ");
+                                query.append("WHERE fieldname=\"" + type + "\"");
+                                query.append("))");
+                            } else {
+                                query.append(" AND 0");
+                            }
+                        }
                     }
 
                 } else if (paramName.startsWith("HASATTR_")) {
                     // TODO:
+                    String msg = "HASATTR_fieldname is not implemented.";
+                    LOG.info("USER ERROR: " + msg);
+                    throw new UnsupportedOperationException(msg);
                 } else if (paramName.startsWith("EQATTR_")) {
                     // TODO:
+                    String msg = "EQATTR_fieldname_attrname is not implemented.";
+                    LOG.info("USER ERROR: " + msg);
+                    throw new UnsupportedOperationException(msg);
                 } else if (paramName.equals("orderBy")) {
                     // Does only work correct if we choose only one Event-Type
                     // to query. Otherwise, the Results are ordered by
@@ -1214,9 +1228,10 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             query.append(" LIMIT " + ((Integer) limit).toString());
         }
 
-        LOG.debug("QUERY: " + query.toString());
-        PreparedStatement ps = dbconnection.prepareStatement(query.toString().replace(
-                "`", delimiter));
+        String q = query.toString();
+        String qs = q.replaceAll("`", delimiter);
+        LOG.debug("QUERY: " + qs);
+        PreparedStatement ps = dbconnection.prepareStatement(qs);
         for (int i = 0; i < queryArgs.size(); i++) {
             ps.setString(i + 1, (String) queryArgs.get(i));
             LOG.debug("       query param " + (i + 1) + ": " + queryArgs.get(i));
