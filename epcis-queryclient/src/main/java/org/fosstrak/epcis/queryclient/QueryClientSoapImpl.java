@@ -100,7 +100,7 @@ public class QueryClientSoapImpl extends QueryClientBase {
             String[] strings = new String[size];
             boolean[] noHackAroundBugs = new boolean[size];
             for (int i = 0; i < size; i++) {
-                String string = stringNodes.item(0).getTextContent();
+                String string = stringNodes.item(i).getTextContent();
                 strings[i] = string;
                 noHackAroundBugs[i] = true;
 
