@@ -1,9 +1,9 @@
 <epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<params>
-		<param>
-			<name>LT_recordTime</name>
-			<value>2006-07-17T05:07:05Z</value>
-		</param>
-	</params>
+  <queryName>SimpleEventQuery</queryName>
+  <params>
+    <param>
+      <name>LT_recordTime</name>
+      <value>2006-06-25T05:10:05Z</value>
+    </param>
+  </params>
 </epcisq:poll>
