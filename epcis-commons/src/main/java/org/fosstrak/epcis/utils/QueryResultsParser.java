@@ -591,7 +591,7 @@ public class QueryResultsParser {
         URI uri = null;
         if (node != null) {
             try {
-                uri = new URI(node.getTextContent());
+                uri = new URI(node.getTextContent().trim());
             } catch (MalformedURIException e) {
                 throw new RuntimeException("URI '" + node.getTextContent()
                         + "' is not valid.", e);
