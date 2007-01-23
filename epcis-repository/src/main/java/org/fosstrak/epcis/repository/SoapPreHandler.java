@@ -28,6 +28,10 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class SoapPreHandler extends BasicHandler {
 
+    // don't declare this logger 'static final' because this would generate a
+    // 'logger not initialized' message
+    private Logger LOG = null;
+
     /**
      * Invokes this SoapPreHandler which performs the initialization for the
      * EPCIS query service, such as reading configuration and setting up the
@@ -35,7 +39,7 @@ public class SoapPreHandler extends BasicHandler {
      * 
      * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      * @param msgContext
-     *            the MessageContext to process with this InitHandler.
+     *            The MessageContext to process with this handler.
      * @throws ImplementationException
      *             If an error reading the configuration or setting up the
      *             database occured.
@@ -51,7 +55,7 @@ public class SoapPreHandler extends BasicHandler {
                 // to load it (the application runs without logging)
                 PropertyConfigurator.configure(servletPath + log4jConfigFile);
             }
-            final Logger LOG = Logger.getLogger("SoapPreHandler.class");
+            LOG = Logger.getLogger("SoapPreHandler.class");
 
             Context initContext = new InitialContext();
             Context env = (Context) initContext.lookup("java:comp/env");
@@ -60,7 +64,7 @@ public class SoapPreHandler extends BasicHandler {
             LOG.info("Connection to database successfully established.");
 
             String delimiter = dbconnection.getMetaData().getIdentifierQuoteString();
-            LOG.info("Resolved string delimiter used to quote SQL identifiers as '"
+            LOG.debug("Resolved string delimiter used to quote SQL identifiers as '"
                     + delimiter + "'.");
 
             Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) ctx.getAttribute("subscribedMap");
@@ -82,6 +86,31 @@ public class SoapPreHandler extends BasicHandler {
             iex.setStackTrace(e.getStackTrace());
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);
             throw iex;
+        }
+    }
+
+    /**
+     * Closes the database connection and stores the subscriptions to the
+     * servlet context when the services runs into an exception.
+     * 
+     * @see org.apache.axis.handlers.BasicHandler#onFault(org.apache.axis.MessageContext)
+     */
+    @Override
+    public void onFault(MessageContext msgContext) {
+        try {
+            Connection dbconnection = (Connection) msgContext.getProperty("dbconnection");
+            dbconnection.close();
+            LOG.info("Database connection successfully closed.");
+
+            Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
+            HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
+            servlet.getServletContext().setAttribute("subscribedMap",
+                    subscribedMap);
+            LOG.info("Subscriptions stored to servlet context.");
+        } catch (SQLException e) {
+            String msg = "Unable to close the database connection: "
+                    + e.getMessage();
+            LOG.error(msg, e);
         }
     }
 

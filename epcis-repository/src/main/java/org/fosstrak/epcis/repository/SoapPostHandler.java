@@ -15,11 +15,14 @@ import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.log4j.Logger;
 
 /**
  * @author Marco Steybe
  */
 public class SoapPostHandler extends BasicHandler {
+
+    private static final Logger LOG = Logger.getLogger(SoapPostHandler.class);
 
     /**
      * Invokes this SoapPostHandler which performs post processing for the EPCIS
@@ -37,11 +40,13 @@ public class SoapPostHandler extends BasicHandler {
         try {
             Connection dbconnection = (Connection) msgContext.getProperty("dbconnection");
             dbconnection.close();
+            LOG.info("Database connection successfully closed.");
 
             Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
             HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
             servlet.getServletContext().setAttribute("subscribedMap",
                     subscribedMap);
+            LOG.info("Subscriptions stored to servlet context.");
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "Unable to close the database connection: " + e.getMessage();
