@@ -17,7 +17,7 @@
         <param>
             <name>MATCH_epc</name>
             <value>
-                <string>urn:epc:idpat:sgtin:0614141.107340.*</string>
+                <string>urn:epc:id:sgtin:0614141.107340.*</string>
             </value>
         </param>
     </params>
