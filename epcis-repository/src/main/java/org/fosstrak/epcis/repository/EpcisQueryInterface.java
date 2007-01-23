@@ -11,6 +11,9 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -792,9 +795,9 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
             // check if this parameter has already been provided
             if (params.contains(paramName)) {
-                String msg = "Two or more inputs are provided for the same parameter "
-                        + paramName;
-                LOG.error(msg);
+                String msg = "Two or more inputs are provided for the same parameter '"
+                        + paramName + "'.";
+                LOG.info("USER ERROR: " + msg);
                 throw new QueryParameterException(msg);
             } else {
                 params.add(paramName);
@@ -973,6 +976,10 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                      */
                     // FIXME: marco: this does not work correctly
                     // see test SE21
+                    // we should also replace all '*' by '%'
+                    // mysql manual says:
+                    // % matches any number of characters, even zero characters
+                    // _ matches exactly one character
                     if (eventType.equals("ObjectEvent")) {
                         query.append(" AND (`event_ObjectEvent`.id IN (");
                         query.append("SELECT event_id FROM `event_ObjectEvent_EPCs` WHERE epc IN (");
@@ -1071,6 +1078,18 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                         || paramName.startsWith("EQ_")
                         || paramName.startsWith("LE_")
                         || paramName.startsWith("LT_")) {
+
+                    // check if this is an extension
+                    String fieldname = paramName.substring(3);
+                    String[] parts = fieldname.split("#");
+                    if (parts.length != 2) {
+                        String msg = "The parameter " + paramName
+                                + " cannot be recognised.";
+                        LOG.info("USER ERROR: " + msg);
+                        throw new QueryParameterException(msg);
+                    }
+
+                    // extract the operand
                     String op = "=";
                     if (paramName.startsWith("GT_")) {
                         op = ">";
@@ -1081,6 +1100,8 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                     } else if (paramName.startsWith("LT_")) {
                         op = "<";
                     }
+
+                    // determine sql WHERE clause (depends on param value)
                     String where;
                     Object val = paramValue;
                     try {
@@ -1103,7 +1124,6 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                             }
                         }
                     }
-                    String fieldname = paramName.substring(3);
                     // FIXME: marco: if db ready -> do this for all events
                     if (eventType.equals("ObjectEvent")) {
                         query.append(" AND `event_ObjectEvent_extensions`.");
@@ -1195,7 +1215,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                 }
             } catch (ClassCastException e) {
                 String msg = "The input value for parameter " + paramName
-                        + " of eventType " + eventType
+                        + " (" + paramValue + ") of eventType " + eventType
                         + " is not of the type required.";
                 LOG.info("USER ERROR: " + msg);
                 throw new QueryParameterException(msg);
@@ -1278,11 +1298,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      * @throws NoSuchNameException
      *             If a query name is not implemented yet.
      */
-    public VoidHolder subscribe(final Subscribe parms)
-            throws ImplementationException, InvalidURIException,
-            SubscribeNotPermittedException, SubscriptionControlsException,
-            ValidationException, DuplicateSubscriptionException,
-            NoSuchNameException {
+    public VoidHolder subscribe(final Subscribe parms) throws RemoteException {
         QueryParam[] qParams = parms.getParams();
         URI dest = parms.getDest();
         String subscrId = parms.getSubscriptionID();
@@ -1294,13 +1310,20 @@ public class EpcisQueryInterface implements EPCISServicePortType {
         }
 
         try {
-            // A few input sanity checks
+            // a few input sanity checks
 
             // dest may be null or empty. But we don't support pre-arranged
             // destinations and throw an InvalidURIException according to the
             // standard.
             if (dest == null || dest.toString().equals("")) {
                 String msg = "Destination URI is empty. This implementation doesn't support pre-arranged destinations.";
+                LOG.info("USER ERROR: " + msg);
+                throw new InvalidURIException(msg);
+            }
+            try {
+                new URL(dest.toString());
+            } catch (MalformedURLException e) {
+                String msg = "Destination URI is invalid: " + e.getMessage();
                 LOG.info("USER ERROR: " + msg);
                 throw new InvalidURIException(msg);
             }
@@ -1536,8 +1559,8 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                 stmt.executeUpdate();
                 return new VoidHolder();
             } else {
-                String msg = "A subscription with ID '" + subscrId
-                        + "' does not exist.";
+                String msg = "There is no subscription with ID '" + subscrId
+                        + "'.";
                 LOG.info("USER ERROR: " + msg);
                 throw new NoSuchSubscriptionException(msg);
             }
