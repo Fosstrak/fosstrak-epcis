@@ -42,7 +42,7 @@ public class ErrorMessagesTest extends TestCase {
     }
 
     /**
-     * Tests if QueryTooComplexException is raised. 
+     * Tests if QueryTooComplexException is raised.
      * 
      * @throws RemoteException
      *             If an Axis error occured.
@@ -134,7 +134,7 @@ public class ErrorMessagesTest extends TestCase {
             fail("InvalidURIException expected");
         } catch (InvalidURIException e) {
             fis.close();
-            assertEquals(e.getReason(),"unknown protocol: htto");
+            assertEquals("Destination URI is invalid: unknown protocol: htto", e.getReason());
         }
     }
 
@@ -166,10 +166,11 @@ public class ErrorMessagesTest extends TestCase {
             client.unsubscribeQuery("QuerySE53"); // clean up
             fail("DuplicateSubscriptionException expected");
         } catch (DuplicateSubscriptionException e) {
-            assertEquals(e.getReason(),"QuerySE53 already exists. Choose a different subscriptionID.");
             fis.close();
             client.unsubscribeQuery("QuerySE53"); // clean up
-            
+            assertEquals(
+                    "SubscriptionID 'QuerySE53' already exists. Choose a different subscriptionID.",
+                    e.getReason());
         }
     }
 
@@ -198,8 +199,9 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (NoSuchSubscriptionException e) {
             // ok
-        	client.unsubscribeQuery("QuerySE54-1");
-            assertEquals(e.getReason(), "There is no subscription with ID 'QuerySE54-2'");
+            client.unsubscribeQuery("QuerySE54-1");
+            assertEquals("There is no subscription with ID 'QuerySE54-2'.",
+                    e.getReason());
         }
     }
 
@@ -226,8 +228,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value for 'second' is out of range in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value for 'second' is out of range in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -254,8 +258,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value for 'second' is out of range in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value for 'second' is out of range in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -281,8 +287,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value 'a' for parameter 'second' is invalid in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value 'a' for parameter 'second' is invalid in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -309,8 +317,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value for 'DayOfWeek' is out of range in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value for 'DayOfWeek' is out of range in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -337,8 +347,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value 'x' for parameter 'DayOfWeek' is invalid in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value 'x' for parameter 'DayOfWeek' is invalid in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -365,8 +377,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value for 'minute' is out of range in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value for 'minute' is out of range in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -393,8 +407,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value for 'minute' is out of range in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value for 'minute' is out of range in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -420,8 +436,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value 'a' for parameter 'minute' is invalid in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value 'a' for parameter 'minute' is invalid in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -448,8 +466,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value for 'hour' is out of range in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value for 'hour' is out of range in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -476,8 +496,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value for 'hour' is out of range in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value for 'hour' is out of range in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -504,8 +526,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
-        	assertEquals(e.getReason(), "The value 'a' for parameter 'hour' is invalid in the query schedule.");
             fis.close();
+            assertEquals(
+                    "The value 'a' for parameter 'hour' is invalid in the query schedule.",
+                    e.getReason());
         }
     }
 
@@ -519,13 +543,14 @@ public class ErrorMessagesTest extends TestCase {
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE68() throws RemoteException, ServiceException, IOException {
+    public void testSE68() throws RemoteException, ServiceException,
+            IOException {
         // subscribe query
         final String query = "Test-EPCIS10-SE68-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         client.subscribeQuery(fis);
         fis.close();
-        
+
         // wait for response (1 min)
         String resp = subscription.waitForNotification(120 * 1000 + 1);
         client.unsubscribeQuery("QuerySE68"); // clean up
@@ -549,8 +574,8 @@ public class ErrorMessagesTest extends TestCase {
         // subscribe query
         final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
-        
-        client.subscribeQuery(fis);   
+
+        client.subscribeQuery(fis);
         fis.close();
 
         // wait for response (1 min)
@@ -560,8 +585,7 @@ public class ErrorMessagesTest extends TestCase {
         System.out.println(resp);
 
         assertNotNull(resp);
-        
-        
+
     }
 
     /**
@@ -584,9 +608,10 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             fail("QueryParameterException expected");
         } catch (QueryParameterException e) {
-        	//ok
-            assertEquals(e.getReason(),"The parameter EQ_abcd cannot be recognised.");
+            // ok
             fis.close();
+            assertEquals("The parameter EQ_abcd cannot be recognised.",
+                    e.getReason());
         }
     }
 
@@ -611,8 +636,10 @@ public class ErrorMessagesTest extends TestCase {
             fail("QueryParameterException expected");
         } catch (QueryParameterException e) {
             // ok
-        	assertEquals(e.getReason(),"The input value for parameter GE_quantity: 3.1459 of the eventType QuantityEvent is not of the type required.");
             fis.close();
+            assertEquals(
+                    "The input value for parameter GE_quantity (3.1459) of eventType QuantityEvent is not of the type required.",
+                    e.getReason());
         }
     }
 
@@ -638,13 +665,11 @@ public class ErrorMessagesTest extends TestCase {
             fail("QueryParameterException expected");
         } catch (QueryParameterException e) {
             // ok
-        	assertEquals(e.getReason(),"Two or more inputs are provided for the same parameter : EQ_bizStep");
             fis.close();
+            assertEquals(
+                    "Two or more inputs are provided for the same parameter 'EQ_bizStep'.",
+                    e.getReason());
         }
-    }
-    
-    public void testSE73() {
-    	fail("Implemented in suite EventQueryTest!");
     }
 
     /**
