@@ -37,7 +37,7 @@
 					</value>
 				</param>
 			</params>
-			<dest>http://192.168.0.1:8080/notificationReceiver</dest>
+			<dest>http://localhost:10000/</dest>
 			<controls>
 				<schedule>
 					<second>0</second>
