@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class SoapPostHandler extends BasicHandler {
 
+    private static final long serialVersionUID = -1909122676446369360L;
     private static final Logger LOG = Logger.getLogger(SoapPostHandler.class);
 
     /**

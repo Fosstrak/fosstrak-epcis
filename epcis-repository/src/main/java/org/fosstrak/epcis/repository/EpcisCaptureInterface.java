@@ -58,7 +58,7 @@ import org.xml.sax.SAXParseException;
  */
 public class EpcisCaptureInterface extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8987594429634294827L;
 
     /**
      * The log to write to.

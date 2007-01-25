@@ -1430,7 +1430,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                 LOG.debug("       query param 7: " + controls.isReportIfEmpty());
 
                 stmt.setString(8, queryName);
-                LOG.debug("       query param 8: " + time);
+                LOG.debug("       query param 8: " + queryName);
 
                 stmt.setString(9, time);
                 LOG.debug("       query param 9: " + time);

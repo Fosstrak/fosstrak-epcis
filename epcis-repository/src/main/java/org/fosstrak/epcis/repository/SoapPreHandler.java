@@ -28,6 +28,8 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class SoapPreHandler extends BasicHandler {
 
+    private static final long serialVersionUID = 8796489572394952784L;
+
     // don't declare this logger 'static final' because this would generate a
     // 'logger not initialized' message
     private Logger LOG = null;
