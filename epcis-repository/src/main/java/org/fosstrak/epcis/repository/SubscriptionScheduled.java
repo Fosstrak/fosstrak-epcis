@@ -18,6 +18,7 @@ import javax.management.timer.Timer;
 import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.QueryParam;
 import org.apache.axis.types.URI;
+import org.apache.log4j.Logger;
 
 /**
  * Special case of Subscription (from subscribe() on query interface) where the
@@ -28,10 +29,12 @@ import org.apache.axis.types.URI;
 public class SubscriptionScheduled extends Subscription implements
         NotificationListener, Serializable {
 
+    private static final Logger LOG = Logger.getLogger(SubscriptionScheduled.class);
+
     /**
      * Generated unique ID for serialization.
      */
-    private static final long serialVersionUID = 2312622721651298302L;
+    private static final long serialVersionUID = 6243380509125848077L;
 
     /**
      * Schedule indicating when subscription query is to be executed.
@@ -42,47 +45,6 @@ public class SubscriptionScheduled extends Subscription implements
      * Whether to continue with sending results.
      */
     private Boolean doItAgain = true;
-
-    // /**
-    // * Opens a connection to the database server.
-    // * Uses the global variables dbserver, dbuser, dbpassword and sets
-    // * dbconnection.
-    // *
-    // * BEWARE OF CODE DUPLICATION: this method is also implemented in the
-    // * package org.autoidlabs.epcnet.epcisrep.querying2
-    // * class EPCISServiceBindingImpl!
-    // *
-    // * @throws ImplementationException Matching various exception to one.
-    // */
-    // private void connectDB() throws ImplementationException {
-    // try {
-    // Context initContext = new InitialContext();
-    // Context env = (Context) initContext.lookup("java:comp/env");
-    // DataSource dataSource = (DataSource) env.lookup("jdbc/EPCISDB");
-    //
-    // dbconnection = dataSource.getConnection();
-    // q = dbconnection.getMetaData().getIdentifierQuoteString();
-    // } catch (NamingException ne) {
-    // ImplementationExceptionSeverity severity =
-    // ImplementationExceptionSeverity.fromString("ERROR");
-    // ImplementationException iex = new ImplementationException();
-    // iex.setReason("Could not get DataSource, check "
-    // + "META-INF/context.xml and "
-    // + "WEB-INF/web.xml (on server side) "
-    // + "for configuration errors ("
-    // + ne.getMessage() + ")");
-    // iex.setSeverity(severity);
-    // throw iex;
-    // } catch (SQLException e) {
-    // ImplementationExceptionSeverity severity =
-    // ImplementationExceptionSeverity.fromString("ERROR");
-    // ImplementationException iex = new ImplementationException();
-    // iex.setReason("could not connect to the database (" + e.getMessage()
-    // + ")");
-    // iex.setSeverity(severity);
-    // throw iex;
-    // }
-    // }
 
     /**
      * Constructor to be used when recreating from storage.
@@ -119,10 +81,10 @@ public class SubscriptionScheduled extends Subscription implements
     }
 
     /**
-     * Starts a Timer to get this query executed again.
+     * Starts a Timer to get this query executed in specific time intervals.
      * 
      * @throws ImplementationException
-     *             If Scheduler craps out.
+     *             If the next scheduled date cannot be evaluated.
      */
     private void startThread() throws ImplementationException {
         Timer nextAction = new Timer();
@@ -135,29 +97,10 @@ public class SubscriptionScheduled extends Subscription implements
     }
 
     /**
-     * This Method stops the execution of the schedule and (doesn't for now)
-     * removes it from the Database.
+     * Stops the re-execution of the schedule. This method is called when a
+     * subscribed query get's unsubscribed.
      */
     public void stopSubscription() {
-
-        // we don't do this, because the service isn't working
-        // stable any more.
-        // try {
-        // connectDB();
-        // String delete = "DELETE FROM subscription WHERE "
-        // + "subscriptionid = (?)";
-        // PreparedStatement stmt;
-        // stmt = dbconnection.prepareStatement(delete);
-        // stmt.setString(1, subscriptionID);
-        // if (stmt.executeUpdate() == 0) {
-        // System.out.println("Ups, something went wrong by"
-        // + " deleting a Query.");
-        // }
-        // } catch (Exception e) {
-        // System.out.println("Please delete Query " + this.subscriptionID
-        // + " in the Database.");
-        // e.printStackTrace();
-        // }
         doItAgain = false;
     }
 
@@ -165,11 +108,12 @@ public class SubscriptionScheduled extends Subscription implements
      * The Object has definitely been destroyed. This may take a while.
      */
     protected void finalize() {
-        System.out.println("A query has been garbage collected.");
+        LOG.debug("A subscribed query has been garbage collected.");
     }
 
     /**
-     * This Method is called after the given time.
+     * This method is handles a notification when the Timer for the schedule
+     * times out.
      * 
      * @see javax.management.NotificationListener#handleNotification(javax.management.Notification,
      *      java.lang.Object)
@@ -182,51 +126,32 @@ public class SubscriptionScheduled extends Subscription implements
     public void handleNotification(final Notification pNotification,
             final Object pHandback) {
         if (pHandback == null) {
-            System.out.println("pHandback in handleNotification is null.");
+            LOG.error("The timer stating the next scheduled query execution time is null!");
             return;
         }
 
         if (!doItAgain) {
             ((Timer) pHandback).stop();
         } else {
-            System.out.println("We do a subscribed query. SubscriptionID is "
-                    + this.subscriptionID);
-
             try {
-                // set to next scheduled execution time.
+                // execute the query
+                executeQuery();
+
+                // determine next scheduled execution time
                 Date nextSchedule = schedule.nextScheduledTime().getTime();
+                LOG.debug("Next scheduled time for the subscribed query is '"
+                        + nextSchedule + "'.");
                 ((Timer) pHandback).addNotification("SubscriptionSchedule",
                         "Please do the query", (Timer) pHandback, nextSchedule);
 
-                this.executeQuery();
-
-                // we don't do this, because the service isn't working
-                // stable any more.
-                // // Update lastexectued in the Database
-                // try {
-                // connectDB();
-                // String update = "UPDATE subscription SET lastexecuted "
-                // + "= (?) WHERE subscriptionid = (?)";
-                // PreparedStatement stmt =
-                // dbconnection.prepareStatement(update);
-                // SimpleDateFormat isoDateFormat =
-                // new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                // GregorianCalendar cal = new GregorianCalendar();
-                // stmt.setString(1, isoDateFormat.format(cal.getTime()));
-                // stmt.setString(2, subscriptionID);
-                // stmt.executeUpdate();
-                // } catch (SQLException e) {
-                // e.printStackTrace();
-                // }
-
-            } catch (ImplementationException ie) {
-                // We decided not to stop the Thread
-                // System.out.println("Please delete Query "
-                // + this.subscriptionID
-                // + " in the Database.");
-                // this.stopSubscription();
-                ie.printStackTrace();
+            } catch (ImplementationException e) {
+                String msg = "The next scheduled date for the subscribed query with ID '"
+                        + subscriptionID
+                        + "' cannot be evaluated: "
+                        + e.getReason();
+                LOG.error(msg, e);
             }
         }
     }
+
 }
