@@ -14,6 +14,8 @@ import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryClientInterface;
 import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.utils.QueryCallbackListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -24,12 +26,11 @@ import org.xml.sax.SAXException;
  * 
  * @author Marco Steybe
  */
-public class UnsubscribeTest extends TestCase {
+public class CallbackUnsubscribeTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
     private QueryClientInterface client = new QueryClientSoapImpl();
-    private SubscriptionNotification subscription = new SubscriptionNotification();
 
     /**
      * Tests if we receive a notification for a subscribed query, and we receive
@@ -54,8 +55,20 @@ public class UnsubscribeTest extends TestCase {
         client.subscribeQuery(fis);
         fis.close();
 
-        // wait for response (1 min)
-        String resp1 = subscription.waitForNotification(60 * 1000 + 1);
+        // start subscription response listener
+        QueryCallbackListener listener = QueryCallbackListener.getInstance();
+        if (!listener.isRunning()) {
+            listener.start();
+        }
+        System.out.println("waiting ...");
+        synchronized (listener) {
+            try {
+                listener.wait(2 * 60 * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        String resp1 = listener.fetchResponse();
         assertNotNull(resp1);
 
         // parse response to make sure we got back a result
@@ -63,12 +76,19 @@ public class UnsubscribeTest extends TestCase {
         Node eventList = epcis.getElementsByTagName("EventList").item(0);
         assertTrue(eventList.hasChildNodes());
 
-        // unsubscribe the query
+        // unsubscribe the query and wait for any response
         client.unsubscribeQuery("QuerySE44");
-
-        // wait for response (1 min)
-        String resp2 = subscription.waitForNotification(60 * 1000 + 1);
+        System.out.println("waiting ...");
+        synchronized (listener) {
+            try {
+                listener.wait(2 * 60 * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        String resp2 = listener.fetchResponse();
         assertNull("No response expected, but received: " + resp2, resp2);
+        listener.stopRunning();
     }
 
     /**
@@ -91,4 +111,14 @@ public class UnsubscribeTest extends TestCase {
         InputSource xmlInput = new InputSource(new StringReader(resp));
         return builder.parse(xmlInput);
     }
+
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            client.unsubscribeQuery("QuerySE44");
+        } catch (NoSuchSubscriptionException e) {
+        }
+    }
+    
+    
 }

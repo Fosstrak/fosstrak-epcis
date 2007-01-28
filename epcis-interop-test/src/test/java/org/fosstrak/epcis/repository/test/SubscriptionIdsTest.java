@@ -19,7 +19,7 @@ import org.accada.epcis.soapapi.NoSuchSubscriptionException;
  * 
  * @author Marco Steybe
  */
-public class SubscriptionIDTest extends TestCase {
+public class SubscriptionIdsTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
     private static final String REQUEST_1 = "Test-EPCIS10-SE46-Request-1-Subscribe.xml";

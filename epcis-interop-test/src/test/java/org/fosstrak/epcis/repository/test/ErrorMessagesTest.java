@@ -31,14 +31,12 @@ public class ErrorMessagesTest extends TestCase {
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
     private QueryClientInterface client;
-    private SubscriptionNotification subscription;
 
     /**
      * @see junit.framework.TestCase#setUp()
      */
     public void setUp() {
         client = new QueryClientSoapImpl();
-        subscription = new SubscriptionNotification();
     }
 
     /**
@@ -134,7 +132,8 @@ public class ErrorMessagesTest extends TestCase {
             fail("InvalidURIException expected");
         } catch (InvalidURIException e) {
             fis.close();
-            assertEquals("Destination URI is invalid: unknown protocol: htto", e.getReason());
+            assertEquals("Destination URI is invalid: unknown protocol: htto",
+                    e.getReason());
         }
     }
 
@@ -534,61 +533,6 @@ public class ErrorMessagesTest extends TestCase {
     }
 
     /**
-     * Tests if QueryTooLargeException is raised (callback).
-     * 
-     * @throws RemoteException
-     *             If an Axis error occured.
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
-     * @throws IOException
-     *             If an I/O error occured.
-     */
-    public void testSE68() throws RemoteException, ServiceException,
-            IOException {
-        // subscribe query
-        final String query = "Test-EPCIS10-SE68-Request-1-Subscribe.xml";
-        InputStream fis = new FileInputStream(PATH + query);
-        client.subscribeQuery(fis);
-        fis.close();
-
-        // wait for response (1 min)
-        String resp = subscription.waitForNotification(120 * 1000 + 1);
-        client.unsubscribeQuery("QuerySE68"); // clean up
-        System.out.println("TODO SE68: check response: should contain QueryTooLargeException: ");
-        System.out.println(resp);
-        assertNotNull(resp);
-    }
-
-    /**
-     * Tests if ImplementationException is raised (callback).
-     * 
-     * @throws RemoteException
-     *             If an Axis error occured.
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
-     * @throws IOException
-     *             If an I/O error occured.
-     */
-    public void testSE69() throws RemoteException, ServiceException,
-            IOException {
-        // subscribe query
-        final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
-        InputStream fis = new FileInputStream(PATH + query);
-
-        client.subscribeQuery(fis);
-        fis.close();
-
-        // wait for response (1 min)
-        String resp = subscription.waitForNotification(60 * 1000 + 2);
-        client.unsubscribeQuery("QuerySE69"); // clean up
-        System.out.println("TODO SE69: check response: should contain ImplementationException: ");
-        System.out.println(resp);
-
-        assertNotNull(resp);
-
-    }
-
-    /**
      * Tests if QueryParameterException is raised (parameter name not defined).
      * 
      * @throws RemoteException
@@ -670,13 +614,6 @@ public class ErrorMessagesTest extends TestCase {
                     "Two or more inputs are provided for the same parameter 'EQ_bizStep'.",
                     e.getReason());
         }
-    }
-
-    /**
-     * Tests if SecurityException is raised.
-     */
-    public void testSE74() {
-        fail("No security implemented!");
     }
 
 }

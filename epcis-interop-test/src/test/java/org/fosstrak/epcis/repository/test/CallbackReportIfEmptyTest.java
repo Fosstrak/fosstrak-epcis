@@ -15,6 +15,7 @@ import junit.framework.TestCase;
 import org.accada.epcis.queryclient.QueryClientInterface;
 import org.accada.epcis.queryclient.QueryClientSoapImpl;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.utils.QueryCallbackListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -25,7 +26,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Marco Steybe
  */
-public class ReportIfEmptyTest extends TestCase {
+public class CallbackReportIfEmptyTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
     private static final String REQUEST_1 = "Test-EPCIS10-SE48-Request-1-Subscribe.xml";
@@ -55,18 +56,19 @@ public class ReportIfEmptyTest extends TestCase {
         fis.close();
 
         // start subscription response listener
-        SubscriptionResponseListener subscription = new SubscriptionResponseListener(
-                9999);
-        subscription.start();
+        QueryCallbackListener listener = QueryCallbackListener.getInstance();
+        if (!listener.isRunning()) {
+            listener.start();
+        }
         System.out.println("waiting ...");
-        synchronized (subscription) {
+        synchronized (listener) {
             try {
-                subscription.wait(2 * 60 * 1000);
+                listener.wait(2 * 60 * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        String resp1 = subscription.fetchResponse();
+        String resp1 = listener.fetchResponse();
         assertNotNull(resp1);
 
         // parse the response -> must have an empty EventList tag
@@ -79,22 +81,23 @@ public class ReportIfEmptyTest extends TestCase {
             client.unsubscribeQuery("QuerySE48-1");
         } catch (NoSuchSubscriptionException e) {
         }
-        
+
         // subscribe the second query
         fis = new FileInputStream(PATH + REQUEST_2);
         client.subscribeQuery(fis);
         fis.close();
 
         System.out.println("waiting ...");
-        synchronized (subscription) {
+        synchronized (listener) {
             try {
-                subscription.wait(2 * 60 * 1000);
+                listener.wait(2 * 60 * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        String resp2 = subscription.fetchResponse();
+        String resp2 = listener.fetchResponse();
         assertNull(resp2);
+        listener.stopRunning();
     }
 
     /**
