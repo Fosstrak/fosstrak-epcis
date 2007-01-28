@@ -5,6 +5,7 @@
 
 package org.accada.epcis.repository;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
@@ -47,7 +48,7 @@ public class Subscription implements Serializable {
      * Generated ID for serialization. Adapt if you change this class in a
      * backwards incompatible way.
      */
-    private static final long serialVersionUID = 4435318130916199467L;
+    private static final long serialVersionUID = -401176555052383495L;
 
     private static final Logger LOG = Logger.getLogger(Subscription.class);
 
@@ -206,33 +207,24 @@ public class Subscription implements Serializable {
             queryDoc.setCreationDate(new GregorianCalendar());
             queryDoc.setEPCISBody(queryBody);
 
-            // set up connection to given destination
-            URL serviceUrl = new URL(dest.toString());
-            HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
-            connection.setInstanceFollowRedirects(false);
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-
             // serialize the response
-            OutputStreamWriter out = new OutputStreamWriter(
-                    connection.getOutputStream());
-            SerializationContext serContext = new SerializationContext(out);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            OutputStreamWriter writer = new OutputStreamWriter(baos);
+            SerializationContext serContext = new SerializationContext(writer);
             QName queryDocXMLType = EPCISQueryDocumentType.getTypeDesc().getXmlType();
             serContext.setWriteXMLType(queryDocXMLType);
             serContext.serialize(queryDocXMLType, new NullAttributes(),
                     queryDoc, queryDocXMLType, EPCISQueryDocumentType.class,
                     false, true);
+            writer.flush();
+            String data = baos.toString();
 
-            // send response
+            // set up connection and send data to given destination
+            URL serviceUrl = new URL(dest.toString());
             LOG.debug("Sending results of subscribed query with ID '"
                     + subscriptionID + "' to '" + serviceUrl + "'.");
-            out.flush();
-            LOG.debug("Response: " + connection.getResponseCode() + " "
-                    + connection.getResponseMessage());
-
-            // close connection
-            out.close();
-            connection.disconnect();
+            int responseCode = sendData(serviceUrl, data);
+            LOG.debug("Response " + responseCode);
 
         } catch (IOException e) {
             String msg = "An error opening a connection to '" + dest
@@ -247,8 +239,50 @@ public class Subscription implements Serializable {
     }
 
     /**
-     * Returns the initial record time.
+     * Sends the given data String to the specified URL.
      * 
+     * @param url
+     *            The URL to send the data to.
+     * @param data
+     *            The data to send.
+     * @return The HTTP response code.
+     * @throws IOException
+     *             If a communication error occured.
+     */
+    private int sendData(URL url, String data) throws IOException {
+        data.concat("\n");
+        // setup connection
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        // connection.setInstanceFollowRedirects(false);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-type", "text/plain");
+        connection.setRequestProperty("Content-length", "" + data.length());
+        // connection.setDoInput(true);
+        connection.setDoOutput(true);
+
+        // encode data
+        // CharBuffer buf = CharBuffer.wrap(data);
+        // Charset charset = Charset.forName("UTF-8");
+        // CharsetEncoder encoder = charset.newEncoder();
+
+        // send data
+        OutputStreamWriter out = new OutputStreamWriter(
+                connection.getOutputStream());
+        LOG.debug("Sending data: " + data);
+        out.write(data);
+        out.flush();
+
+        // get response
+        // connection.getInputStream();
+        int responseCode = connection.getResponseCode();
+
+        // disconnect
+        connection.disconnect();
+
+        return responseCode;
+    }
+
+    /**
      * @return The initial record time.
      */
     public GregorianCalendar getInitialRecordTime() {

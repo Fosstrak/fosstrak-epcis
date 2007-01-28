@@ -77,6 +77,11 @@ public class SubscriptionScheduled extends Subscription implements
         super(subscriptionID, queryParams, dest, reportIfEmpty,
               initialRecordTime, lastTimeExecuted, queryName);
         this.schedule = schedule;
+        if (LOG.isDebugEnabled()) {
+            Date nextSchedule = schedule.nextScheduledTime().getTime();
+            LOG.debug("Next scheduled time for the subscribed query is '"
+                    + nextSchedule + "'.");
+        }
         startThread();
     }
 
