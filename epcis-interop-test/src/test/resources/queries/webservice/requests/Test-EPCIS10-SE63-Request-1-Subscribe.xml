@@ -1,38 +1,38 @@
 <epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<params>
-		<param>
-			<name>eventType</name>
-			<value>
-				<string>ObjectEvent</string>
-			</value>
-		</param>
-		<param>
-			<name>EQ_bizStep</name>
-			<value>
-				<string>urn:epcglobal:fmcg:bizstep:receiving</string>
-			</value>
-		</param>
-		<param>
-			<name>EQ_bizLocation</name>
-			<value>
-				<string>urn:epcglobal:fmcg:loc:0614141073468</string>
-			</value>
-		</param>
-	</params>
-	<dest>http://127.0.0.1:10000/</dest>
-	<controls>
-		<schedule>
-			<second>0</second>
-			<minute>0</minute>
-			<hour>24</hour>
-		</schedule>
-		<!-- FIXME -->
-		<!-- Candidate spec of EPCIS 1.0 does not allow omission of 
-			initialRecordTime.  The initialRecordTime element is for
-			avoiding XML validation errors. -->
-		<initialRecordTime>2006-07-25T09:00:00.000Z</initialRecordTime>
-		<reportIfEmpty>false</reportIfEmpty>
-	</controls>
-	<subscriptionID>QuerySE63</subscriptionID>
+  <queryName>SimpleEventQuery</queryName>
+  <params>
+    <param>
+      <name>eventType</name>
+      <value>
+        <string>ObjectEvent</string>
+      </value>
+    </param>
+    <param>
+      <name>EQ_bizStep</name>
+      <value>
+        <string>urn:epcglobal:fmcg:bizstep:receiving</string>
+      </value>
+    </param>
+    <param>
+      <name>EQ_bizLocation</name>
+      <value>
+        <string>urn:epcglobal:fmcg:loc:0614141073468</string>
+      </value>
+    </param>
+  </params>
+  <dest>http://127.0.0.1:8899/</dest>
+  <controls>
+    <schedule>
+      <second>0</second>
+      <minute>0</minute>
+      <hour>24</hour>
+    </schedule>
+    <!-- FIXME -->
+    <!-- Candidate spec of EPCIS 1.0 does not allow omission of 
+      initialRecordTime.  The initialRecordTime element is for
+      avoiding XML validation errors. -->
+    <initialRecordTime>2006-07-25T09:00:00.000Z</initialRecordTime>
+    <reportIfEmpty>false</reportIfEmpty>
+  </controls>
+  <subscriptionID>QuerySE63</subscriptionID>
 </epcisq:Subscribe>

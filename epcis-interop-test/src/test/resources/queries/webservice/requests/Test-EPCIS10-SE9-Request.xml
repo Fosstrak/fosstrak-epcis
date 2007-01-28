@@ -22,7 +22,7 @@
         </param>
     </params>
 
-    <dest>http://127.0.0.1:10000/</dest>
+    <dest>http://127.0.0.1:8899/</dest>
 
     <controls>
         <schedule>
