@@ -6,11 +6,13 @@ BEGIN;
 ---- Vocabularies ----
 
 DELETE FROM voc_BizLoc;
+DELETE FROM BizLoc_attr;
 DELETE FROM voc_BizStep;
 DELETE FROM voc_BizTransType;
 DELETE FROM voc_BizTrans;
 DELETE FROM voc_Disposition;
 DELETE FROM voc_ReadPoint;
+DELETE FROM ReadPoint_attr;
 DELETE FROM voc_EPCClass;
 
 COMMIT;
