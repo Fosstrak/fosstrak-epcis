@@ -57,11 +57,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -83,11 +79,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -109,11 +101,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -135,11 +123,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -161,11 +145,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -187,11 +167,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -216,11 +192,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -242,11 +214,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -268,11 +236,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -294,11 +258,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -320,11 +280,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -346,11 +302,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -372,11 +324,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -398,11 +346,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -424,11 +368,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -450,11 +390,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -476,11 +412,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -528,11 +460,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -554,11 +482,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -580,11 +504,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -606,11 +526,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -632,11 +548,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -658,11 +570,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -684,11 +592,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -710,11 +614,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -736,11 +636,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -762,11 +658,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -788,11 +680,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -814,11 +702,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -882,11 +766,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -908,11 +788,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
     /**
@@ -933,11 +809,7 @@ public class EventQueryTest extends TestCase {
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        QueryResultsParser.compareResults(expResults, actResults);
     }
 
 }
