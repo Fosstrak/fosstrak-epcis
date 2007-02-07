@@ -112,6 +112,17 @@ CREATE TABLE `event_AggregationEvent_bizTrans` (
 `bizTrans_id` bigint NOT NULL REFERENCES `BizTransaction` (`id`)
 );
 
+CREATE TABLE `event_AggregationEvent_extensions` (
+`id` bigint PRIMARY KEY auto_increment,
+`event_id` bigint NOT NULL REFERENCES `event_AggregationEvent` (`id`),
+`fieldname` varchar(128) NOT NULL,
+`prefix` varchar(32) NOT NULL,
+`intValue` integer,
+`floatValue` float,
+`dateValue` timestamp NULL DEFAULT NULL,
+`strValue` varchar(1024)
+);
+
 -- Object events --
 
 CREATE TABLE `event_ObjectEvent` (
@@ -171,6 +182,17 @@ CREATE TABLE `event_QuantityEvent_bizTrans` (
 `bizTrans_id` bigint NOT NULL REFERENCES `BizTransaction` (`id`)
 );
 
+CREATE TABLE `event_QuantityEvent_extensions` (
+`id` bigint PRIMARY KEY auto_increment,
+`event_id` bigint NOT NULL REFERENCES `event_QuantityEvent` (`id`),
+`fieldname` varchar(128) NOT NULL,
+`prefix` varchar(32) NOT NULL,
+`intValue` integer,
+`floatValue` float,
+`dateValue` timestamp NULL DEFAULT NULL,
+`strValue` varchar(1024)
+);
+
 -- Transactions events --
 
 CREATE TABLE `event_TransactionEvent` (
@@ -196,6 +218,17 @@ CREATE TABLE `event_TransactionEvent_bizTrans` (
 -- bizTrans 1..* associated with event, at least one not yet enforced in DB
 `event_id` bigint NOT NULL REFERENCES `event_TransactionEvent` (`id`),
 `bizTrans_id` bigint NOT NULL REFERENCES `BizTransaction` (`id`)
+);
+
+CREATE TABLE `event_TransactionEvent_extensions` (
+`id` bigint PRIMARY KEY auto_increment,
+`event_id` bigint NOT NULL REFERENCES `event_TransactionEvent` (`id`),
+`fieldname` varchar(128) NOT NULL,
+`prefix` varchar(32) NOT NULL,
+`intValue` integer,
+`floatValue` float,
+`dateValue` timestamp NULL DEFAULT NULL,
+`strValue` varchar(1024)
 );
 
 -- --- Stored subscriptions -----
