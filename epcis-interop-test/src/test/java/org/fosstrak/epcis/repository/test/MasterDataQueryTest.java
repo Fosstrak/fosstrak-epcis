@@ -17,10 +17,12 @@ import org.accada.epcis.soapapi.AggregationEventType;
 import org.accada.epcis.soapapi.BusinessTransactionType;
 import org.accada.epcis.soapapi.EPC;
 import org.accada.epcis.soapapi.EventListType;
+import org.accada.epcis.soapapi.InvalidURIException;
 import org.accada.epcis.soapapi.ObjectEventType;
 import org.accada.epcis.soapapi.QuantityEventType;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooLargeException;
+import org.accada.epcis.soapapi.SubscribeNotPermittedException;
 import org.accada.epcis.soapapi.TransactionEventType;
 import org.accada.epcis.utils.QueryResultsParser;
 import org.apache.log4j.Logger;
@@ -248,15 +250,15 @@ public class MasterDataQueryTest extends TestCase {
         String query = pathToQueries + queryPrefix + testNr + querySuffix;
         LOG.info("query taken from " + query);
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        try{
+        client.subscribeQuery(fis);
         fis.close();
 
-        String resp = pathToResp + respPrefix + testNr + respSuffix;
-        LOG.info("response taken from " + resp);
-        fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
-        fis.close();
-        compareResults(expResults, actResults);
+        fail("SubscribeNotPermittedException expected");
+        } catch (SubscribeNotPermittedException e) {
+        assertEquals("Subscription not allowed for SimpleMasterDataQuery.",
+                e.getReason());
+    }
     }
 
     private void compareResults(QueryResults expResults, QueryResults actResults) {
