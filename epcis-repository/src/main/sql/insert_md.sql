@@ -47,6 +47,7 @@ INSERT INTO `vocabularies` (`uri`, `table_name`) VALUES
 INSERT INTO `voc_bizstep` (`id`, `uri`) VALUES 
 ('NULL', 'urn:epcglobal:hls:bizstep:commissioning'),
 ('NULL', 'urn:epcglobal:hls:bizstep:casetopalletaggregation'),
+('NULL', 'urn:epcglobal:fmcg:bizstep:receiving'),
 ('NULL', 'urn:epcglobal:fmcg:bizstep:picking'),
 ('NULL', 'urn:epcglobal:fmcg:bizstep:shipping')
 ;
