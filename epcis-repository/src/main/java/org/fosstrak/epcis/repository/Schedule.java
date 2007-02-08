@@ -17,12 +17,9 @@ import static java.util.Calendar.SECOND;
 import static java.util.Calendar.YEAR;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
@@ -36,11 +33,9 @@ import org.apache.log4j.Logger;
  * but could be extended to be used otherwise.
  * 
  * @author Arthur van Dorp
+ * @author Marco Steybe
  */
 public class Schedule implements Serializable {
-    // TODO: This class has become extremely ugly and is in dire
-    // need of a revamp. Lots of code duplication has to be removed.
-    // Especially in the ...MadeValid() methods.
 
     private static final Logger LOG = Logger.getLogger(Schedule.class);
 
@@ -53,26 +48,10 @@ public class Schedule implements Serializable {
      * The valid second-values. Caveat: Empty means all seconds are valid.
      */
     private TreeSet<Integer> seconds = new TreeSet<Integer>();
-    /**
-     * The valid minute-values. Caveat: Empty means all minutes are valid.
-     */
     private TreeSet<Integer> minutes = new TreeSet<Integer>();
-    /**
-     * The valid hour-values. Cave: Empty means all hours are valid.
-     */
     private TreeSet<Integer> hours = new TreeSet<Integer>();
-    /**
-     * The valid days of month-values. Cave: Empty means all days are valid.
-     */
     private TreeSet<Integer> daysOfMonth = new TreeSet<Integer>();
-    /**
-     * The valid month-values. Cave: Empty means all months are valid.
-     */
     private TreeSet<Integer> months = new TreeSet<Integer>();
-    /**
-     * The valid days of week-values. Cave: Empty means all days of week are
-     * valid.
-     */
     private TreeSet<Integer> daysOfWeek = new TreeSet<Integer>();
 
     /**
@@ -93,9 +72,8 @@ public class Schedule implements Serializable {
      */
     public Schedule(final QuerySchedule schedule)
             throws SubscriptionControlsException {
-        // Let's parse the QuerySchedule and
-        // check it for validity when setting
-        // the schedule values.
+
+        // ease handling of null values in the query schedule
         if (schedule.getSecond() == null) {
             schedule.setSecond("");
         }
@@ -114,51 +92,38 @@ public class Schedule implements Serializable {
         if (schedule.getDayOfWeek() == null) {
             schedule.setDayOfWeek("");
         }
+
+        // retrieve the values from the given query schedule
         String[] second = schedule.getSecond().split(",");
         String[] minute = schedule.getMinute().split(",");
         String[] hour = schedule.getHour().split(",");
         String[] dayOfMonth = schedule.getDayOfMonth().split(",");
         String[] month = schedule.getMonth().split(",");
         String[] dayOfWeek = schedule.getDayOfWeek().split(",");
-        // Check and parse numbers and ranges
-        Object[] sec = parseValuesAndRanges(second, "second");
-        addSecondValues((Integer[]) sec[0]);
-        addSecondRanges((Integer[][]) sec[1]);
-        Object[] min = parseValuesAndRanges(minute, "minute");
-        addMinuteValues((Integer[]) min[0]);
-        addMinuteRanges((Integer[][]) min[1]);
-        Object[] h = parseValuesAndRanges(hour, "hour");
-        addHourValues((Integer[]) h[0]);
-        addHourRanges((Integer[][]) h[1]);
-        Object[] daysM = parseValuesAndRanges(dayOfMonth, "DayOfMonth");
-        addDayOfMonthValues((Integer[]) daysM[0]);
-        addDayOfMonthRanges((Integer[][]) daysM[1]);
-        Object[] mon = parseValuesAndRanges(month, "month");
-        addMonthValues((Integer[]) mon[0]);
-        addMonthRanges((Integer[][]) mon[1]);
-        Object[] daysW = parseValuesAndRanges(dayOfWeek, "DayOfWeek");
-        addDayOfWeekValues((Integer[]) daysW[0]);
-        addDayOfWeekRanges((Integer[][]) daysW[1]);
 
-        // Check for invalid months/dayOfMonth combinations
-        // ie. only 30.2 / 31.6 etc.
+        // parse numbers and ranges, check and add values
+        handleValues(second, "second", 0, 59);
+        handleValues(minute, "minute", 0, 59);
+        handleValues(hour, "hour", 0, 23);
+        handleValues(dayOfMonth, "dayOfMonth", 1, 31);
+        handleValues(month, "month", 1, 12);
+        handleValues(dayOfWeek, "dayOfWeek", 1, 7);
+
+        // check for invalid month/dayOfMonth combinations, e.g. 30.2., 31.4.
         if (!months.isEmpty()
                 && (months.first() == months.last() && months.first() == 1 && (daysOfMonth.first() == 30 || daysOfMonth.first() == 31))) {
             throw new SubscriptionControlsException(
-                    "Schedule invalid. Dates given are all impossible."
-                            + "February doesn't have a 30th or 31st day.");
+                    "Invalid query schedule: impossible month/dayOfMonth combination, e.g. February 30.");
         }
         if (!months.isEmpty()
                 && daysOfMonth.first() == 31
-                && !months.contains(0) // Months w. 31 days are always ok
+                && !months.contains(0) // months w. 31 days are always ok
                 && !months.contains(2) && !months.contains(4)
                 && !months.contains(6) && !months.contains(7)
                 && !months.contains(9) && !months.contains(11)) {
             throw new SubscriptionControlsException(
-                    "Schedule invalid. Dates given are all impossible."
-                            + "Given months don't have a 31st.");
+                    "Invalid query schedule: impossible month/dayOfMonth combination, e.g. April 31.");
         }
-
     }
 
     /**
@@ -170,14 +135,19 @@ public class Schedule implements Serializable {
      */
     public GregorianCalendar nextScheduledTime() throws ImplementationException {
         GregorianCalendar cal = new GregorianCalendar();
-        // We start at the next second
-        // to avoid multiple results.
+        // start at the next second to avoid multiple results
         cal.add(SECOND, 1);
         return nextScheduledTime(cal);
     }
 
     /**
-     * Calculates the next scheduled time after the given 'time'.
+     * Calculates the next scheduled time after the given time. Algorithm idea:<br> -
+     * start with biggest time unit (i.e. year) of the given time <br> - if the
+     * time unit is valid (e.g. the time unit matches the <br>
+     * scheduled time, this is implicitly true if the time in the <br>
+     * schedule was omitted) *and* there exists a valid smaller time <br>
+     * unit, *then* return this time unit <br> - do this recursively for all
+     * time units <br> - month needs to be special cased because of dayOfWeek
      * 
      * @param time
      *            Time after which next scheduled time should be returned.
@@ -187,17 +157,8 @@ public class Schedule implements Serializable {
      */
     public GregorianCalendar nextScheduledTime(final GregorianCalendar time)
             throws ImplementationException {
-        /*
-         * Algorithm idea: Start with biggest time unit (i.e. year) of the given
-         * time. If unit value is specified to be valid (also implicitly by
-         * omitting the value) in the schedule *and* there exists a valid
-         * smaller unit for that time unit -> choose it as return value. Do so
-         * recursively for all time units. Unfortunately month has to be special
-         * cased because of 'dayOfWeek'. Attention: This is an ad hoc idea. If
-         * you know a better algorithm speak up and/or implement it. Arthur.
-         */
         GregorianCalendar nextSchedule = (GregorianCalendar) time.clone();
-        // Look at year
+        // look at year
         while (!monthMadeValid(nextSchedule)) {
             nextSchedule.roll(YEAR, true);
             setFieldsToMinimum(nextSchedule, MONTH);
@@ -206,8 +167,8 @@ public class Schedule implements Serializable {
     }
 
     /**
-     * Returns true if the month and all smaller units have been succesfully set
-     * to valid values within the set year.
+     * Returns true if the month and all smaller time units have been
+     * succesfully set to valid values.
      * 
      * @param nextSchedule
      *            The current candidate for the result.
@@ -217,19 +178,24 @@ public class Schedule implements Serializable {
      */
     private boolean monthMadeValid(final GregorianCalendar nextSchedule)
             throws ImplementationException {
-        if (!months.contains(nextSchedule.get(MONTH)) && !months.isEmpty()) {
+        // check if the month of the current time is valid, i.e. there is a
+        // month value in the schedule equal to the month value of the current
+        // time
+        if (!months.isEmpty() && !months.contains(nextSchedule.get(MONTH))) {
+            // no, month value of the current time is invalid
+            // roll the month (set it to the next value)
             if (!setFieldToNextValidRoll(nextSchedule, MONTH, DAY_OF_MONTH)) {
                 return false;
             }
         }
-        // Now we're in a valid month, make smaller units
-        // valid as well or go to next month.
+        // now we're in a valid month, make smaller units valid as well or go to
+        // next month
         while (!dayMadeValid(nextSchedule)) {
-            // No valid day for this month, try next month.
+            // no valid day for this month, try next
             if (!setFieldToNextValidRoll(nextSchedule, MONTH, DAY_OF_MONTH)) {
                 return false;
             }
-            // Reset all smaller units to min.
+            // reset all smaller units to minimum
             if (!setFieldsToMinimum(nextSchedule, DAY_OF_MONTH)) {
                 return false;
             }
@@ -364,7 +330,7 @@ public class Schedule implements Serializable {
      */
     private boolean secondMadeValid(final GregorianCalendar nextSchedule)
             throws ImplementationException {
-        if (!seconds.contains(nextSchedule.get(SECOND)) && !seconds.isEmpty()) {
+        if (!seconds.isEmpty() && !seconds.contains(nextSchedule.get(SECOND))) {
             return setFieldToNextValid(nextSchedule, SECOND);
         }
         return true;
@@ -384,16 +350,16 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private Boolean setFieldToNextValid(final GregorianCalendar cal,
+    private boolean setFieldToNextValid(final GregorianCalendar cal,
             final int field) throws ImplementationException {
-        Integer next;
-        TreeSet<Integer> vals = getVals(field);
+        int next;
+        TreeSet<Integer> vals = getValues(field);
         if (vals.isEmpty()) {
             next = cal.get(field) + 1;
         } else {
             try {
-                // get next valid value which is bigger than current.
-                next = vals.tailSet(cal.get(field) + 1).first();
+                // get next valid value which is bigger than current
+                next = vals.tailSet(new Integer(cal.get(field) + 1)).first().intValue();
             } catch (NoSuchElementException nse) {
                 return false;
             }
@@ -402,7 +368,7 @@ public class Schedule implements Serializable {
                 || next < cal.getActualMinimum(field)) {
             return false;
         }
-        // All is well, set it to next.
+        // all is well, set it to next
         cal.set(field, next);
         return true;
     }
@@ -424,17 +390,18 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private Boolean setFieldToNextValidRoll(final GregorianCalendar cal,
+    private boolean setFieldToNextValidRoll(final GregorianCalendar cal,
             final int field, final int smallerField)
             throws ImplementationException {
-        cal.add(field, 1);
+        // FIXME marco: why this??? we set the field to next value twice!
+        // cal.add(field, 1);
         setFieldsToMinimum(cal, smallerField);
         return setFieldToNextValid(cal, field);
     }
 
     /**
      * Sets the field of a GregorianCalender to its minimum, which is defined as
-     * the minimal possible value according to the calendar type used possibly
+     * the minimal possible value according to the calendar type possibly
      * superseded by the defined values in the schedule we have. Returns whether
      * the new value has been set and is valid.
      * 
@@ -446,25 +413,19 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private Boolean setFieldToMinimum(final GregorianCalendar cal,
+    private boolean setFieldToMinimum(final GregorianCalendar cal,
             final int field) throws ImplementationException {
-        Integer min;
-        TreeSet<Integer> vals = getVals(field);
-        if (vals.isEmpty()) {
+        int min;
+        TreeSet<Integer> values = getValues(field);
+        if (values.isEmpty()) {
             min = cal.getActualMinimum(field);
         } else {
-            min = java.lang.Math.max(vals.first(), cal.getActualMinimum(field));
+            min = Math.max(values.first().intValue(),
+                    cal.getActualMinimum(field));
             if (min > cal.getActualMaximum(field)) {
                 min = cal.getActualMaximum(field);
-                if (!vals.contains(min) || min < cal.getActualMinimum(field)
+                if (!values.contains(min) || min < cal.getActualMinimum(field)
                         || min > cal.getActualMaximum(field)) {
-                    // System.out.println("Rarely we should see an invalid
-                    // min.");
-                    // System.out.println("Field is: " + field + " MinValid is:
-                    // "
-                    // + vals.first() + " minCal is: "
-                    // + cal.getActualMinimum(field)
-                    // + " maxCal is: " + cal.getActualMaximum(field));
                     return false;
                 }
             }
@@ -474,23 +435,23 @@ public class Schedule implements Serializable {
     }
 
     /**
-     * Sets the field of a GregorianCalender and all smaller fields (not
-     * WEEK_OF_DAY) to its minimum, which is defined as the minimal possible
+     * Sets the given field of a GregorianCalender and all smaller fields (not
+     * WEEK_OF_DAY) to their minimum, which is defined as the minimal possible
      * value according to the calendar type used possibly superseded by the
      * defined values in the schedule we have. Returns whether the new values
      * have been set and are all valid.
      * 
      * @param cal
-     *            Calendar instance to adjust.
+     *            The Calendar instance to adjust.
      * @param largestField
      *            This field and smaller ones are reset
      * @return True if setting to min worked for all values.
      * @throws ImplementationException
      *             Various errors.
      */
-    private Boolean setFieldsToMinimum(final GregorianCalendar cal,
+    private boolean setFieldsToMinimum(final GregorianCalendar cal,
             final int largestField) throws ImplementationException {
-        Boolean result = true;
+        boolean result = true;
         switch (largestField) {
         case (MONTH):
             result = setFieldToMinimum(cal, MONTH) && result;
@@ -503,26 +464,29 @@ public class Schedule implements Serializable {
         case (SECOND):
             result = setFieldToMinimum(cal, SECOND) && result;
             break;
-        default:
-            throw new ImplementationException(
-                    "Reached code we should never have reached: Ohb3umoo",
-                    ImplementationExceptionSeverity.fromString("ERROR"), null,
-                    null);
+        default: {
+            String msg = "Invalid field: " + largestField;
+            ImplementationException iex = new ImplementationException();
+            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+            iex.setReason(msg);
+            LOG.error(msg, iex);
+            throw iex;
+        }
         }
         return result;
     }
 
     /**
-     * Returns the numbers belonging to the 'field' value of a
-     * GregorianCalendar.
+     * Returns the values belonging to the given field of a GregorianCalendar.
      * 
      * @param field
-     *            Field number of GregorianCalendar.
-     * @return The schedule numbers belonging to this 'field'.
+     *            The field id of a GregorianCalendar.
+     * @see GregorianCalendar
+     * @return The corresponding schedule values.
      * @throws ImplementationException
      *             In case of a access to an unknown field.
      */
-    private TreeSet<Integer> getVals(final int field)
+    private TreeSet<Integer> getValues(final int field)
             throws ImplementationException {
         switch (field) {
         case (DAY_OF_WEEK):
@@ -537,322 +501,114 @@ public class Schedule implements Serializable {
             return minutes;
         case (SECOND):
             return seconds;
-        default:
-            throw new ImplementationException(
-                    "Reached code we should never have reached: ieDahc5o",
-                    ImplementationExceptionSeverity.fromString("ERROR"), null,
-                    null);
+        default: {
+            String msg = "Invalid field: " + field;
+            ImplementationException iex = new ImplementationException();
+            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+            iex.setReason(msg);
+            LOG.error(msg, iex);
+            throw iex;
+        }
         }
     }
 
     /**
-     * Checks whether the 'values', which are either numbers or ranges, are
-     * parseable and puts them into the return value.
+     * Checks whether the given values, which are either numbers or ranges, are
+     * valid (parsable as Integer) and adds the value to the correct set of
+     * values (e.g. seconds).
      * 
      * @param values
-     *            The numbers and ranges to be checked.
+     *            The numbers and ranges to be checked and added.
+     * @param type
+     *            The name of the schedule element, e.g. 'second'.
+     * @param min
+     *            The minimum allowed value.
+     * @param max
+     *            The maximum allowed value.
      * @throws SubscriptionControlsException
-     *             In case there's some invalid data.
-     * @return Returns an array where the first element is an array of ints with
-     *         the number values and the second element is an array of arrays
-     *         which denote the ranges.
+     *             If one of the given values is invalid, i.e. does not lie
+     *             between the <code>min</code> and <code>max</code> value.
      */
-    private Object[] parseValuesAndRanges(final String[] values,
-            final String parameter) throws SubscriptionControlsException {
-        List<Integer> nums = new ArrayList<Integer>();
-        List<Integer[]> ranges = new ArrayList<Integer[]>();
+    private void handleValues(final String[] values, final String type,
+            int min, int max) throws SubscriptionControlsException {
+        // we put values into this sorted set
+        TreeSet<Integer> vals = new TreeSet<Integer>();
         for (String v : values) {
             try {
                 if (v.startsWith("[")) {
-                    // it's a range.
-                    String[] r = v.substring(1, v.length() - 1).split("-");
-                    ranges.add(new Integer[] {
-                            Integer.decode(r[0]), Integer.decode(r[1]),
-                    });
+                    // it's a range
+                    String[] range = v.substring(1, v.length() - 1).split("-");
+                    int start = Integer.parseInt(range[0]);
+                    int end = Integer.parseInt(range[1]);
+                    // check range
+                    if (start < min || end > max || start > end) {
+                        throw new SubscriptionControlsException(
+                                "The value for '"
+                                        + type
+                                        + "' is out of range in the query schedule.");
+                    }
+                    // add all values in the range
+                    for (int value = start; value <= end; value++) {
+                        vals = addValue(value, type, vals);
+                    }
                 } else if (!v.equals("")) {
-                    // it's a number.
-                    nums.add(Integer.decode(v));
+                    // it's a single value
+                    int value = Integer.parseInt(v);
+                    // check value
+                    if (value < min || value > max) {
+                        throw new SubscriptionControlsException(
+                                "The value for '"
+                                        + type
+                                        + "' is out of range in the query schedule.");
+                    }
+                    // add value
+                    vals = addValue(value, type, vals);
                 }
             } catch (Exception e) {
-                String msg = "The value '" + v + "' for parameter '"
-                        + parameter + "' is invalid in the query schedule.";
+                String msg = "The value '" + v + "' for parameter '" + type
+                        + "' is invalid in the query schedule.";
                 LOG.info("USER ERROR: " + msg + e.getMessage());
                 throw new SubscriptionControlsException(msg);
             }
         }
-        return new Object[] {
-                ((Integer[]) nums.toArray(new Integer[] {})),
-                ((Integer[][]) ranges.toArray(new Integer[][] {}))
-        };
-    }
 
-    /**
-     * Checks whether all ranges lie within min and max and whether range[0] <=
-     * range[1].
-     * 
-     * @param rangesArray
-     *            Ranges to check.
-     * @param min
-     *            Minimal allowed value.
-     * @param max
-     *            Maximal allowed value.
-     * @throws SubscriptionControlsException
-     *             If illegal range encountered.
-     */
-    private void checkRanges(final Integer[][] rangesArray, final int min,
-            final int max, final String parameter)
-            throws SubscriptionControlsException {
-        for (Integer[] r : rangesArray) {
-            if (r[0] < min || r[1] > max || r[0] > r[1]) {
-                throw new SubscriptionControlsException("The value for '"
-                        + parameter
-                        + "' is out of range in the query schedule.");
-            }
+        if (type.equals("second")) {
+            this.seconds = vals;
+        } else if (type.equals("minute")) {
+            this.minutes = vals;
+        } else if (type.equals("hour")) {
+            this.hours = vals;
+        } else if (type.equals("dayOfMonth")) {
+            this.daysOfMonth = vals;
+        } else if (type.equals("month")) {
+            this.months = vals;
+        } else if (type.equals("dayOfWeek")) {
+            this.daysOfWeek = vals;
         }
     }
 
     /**
-     * Checks whether all values lie within min and max.
+     * Adds a schedule value to the given set of values with some special
+     * treatment for 'month' and 'dayOfWeek'.
      * 
-     * @param numsArray
-     *            Numbers to check.
-     * @param min
-     *            Minimal allowed value.
-     * @param max
-     *            Maximal allowed value.
-     * @throws SubscriptionControlsException
-     *             If illegal range encountered.
+     * @param value
+     *            The value to be added.
+     * @param type
+     *            The name of the schedule element, e.g. 'second'.
+     * @param vals
+     *            The set of values to which the value should be added.
+     * @return The modified set of values.
      */
-    private void checkNums(final Integer[] numsArray, final int min,
-            final int max, final String parameter)
-            throws SubscriptionControlsException {
-        for (Integer n : numsArray) {
-            if (n < min || n > max) {
-                throw new SubscriptionControlsException("The value for '"
-                        + parameter
-                        + "' is out of range in the query schedule.");
-            }
+    private TreeSet<Integer> addValue(int value, String type,
+            TreeSet<Integer> vals) {
+        if (type.equals("dayOfWeek")) {
+            vals.add(new Integer((value % 7) + 1));
+        } else if (type.equals("month")) {
+            vals.add(new Integer(value - 1));
+        } else {
+            vals.add(new Integer(value));
         }
-    }
-
-    /**
-     * Adds all the values in the ranges to the given set.
-     * 
-     * @param ranges
-     *            Ranges to add to set.
-     * @param set
-     *            Set to be enhanced with the values of the ranges.
-     */
-    private void addRangesToTreeSets(final Integer[][] ranges,
-            final TreeSet<Integer> set) {
-        for (Integer[] r : ranges) {
-            for (Integer v = r[0]; v <= r[1]; v++) {
-                set.add(v);
-            }
-        }
-    }
-
-    /**
-     * Adds all the values in the array to the given set.
-     * 
-     * @param array
-     *            Array to add to set.
-     * @param set
-     *            Set to be enhanced with the values of the array.
-     */
-    private void addValuesToTreeSets(final Integer[] array,
-            final TreeSet<Integer> set) {
-        for (Integer v : array) {
-            set.add(v);
-        }
-    }
-
-    /**
-     * Adds day-of-month ranges.
-     * 
-     * @param dayOfMonthRanges
-     *            The day-of-month ranges to add.
-     * @throws SubscriptionControlsException
-     *             If one of the ranges is invalid.
-     */
-    public void addDayOfMonthRanges(final Integer[][] dayOfMonthRanges)
-            throws SubscriptionControlsException {
-        checkRanges(dayOfMonthRanges, 1, 31, "DayOfMonth");
-        addRangesToTreeSets(dayOfMonthRanges, daysOfMonth);
-    }
-
-    /**
-     * Adds day-of-month values.
-     * 
-     * @param dayOfMonthValues
-     *            The day-of-month values to add.
-     * @throws SubscriptionControlsException
-     *             If one of the values is invalid.
-     */
-    public void addDayOfMonthValues(final Integer[] dayOfMonthValues)
-            throws SubscriptionControlsException {
-        checkNums(dayOfMonthValues, 1, 31, "DayOfMonth");
-        addValuesToTreeSets(dayOfMonthValues, daysOfMonth);
-    }
-
-    /**
-     * Adds day-of-week ranges.
-     * 
-     * @param dayOfWeekRanges
-     *            The day-of-week ranges to add.
-     * @throws SubscriptionControlsException
-     *             If one of the ranges is invalid.
-     */
-    public void addDayOfWeekRanges(final Integer[][] dayOfWeekRanges)
-            throws SubscriptionControlsException {
-        checkRanges(dayOfWeekRanges, 1, 7, "DayOfWeek");
-        // Weekdays start one earlier in Java.
-        TreeSet<Integer> temp = new TreeSet<Integer>();
-        addRangesToTreeSets(dayOfWeekRanges, temp);
-        for (Integer m : temp) {
-            daysOfWeek.add((m % 7) + 1);
-        }
-    }
-
-    /**
-     * Adds day-of-week values.
-     * 
-     * @param dayOfWeekValues
-     *            The day-of-week values to add.
-     * @throws SubscriptionControlsException
-     *             If one of the values is invalid.
-     */
-    public void addDayOfWeekValues(final Integer[] dayOfWeekValues)
-            throws SubscriptionControlsException {
-        checkNums(dayOfWeekValues, 1, 7, "DayOfWeek");
-        // Weekdays start one earlier in Java.
-        TreeSet<Integer> temp = new TreeSet<Integer>();
-        addValuesToTreeSets(dayOfWeekValues, temp);
-        for (Integer m : temp) {
-            daysOfWeek.add((m % 7) + 1);
-        }
-    }
-
-    /**
-     * Adds hour ranges.
-     * 
-     * @param hourRanges
-     *            The hour ranges to add.
-     * @throws SubscriptionControlsException
-     *             If one of the ranges is invalid.
-     */
-    public void addHourRanges(final Integer[][] hourRanges)
-            throws SubscriptionControlsException {
-        checkRanges(hourRanges, 0, 23, "hour");
-        addRangesToTreeSets(hourRanges, hours);
-    }
-
-    /**
-     * Adds hour values.
-     * 
-     * @param hourValues
-     *            The hour values to add.
-     * @throws SubscriptionControlsException
-     *             If one of the values is invalid.
-     */
-    public void addHourValues(final Integer[] hourValues)
-            throws SubscriptionControlsException {
-        checkNums(hourValues, 0, 23, "hour");
-        addValuesToTreeSets(hourValues, hours);
-    }
-
-    /**
-     * Adds minute ranges.
-     * 
-     * @param minuteRanges
-     *            The minute ranges to add.
-     * @throws SubscriptionControlsException
-     *             If one of the ranges is invalid.
-     */
-    public void addMinuteRanges(final Integer[][] minuteRanges)
-            throws SubscriptionControlsException {
-        checkRanges(minuteRanges, 0, 59, "minute");
-        addRangesToTreeSets(minuteRanges, minutes);
-    }
-
-    /**
-     * Adds minute values.
-     * 
-     * @param minuteValues
-     *            The minute values to add.
-     * @throws SubscriptionControlsException
-     *             If one of the values is invalid.
-     */
-    public void addMinuteValues(final Integer[] minuteValues)
-            throws SubscriptionControlsException {
-        checkNums(minuteValues, 0, 59, "minute");
-        addValuesToTreeSets(minuteValues, minutes);
-    }
-
-    /**
-     * Adds month ranges.
-     * 
-     * @param monthRanges
-     *            The month ranges to add.
-     * @throws SubscriptionControlsException
-     *             If one of the ranges is invalid.
-     */
-    public void addMonthRanges(final Integer[][] monthRanges)
-            throws SubscriptionControlsException {
-        checkRanges(monthRanges, 1, 12, "month");
-        // Months start with 0 in Java.
-        TreeSet<Integer> temp = new TreeSet<Integer>();
-        addRangesToTreeSets(monthRanges, temp);
-        for (Integer m : temp) {
-            months.add(m - 1);
-        }
-    }
-
-    /**
-     * Adds month values.
-     * 
-     * @param monthValues
-     *            The month values to add.
-     * @throws SubscriptionControlsException
-     *             If one of the values is invalid.
-     */
-    public void addMonthValues(final Integer[] monthValues)
-            throws SubscriptionControlsException {
-        checkNums(monthValues, 1, 12, "month");
-        // Months start with 0 in Java.
-        TreeSet<Integer> temp = new TreeSet<Integer>();
-        addValuesToTreeSets(monthValues, temp);
-        for (Integer m : temp) {
-            months.add(m - 1);
-        }
-    }
-
-    /**
-     * Adds second ranges.
-     * 
-     * @param secondRanges
-     *            The second ranges to add.
-     * @throws SubscriptionControlsException
-     *             If one of the ranges is invalid.
-     */
-    public void addSecondRanges(final Integer[][] secondRanges)
-            throws SubscriptionControlsException {
-        checkRanges(secondRanges, 0, 59, "second");
-        addRangesToTreeSets(secondRanges, seconds);
-    }
-
-    /**
-     * Adds second values.
-     * 
-     * @param secondValues
-     *            The second values to add.
-     * @throws SubscriptionControlsException
-     *             If one of the values is invalid.
-     */
-    public void addSecondValues(final Integer[] secondValues)
-            throws SubscriptionControlsException {
-        checkNums(secondValues, 0, 59, "second");
-        addValuesToTreeSets(secondValues, seconds);
+        return vals;
     }
 
     public TreeSet<Integer> getDaysOfMonth() {
