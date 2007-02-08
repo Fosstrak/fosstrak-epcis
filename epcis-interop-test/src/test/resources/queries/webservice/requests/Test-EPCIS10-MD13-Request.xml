@@ -12,12 +12,12 @@
 			</value>
 		</param>
 	</params>
-	<dest/>
+	<dest>http://127.0.0.1:8899/</dest>
 	<controls>
 		<schedule>
 			<second>0</second>
 		</schedule>
-		<initialRecordTime>2001-12-17T09:30:47.0Z</initialRecordTime>
+		<initialRecordTime>2001-12-17T09:30:47.000Z</initialRecordTime>
 		<reportIfEmpty>false</reportIfEmpty>
 	</controls>
 	<subscriptionID>Query Q</subscriptionID>
