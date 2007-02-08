@@ -22,12 +22,14 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -1697,16 +1699,319 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                 throw iex;
             }
         } else if (queryName.equals("SimpleMasterDataQuery")) {
-            // FIXME: implement SimpleMasterDataQuery here.
-            return null;
-        } else {
+ 			QueryParam[] queryParams = parms.getParams();
+ 			QueryResults results = new QueryResults();
+ 			boolean includesAttributes = false;
+ 			try {
+ 				PreparedStatement statement = createMasterDataQuery(queryParams, includesAttributes);
+ 				ResultSet result = statement.executeQuery();
+ 				if (includesAttributes) {
+ 					while (result.next()) {
+ 						LOG.info("QUERY RESULT: uri " + result.getString("uri")+ " attribute " + result.getString("attribute") + " value " +  result.getString("value") );
+ 					}
+ 				} else {
+ 					while (result.next()) {
+ 						LOG.info("QUERY RESULT: uri " + result.getString("uri"));
+ 					}
+ 				}
+ 			} catch (SQLException e) {
+ 				// TODO Auto-generated catch block
+ 				e.printStackTrace();
+ 			}
+ 			return results;
+		} else {
             String msg = "Invalid query name '" + parms.getQueryName()
                     + "' provided.";
             LOG.info("USER ERROR: " + msg);
             throw new NoSuchNameException(msg);
         }
     }
+    
+    private PreparedStatement createMasterDataQuery(
+			final QueryParam[] queryParams, boolean includesAttributes) throws SQLException,
+			QueryParameterException {
+		StringBuffer query = new StringBuffer();
+		String fromStatement;
+		String whereStatement;
+		int index;
+		List<QueryParam> paramList = Arrays.asList(queryParams);
 
+		// elements will be removed as we go as a control
+		List<String> params = new ArrayList<String>();
+
+		// vocabularies queried
+		List<String> vocabs = new ArrayList<String>();
+		
+		// to remember which vocabulary has which result
+		Map<String, List<String>> results = new HashMap<String, List<String>>();
+
+		// tables we are extracting from + attributes
+		// List<String> tables =
+
+		// Conditions to rememember if we already had a statement of that kind
+		boolean firstFromStmt = true;
+		boolean firstWhereStmt = true;
+
+		// return size Limit
+		int maxElementCount = 0;
+
+		// include children ?
+		boolean includeChildren = false;
+
+		// extract parameter names
+		for (QueryParam param : paramList) {
+			params.add(param.getName());
+			LOG.info("Parameter: "+ param.getName() + " added.");
+		}
+		
+		// Required parameters
+		index = params.indexOf("includeAttributes");
+		LOG.info("Parameter includeAttributes is read.");
+		if (paramList.get(index).getValue().equals("true")) {
+			includesAttributes = true;
+			LOG.info("Parameter includeAttributes is true.");
+		}
+		params.remove(index);
+		
+		if(params.contains("includeChildren")){
+			index = params.indexOf("includeChildren");
+			if (paramList.get(index).getValue().equals("true")) {
+				includeChildren = true;
+				params.remove(index);
+			}
+			params.remove(index);
+		}
+
+		// Optional parameters
+		if (params.contains("maxElementCount")) {
+			index = params.indexOf("maxElementCount");
+			QueryParam maxCount = paramList.get(index);
+			maxElementCount = Integer.parseInt(maxCount.getValue().toString());
+			params.remove(index);
+
+			// FROM
+			// Either select from
+			// -vocabularies given by name (vocabularyName)
+			// -vocabularies given by id (EQ_name)
+			// or vocabulary is yet to be defined
+		} else if (params.contains("vocabularyName")) {
+			fromStatement = restrictVocabulary(paramList.get(params.indexOf("vocabularyName")), vocabs);
+			params.remove(params.indexOf("vocabularyName"));
+			if (vocabs.size() == 0) {
+				throw new QueryParameterException(
+						"Check arguments of MasterDataQuery with 'vocabularyName' attribute.");
+			} else if (params.isEmpty()){
+				if (! includesAttributes) {
+				query.append("SELECT `uri` " + fromStatement);
+				} else {
+					String newFromStmt = includeAttributes(vocabs);
+					query.append("SELECT * " + newFromStmt);
+				}
+			}
+		} else if (params.contains("EQ_name")) {
+			fromStatement = getVocByAttribute(paramList.get(params
+					.indexOf("EQ_name")), vocabs);
+			params.remove(params.indexOf("EQ_name"));
+
+			// Result aggregation
+		} else if (params.contains("attributeNames")) {
+			if (includesAttributes) {
+				 results.putAll(restrictByAttributes(paramList.get(params
+						.indexOf("attributeNames")), vocabs));
+				firstWhereStmt = false;
+			}
+			params.remove(params.indexOf("attributeNames"));
+		} else if (params.contains("HASATTR")) {
+			hasAttributes(paramList.get(params
+					.indexOf("HASATTR")), vocabs);
+			params.remove(params.indexOf("HASATTR"));
+		}else if (params.contains("WD_name")) {
+			// TODO
+			params.remove(params.indexOf("WD_name"));
+		} 
+
+		// Should be finished here
+		if (params.size() > 0) {
+			// Or have we still got an EQATTR_attrname parameter ?
+			if (params.size() == 1) {
+				ListIterator<String> paramIt = params.listIterator();
+				String attribute = paramIt.next();
+				if (attribute.startsWith("EQATTR_")) {
+					attribute = attribute.substring("EQATTR_".length());
+					System.out.println("We have found EQATTR_" + attribute
+							+ " !");
+				}
+			} else {
+				System.out.println("We have " + params.size()
+						+ " parameters left that shouldn't be !");
+			}
+		}
+
+		// TODO check if delimiters are ok
+		LOG.info("QUERY SENT: " + query.toString());
+		return dbconnection.prepareStatement(query.toString());
+	}
+
+	/**
+	 * Refines FromStatement to include attribute tables in result
+	 * 
+	 * @param vocabs The vocabulary elements to which attributes have to be included
+	 * @return a new FromSQL stmt
+	 */
+	private String includeAttributes(List<String> vocabs) {
+		String fromStmt = "FROM ";
+		for (String table : vocabs) {
+			fromStmt += "`voc_" + table + "` INNER JOIN `" + table + "_attr`";
+		}
+		return fromStmt;
+	}
+
+	private void hasAttributes(QueryParam param, List<String> vocabs) {
+		List<String> attr = (List<String>) param.getValue();
+		//TODO
+	}
+
+	/**
+	 * finds out which vocabulary has that attribute TODO: check if correct
+	 * 
+	 * @param param
+	 * @param vocabs
+	 * @return
+	 * @throws SQLException
+	 */
+	private Map<String, List<String>> restrictByAttributes(QueryParam param,
+			List<String> vocabs) throws SQLException {
+		List<String> attr = (List<String>) param.getValue();
+		String ATTR_QUERY = "SELECT * FROM ? WHERE `attribute` IN (";
+		String VOC_QUERY = "SELECT `uri` FROM ? WHERE `id` = ?";
+		Map<String, List<String>> vocMap = new HashMap<String, List<String>>();
+		List<String> uris = new ArrayList<String>();
+		List<String> attributes = new ArrayList<String>();
+		List<String> values = new ArrayList<String>();
+		List<String> resultSet = new ArrayList<String>();
+		int id = 0;
+		int i = 0;
+
+		// construct query
+		for (String attrName : attr) {
+			ATTR_QUERY += " '" + attrName + "', ";
+		}
+		ATTR_QUERY += ATTR_QUERY.substring(0, ATTR_QUERY.length() - 2) + ")";
+
+		// execute query
+		if (vocabs.size() > 0) {
+			for (String voc : vocabs) {
+				PreparedStatement s = dbconnection.prepareStatement(ATTR_QUERY);
+				s.setString(1, voc + "_extension");
+				ResultSet result = s.executeQuery();
+				while (result.next()) {
+					id = result.getInt("id");
+					attributes.add(result.getString("attribute"));
+					values.add(result.getString("value"));
+					PreparedStatement finalStatement = dbconnection.prepareStatement(VOC_QUERY);
+					finalStatement.setString(1, "`voc_" + voc + "`");
+					finalStatement.setInt(2, id);
+					ResultSet vocUri = finalStatement.executeQuery();
+					vocUri.next();
+					uris.add( vocUri.getString("uri"));
+				}
+			}	
+		} else {
+			System.out
+					.println("TODO restrictByAttributes: vocabs not yet defined");
+		}
+		for(String uri : uris) {
+			resultSet.clear();
+			resultSet.add(attributes.get(i));
+			resultSet.add(values.get(i));
+			vocMap.put(uri, resultSet);
+			i++;
+		}
+		return vocMap;
+	}
+
+	private String getVocByAttribute(QueryParam param, List<String> vocabs)
+			throws SQLException {
+		String fromStmt = "FROM ";
+		String tableName;
+		try {
+			List<String> attr = (List<String>) param.getValue();
+			for (String uri : attr) {
+				tableName = findTableFromUri(uri);
+				vocabs.add(tableName.substring(4));
+				if (!tableName.equals("")) {
+					fromStmt += "`" + tableName + "`, `"
+							+ tableName.substring(4) + "_extensions `, ";
+				}
+			}
+			if (fromStmt.endsWith(", ")) {
+				fromStmt = fromStmt.substring(0, fromStmt.length() - 2) + " ";
+			}
+		} catch (ClassCastException e) {
+			throw new ClassCastException(e.getMessage());
+		}
+		return fromStmt;
+	}
+
+	private String restrictVocabulary(QueryParam param, List<String> vocabs)
+			throws SQLException {
+		String tableName;
+		String from = "FROM ";
+		String GET_VOCI = "SELECT `table_name` FROM `vocabularies` WHERE uri = ";
+		try {
+			String[] vocis = ((ArrayOfString) param.getValue()).getString();
+			for (String uri : vocis) {
+				LOG.info("Selecting vocabulary "+uri);
+				Statement s = dbconnection.createStatement();
+				ResultSet result = s.executeQuery(GET_VOCI + "'" + uri + "'");
+				while (result.next()) {
+					tableName = result.getString("table_name");
+					from += tableName +", ";
+				//	LOG.info("Got back table: " + tableName);
+					vocabs.add(tableName.substring(4));
+				//	LOG.info("Added to vocabs: " + tableName.substring(4));
+				} 
+			}
+		} catch (ClassCastException e) {
+			throw new ClassCastException(e.getMessage());
+		}
+		return from.substring(0, from.length()- 2);
+	}
+
+	/**
+	 * Searches through all 'voc_*' tables for a uri and returns the name of the
+	 * table
+	 * 
+	 * @param uri
+	 *            a vocabulary
+	 * @return name of Table which has the <i>uri</i>
+	 * @throws SQLException
+	 */
+	private String findTableFromUri(String uri) throws SQLException {
+		List<String> tables = new ArrayList<String>();
+		final String GET_VOC_TABLES = "SELECT `table_name` FROM `vocabularies`";
+		final String HAS_ID = "SELECT `id` FROM ? WHERE `uri` = ?";
+
+		// get all Vocabulary Tables
+		Statement s = dbconnection.createStatement();
+		ResultSet result = s.executeQuery(GET_VOC_TABLES);
+		while (result.next()) {
+			tables.add(result.getString(1));
+		}
+
+		// find out which table has vocabulary
+		for (String table : tables) {
+			PreparedStatement ps = dbconnection.prepareStatement(HAS_ID);
+			ps.setString(1, "`" + table + "`");
+			ps.setString(2, "'" + uri + "'");
+			result = ps.executeQuery();
+			if (result.next()) {
+				return table;
+			}
+		}
+		return "";
+	}
+    
     /**
      * Returns the standard version.
      * 
