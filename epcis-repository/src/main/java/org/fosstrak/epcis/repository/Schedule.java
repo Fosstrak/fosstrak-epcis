@@ -330,16 +330,17 @@ public class Schedule implements Serializable {
      */
     private boolean secondMadeValid(final GregorianCalendar nextSchedule)
             throws ImplementationException {
+        // check whether the second value of the current time is a valid scheduled second
         if (!seconds.isEmpty() && !seconds.contains(nextSchedule.get(SECOND))) {
-            return setFieldToNextValid(nextSchedule, SECOND);
+            // no current second is not scheduled
+            // set is to the next scheduled second
+            return setToNextScheduledValue(nextSchedule, SECOND);
         }
         return true;
     }
 
     /**
-     * Sets the field of a GregorianCalender to its next valid value, is defined
-     * as the next possible value according to the calendar type used possibly
-     * superseded by the defined values in the schedule we have. Returns whether
+     * Sets the specified field of the given callendar to the next scheduled value. Returns whether
      * the new value has been set and is valid.
      * 
      * @param cal
@@ -350,7 +351,7 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean setFieldToNextValid(final GregorianCalendar cal,
+    private boolean setToNextScheduledValue(final GregorianCalendar cal,
             final int field) throws ImplementationException {
         int next;
         TreeSet<Integer> vals = getValues(field);
@@ -358,9 +359,11 @@ public class Schedule implements Serializable {
             next = cal.get(field) + 1;
         } else {
             try {
-                // get next valid value which is bigger than current
-                next = vals.tailSet(new Integer(cal.get(field) + 1)).first().intValue();
+                // get next scheduled value which is bigger than current
+                int incrValue = cal.get(field) + 1;
+                next = vals.tailSet(new Integer(incrValue)).first().intValue();
             } catch (NoSuchElementException nse) {
+                // there is no bigger scheduled value
                 return false;
             }
         }
@@ -394,9 +397,9 @@ public class Schedule implements Serializable {
             final int field, final int smallerField)
             throws ImplementationException {
         // FIXME marco: why this??? we set the field to next value twice!
-        // cal.add(field, 1);
+//      cal.add(field, 1);
         setFieldsToMinimum(cal, smallerField);
-        return setFieldToNextValid(cal, field);
+        return setToNextScheduledValue(cal, field);
     }
 
     /**
@@ -633,5 +636,21 @@ public class Schedule implements Serializable {
 
     public TreeSet<Integer> getSeconds() {
         return seconds;
+    }
+    
+    public static void main(String[] args) throws Exception {
+        QuerySchedule qsLeapYear = new QuerySchedule();
+        qsLeapYear.setMonth("2");
+        qsLeapYear.setDayOfMonth("29");
+        qsLeapYear.setHour("23");
+        qsLeapYear.setMinute("0");
+        qsLeapYear.setSecond("0");
+        Schedule sched = new Schedule(qsLeapYear);
+
+        // current time is 1.1.2001
+        GregorianCalendar start = new GregorianCalendar(2001, 0, 1);
+
+        // get next scheduled time
+        GregorianCalendar act = sched.nextScheduledTime(start);
     }
 }

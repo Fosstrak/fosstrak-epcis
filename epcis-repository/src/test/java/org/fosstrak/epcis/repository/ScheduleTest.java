@@ -16,138 +16,179 @@ import org.accada.epcis.soapapi.SubscriptionControlsException;
  */
 public class ScheduleTest extends TestCase {
 
-    private Schedule simpleSchedule;
-    private Schedule usualSchedule;
-    private Schedule dayOfWeekSchedule;
-    private Schedule leapYearSchedule;
-
-    private GregorianCalendar firstJune2006;
-    private GregorianCalendar firstJanuary20070100;
-    private GregorianCalendar dayOfWeekStart;
-    private GregorianCalendar leapYearStart;
-
-    public void setUp() throws SubscriptionControlsException {
-        // Basic test.
-        QuerySchedule qsSimple = new QuerySchedule();
-        qsSimple.setSecond("0");
-        qsSimple.setMinute("0");
-        qsSimple.setHour("1");
-        qsSimple.setDayOfMonth("1");
-        qsSimple.setMonth("1");
-        simpleSchedule = new Schedule(qsSimple);
-
-        // Normal use case
-        QuerySchedule qsUsual = new QuerySchedule();
-        qsUsual.setSecond("0");
-        qsUsual.setMinute("0,30");
-        usualSchedule = new Schedule(qsUsual);
-
-        // leap years. Start in 2001 and look for 29th in 2004.
-        QuerySchedule qsLeapYear = new QuerySchedule();
-        qsLeapYear.setSecond("0");
-        qsLeapYear.setMinute("0");
-        qsLeapYear.setHour("23");
-        qsLeapYear.setDayOfMonth("29");
-        qsLeapYear.setMonth("2");
-        leapYearSchedule = new Schedule(qsLeapYear);
-        leapYearStart = new GregorianCalendar(2001, 0, 1);
-
-        // impossibleSchedule // 30/31 of february
-        // summerTimeSchedule
-        // winterTimeSchedule
-        firstJune2006 = new GregorianCalendar(2006, 5, 1, 0, 0, 0);
-        firstJanuary20070100 = new GregorianCalendar(2007, 0, 1, 1, 0, 0);
-    }
-
-    /**
-     * Test method for 'org.autoidlabs.epcnet.epcisrep.querying2.
-     * accadaschedule.Schedule.nextScheduledTime(GregorianCalendar)' Mainly test
-     * whether the returned Calendars are correct.
-     * 
-     * @throws ImplementationException
-     */
-    public void testSimpleNextScheduledTime()
-            throws ImplementationException {
-        GregorianCalendar result = simpleSchedule.nextScheduledTime(firstJune2006);
-        assertEquals(firstJanuary20070100, result);
-    }
-
-    public void testUsualNextScheduledTime()
-            throws ImplementationException {
-        GregorianCalendar result = usualSchedule.nextScheduledTime(firstJune2006);
-        // It's already a valid time.
-        assertEquals(firstJune2006, result);
-    }
-
-    public void testDayOfWeekNextScheduledTime()
-            throws ImplementationException, SubscriptionControlsException {
-        // Check for proper use of weekdays
-        QuerySchedule qsDayOfWeek = new QuerySchedule();
-        qsDayOfWeek.setSecond("59");
-        qsDayOfWeek.setMinute("15");
-        qsDayOfWeek.setHour("17");
-        qsDayOfWeek.setDayOfMonth("[1-31],15,20"); // Check also for
-                                                    // duplicates.
-        qsDayOfWeek.setMonth("7");
-        qsDayOfWeek.setDayOfWeek("4");
-        dayOfWeekSchedule = new Schedule(qsDayOfWeek);
-        dayOfWeekStart = new GregorianCalendar(2006, 6, 14, 15, 0, 0);
-        GregorianCalendar result = dayOfWeekSchedule.nextScheduledTime(dayOfWeekStart);
-        GregorianCalendar expected = new GregorianCalendar(2006, 6, 20, 17, 15,
-                59);
-        assertEquals(expected, result);
-    }
-
-    public void testLeapYearNextScheduledTime()
-            throws ImplementationException {
-        GregorianCalendar result = leapYearSchedule.nextScheduledTime(leapYearStart);
-        GregorianCalendar expected = new GregorianCalendar(2004, 1, 29, 23, 0,
-                0);
-        assertEquals(expected, result);
-    }
-
-    public void testNextScheduledMinute()
-            throws ImplementationException, SubscriptionControlsException {
-
+    public void testNextScheduledYear() throws ImplementationException,
+            SubscriptionControlsException {
+        // scheduled time is 1.1. 01:00.00
         QuerySchedule qs = new QuerySchedule();
         qs.setSecond("0");
-        Schedule schedule = new Schedule(qs);
+        qs.setMinute("0");
+        qs.setHour("1");
+        qs.setDayOfMonth("1");
+        qs.setMonth("1");
+        Schedule sched = new Schedule(qs);
 
-        GregorianCalendar time = new GregorianCalendar(2007, 2, 8, 17, 47, 24);
-        GregorianCalendar act = schedule.nextScheduledTime(time);
-        GregorianCalendar exp = new GregorianCalendar(2007, 2, 8, 17, 48, 00);
-        assertEquals(act, exp);
+        // current time is 1.6.2006 00:00.00
+        GregorianCalendar start = new GregorianCalendar(2006, 5, 1, 0, 0, 0);
+
+        // get next scheduled time
+        GregorianCalendar act = sched.nextScheduledTime(start);
+
+        // expected time is 1.1.2007 01:00.00
+        GregorianCalendar exp = new GregorianCalendar(2007, 0, 1, 1, 0, 0);
+        assertEquals(exp, act);
     }
 
-    public void testComplexNextScheduledTime()
-            throws ImplementationException, SubscriptionControlsException {
+    public void testNextScheduledHalfHour() throws ImplementationException,
+            SubscriptionControlsException {
+        // scheduled time is every half an hour
+        // always at the top and the bottom of every hour
+        QuerySchedule qs = new QuerySchedule();
+        qs.setSecond("0");
+        qs.setMinute("0,30");
+        Schedule sched = new Schedule(qs);
 
+        // current time is 1.6.2006 00:00.00
+        GregorianCalendar start = new GregorianCalendar(2006, 5, 1, 0, 0, 0);
+
+        // get next scheduled time
+        GregorianCalendar act = sched.nextScheduledTime(start);
+
+        // this is already a valid time!
+        GregorianCalendar exp = (GregorianCalendar) start.clone();
+        assertEquals(exp, act);
+
+        // add a second to current time
+        // current time is 1.6.2006 00:00.01
+        start.add(Calendar.SECOND, 1);
+
+        // get next scheduled time
+        act = sched.nextScheduledTime(start);
+
+        // expected time is 1.6.2006 00:30.00
+        exp = new GregorianCalendar(2006, 5, 1, 0, 30, 0);
+        assertEquals(exp, act);
+    }
+
+    public void testNextScheduledDayOfWeek() throws ImplementationException,
+            SubscriptionControlsException {
+        // scheduled time is every July, at a Thursday, 17:15.59
+        QuerySchedule qs = new QuerySchedule();
+        qs.setMonth("7");
+        qs.setDayOfMonth("[1-31],15,20"); // test duplicates!!
+        qs.setDayOfWeek("4");
+        qs.setHour("17");
+        qs.setMinute("15");
+        qs.setSecond("59");
+        Schedule sched = new Schedule(qs);
+
+        // current time is 14.7.2006 15:00.00
+        GregorianCalendar start = new GregorianCalendar(2006, 6, 14, 15, 0, 0);
+
+        // get next scheduled time
+        GregorianCalendar act = sched.nextScheduledTime(start);
+
+        // expected time is 20.7.2006 17:15.59
+        GregorianCalendar exp = new GregorianCalendar(2006, 6, 20, 17, 15, 59);
+        assertEquals(exp, act);
+    }
+
+    public void testNextScheduledLeapYear() throws ImplementationException,
+            SubscriptionControlsException {
+        // scheduled time is 29.2. 23:00.00 -> must be a leap year
+        QuerySchedule qs = new QuerySchedule();
+        qs.setMonth("2");
+        qs.setDayOfMonth("29");
+        qs.setHour("23");
+        qs.setMinute("0");
+        qs.setSecond("0");
+        Schedule sched = new Schedule(qs);
+
+        // current time is 1.1.2001
+        GregorianCalendar start = new GregorianCalendar(2001, 0, 1);
+
+        // get next scheduled time
+        GregorianCalendar act = sched.nextScheduledTime(start);
+
+        // expected time is 29.2.2004 23:00.00
+        GregorianCalendar exp = new GregorianCalendar(2004, 1, 29, 23, 0, 0);
+
+        printDateTime(act);
+        printDateTime(exp);
+        assertEquals(exp, act);
+    }
+
+    public void testNextScheduledMinute() throws ImplementationException,
+            SubscriptionControlsException {
+        // scheduled time is always at top of a minute
+        QuerySchedule qs = new QuerySchedule();
+        qs.setSecond("0");
+        Schedule sched = new Schedule(qs);
+
+        // current time is 8.2.2007 17:47.24
+        GregorianCalendar start = new GregorianCalendar(2007, 1, 8, 17, 47, 24);
+
+        // get next scheduled time
+        GregorianCalendar act = sched.nextScheduledTime(start);
+
+        // expected time is 8.2.2007 17:48.00
+        GregorianCalendar exp = new GregorianCalendar(2007, 1, 8, 17, 48, 00);
+        assertEquals(exp, act);
+    }
+
+    public void testComplexNextScheduledTime() throws ImplementationException,
+            SubscriptionControlsException {
+        // scheduled time is 1., 10., 20., or 30. of a month,
+        // at 07-11, 13-17, or 20 hours, 50.30 minutes
         QuerySchedule qs = new QuerySchedule();
         qs.setSecond("30");
         qs.setMinute("50");
         qs.setHour("[7-11],[13-17],20");
         qs.setDayOfMonth("1,10,20,30");
-        Schedule schedule = new Schedule(qs);
+        Schedule sched = new Schedule(qs);
 
-        GregorianCalendar time = new GregorianCalendar(2010, 0, 2, 8, 30, 0);
-        GregorianCalendar result1 = schedule.nextScheduledTime(time);
-        GregorianCalendar expected1 = new GregorianCalendar(2010, 0, 10, 7, 50,
-                30);
-        assertEquals(result1, expected1);
+        // current time is 2.1.2010 08:30.00
+        GregorianCalendar start = new GregorianCalendar(2010, 0, 2, 8, 30, 0);
 
-        time = (GregorianCalendar) result1.clone();
-        time.add(Calendar.SECOND, 1);
-        GregorianCalendar result2 = schedule.nextScheduledTime(time);
-        GregorianCalendar expected2 = new GregorianCalendar(2010, 0, 10, 8, 50,
-                30);
-        assertEquals(result2, expected2);
+        // get next scheduled time
+        GregorianCalendar act = sched.nextScheduledTime(start);
 
-        time = (GregorianCalendar) result2.clone();
-        time.add(Calendar.HOUR, 10);
-        GregorianCalendar result3 = schedule.nextScheduledTime(time);
-        GregorianCalendar expected3 = new GregorianCalendar(2010, 0, 10, 20, 50,
-                30);
-        assertEquals(result3, expected3);
+        // expected time is 10.1. 07:50.30
+        GregorianCalendar exp = new GregorianCalendar(2010, 0, 10, 7, 50, 30);
+        assertEquals(exp, act);
+
+        // add one second to scheduled time
+        start = (GregorianCalendar) exp.clone();
+        start.add(Calendar.SECOND, 1);
+
+        // get next scheduled time
+        act = sched.nextScheduledTime(start);
+
+        // expected time is 10.1. 08:50.30
+        exp = new GregorianCalendar(2010, 0, 10, 8, 50, 30);
+        assertEquals(exp, act);
+
+        // add some more time to scheduled time
+        start = (GregorianCalendar) exp.clone();
+        start.add(Calendar.HOUR, 3);
+        start.add(Calendar.SECOND, 1);
+
+        // get next scheduled time
+        act = sched.nextScheduledTime(start);
+
+        // expected time is 10.1. 13:50.30
+        exp = new GregorianCalendar(2010, 0, 10, 13, 50, 30);
+        assertEquals(exp, act);
+
+        // add some more time to scheduled time
+        start = (GregorianCalendar) exp.clone();
+        start.add(Calendar.DAY_OF_MONTH, 1);
+
+        // get next scheduled time
+        act = sched.nextScheduledTime(start);
+
+        // expected time is 20.1. 07:50.30
+        exp = new GregorianCalendar(2010, 0, 20, 07, 50, 30);
+        assertEquals(exp, act);
     }
 
     public void testLeapYearDayOfWeekNextScheduledTime()
@@ -161,7 +202,7 @@ public class ScheduleTest extends TestCase {
         qs.setMonth("2");
         qs.setDayOfWeek("1");
         Schedule schedule = new Schedule(qs);
-        
+
         GregorianCalendar start = schedule.nextScheduledTime(new GregorianCalendar(
                 2001, 0, 1, 0, 0, 0));
         GregorianCalendar result = schedule.nextScheduledTime(start);
@@ -200,13 +241,13 @@ public class ScheduleTest extends TestCase {
         System.out.println("Year: "
                 + cal.get(Calendar.YEAR)
                 // Calendar starts months with 0
-                + " Month: " + (cal.get(Calendar.MONTH) + 1) + " Day: "
-                + cal.get(Calendar.DAY_OF_MONTH) + " Hour: "
-                + cal.get(Calendar.HOUR_OF_DAY) + " Minute: "
-                + cal.get(Calendar.MINUTE) + " Second: "
+                + ", Month: " + (cal.get(Calendar.MONTH) + 1) + ", Day: "
+                + cal.get(Calendar.DAY_OF_MONTH) + ", Hour: "
+                + cal.get(Calendar.HOUR_OF_DAY) + ", Minute: "
+                + cal.get(Calendar.MINUTE) + ", Second: "
                 + cal.get(Calendar.SECOND)
                 // Calendar week days start on sunday
-                + " Weekday: " + (cal.get(Calendar.DAY_OF_WEEK) - 1));
+                + ", Weekday: " + (cal.get(Calendar.DAY_OF_WEEK) - 1));
     }
 
 }
