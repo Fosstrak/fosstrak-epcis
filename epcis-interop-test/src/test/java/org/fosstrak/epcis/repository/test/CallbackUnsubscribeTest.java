@@ -63,7 +63,7 @@ public class CallbackUnsubscribeTest extends TestCase {
         System.out.println("waiting ...");
         synchronized (listener) {
             try {
-                listener.wait(2 * 60 * 1000);
+                listener.wait(60000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -81,7 +81,7 @@ public class CallbackUnsubscribeTest extends TestCase {
         System.out.println("waiting ...");
         synchronized (listener) {
             try {
-                listener.wait(2 * 60 * 1000);
+                listener.wait(60000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
