@@ -29,13 +29,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.accada.epcis.soapapi.ActionType;
 import org.accada.epcis.soapapi.AggregationEventType;
 import org.accada.epcis.soapapi.ArrayOfString;
+import org.accada.epcis.soapapi.AttributeType;
 import org.accada.epcis.soapapi.BusinessLocationType;
 import org.accada.epcis.soapapi.BusinessTransactionType;
 import org.accada.epcis.soapapi.DuplicateSubscriptionException;
@@ -65,6 +67,8 @@ import org.accada.epcis.soapapi.SubscriptionControlsException;
 import org.accada.epcis.soapapi.TransactionEventType;
 import org.accada.epcis.soapapi.Unsubscribe;
 import org.accada.epcis.soapapi.ValidationException;
+import org.accada.epcis.soapapi.VocabularyElementType;
+import org.accada.epcis.soapapi.VocabularyType;
 import org.accada.epcis.soapapi.VoidHolder;
 import org.accada.epcis.utils.TimeParser;
 import org.apache.axis.MessageContext;
@@ -124,8 +128,8 @@ public class EpcisQueryInterface implements EPCISServicePortType {
     private final Set<String> queryNames = new HashSet<String>() {
         private static final long serialVersionUID = -3868728341409854448L;
         {
-            // TODO: add SimpleMasterDataQuery once implemented.
             add("SimpleEventQuery");
+            add("SimpleMasterDataQuery");
         }
     };
 
@@ -1303,7 +1307,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
             // SimpleMasterDataQuery only valid for polling
             if (queryName.equals("SimpleMasterDataQuery")) {
-                String msg = "SimpleMasterDataQuery not permitted for use with subscribe, only with poll.";
+                String msg = "Subscription not allowed for SimpleMasterDataQuery.";
                 LOG.info("USER ERROR: " + msg);
                 throw new SubscribeNotPermittedException(msg);
             }
@@ -1699,319 +1703,451 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                 throw iex;
             }
         } else if (queryName.equals("SimpleMasterDataQuery")) {
- 			QueryParam[] queryParams = parms.getParams();
- 			QueryResults results = new QueryResults();
- 			boolean includesAttributes = false;
- 			try {
- 				PreparedStatement statement = createMasterDataQuery(queryParams, includesAttributes);
- 				ResultSet result = statement.executeQuery();
- 				if (includesAttributes) {
- 					while (result.next()) {
- 						LOG.info("QUERY RESULT: uri " + result.getString("uri")+ " attribute " + result.getString("attribute") + " value " +  result.getString("value") );
- 					}
- 				} else {
- 					while (result.next()) {
- 						LOG.info("QUERY RESULT: uri " + result.getString("uri"));
- 					}
- 				}
- 			} catch (SQLException e) {
- 				// TODO Auto-generated catch block
- 				e.printStackTrace();
- 			}
- 			return results;
-		} else {
+            QueryParam[] queryParams = parms.getParams();
+            try {
+                QueryResults results = createMasterDataQuery(queryParams);
+                return results;
+            } catch (SQLException e) {
+                ImplementationException iex = new ImplementationException();
+                String msg = "SQL error during query execution: "
+                        + e.getMessage();
+                LOG.error(msg, e);
+                iex.setReason(msg);
+                iex.setStackTrace(e.getStackTrace());
+                iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+                throw iex;
+            }
+        } else {
             String msg = "Invalid query name '" + parms.getQueryName()
                     + "' provided.";
             LOG.info("USER ERROR: " + msg);
             throw new NoSuchNameException(msg);
         }
     }
-    
-    private PreparedStatement createMasterDataQuery(
-			final QueryParam[] queryParams, boolean includesAttributes) throws SQLException,
-			QueryParameterException {
-		StringBuffer query = new StringBuffer();
-		String fromStatement;
-		String whereStatement;
-		int index;
-		List<QueryParam> paramList = Arrays.asList(queryParams);
 
-		// elements will be removed as we go as a control
-		List<String> params = new ArrayList<String>();
+    /**
+     * Runs a MasterDataQuery for the given QueryParam array and returns the
+     * QueryResults.
+     * 
+     * @param queryParams
+     *            The parameters for running the MasterDataQuery.
+     * @return The QueryResults.
+     * @throws SQLException
+     *             If an error accessing the database occured.
+     * @throws QueryParameterException
+     *             If one of the provided QueryParam is invalid.
+     * @throws ImplementationException
+     *             If a service implementation error occured.
+     * @throws QueryTooLargeException
+     *             If the query is too large to be executed.
+     */
+    private QueryResults createMasterDataQuery(final QueryParam[] queryParams)
+            throws SQLException, QueryParameterException,
+            ImplementationException, QueryTooLargeException {
 
-		// vocabularies queried
-		List<String> vocabs = new ArrayList<String>();
-		
-		// to remember which vocabulary has which result
-		Map<String, List<String>> results = new HashMap<String, List<String>>();
+        // populate a sorted map with the given parameters
+        List<QueryParam> paramList = Arrays.asList(queryParams);
+        SortedMap<String, Object> params = new TreeMap<String, Object>();
+        for (QueryParam param : paramList) {
+            params.put(param.getName(), param.getValue());
+        }
 
-		// tables we are extracting from + attributes
-		// List<String> tables =
+        // check for parameter 'includeAttributes'
+        boolean includeAttributes = false;
+        try {
+            Object val = params.remove("includeAttributes");
+            includeAttributes = Boolean.parseBoolean(val.toString());
+            // defaults to 'false' if an invalid value is provided!
+        } catch (NullPointerException e) {
+            String msg = "Invalid MasterDataQuery: missing required parameter 'includeAttributes' or invalid value provided.";
+            LOG.info("USER ERROR: " + msg, e);
+            throw new QueryParameterException(msg);
+        }
 
-		// Conditions to rememember if we already had a statement of that kind
-		boolean firstFromStmt = true;
-		boolean firstWhereStmt = true;
+        // check for parameter 'includeChildren'
+        boolean includeChildren = false;
+        try {
+            Object val = params.remove("includeChildren");
+            includeChildren = Boolean.parseBoolean(val.toString());
+            // defaults to 'false' if an invalid value is provided!
+        } catch (NullPointerException e) {
+            String msg = "Invalid MasterDataQuery: missing required parameter 'includeChildren' or invalid value provided.";
+            LOG.info("USER ERROR: " + msg);
+            throw new QueryParameterException(msg);
+        }
 
-		// return size Limit
-		int maxElementCount = 0;
+        // fetch vocabulary table names
+        String[] uris = new String[0];
+        if (params.containsKey("vocabularyName")) {
+            Object val = params.remove("vocabularyName");
+            uris = ((ArrayOfString) val).getString();
+        }
+        Map<String, URI> tableNames = fetchVocabularyTableNames(uris);
 
-		// include children ?
-		boolean includeChildren = false;
+        // filter vocabularies by name
+        String[] filterVocNames = new String[0];
+        if (params.containsKey("EQ_name")) {
+            Object val = params.remove("EQ_name");
+            filterVocNames = ((ArrayOfString) val).getString();
+        }
 
-		// extract parameter names
-		for (QueryParam param : paramList) {
-			params.add(param.getName());
-			LOG.info("Parameter: "+ param.getName() + " added.");
-		}
-		
-		// Required parameters
-		index = params.indexOf("includeAttributes");
-		LOG.info("Parameter includeAttributes is read.");
-		if (paramList.get(index).getValue().equals("true")) {
-			includesAttributes = true;
-			LOG.info("Parameter includeAttributes is true.");
-		}
-		params.remove(index);
-		
-		if(params.contains("includeChildren")){
-			index = params.indexOf("includeChildren");
-			if (paramList.get(index).getValue().equals("true")) {
-				includeChildren = true;
-				params.remove(index);
-			}
-			params.remove(index);
-		}
+        // filter vocabularies by name with desendants
+        String[] filterVocNamesWd = new String[0];
+        if (params.containsKey("WD_name")) {
+            Object val = params.remove("WD_name");
+            filterVocNamesWd = ((ArrayOfString) val).getString();
+        }
 
-		// Optional parameters
-		if (params.contains("maxElementCount")) {
-			index = params.indexOf("maxElementCount");
-			QueryParam maxCount = paramList.get(index);
-			maxElementCount = Integer.parseInt(maxCount.getValue().toString());
-			params.remove(index);
+        // filter vocabularies by attribute name
+        String[] filterVocAttrNames = new String[0];
+        if (params.containsKey("HASATTR")) {
+            Object val = params.remove("HASATTR");
+            filterVocAttrNames = ((ArrayOfString) val).getString();
+        }
 
-			// FROM
-			// Either select from
-			// -vocabularies given by name (vocabularyName)
-			// -vocabularies given by id (EQ_name)
-			// or vocabulary is yet to be defined
-		} else if (params.contains("vocabularyName")) {
-			fromStatement = restrictVocabulary(paramList.get(params.indexOf("vocabularyName")), vocabs);
-			params.remove(params.indexOf("vocabularyName"));
-			if (vocabs.size() == 0) {
-				throw new QueryParameterException(
-						"Check arguments of MasterDataQuery with 'vocabularyName' attribute.");
-			} else if (params.isEmpty()){
-				if (! includesAttributes) {
-				query.append("SELECT `uri` " + fromStatement);
-				} else {
-					String newFromStmt = includeAttributes(vocabs);
-					query.append("SELECT * " + newFromStmt);
-				}
-			}
-		} else if (params.contains("EQ_name")) {
-			fromStatement = getVocByAttribute(paramList.get(params
-					.indexOf("EQ_name")), vocabs);
-			params.remove(params.indexOf("EQ_name"));
+        // filter vocabularies by attribute value
+        Map<String, String[]> filterAttrs = new HashMap<String, String[]>();
+        for (String param : params.keySet()) {
+            if (param.startsWith("EQATTR_")) {
+                String attrname = param.substring(7);
+                Object val = params.remove(param);
+                String[] values = ((ArrayOfString) val).getString();
+                filterAttrs.put(attrname, values);
+            }
+        }
 
-			// Result aggregation
-		} else if (params.contains("attributeNames")) {
-			if (includesAttributes) {
-				 results.putAll(restrictByAttributes(paramList.get(params
-						.indexOf("attributeNames")), vocabs));
-				firstWhereStmt = false;
-			}
-			params.remove(params.indexOf("attributeNames"));
-		} else if (params.contains("HASATTR")) {
-			hasAttributes(paramList.get(params
-					.indexOf("HASATTR")), vocabs);
-			params.remove(params.indexOf("HASATTR"));
-		}else if (params.contains("WD_name")) {
-			// TODO
-			params.remove(params.indexOf("WD_name"));
-		} 
+        // filter attributes by name
+        String[] filterAttrNames = new String[0];
+        if (params.containsKey("attributeNames") && includeAttributes) {
+            Object val = params.remove("attributeNames");
+            filterAttrNames = ((ArrayOfString) val).getString();
+        }
 
-		// Should be finished here
-		if (params.size() > 0) {
-			// Or have we still got an EQATTR_attrname parameter ?
-			if (params.size() == 1) {
-				ListIterator<String> paramIt = params.listIterator();
-				String attribute = paramIt.next();
-				if (attribute.startsWith("EQATTR_")) {
-					attribute = attribute.substring("EQATTR_".length());
-					System.out.println("We have found EQATTR_" + attribute
-							+ " !");
-				}
-			} else {
-				System.out.println("We have " + params.size()
-						+ " parameters left that shouldn't be !");
-			}
-		}
+        // filter number of returned elements
+        int maxElementCount = -1;
+        if (params.containsKey("maxElementCount")) {
+            Object val = params.remove("maxElementCount");
+            maxElementCount = ((Integer) val).intValue();
+        }
 
-		// TODO check if delimiters are ok
-		LOG.info("QUERY SENT: " + query.toString());
-		return dbconnection.prepareStatement(query.toString());
-	}
+        List<VocabularyType> vocList = new ArrayList<VocabularyType>();
+        // handle each vocabulary table
+        for (String vocTableName : tableNames.keySet()) {
+            List<VocabularyElementType> vocElemList = new ArrayList<VocabularyElementType>();
 
-	/**
-	 * Refines FromStatement to include attribute tables in result
-	 * 
-	 * @param vocabs The vocabulary elements to which attributes have to be included
-	 * @return a new FromSQL stmt
-	 */
-	private String includeAttributes(List<String> vocabs) {
-		String fromStmt = "FROM ";
-		for (String table : vocabs) {
-			fromStmt += "`voc_" + table + "` INNER JOIN `" + table + "_attr`";
-		}
-		return fromStmt;
-	}
+            // fetch all vocabularies filtered by the given arguments
+            List<URI> vocs = fetchVocabularies(vocTableName, filterVocNames,
+                    filterVocNamesWd, filterAttrs, filterVocAttrNames,
+                    maxElementCount);
 
-	private void hasAttributes(QueryParam param, List<String> vocabs) {
-		List<String> attr = (List<String>) param.getValue();
-		//TODO
-	}
+            // handle each vocabulary element
+            for (URI voc : vocs) {
+                VocabularyElementType vocElem = new VocabularyElementType();
+                vocElem.setId(voc);
 
-	/**
-	 * finds out which vocabulary has that attribute TODO: check if correct
-	 * 
-	 * @param param
-	 * @param vocabs
-	 * @return
-	 * @throws SQLException
-	 */
-	private Map<String, List<String>> restrictByAttributes(QueryParam param,
-			List<String> vocabs) throws SQLException {
-		List<String> attr = (List<String>) param.getValue();
-		String ATTR_QUERY = "SELECT * FROM ? WHERE `attribute` IN (";
-		String VOC_QUERY = "SELECT `uri` FROM ? WHERE `id` = ?";
-		Map<String, List<String>> vocMap = new HashMap<String, List<String>>();
-		List<String> uris = new ArrayList<String>();
-		List<String> attributes = new ArrayList<String>();
-		List<String> values = new ArrayList<String>();
-		List<String> resultSet = new ArrayList<String>();
-		int id = 0;
-		int i = 0;
+                AttributeType[] attributes = null;
+                if (includeAttributes) {
+                    List<AttributeType> attrList = new ArrayList<AttributeType>();
 
-		// construct query
-		for (String attrName : attr) {
-			ATTR_QUERY += " '" + attrName + "', ";
-		}
-		ATTR_QUERY += ATTR_QUERY.substring(0, ATTR_QUERY.length() - 2) + ")";
+                    // fetch all attributes for current vocabulary element
+                    Map<String, String> attrMap = fetchAttributes(vocTableName,
+                            voc.toString(), filterAttrNames);
 
-		// execute query
-		if (vocabs.size() > 0) {
-			for (String voc : vocabs) {
-				PreparedStatement s = dbconnection.prepareStatement(ATTR_QUERY);
-				s.setString(1, voc + "_extension");
-				ResultSet result = s.executeQuery();
-				while (result.next()) {
-					id = result.getInt("id");
-					attributes.add(result.getString("attribute"));
-					values.add(result.getString("value"));
-					PreparedStatement finalStatement = dbconnection.prepareStatement(VOC_QUERY);
-					finalStatement.setString(1, "`voc_" + voc + "`");
-					finalStatement.setInt(2, id);
-					ResultSet vocUri = finalStatement.executeQuery();
-					vocUri.next();
-					uris.add( vocUri.getString("uri"));
-				}
-			}	
-		} else {
-			System.out
-					.println("TODO restrictByAttributes: vocabs not yet defined");
-		}
-		for(String uri : uris) {
-			resultSet.clear();
-			resultSet.add(attributes.get(i));
-			resultSet.add(values.get(i));
-			vocMap.put(uri, resultSet);
-			i++;
-		}
-		return vocMap;
-	}
+                    // handle each attribute element
+                    for (String attrId : attrMap.keySet()) {
+                        AttributeType attr = new AttributeType();
+                        attr.setId(stringToUri(attrId));
+                        // FIXME marco: set also attr value
+                        // problem: in AttributeType (which should extend
+                        // xsd:anyType), there is no possibility to set a value
+                        attrList.add(attr);
+                    }
+                    if (attrList.size() > 0) {
+                        attributes = new AttributeType[attrList.size()];
+                        attributes = attrList.toArray(attributes);
+                    }
+                }
+                vocElem.setAttribute(attributes);
 
-	private String getVocByAttribute(QueryParam param, List<String> vocabs)
-			throws SQLException {
-		String fromStmt = "FROM ";
-		String tableName;
-		try {
-			List<String> attr = (List<String>) param.getValue();
-			for (String uri : attr) {
-				tableName = findTableFromUri(uri);
-				vocabs.add(tableName.substring(4));
-				if (!tableName.equals("")) {
-					fromStmt += "`" + tableName + "`, `"
-							+ tableName.substring(4) + "_extensions `, ";
-				}
-			}
-			if (fromStmt.endsWith(", ")) {
-				fromStmt = fromStmt.substring(0, fromStmt.length() - 2) + " ";
-			}
-		} catch (ClassCastException e) {
-			throw new ClassCastException(e.getMessage());
-		}
-		return fromStmt;
-	}
+                URI[] children = null;
+                if (includeChildren) {
+                    // fetch all children for current vocabulary element
+                    List<URI> childrenList = fetchChildren(vocTableName,
+                            voc.toString());
+                    if (childrenList.size() > 0) {
+                        children = new URI[childrenList.size()];
+                        children = childrenList.toArray(children);
+                    }
+                }
+                vocElem.setChildren(children);
+                vocElemList.add(vocElem);
+            }
+            VocabularyElementType[] vocElems = null;
+            if (vocElemList.size() > 0) {
+                vocElems = new VocabularyElementType[vocElemList.size()];
+                vocElems = vocElemList.toArray(vocElems);
 
-	private String restrictVocabulary(QueryParam param, List<String> vocabs)
-			throws SQLException {
-		String tableName;
-		String from = "FROM ";
-		String GET_VOCI = "SELECT `table_name` FROM `vocabularies` WHERE uri = ";
-		try {
-			String[] vocis = ((ArrayOfString) param.getValue()).getString();
-			for (String uri : vocis) {
-				LOG.info("Selecting vocabulary "+uri);
-				Statement s = dbconnection.createStatement();
-				ResultSet result = s.executeQuery(GET_VOCI + "'" + uri + "'");
-				while (result.next()) {
-					tableName = result.getString("table_name");
-					from += tableName +", ";
-				//	LOG.info("Got back table: " + tableName);
-					vocabs.add(tableName.substring(4));
-				//	LOG.info("Added to vocabs: " + tableName.substring(4));
-				} 
-			}
-		} catch (ClassCastException e) {
-			throw new ClassCastException(e.getMessage());
-		}
-		return from.substring(0, from.length()- 2);
-	}
+                VocabularyType voc = new VocabularyType();
+                voc.setVocabularyElementList(vocElems);
+                voc.setType(tableNames.get(vocTableName));
+                vocList.add(voc);
+            }
+        }
+        VocabularyType[] vocs = null;
+        if (vocList.size() > 0) {
+            vocs = new VocabularyType[vocList.size()];
+            vocs = vocList.toArray(vocs);
+        }
 
-	/**
-	 * Searches through all 'voc_*' tables for a uri and returns the name of the
-	 * table
-	 * 
-	 * @param uri
-	 *            a vocabulary
-	 * @return name of Table which has the <i>uri</i>
-	 * @throws SQLException
-	 */
-	private String findTableFromUri(String uri) throws SQLException {
-		List<String> tables = new ArrayList<String>();
-		final String GET_VOC_TABLES = "SELECT `table_name` FROM `vocabularies`";
-		final String HAS_ID = "SELECT `id` FROM ? WHERE `uri` = ?";
+        QueryResultsBody resultsBody = new QueryResultsBody();
+        resultsBody.setVocabularyList(vocs);
 
-		// get all Vocabulary Tables
-		Statement s = dbconnection.createStatement();
-		ResultSet result = s.executeQuery(GET_VOC_TABLES);
-		while (result.next()) {
-			tables.add(result.getString(1));
-		}
+        QueryResults results = new QueryResults();
+        results.setQueryName("SimpleMasterDataQuery");
+        results.setResultsBody(resultsBody);
+        return results;
+    }
 
-		// find out which table has vocabulary
-		for (String table : tables) {
-			PreparedStatement ps = dbconnection.prepareStatement(HAS_ID);
-			ps.setString(1, "`" + table + "`");
-			ps.setString(2, "'" + uri + "'");
-			result = ps.executeQuery();
-			if (result.next()) {
-				return table;
-			}
-		}
-		return "";
-	}
-    
+    /**
+     * Retrieves vocabularies filtered by the given arguments.
+     * 
+     * @param table
+     *            The name of the vocabulary table in which to look.
+     * @param filterVocNames
+     *            A possibly empty array of vocabulary names which filter the
+     *            returned vocabularies by name.
+     * @param filterVocNamesWd
+     *            A possibly empty array of vocabulary names which filter the
+     *            returned vocabularies by the name of their descendants.
+     * @param filterAttrs
+     *            A possibly empty mapping of attribute names to attribute
+     *            values which filter the returned vocabularies by their
+     *            attribute names and values.
+     * @param attrs
+     *            A possibly empty array of attribute names which filter the
+     *            returned vocabularies by their attribute names.
+     * @param maxElementCount
+     *            The maximum number of vocabularies that should be retrieved.
+     *            If the actual number of vacabularies exceeds this number, a
+     *            QueryTooLargeException is raised.
+     * @return A List of vocabularies (URI) filtered by the given arguments.
+     * @throws SQLException
+     *             If an error accessing the database occured.
+     * @throws ImplementationException
+     *             If an error converting a String to an URI occured.
+     * @throws QueryTooLargeException
+     *             If the actual number of returned vocabularies would exceed
+     *             the given maxElementCount.
+     */
+    private List<URI> fetchVocabularies(String table, String[] filterVocNames,
+            String[] filterVocNamesWd, Map<String, String[]> filterAttrs,
+            String[] attrs, int maxElementCount) throws SQLException,
+            ImplementationException, QueryTooLargeException {
+        List<URI> vocs = new ArrayList<URI>();
+
+        StringBuffer sql = new StringBuffer();
+        List<String> queryArgs = new ArrayList<String>();
+        sql.append("SELECT DISTINCT `uri` FROM `voc_");
+        sql.append(table);
+        sql.append("` AS vocTable");
+        // filter by attribute
+        if (attrs.length > 0 || filterAttrs.size() > 0) {
+            sql.append(", `voc_");
+            sql.append(table);
+            sql.append("_attr` AS attrTable ");
+            sql.append("WHERE vocTable.id=attrTable.id");
+            if (attrs.length > 0) {
+                // filter by attribute name
+                sql.append(" AND attrTable.`attribute` IN (");
+                stringArrayToSQL(attrs, sql, queryArgs);
+                sql.append(")");
+            }
+            if (filterAttrs.size() > 0) {
+                // filter by attribute name & value
+                for (String attrname : filterAttrs.keySet()) {
+                    sql.append(" AND attrTable.`attribute`=?");
+                    queryArgs.add(attrname);
+                    sql.append(" AND attrTable.`value` IN (");
+                    stringArrayToSQL(filterAttrs.get(attrname), sql, queryArgs);
+                    sql.append(")");
+                }
+            }
+        } else {
+            sql.append(" WHERE 1");
+        }
+        if (filterVocNames.length > 0) {
+            // filter by voc name
+            sql.append(" AND vocTable.`uri` IN (");
+            stringArrayToSQL(filterVocNames, sql, queryArgs);
+            sql.append(")");
+        }
+        if (filterVocNamesWd.length > 0) {
+            // filter by voc name with descendants
+            sql.append(" AND (vocTable.`uri` LIKE ?");
+            queryArgs.add(filterVocNamesWd[0] + "%");
+            for (int i = 1; i < filterVocNamesWd.length; i++) {
+                sql.append(" OR vocTable.`uri` LIKE ?");
+                queryArgs.add(filterVocNamesWd[i] + "%");
+            }
+            sql.append(")");
+        }
+        sql.append(";");
+
+        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
+        LOG.debug("QUERY: " + sql);
+        int i = 1;
+        for (String arg : queryArgs) {
+            LOG.debug("       query param " + i + ": " + arg);
+            ps.setString(i++, arg);
+        }
+        ResultSet rs = ps.executeQuery();
+        int count = 0;
+        while (rs.next()) {
+            if (maxElementCount > -1 && count > maxElementCount) {
+                String msg = "Actual number of vocabulary elements exceeds specified 'maxElementCount'.";
+                LOG.info("USER ERROR: " + msg);
+                throw new QueryTooLargeException();
+            }
+            URI uri = stringToUri(rs.getString("uri"));
+            vocs.add(uri);
+            count++;
+        }
+
+        return vocs;
+    }
+
+    /**
+     * Retrieves all vocabulary table names for the given vocabulary names.
+     * 
+     * @param uris
+     *            A possibly empty array of vocabulary names.
+     * @return A mapping from the table name to the vocabulary name.
+     * @throws SQLException
+     *             If an error accessing the databse occured.
+     * @throws ImplementationException
+     *             If an error converting a String to an URI occured.
+     */
+    private Map<String, URI> fetchVocabularyTableNames(String[] uris)
+            throws SQLException, ImplementationException {
+        Map<String, URI> tableNames = new HashMap<String, URI>();
+
+        List<String> queryArgs = new ArrayList<String>(uris.length);
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT `table_name`, `uri` FROM `vocabularies`");
+        if (uris.length > 0) {
+            sql.append(" WHERE `uri` IN (");
+            stringArrayToSQL(uris, sql, queryArgs);
+            sql.append(")");
+        }
+        sql.append(";");
+        LOG.debug("QUERY: " + sql);
+        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
+        int i = 1;
+        for (String arg : queryArgs) {
+            LOG.debug("       query param " + i + ": " + arg);
+            ps.setString(i++, arg);
+        }
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            String tableName = rs.getString("table_name");
+            String uri = rs.getString("uri");
+            tableNames.put(tableName, stringToUri(uri));
+        }
+        return tableNames;
+    }
+
+    /**
+     * Retrieves all attributes for the given vocabulary name, filtered by the
+     * given attribute names.
+     * 
+     * @param vocTableName
+     *            The name of the vocabulary table in which to look for the
+     *            attributes.
+     * @param vocName
+     *            The name (URI) of the vocabulary for which the attributes
+     *            should be retrieved.
+     * @param filterAttrNames
+     *            A possibly empty array of attribute names which should filter
+     *            the retrieved attributes.
+     * @return The attributes, a mapping from attribute name to attribute value.
+     * @throws SQLException
+     *             If an error accessing the database occured.
+     */
+    private Map<String, String> fetchAttributes(String vocTableName,
+            String vocName, String[] filterAttrNames) throws SQLException {
+        Map<String, String> attributes = new HashMap<String, String>();
+
+        List<String> queryArgs = new ArrayList<String>(filterAttrNames.length);
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT `attribute`, `value` FROM `voc_");
+        sql.append(vocTableName);
+        sql.append("_attr` AS attrTable WHERE attrTable.id=(");
+        sql.append("SELECT id FROM `voc_");
+        sql.append(vocTableName);
+        sql.append("` WHERE `uri`=?)");
+        queryArgs.add(vocName);
+        if (filterAttrNames.length > 0) {
+            // filter by attribute names
+            sql.append(" AND `attribute` IN (");
+            stringArrayToSQL(filterAttrNames, sql, queryArgs);
+            sql.append(");");
+        } else {
+            sql.append(";");
+        }
+        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
+        LOG.debug("QUERY: " + sql);
+        int i = 1;
+        for (String arg : queryArgs) {
+            LOG.debug("       query param " + i + ": " + arg);
+            ps.setString(i++, arg);
+        }
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            String attr = rs.getString("attribute");
+            String val = rs.getString("value");
+            attributes.put(attr, val);
+        }
+        return attributes;
+    }
+
+    /**
+     * Retrieves all children URI for the given vocabulary uri in the given
+     * vocabulary table.
+     * 
+     * @param vocTableName
+     *            The name of the vocabulary table in which to look for the
+     *            children uris.
+     * @param vocUri
+     *            The vocabulary uri string for which the children should be
+     *            retrieved.
+     * @return A List of URI containing the children.
+     * @throws SQLException
+     *             If a DB access error occured.
+     * @throws ImplementationException
+     *             If a String could not be converted into an URI.
+     */
+    private List<URI> fetchChildren(String vocTableName, String vocUri)
+            throws SQLException, ImplementationException {
+        List<URI> children = new ArrayList<URI>();
+
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT DISTINCT `uri` FROM `voc_");
+        sql.append(vocTableName);
+        sql.append("` AS vocTable WHERE vocTable.`uri` LIKE ?;");
+
+        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
+        String arg = vocUri + "_%";
+        LOG.debug("QUERY: " + sql);
+        LOG.debug("       query param 1: " + arg);
+        ps.setString(1, arg);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            URI uri = stringToUri(rs.getString("uri"));
+            children.add(uri);
+        }
+        return children;
+    }
+
     /**
      * Returns the standard version.
      * 
@@ -2059,5 +2195,4 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             }
         }
     }
-
 }
