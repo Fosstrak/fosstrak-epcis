@@ -3,8 +3,11 @@ package org.accada.epcis.utils;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -13,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.accada.epcis.soapapi.ActionType;
 import org.accada.epcis.soapapi.AggregationEventExtensionType;
 import org.accada.epcis.soapapi.AggregationEventType;
+import org.accada.epcis.soapapi.AttributeType;
 import org.accada.epcis.soapapi.BusinessLocationType;
 import org.accada.epcis.soapapi.BusinessTransactionType;
 import org.accada.epcis.soapapi.EPC;
@@ -29,6 +33,7 @@ import org.accada.epcis.soapapi.QueryResultsExtensionType;
 import org.accada.epcis.soapapi.ReadPointType;
 import org.accada.epcis.soapapi.TransactionEventExtensionType;
 import org.accada.epcis.soapapi.TransactionEventType;
+import org.accada.epcis.soapapi.VocabularyElementType;
 import org.accada.epcis.soapapi.VocabularyType;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
@@ -49,7 +54,6 @@ import org.w3c.dom.NodeList;
 public class QueryResultsParser {
 
     private static final Logger LOG = Logger.getLogger(QueryResultsParser.class);
-
 
     /**
      * A helper method to parse and convert the XML representation of an EPCIS
@@ -73,9 +77,28 @@ public class QueryResultsParser {
                 0);
 
         if (!queryName.getTextContent().equals("SimpleEventQuery")) {
-            throw new UnsupportedOperationException("Only queries of type "
-                    + "SimpleEventQuery are supported.");
-            // TODO (marco) handle SimpleMasterDataQuery here
+            Element vocList = (Element) epcisq.getElementsByTagName(
+                    "VocabularyList").item(0);
+            VocabularyType[] vocs = null;
+            if (vocList != null) {
+                NodeList vocsList = vocList.getElementsByTagName("Vocabulary");
+                if (vocsList != null && vocsList.getLength() != 0) {
+                    vocs = handleVocabularies(vocsList);
+                }
+            }
+
+            EventListType eventList = null;
+            QueryResultsBody queryResultsBody = new QueryResultsBody(eventList,
+                    vocs);
+
+            // no extensions implemented!
+            QueryResultsExtensionType queryResultsExtension = null;
+
+            String queryNam = queryName.getTextContent();
+            String subscriptionId = null;
+            MessageElement[] message = null;
+            queryResults = new QueryResults(queryNam, subscriptionId,
+                    queryResultsBody, queryResultsExtension, message);
         } else {
             Element eventList = (Element) epcisq.getElementsByTagName(
                     "EventList").item(0);
@@ -115,7 +138,6 @@ public class QueryResultsParser {
                     aggrEvents, quantEvents, transEvents, epcisEventList,
                     message);
 
-            // TODO marco: parse vocabulary from xml
             VocabularyType[] vocabulary = null;
             QueryResultsBody queryResultsBody = new QueryResultsBody(
                     eventListType, vocabulary);
@@ -157,17 +179,19 @@ public class QueryResultsParser {
 
             // TODO parse message element
             List<MessageElement> messages = new ArrayList<MessageElement>();
-            Node temperature = objectEvent.getElementsByTagName("hls:temperature").item(0);
+            Node temperature = objectEvent.getElementsByTagName(
+                    "hls:temperature").item(0);
             if (temperature != null) {
                 MessageElement me = new MessageElement("temperature", "hls",
                         "http://schema.hls.com/extension");
                 me.setValue(temperature.getTextContent());
                 messages.add(me);
             }
-            Node batchNumber = objectEvent.getElementsByTagName("hls:batchNumber").item(0);
+            Node batchNumber = objectEvent.getElementsByTagName(
+                    "hls:batchNumber").item(0);
             if (batchNumber != null) {
                 MessageElement me = new MessageElement("batchNumber", "hls",
-                "http://schema.hls.com/extension");
+                        "http://schema.hls.com/extension");
                 me.setValue(batchNumber.getTextContent());
                 messages.add(me);
             }
@@ -428,7 +452,8 @@ public class QueryResultsParser {
         return list.toArray(aggrEvent);
     }
 
-    private static QuantityEventType[] handleQuantityEvents(NodeList quantityEventList) {
+    private static QuantityEventType[] handleQuantityEvents(
+            NodeList quantityEventList) {
         Vector<QuantityEventType> list = new Vector<QuantityEventType>();
 
         for (int i = 0; i < quantityEventList.getLength(); i++) {
@@ -516,6 +541,86 @@ public class QueryResultsParser {
         return list.toArray(quantityEvent);
     }
 
+    private static VocabularyType[] handleVocabularies(NodeList vocList) {
+        List<VocabularyType> vocabularies = new ArrayList<VocabularyType>();
+
+        for (int i = 0; i < vocList.getLength(); i++) {
+            Element vocElem = (Element) vocList.item(i);
+
+            // get 'type' attribute
+            Node vocTypeNode = vocElem.getAttributeNode("type");
+            URI vocType = handleUri(vocTypeNode);
+
+            // parse <VocabularyElement>
+            List<VocabularyElementType> vocElementList = new ArrayList<VocabularyElementType>();
+            NodeList vocElementNodeList = vocElem.getElementsByTagName("VocabularyElement");
+            for (int j = 0; j < vocElementNodeList.getLength(); j++) {
+                Element vocElementElem = (Element) vocElementNodeList.item(j);
+
+                Node vocIdNode = vocElementElem.getAttributeNode("id");
+                URI vocId = handleUri(vocIdNode);
+
+                // parse <attribute>
+                List<AttributeType> attrList = new ArrayList<AttributeType>();
+                NodeList attrNodeList = vocElementElem.getElementsByTagName("attribute");
+                for (int k = 0; k < attrNodeList.getLength(); k++) {
+                    Element attrElem = (Element) attrNodeList.item(k);
+
+                    Node attrIdNode = attrElem.getAttributeNode("id");
+                    URI attrId = handleUri(attrIdNode);
+
+                    // FIXME marco: handle content (=attr value)
+
+                    AttributeType attr = new AttributeType();
+                    attr.setId(attrId);
+                    attrList.add(attr);
+                }
+                AttributeType[] attrs = null;
+                if (attrList.size() > 0) {
+                    attrs = new AttributeType[attrList.size()];
+                    attrs = attrList.toArray(attrs);
+                }
+
+                // parse <children>
+                List<URI> childList = new ArrayList<URI>();
+                NodeList childNodeList = vocElementElem.getElementsByTagName("children");
+                for (int k = 0; k < childNodeList.getLength(); k++) {
+                    Element childElem = (Element) childNodeList.item(k);
+                    
+                    NodeList childIdList = childElem.getElementsByTagName("id");
+                    for (int l = 0; l< childIdList.getLength(); l++) {
+                        Node childIdNode = childIdList.item(l);
+                        URI childId = handleUri(childIdNode);
+                        childList.add(childId);
+                    }
+                }
+                URI[] children = null;
+                if (childList.size() > 0) {
+                    children = new URI[childList.size()];
+                    children = childList.toArray(children);
+                }
+
+                VocabularyElementType vocElement = new VocabularyElementType();
+                vocElement.setAttribute(attrs);
+                vocElement.setChildren(children);
+                vocElement.setExtension(null);
+                vocElement.setId(vocId);
+
+                vocElementList.add(vocElement);
+            }
+
+            VocabularyElementType[] vocElements = new VocabularyElementType[vocElementList.size()];
+            vocElements = vocElementList.toArray(vocElements);
+
+            VocabularyType voc = new VocabularyType();
+            voc.setType(vocType);
+            voc.setVocabularyElementList(vocElements);
+            vocabularies.add(voc);
+        }
+        VocabularyType[] vocs = new VocabularyType[vocabularies.size()];
+        return vocabularies.toArray(vocs);
+    }
+
     private static ActionType handleAction(Node actionNode) {
         ActionType action = null;
         if (actionNode != null) {
@@ -564,7 +669,8 @@ public class QueryResultsParser {
         return cal;
     }
 
-    private static BusinessTransactionType[] handleBizTransList(Node bizTransListNode) {
+    private static BusinessTransactionType[] handleBizTransList(
+            Node bizTransListNode) {
         BusinessTransactionType[] bizTransList = null;
         if (bizTransListNode != null) {
             List<BusinessTransactionType> bizList = new Vector<BusinessTransactionType>();
@@ -599,18 +705,84 @@ public class QueryResultsParser {
         }
         return uri;
     }
-    
 
-    public static void compareResults(QueryResults expResults, QueryResults actResults) {
+    public static void compareResults(QueryResults expResults,
+            QueryResults actResults) {
+        assertEquals(expResults == null, actResults == null);
         assertEquals(expResults.get_any(), actResults.get_any());
         assertEquals(expResults.getExtension(), actResults.getExtension());
         assertEquals(expResults.getQueryName(), actResults.getQueryName());
         assertEquals(expResults.getSubscriptionID(),
                 actResults.getSubscriptionID());
 
+        VocabularyType[] expVocabularies = expResults.getResultsBody().getVocabularyList();
+        VocabularyType[] actVocabularies = actResults.getResultsBody().getVocabularyList();
+        assertEquals(expVocabularies == null, actVocabularies == null);
+        if (actVocabularies != null) {
+            compareVocabularies(expVocabularies, actVocabularies);
+        }
+
         EventListType actEvents = actResults.getResultsBody().getEventList();
         EventListType expEvents = expResults.getResultsBody().getEventList();
+        assertEquals(actEvents == null, expEvents == null);
+        if (actEvents != null) {
+            compareEvents(expEvents, actEvents);
+        }
+    }
 
+    private static void compareVocabularies(VocabularyType[] expVocs,
+            VocabularyType[] actVocs) {
+        assertEquals(expVocs.length, actVocs.length);
+        for (int i = 0; i < expVocs.length; i++) {
+            assertEquals(expVocs[i].getType(), actVocs[i].getType());
+
+            VocabularyElementType[] expVocList = expVocs[i].getVocabularyElementList();
+            VocabularyElementType[] actVocList = actVocs[i].getVocabularyElementList();
+            assertEquals(expVocList == null, actVocList == null);
+            assertEquals(expVocList.length, actVocList.length);
+
+            // make map to ensure same order of elements
+            Map<URI, VocabularyElementType> expVocMap = new HashMap<URI, VocabularyElementType>();
+            for (int k = 0; k < expVocList.length; k++) {
+                expVocMap.put(expVocList[k].getId(), expVocList[k]);
+            }
+            for (int j = 0; j < actVocList.length; j++) {
+                VocabularyElementType actVoc = actVocList[j];
+                VocabularyElementType expVoc = expVocMap.get(actVoc.getId());
+                assertEquals(expVoc == null, actVoc == null);
+                assertEquals(expVoc.getId(), actVoc.getId());
+
+                AttributeType[] expAttrs = expVoc.getAttribute();
+                AttributeType[] actAttrs = actVoc.getAttribute();
+                assertEquals(expAttrs == null, actAttrs == null);
+                if (expAttrs != null) {
+                    assertEquals(expAttrs.length, actAttrs.length);
+                    List<URI> expAttrIdList = new ArrayList<URI>();
+                    for (int k = 0; k < actAttrs.length; k++) {
+                        expAttrIdList.add(expAttrs[k].getId());
+                    }
+                    for (int k = 0; k < actAttrs.length; k++) {
+                        assertTrue(expAttrIdList.contains(actAttrs[k].getId()));
+                    }
+                    // FIXME marco: compare also attr value
+                }
+
+                URI[] expChildren = expVoc.getChildren();
+                URI[] actChildren = actVoc.getChildren();
+                assertEquals(expChildren == null, actChildren == null);
+                if (expChildren != null) {
+                    assertEquals(expChildren.length, actChildren.length);
+                    List<URI> expChildIdList = Arrays.asList(expChildren);
+                    for (int k = 0; k < actChildren.length; k++) {
+                        assertTrue(expChildIdList.contains(actChildren[k]));
+                    }
+                }
+            }
+        }
+    }
+
+    private static void compareEvents(EventListType actEvents,
+            EventListType expEvents) {
         // compare ObjectEvent
         ObjectEventType[] actObjectEvent = actEvents.getObjectEvent();
         ObjectEventType[] expObjectEvent = expEvents.getObjectEvent();
@@ -820,6 +992,13 @@ public class QueryResultsParser {
         if (expected != null && expected.equals(actual)) {
             return;
         }
-        throw new AssertionError("expected:<"+expected+"> but was:<"+actual+">");
+        throw new AssertionError("expected:<" + expected + "> but was:<"
+                + actual + ">");
+    }
+
+    private static void assertTrue(boolean check) {
+        if (!check) {
+            throw new AssertionError();
+        }
     }
 }
