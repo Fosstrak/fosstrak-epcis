@@ -36,11 +36,25 @@ BEGIN;
 
 SET storage_engine=INNODB;
 
+
 -- Vocabularies --
+
+
+CREATE TABLE `Vocabularies` (  -- maps vocabulary tpyes to their table names
+`id` bigint PRIMARY KEY auto_increment,
+`uri` varchar(1023) NOT NULL,  -- uri of vocabulary Type
+`table_name` varchar(128) NOT NULL
+);
 
 CREATE TABLE `voc_BizLoc` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `uri` varchar(1023) NOT NULL 
+);
+
+CREATE TABLE `voc_BizLoc_attr` (
+`id` bigint NOT NULL REFERENCES `voc_BizLoc`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
 );
 
 CREATE TABLE `voc_BizStep` (
@@ -48,9 +62,21 @@ CREATE TABLE `voc_BizStep` (
 `uri` varchar(1023) NOT NULL 
 );
 
+CREATE TABLE `voc_BizStep_attr` (
+`id` bigint NOT NULL REFERENCES `voc_BizStep`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
+);
+
 CREATE TABLE `voc_BizTransType` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `uri` varchar(1023) NOT NULL 
+);
+
+CREATE TABLE `voc_BizTransType_attr` (
+`id` bigint NOT NULL REFERENCES `voc_BizTransType`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
 );
 
 CREATE TABLE `voc_BizTrans` (
@@ -58,9 +84,21 @@ CREATE TABLE `voc_BizTrans` (
 `uri` varchar(1023) NOT NULL 
 );
 
+CREATE TABLE `voc_BizTrans_attr` (
+`id` bigint NOT NULL REFERENCES `voc_BizTrans`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
+);
+
 CREATE TABLE `voc_Disposition` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `uri` varchar(1023) NOT NULL 
+);
+
+CREATE TABLE `voc_Disposition_attr` (
+`id` bigint NOT NULL REFERENCES `voc_Disposition`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
 );
 
 CREATE TABLE `voc_ReadPoint` (
@@ -68,9 +106,21 @@ CREATE TABLE `voc_ReadPoint` (
 `uri` varchar(1023) NOT NULL 
 );
 
+CREATE TABLE `voc_ReadPoint_attr` (
+`id` bigint NOT NULL REFERENCES `voc_ReadPoint`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
+);
+
 CREATE TABLE `voc_EPCClass` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `uri` varchar(1023) NOT NULL 
+);
+
+CREATE TABLE `voc_EPCClass_attr` (
+`id` bigint NOT NULL REFERENCES `voc_EPCClass`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
 );
 
 
