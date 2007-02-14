@@ -21,7 +21,9 @@
     <module>epcis-repository</module>
     <module>epcis-queryclient</module>
     <module>epcis-captureclient</module>
+    <!--
     <module>epcis-interop-test</module>
+    -->
   </modules>
 
 
