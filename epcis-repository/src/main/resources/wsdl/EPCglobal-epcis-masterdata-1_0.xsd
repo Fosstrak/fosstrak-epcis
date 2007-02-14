@@ -79,6 +79,13 @@
 	<xsd:complexType name="AttributeType">
 		<xsd:complexContent>
 			<xsd:extension base="xsd:anyType">
+				<!--
+					The following sequence element is an adaption to the specified schema necessary
+					because the Axis generated code does not provide means to add any attribute value.
+				-->
+				<xsd:sequence>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
 				<xsd:attribute name="id" type="xsd:anyURI" use="required"/>
 				<xsd:anyAttribute processContents="lax"/>
 			</xsd:extension>

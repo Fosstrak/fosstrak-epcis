@@ -73,6 +73,7 @@ import org.accada.epcis.soapapi.VoidHolder;
 import org.accada.epcis.utils.TimeParser;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.message.Text;
 import org.apache.axis.types.URI;
 import org.apache.log4j.Logger;
 
@@ -1857,9 +1858,12 @@ public class EpcisQueryInterface implements EPCISServicePortType {
                     for (String attrId : attrMap.keySet()) {
                         AttributeType attr = new AttributeType();
                         attr.setId(stringToUri(attrId));
-                        // FIXME marco: set also attr value
-                        // problem: in AttributeType (which should extend
-                        // xsd:anyType), there is no possibility to set a value
+                        String attrValue = attrMap.get(attrId);
+                        // attr value must be set with a text message element
+                        MessageElement[] val = new MessageElement[] {
+                            new MessageElement(new Text(attrValue))
+                        };
+                        attr.set_any(val);
                         attrList.add(attr);
                     }
                     if (attrList.size() > 0) {
@@ -2006,7 +2010,10 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             if (maxElementCount > -1 && count > maxElementCount) {
                 String msg = "Actual number of vocabulary elements exceeds specified 'maxElementCount'.";
                 LOG.info("USER ERROR: " + msg);
-                throw new QueryTooLargeException();
+                QueryTooLargeException qtle = new QueryTooLargeException();
+                qtle.setReason(msg);
+                qtle.setQueryName("SimpleMasterDataQuery");
+                throw qtle;
             }
             URI uri = stringToUri(rs.getString("uri"));
             vocs.add(uri);
