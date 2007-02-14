@@ -99,21 +99,23 @@ public class SoapPreHandler extends BasicHandler {
      */
     @Override
     public void onFault(MessageContext msgContext) {
+        LOG.info("There was an Axis Fault. If this was not an intended 'USER ERROR' check the axis log for more details.");
+        
         try {
             Connection dbconnection = (Connection) msgContext.getProperty("dbconnection");
             dbconnection.close();
             LOG.info("Database connection successfully closed.");
-
-            Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
-            HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
-            servlet.getServletContext().setAttribute("subscribedMap",
-                    subscribedMap);
-            LOG.info("Subscriptions stored to servlet context.");
         } catch (SQLException e) {
             String msg = "Unable to close the database connection: "
                     + e.getMessage();
             LOG.error(msg, e);
         }
+
+        Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
+        HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
+        servlet.getServletContext().setAttribute("subscribedMap",
+                subscribedMap);
+        LOG.info("Subscriptions stored to servlet context.");
     }
 
 }
