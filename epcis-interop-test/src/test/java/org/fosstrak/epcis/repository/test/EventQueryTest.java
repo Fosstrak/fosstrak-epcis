@@ -14,7 +14,6 @@ import org.accada.epcis.soapapi.QueryParameterException;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.utils.QueryResultsParser;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * @author Marco Steybe
@@ -28,15 +27,7 @@ public class EventQueryTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response-1-poll.xml";
 
-    QueryClientInterface client;
-
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    public void setUp() {
-        PropertyConfigurator.configure("src/test/resources/conf/log4j.properties");
-        client = new QueryClientSoapImpl();
-    }
+    QueryClientInterface client = new QueryClientSoapImpl();
 
     /**
      * Tests the GE_eventTime attribute.

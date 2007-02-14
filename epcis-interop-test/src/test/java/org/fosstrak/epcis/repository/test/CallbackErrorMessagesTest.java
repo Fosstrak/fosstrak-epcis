@@ -24,14 +24,7 @@ public class CallbackErrorMessagesTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryClientInterface client;
-
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    public void setUp() {
-        client = new QueryClientSoapImpl();
-    }
+    private QueryClientInterface client = new QueryClientSoapImpl();
 
     /**
      * Tests if QueryTooLargeException is raised (callback).

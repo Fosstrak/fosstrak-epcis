@@ -30,14 +30,7 @@ public class ErrorMessagesTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryClientInterface client;
-
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    public void setUp() {
-        client = new QueryClientSoapImpl();
-    }
+    private QueryClientInterface client = new QueryClientSoapImpl();
 
     /**
      * Tests if QueryTooComplexException is raised.

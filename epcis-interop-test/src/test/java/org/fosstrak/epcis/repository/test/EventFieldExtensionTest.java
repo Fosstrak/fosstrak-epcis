@@ -33,20 +33,17 @@ public class EventFieldExtensionTest extends TestCase {
         // send event1
         CaptureInterfaceClient captureClient = new CaptureInterfaceClient();
         String resp = captureClient.sendEvent(event1);
-        System.out.println(resp);
         assertEquals("200 OK: Request succeeded.", resp);
 
         // send event2
         resp = captureClient.sendEvent(event2);
-        System.out.println(resp);
         assertEquals("200 OK: Request succeeded.", resp);
 
         // send query
         QueryClientInterface queryClient = new QueryClientSoapImpl();
         queryClient.runQuery(new ByteArrayInputStream(query.getBytes()));
 
-        System.out.println("Check response in TCPMonitor. Should contain the following ObjectEvent:\n");
-        System.out.println(response);
+        // TODO check response!
     }
 
     /**

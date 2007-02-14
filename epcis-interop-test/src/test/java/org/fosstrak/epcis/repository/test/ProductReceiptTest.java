@@ -21,7 +21,6 @@ import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.TransactionEventType;
 import org.accada.epcis.utils.QueryResultsParser;
 import org.apache.axis.message.MessageElement;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * @author Marco Steybe
@@ -35,15 +34,7 @@ public class ProductReceiptTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response.xml";
 
-    QueryClientInterface client;
-
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    public void setUp() {
-        PropertyConfigurator.configure("src/test/resources/conf/log4j.properties");
-        client = new QueryClientSoapImpl();
-    }
+    QueryClientInterface client = new QueryClientSoapImpl();
 
     public void testSE4() throws IOException, ServiceException {
         int testNr = 4;

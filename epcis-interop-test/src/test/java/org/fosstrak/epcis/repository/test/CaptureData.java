@@ -7,8 +7,6 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.accada.epcis.captureclient.CaptureInterfaceClient;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * @author Marco Steybe
@@ -28,22 +26,7 @@ public class CaptureData extends TestCase {
     private static final String RECEIVE_ORDER_XML = "src/test/resources/events/7_receive_order_events.xml";
     private static final String STORE_INVENTORY_XML = "src/test/resources/events/8_store_inventory_events.xml";
 
-    /**
-     * The logger for this class.
-     */
-    private static Logger LOG = Logger.getLogger(CaptureData.class);
-
-    private static final String LOG4J_CONFIG_FILE = "src/test/resources/conf/log4j.properties";
-
-    private CaptureInterfaceClient client;
-
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    public void setUp() {
-        PropertyConfigurator.configure(LOG4J_CONFIG_FILE);
-        client = new CaptureInterfaceClient();
-    }
+    private CaptureInterfaceClient client = new CaptureInterfaceClient();
 
     /**
      * Testing events: Test 1.
@@ -58,11 +41,9 @@ public class CaptureData extends TestCase {
         fis.read(xml);
 
         String eventXml = new String(xml);
-        LOG.debug(eventXml);
 
         // send the data
         String response = client.sendEvent(eventXml);
-        LOG.debug(response);
         assertEquals("200 OK: Request succeeded.", response);
     }
 
