@@ -1,7 +1,4 @@
-/**
- * 
- */
-package org.accada.epcis.repository.wrapper;
+package org.accada.epcis.repository;
 
 import java.sql.Timestamp;
 
@@ -9,6 +6,8 @@ import org.accada.epcis.utils.TimeParser;
 import org.apache.log4j.Logger;
 
 /**
+ * A simple representation for an event field extension.
+ * 
  * @author Marco Steybe
  */
 public class EventFieldExtension {
@@ -26,7 +25,9 @@ public class EventFieldExtension {
     private String strValue = null;
 
     /**
-     * Constructs a new EventFieldExtension from the parameters.
+     * Constructs a new EventFieldExtension from the parameters. The value will
+     * be parsed to see if it represents an integer, a float, a date, or a
+     * string.
      * 
      * @param prefix
      *            The prefix of the event field.

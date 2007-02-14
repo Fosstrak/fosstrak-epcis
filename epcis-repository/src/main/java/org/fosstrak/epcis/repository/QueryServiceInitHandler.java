@@ -26,7 +26,7 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  * @author Marco Steybe
  */
-public class SoapPreHandler extends BasicHandler {
+public class QueryServiceInitHandler extends BasicHandler {
 
     private static final long serialVersionUID = 8796489572394952784L;
 

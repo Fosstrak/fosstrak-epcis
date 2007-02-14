@@ -39,11 +39,10 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.accada.epcis.repository.wrapper.BusinessTransaction;
-import org.accada.epcis.repository.wrapper.EventFieldExtension;
-import org.accada.epcis.repository.wrapper.Vocabulary;
-import org.accada.epcis.repository.wrapper.Vocabulary.VociSyntaxException;
+import org.accada.epcis.soapapi.BusinessTransactionType;
 import org.accada.epcis.utils.TimeParser;
+import org.apache.axis.types.URI;
+import org.apache.axis.types.URI.MalformedURIException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
@@ -384,14 +383,14 @@ public class EpcisCaptureInterface extends HttpServlet {
         String action = null;
         String parentID = null;
         Long quantity = null;
-        Vocabulary bizStep = null;
-        Vocabulary disposition = null;
-        Vocabulary readPoint = null;
-        Vocabulary bizLocation = null;
-        Vocabulary epcClass = null;
+        URI bizStep = null;
+        URI disposition = null;
+        URI readPoint = null;
+        URI bizLocation = null;
+        URI epcClass = null;
 
-        Vocabulary[] epcs = null;
-        List<BusinessTransaction> bizTransactionList = null;
+        URI[] epcs = null;
+        List<BusinessTransactionType> bizTransactionList = null;
         List<EventFieldExtension> fieldNameExtList = new ArrayList<EventFieldExtension>();
 
         try {
@@ -432,19 +431,19 @@ public class EpcisCaptureInterface extends HttpServlet {
                                 "Encountered illegal 'action' value: " + action);
                     }
                 } else if (nodeName.equals("bizStep")) {
-                    bizStep = new Vocabulary(curEventNode.getTextContent());
+                    bizStep = new URI(curEventNode.getTextContent());
                 } else if (nodeName.equals("disposition")) {
-                    disposition = new Vocabulary(curEventNode.getTextContent());
+                    disposition = new URI(curEventNode.getTextContent());
                 } else if (nodeName.equals("readPoint")) {
                     Element attrElem = (Element) curEventNode;
                     Node id = attrElem.getElementsByTagName("id").item(0);
-                    readPoint = new Vocabulary(id.getTextContent());
+                    readPoint = new URI(id.getTextContent());
                 } else if (nodeName.equals("bizLocation")) {
                     Element attrElem = (Element) curEventNode;
                     Node id = attrElem.getElementsByTagName("id").item(0);
-                    bizLocation = new Vocabulary(id.getTextContent());
+                    bizLocation = new URI(id.getTextContent());
                 } else if (nodeName.equals("epcClass")) {
-                    epcClass = new Vocabulary(curEventNode.getTextContent());
+                    epcClass = new URI(curEventNode.getTextContent());
                 } else if (nodeName.equals("quantity")) {
                     quantity = new Long(curEventNode.getTextContent());
                 } else if (nodeName.equals("parentID")) {
@@ -468,7 +467,7 @@ public class EpcisCaptureInterface extends HttpServlet {
                     }
                 }
             }
-        } catch (VociSyntaxException e) {
+        } catch (MalformedURIException e) {
             throw new SAXException("  event field '"
                     + curEventNode.getNodeName() + "' is not of type URI: "
                     + curEventNode.getTextContent(), e);
@@ -607,7 +606,7 @@ public class EpcisCaptureInterface extends HttpServlet {
 
             // insert all BizTransactions into the BusinessTransaction-Table
             // and connect it with the "event_<event-name>_bizTrans"-Table
-            for (final BusinessTransaction bizTrans : bizTransactionList) {
+            for (final BusinessTransactionType bizTrans : bizTransactionList) {
                 long bTrans = insertBusinessTransaction(bizTrans);
                 ps.setLong(2, bTrans);
                 LOG.debug("       query param 2: " + bTrans);
@@ -653,7 +652,7 @@ public class EpcisCaptureInterface extends HttpServlet {
      *             If an SQL problem with the database ocurred or if we are not
      *             allowed to insert a missing vocabulary.
      */
-    private long insertVocabulary(final String tableName, final Vocabulary uri)
+    private long insertVocabulary(final String tableName, final URI uri)
             throws SQLException {
         String stmt = "SELECT id FROM " + tableName + " WHERE uri=?";
         PreparedStatement ps = dbconnection.prepareStatement(stmt);
@@ -691,19 +690,19 @@ public class EpcisCaptureInterface extends HttpServlet {
      * @param epcNode
      *            The parent Node from which EPC URIs should be extracted.
      * @return An array of Voci containing all the URIs found in the given node.
-     * @throws VociSyntaxException
+     * @throws MalformedURIException
      *             If a string is not parsable as URI.
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private Vocabulary[] handleEpcs(final Node epcNode)
-            throws VociSyntaxException, SAXParseException {
-        List<Vocabulary> epcList = new ArrayList<Vocabulary>();
+    private URI[] handleEpcs(final Node epcNode)
+            throws MalformedURIException, SAXParseException {
+        List<URI> epcList = new ArrayList<URI>();
 
         for (int i = 0; i < epcNode.getChildNodes().getLength(); i++) {
             Node curNode = epcNode.getChildNodes().item(i);
             if (curNode.getNodeName().equals("epc")) {
-                epcList.add(new Vocabulary(curNode.getTextContent()));
+                epcList.add(new URI(curNode.getTextContent()));
             } else {
                 if (curNode.getNodeName() != "#text"
                         && curNode.getNodeName() != "#comment") {
@@ -713,7 +712,7 @@ public class EpcisCaptureInterface extends HttpServlet {
             }
         }
 
-        Vocabulary[] epcs = new Vocabulary[epcList.size()];
+        URI[] epcs = new URI[epcList.size()];
         epcList.toArray(epcs);
 
         return epcs;
@@ -727,22 +726,23 @@ public class EpcisCaptureInterface extends HttpServlet {
      *            The parent Node from which BizTransaction URIs should be
      *            extracted.
      * @return A List of BizTransaction.
-     * @throws VociSyntaxException
+     * @throws MalformedURIException
      *             If a string is not parsable as URI.
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private List<BusinessTransaction> handleBizTransactions(final Node bizNode)
-            throws VociSyntaxException, SAXParseException {
-        final List<BusinessTransaction> bizList = new ArrayList<BusinessTransaction>();
+    private List<BusinessTransactionType> handleBizTransactions(final Node bizNode)
+            throws MalformedURIException, SAXParseException {
+        final List<BusinessTransactionType> bizList = new ArrayList<BusinessTransactionType>();
 
         for (int i = 0; i < bizNode.getChildNodes().getLength(); i++) {
             Node curNode = bizNode.getChildNodes().item(i);
             if (curNode.getNodeName().equals("bizTransaction")) {
                 String bizTransType = curNode.getAttributes().item(0).getTextContent();
                 String bizTrans = curNode.getTextContent();
-                BusinessTransaction bt = new BusinessTransaction(
-                        new Vocabulary(bizTransType), new Vocabulary(bizTrans));
+                BusinessTransactionType bt = new BusinessTransactionType();
+                bt.setValue(new URI(bizTrans));
+                bt.setType(new URI(bizTransType));
                 bizList.add(bt);
             } else {
                 if (!curNode.getNodeName().equals("#text")
@@ -765,12 +765,12 @@ public class EpcisCaptureInterface extends HttpServlet {
      * @throws SQLException
      *             If an SQL problem with the database ocurred.
      */
-    private long insertBusinessTransaction(final BusinessTransaction bizTrans)
+    private long insertBusinessTransaction(final BusinessTransactionType bizTrans)
             throws SQLException {
         final long id = insertVocabulary("voc_BizTrans",
-                bizTrans.getBizTransID());
+                bizTrans.getValue());
         final long type = insertVocabulary("voc_BizTransType",
-                bizTrans.getBizTransType());
+                bizTrans.getType());
 
         String stmt = "SELECT id FROM BizTransaction WHERE bizTrans=? AND type=?";
         PreparedStatement ps = dbconnection.prepareStatement(stmt);

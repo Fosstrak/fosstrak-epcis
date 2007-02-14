@@ -20,10 +20,10 @@ import org.apache.log4j.Logger;
 /**
  * @author Marco Steybe
  */
-public class SoapPostHandler extends BasicHandler {
+public class QueryServiceCleanupHandler extends BasicHandler {
 
     private static final long serialVersionUID = -1909122676446369360L;
-    private static final Logger LOG = Logger.getLogger(SoapPostHandler.class);
+    private static final Logger LOG = Logger.getLogger(QueryServiceCleanupHandler.class);
 
     /**
      * Invokes this SoapPostHandler which performs post processing for the EPCIS
