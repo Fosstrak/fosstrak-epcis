@@ -36,6 +36,7 @@ import org.accada.epcis.soapapi.TransactionEventType;
 import org.accada.epcis.soapapi.VocabularyElementType;
 import org.accada.epcis.soapapi.VocabularyType;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.message.Text;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
 import org.apache.log4j.Logger;
@@ -569,10 +570,14 @@ public class QueryResultsParser {
                     Node attrIdNode = attrElem.getAttributeNode("id");
                     URI attrId = handleUri(attrIdNode);
 
-                    // FIXME marco: handle content (=attr value)
+                    String attrStringVal = attrElem.getTextContent();
+                    MessageElement[] attrVal = new MessageElement[] {
+                        new MessageElement(new Text(attrStringVal))
+                    };
 
                     AttributeType attr = new AttributeType();
                     attr.setId(attrId);
+                    attr.set_any(attrVal);
                     attrList.add(attr);
                 }
                 AttributeType[] attrs = null;
@@ -586,9 +591,9 @@ public class QueryResultsParser {
                 NodeList childNodeList = vocElementElem.getElementsByTagName("children");
                 for (int k = 0; k < childNodeList.getLength(); k++) {
                     Element childElem = (Element) childNodeList.item(k);
-                    
+
                     NodeList childIdList = childElem.getElementsByTagName("id");
-                    for (int l = 0; l< childIdList.getLength(); l++) {
+                    for (int l = 0; l < childIdList.getLength(); l++) {
                         Node childIdNode = childIdList.item(l);
                         URI childId = handleUri(childIdNode);
                         childList.add(childId);
@@ -757,14 +762,28 @@ public class QueryResultsParser {
                 assertEquals(expAttrs == null, actAttrs == null);
                 if (expAttrs != null) {
                     assertEquals(expAttrs.length, actAttrs.length);
-                    List<URI> expAttrIdList = new ArrayList<URI>();
-                    for (int k = 0; k < actAttrs.length; k++) {
-                        expAttrIdList.add(expAttrs[k].getId());
+                    Map<URI, AttributeType> expAttrMap = new HashMap<URI, AttributeType>();
+                    for (int k = 0; k < expAttrs.length; k++) {
+                        expAttrMap.put(expAttrs[k].getId(), expAttrs[k]);
                     }
                     for (int k = 0; k < actAttrs.length; k++) {
-                        assertTrue(expAttrIdList.contains(actAttrs[k].getId()));
+                        AttributeType actAttr = actAttrs[k];
+                        AttributeType expAttr = expAttrMap.get(actAttr.getId());
+                        assertEquals(expAttr == null, expAttr == null);
+                        assertEquals(expAttr.getId(), actAttr.getId());
+
+                        MessageElement[] expME = expAttr.get_any();
+                        MessageElement[] actME = actAttr.get_any();
+                        assertEquals(expME == null, actME == null);
+                        if (expME != null) {
+                            assertEquals(expME.length, actME.length);
+                            for (int l = 0; l < expME.length; l++) {
+                                assertEquals(expME[l].getNodeValue().trim(),
+                                        actME[l].getNodeValue().trim());
+                                ;
+                            }
+                        }
                     }
-                    // FIXME marco: compare also attr value
                 }
 
                 URI[] expChildren = expVoc.getChildren();

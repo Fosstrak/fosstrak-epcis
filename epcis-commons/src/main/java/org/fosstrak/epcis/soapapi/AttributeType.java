@@ -7,15 +7,39 @@
 
 package org.accada.epcis.soapapi;
 
-public class AttributeType  extends java.lang.Object  implements java.io.Serializable {
+public class AttributeType  extends java.lang.Object  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
+    private org.apache.axis.message.MessageElement [] _any;
+
     private org.apache.axis.types.URI id;  // attribute
 
     public AttributeType() {
     }
 
     public AttributeType(
-           org.apache.axis.types.URI id) {
+           org.apache.axis.types.URI id,
+           org.apache.axis.message.MessageElement [] _any) {
         this.id = id;
+        this._any = _any;
+    }
+
+
+    /**
+     * Gets the _any value for this AttributeType.
+     * 
+     * @return _any
+     */
+    public org.apache.axis.message.MessageElement [] get_any() {
+        return _any;
+    }
+
+
+    /**
+     * Sets the _any value for this AttributeType.
+     * 
+     * @param _any
+     */
+    public void set_any(org.apache.axis.message.MessageElement [] _any) {
+        this._any = _any;
     }
 
 
@@ -50,6 +74,9 @@ public class AttributeType  extends java.lang.Object  implements java.io.Seriali
         __equalsCalc = obj;
         boolean _equals;
         _equals = super.equals(obj) && 
+            ((this._any==null && other.get_any()==null) || 
+             (this._any!=null &&
+              java.util.Arrays.equals(this._any, other.get_any()))) &&
             ((this.id==null && other.getId()==null) || 
              (this.id!=null &&
               this.id.equals(other.getId())));
@@ -64,6 +91,17 @@ public class AttributeType  extends java.lang.Object  implements java.io.Seriali
         }
         __hashCodeCalc = true;
         int _hashCode = super.hashCode();
+        if (get_any() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(get_any());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(get_any(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
+        }
         if (getId() != null) {
             _hashCode += getId().hashCode();
         }
