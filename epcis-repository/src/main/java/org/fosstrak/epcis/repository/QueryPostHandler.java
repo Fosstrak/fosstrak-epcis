@@ -20,10 +20,10 @@ import org.apache.log4j.Logger;
 /**
  * @author Marco Steybe
  */
-public class QueryServiceCleanupHandler extends BasicHandler {
+public class QueryPostHandler extends BasicHandler {
 
     private static final long serialVersionUID = -1909122676446369360L;
-    private static final Logger LOG = Logger.getLogger(QueryServiceCleanupHandler.class);
+    private static final Logger LOG = Logger.getLogger(QueryPostHandler.class);
 
     /**
      * Invokes this SoapPostHandler which performs post processing for the EPCIS
@@ -43,7 +43,7 @@ public class QueryServiceCleanupHandler extends BasicHandler {
             dbconnection.close();
             LOG.info("Database connection successfully closed.");
 
-            Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
+            Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) msgContext.getProperty("subscribedMap");
             HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
             servlet.getServletContext().setAttribute("subscribedMap",
                     subscribedMap);

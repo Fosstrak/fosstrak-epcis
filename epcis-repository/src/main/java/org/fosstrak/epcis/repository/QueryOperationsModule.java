@@ -93,9 +93,9 @@ import org.apache.log4j.Logger;
  * @author Arthur van Dorp
  * @author Marco Steybe
  */
-public class EpcisQueryInterface implements EPCISServicePortType {
+public class QueryOperationsModule implements EPCISServicePortType {
 
-    private static final Logger LOG = Logger.getLogger(EpcisQueryInterface.class);
+    private static final Logger LOG = Logger.getLogger(QueryOperationsModule.class);
 
     /**
      * The version of the standard that this service is implementing.
@@ -207,7 +207,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             + "LEFT JOIN `event_TransactionEvent_extensions` ON `event_TransactionEvent`.id = `event_TransactionEvent_extensions`.event_id "
             + "WHERE 1 ";
 
-    public EpcisQueryInterface() {
+    public QueryOperationsModule() {
         LOG.info("EpcisQueryInterface invoked.");
         MessageContext msgContext = MessageContext.getCurrentContext();
         delimiter = (String) msgContext.getProperty("delimiter");
@@ -1351,9 +1351,9 @@ public class EpcisQueryInterface implements EPCISServicePortType {
             Schedule schedule = new Schedule(controls.getSchedule());
 
             // load subscriptions
-            Map<String, SubscriptionScheduled> subscribedMap = loadSubscriptions();
+            Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions();
 
-            SubscriptionScheduled newSubscription = new SubscriptionScheduled(
+            QuerySubscriptionScheduled newSubscription = new QuerySubscriptionScheduled(
                     subscrId, qParams, dest, controls.isReportIfEmpty(),
                     initialRecordTime, initialRecordTime, schedule, queryName);
 
@@ -1444,7 +1444,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      * @throws ImplementationException
      *             If a problem with the EPCIS implementation occured.
      */
-    private Map<String, SubscriptionScheduled> fetchSubscriptions()
+    private Map<String, QuerySubscriptionScheduled> fetchSubscriptions()
             throws SQLException, ImplementationException {
         String query = "SELECT * FROM subscription";
         LOG.debug("QUERY: " + query);
@@ -1453,7 +1453,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
         GregorianCalendar initrectime = new GregorianCalendar();
 
         ResultSet rs = stmt.executeQuery(query);
-        Map<String, SubscriptionScheduled> subscribedMap = new HashMap<String, SubscriptionScheduled>();
+        Map<String, QuerySubscriptionScheduled> subscribedMap = new HashMap<String, QuerySubscriptionScheduled>();
         while (rs.next()) {
             try {
                 String subscrId = rs.getString("subscriptionid");
@@ -1473,7 +1473,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
 
                 String queryName = rs.getString("queryname");
 
-                SubscriptionScheduled newSubscription = new SubscriptionScheduled(
+                QuerySubscriptionScheduled newSubscription = new QuerySubscriptionScheduled(
                         subscrId, params, dest, exportifempty, initrectime,
                         new GregorianCalendar(), sched, queryName);
                 subscribedMap.put(subscrId, newSubscription);
@@ -1509,12 +1509,12 @@ public class EpcisQueryInterface implements EPCISServicePortType {
     public VoidHolder unsubscribe(final Unsubscribe parms)
             throws ImplementationException, NoSuchSubscriptionException {
         try {
-            Map<String, SubscriptionScheduled> subscribedMap = loadSubscriptions();
+            Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions();
             String subscrId = parms.getSubscriptionID();
 
             if (subscribedMap.containsKey(subscrId)) {
                 // remove subscription from local hash map
-                SubscriptionScheduled toDelete = subscribedMap.get(subscrId);
+                QuerySubscriptionScheduled toDelete = subscribedMap.get(subscrId);
                 toDelete.stopSubscription();
                 subscribedMap.remove(subscrId);
                 saveSubscriptions(subscribedMap);
@@ -1553,7 +1553,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      *            The map with the subscriptions.
      */
     private void saveSubscriptions(
-            final Map<String, SubscriptionScheduled> subscribedMap) {
+            final Map<String, QuerySubscriptionScheduled> subscribedMap) {
         MessageContext msgContext = MessageContext.getCurrentContext();
         msgContext.setProperty("subscribedMap", subscribedMap);
     }
@@ -1565,10 +1565,10 @@ public class EpcisQueryInterface implements EPCISServicePortType {
      * @throws ImplementationException
      *             If the map could not be reloaded.
      */
-    private Map<String, SubscriptionScheduled> loadSubscriptions()
+    private Map<String, QuerySubscriptionScheduled> loadSubscriptions()
             throws ImplementationException, SQLException {
         MessageContext msgContext = MessageContext.getCurrentContext();
-        Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
+        Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) msgContext.getProperty("subscribedMap");
         if (subscribedMap == null) {
             subscribedMap = fetchSubscriptions();
         }
@@ -1588,7 +1588,7 @@ public class EpcisQueryInterface implements EPCISServicePortType {
     public ArrayOfString getSubscriptionIDs(final GetSubscriptionIDs parms)
             throws ImplementationException {
         try {
-            Map<String, SubscriptionScheduled> subscribedMap = loadSubscriptions();
+            Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions();
             String[] temp = {};
             temp = subscribedMap.keySet().toArray(temp);
             ArrayOfString arrOfStr = new ArrayOfString();

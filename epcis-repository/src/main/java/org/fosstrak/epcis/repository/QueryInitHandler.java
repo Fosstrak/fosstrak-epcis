@@ -26,7 +26,7 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  * @author Marco Steybe
  */
-public class QueryServiceInitHandler extends BasicHandler {
+public class QueryInitHandler extends BasicHandler {
 
     private static final long serialVersionUID = 8796489572394952784L;
 
@@ -69,7 +69,7 @@ public class QueryServiceInitHandler extends BasicHandler {
             LOG.debug("Resolved string delimiter used to quote SQL identifiers as '"
                     + delimiter + "'.");
 
-            Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) ctx.getAttribute("subscribedMap");
+            Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) ctx.getAttribute("subscribedMap");
 
             msgContext.setProperty("dbconnection", dbconnection);
             msgContext.setProperty("delimiter", delimiter);
@@ -111,7 +111,7 @@ public class QueryServiceInitHandler extends BasicHandler {
             LOG.error(msg, e);
         }
 
-        Map<String, SubscriptionScheduled> subscribedMap = (HashMap<String, SubscriptionScheduled>) msgContext.getProperty("subscribedMap");
+        Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) msgContext.getProperty("subscribedMap");
         HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
         servlet.getServletContext().setAttribute("subscribedMap",
                 subscribedMap);

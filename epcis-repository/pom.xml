@@ -172,14 +172,14 @@
             -->
                 <!--
                 Tie EPCISServiceBindingSkeleton to our existing
-                EpcisQueryInterface implementation and delete
+                QueryOperationsModule implementation and delete
                 unneeded class.
                 -->
             <!--
                 <replace
                   file="target/generated-sources/main/java/${directory.structure.soapapi}/EPCISServiceBindingSkeleton.java"
                   token="new ${package.structure.soapapi}.EPCISServiceBindingImpl"
-                  value="new ${package.structure.repository}.EpcisQueryInterface"
+                  value="new ${package.structure.repository}.QueryOperationsModule"
                   summary="true" />
                 <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/EPCISServiceBindingImpl.java"/>
 

@@ -314,7 +314,7 @@ public class EPCISServiceBindingSkeleton implements org.accada.epcis.soapapi.EPC
     }
 
     public EPCISServiceBindingSkeleton() {
-        this.impl = new org.accada.epcis.repository.EpcisQueryInterface();
+        this.impl = new org.accada.epcis.repository.QueryOperationsModule();
     }
 
     public EPCISServiceBindingSkeleton(org.accada.epcis.soapapi.EPCISServicePortType impl) {

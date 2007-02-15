@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Alain Remund, Arthur van Dorp
  */
-public class Subscription implements Serializable {
+public class QuerySubscription implements Serializable {
 
     /**
      * Generated ID for serialization. Adapt if you change this class in a
@@ -50,7 +50,7 @@ public class Subscription implements Serializable {
      */
     private static final long serialVersionUID = -401176555052383495L;
 
-    private static final Logger LOG = Logger.getLogger(Subscription.class);
+    private static final Logger LOG = Logger.getLogger(QuerySubscription.class);
 
     /**
      * SubscriptionID.
@@ -103,7 +103,7 @@ public class Subscription implements Serializable {
      * @param queryName
      *            queryName.
      */
-    public Subscription(final String subscriptionID,
+    public QuerySubscription(final String subscriptionID,
             final QueryParam[] queryParams, final URI dest,
             final Boolean reportIfEmpty,
             final GregorianCalendar initialRecordTime,

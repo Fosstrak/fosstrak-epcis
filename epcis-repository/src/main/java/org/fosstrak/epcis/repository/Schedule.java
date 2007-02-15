@@ -637,20 +637,4 @@ public class Schedule implements Serializable {
     public TreeSet<Integer> getSeconds() {
         return seconds;
     }
-    
-    public static void main(String[] args) throws Exception {
-        QuerySchedule qsLeapYear = new QuerySchedule();
-        qsLeapYear.setMonth("2");
-        qsLeapYear.setDayOfMonth("29");
-        qsLeapYear.setHour("23");
-        qsLeapYear.setMinute("0");
-        qsLeapYear.setSecond("0");
-        Schedule sched = new Schedule(qsLeapYear);
-
-        // current time is 1.1.2001
-        GregorianCalendar start = new GregorianCalendar(2001, 0, 1);
-
-        // get next scheduled time
-        GregorianCalendar act = sched.nextScheduledTime(start);
-    }
 }

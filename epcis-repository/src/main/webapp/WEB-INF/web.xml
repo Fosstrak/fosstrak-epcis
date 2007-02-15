@@ -37,28 +37,27 @@
 
 
   <!-- ====================================================================== -->
-  <!--                     EPCIS Capture Interface                            -->
+  <!--                     Core Capture Operations Module                     -->
   <!-- ====================================================================== -->
 
   <servlet>
-    <servlet-name>EpcisCaptureInterface</servlet-name>
+    <servlet-name>CaptureOperationsModule</servlet-name>
     <description>
       This servlet captures EPCIS events sent in HTTP POST requests. The POST
       parameter name is "event", the data is an XML representation of an
       ObjectEvent, AggregationEvent, QuantityEvent or TransactionEvent.
     </description>
-    <servlet-class>org.accada.epcis.repository.EpcisCaptureInterface</servlet-class>
+    <servlet-class>org.accada.epcis.repository.CaptureOperationsModule</servlet-class>
   </servlet>
 
 
   <!--
     the servlet will be available at the following URL:
-    http://{url:port}/{context-path}/capture
-    e.g.
+    http://{url:port}/{context-path}/capture, e.g.
     http://localhost:8080/epcis-repository-0.2.0-SNAPSHOT/capture
   -->
   <servlet-mapping>
-    <servlet-name>EpcisCaptureInterface</servlet-name>
+    <servlet-name>CaptureOperationsModule</servlet-name>
     <url-pattern>/capture</url-pattern>
   </servlet-mapping>
 

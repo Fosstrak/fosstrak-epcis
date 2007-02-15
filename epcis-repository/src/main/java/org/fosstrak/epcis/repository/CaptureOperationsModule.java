@@ -55,14 +55,14 @@ import org.xml.sax.SAXParseException;
 /**
  * @author Marco Steybe
  */
-public class EpcisCaptureInterface extends HttpServlet {
+public class CaptureOperationsModule extends HttpServlet {
 
     private static final long serialVersionUID = 8987594429634294827L;
 
     /**
      * The log to write to.
      */
-    private static final Logger LOG = Logger.getLogger(EpcisCaptureInterface.class);
+    private static final Logger LOG = Logger.getLogger(CaptureOperationsModule.class);
 
     /**
      * The XML-Validator which validates the incoming messages.

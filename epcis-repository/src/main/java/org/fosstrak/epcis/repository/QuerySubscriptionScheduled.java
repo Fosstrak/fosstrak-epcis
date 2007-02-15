@@ -26,10 +26,10 @@ import org.apache.log4j.Logger;
  * 
  * @author Alain Remund, Arthur van Dorp
  */
-public class SubscriptionScheduled extends Subscription implements
+public class QuerySubscriptionScheduled extends QuerySubscription implements
         NotificationListener, Serializable {
 
-    private static final Logger LOG = Logger.getLogger(SubscriptionScheduled.class);
+    private static final Logger LOG = Logger.getLogger(QuerySubscriptionScheduled.class);
 
     /**
      * Generated unique ID for serialization.
@@ -68,7 +68,7 @@ public class SubscriptionScheduled extends Subscription implements
      * @throws ImplementationException
      *             If the Scheduler could not be started.
      */
-    public SubscriptionScheduled(final String subscriptionID,
+    public QuerySubscriptionScheduled(final String subscriptionID,
             final QueryParam[] queryParams, final URI dest,
             final Boolean reportIfEmpty,
             final GregorianCalendar initialRecordTime,
