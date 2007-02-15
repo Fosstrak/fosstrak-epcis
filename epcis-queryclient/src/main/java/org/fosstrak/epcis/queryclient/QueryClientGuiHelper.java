@@ -1,6 +1,6 @@
 package org.accada.epcis.queryclient;
 
-/**
+/*
  * BEWARE OF UGLY HACK We had to do some modifications to the
  * EPCglobal-epcis.xsd file: <xsd:complexType name="EventListType"> <xsd:choice
  * maxOccurs="unbounded"> <xsd:element name="ObjectEvent"
@@ -64,7 +64,7 @@ import org.accada.epcis.soapapi.Unsubscribe;
  * 
  * @author David Gubler
  */
-public class QueryClient {
+public class QueryClientGuiHelper {
     /**
      * Holds the locator for the service.
      */
@@ -89,7 +89,7 @@ public class QueryClient {
      * @param area
      *            as string
      */
-    public QueryClient(final String address, final JTextArea area) {
+    public QueryClientGuiHelper(final String address, final JTextArea area) {
         debugTextArea = area;
         service = new EPCglobalEPCISServiceLocator();
         service.setEPCglobalEPCISServicePortEndpointAddress(address);
