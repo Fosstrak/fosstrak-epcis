@@ -7,59 +7,88 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Properties;
 
 /**
- * refactoring: this class should be renamed to CaptureInterfaceClient. the
- * existing class with this name should be renamed to CaptureInterfaceClientGui.
- * maybe also rename CaptureInterfaceClientSwingGui to
- * CaptureInterfaceClientWindow -> it should use this CaptureInterfaceClient
- * (has-a relation). also these classes should not be in directory capturingGUI.
- * This client provides access to the EPCIS Capture Interface.
+ * This client provides access to the repository's Capture Operations Module
+ * through the capture interface. EPCISEvents will be sent to the module using
+ * HTTP POST requests.
  * 
  * @author Marco Steybe
  */
-public class CaptureClient {
+public class CaptureClient implements CaptureInterface {
 
-    // TODO LOG4J
+    private static final String PROPERTY_FILE = "/captureclient.properties";
 
-    // TODO properties file to hold url
-    private static final String CAPTURE_INTERFACE_URL = "http://localhost:8080/capturing/servlet/capture";
+    private static final String PROPERTY_CAPTURE_URL = "default.url";
 
     /**
-     * Empty Constructor.
+     * The URL String at which the Capture Operations Module listens.
+     */
+    private String captureUrl;
+
+    private Properties props = new Properties();
+
+    /**
+     * Constructs a new CaptureClient which connects to the Capture Operations
+     * Module listening at the default URL.
      */
     public CaptureClient() {
+        this(null);
     }
 
     /**
-     * Sends an EventObject to the EPCIS Capture Interface using an HTTP POST
-     * request.
+     * Constructs a new CaptureClient which connects to the Capture Operations
+     * Module listening at the given URL.
      * 
-     * @param eventXml
-     *            The XML containing the EventObject.
-     * @return The response from the EPCIS Capture Interface
-     * @throws IOException
-     *             If an I/O Exception on the transport layer (HTTP) occurred.
+     * @param url
+     *            The URL at which the capture service listens.
      */
-    public String sendEvent(final String eventXml) throws IOException {
+    public CaptureClient(final String url) {
+        // load properties
+        InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
+        if (is == null) {
+            throw new RuntimeException("Unable to load properties from file "
+                    + PROPERTY_FILE);
+        }
+        try {
+            props.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load properties from file "
+                    + PROPERTY_FILE);
+        }
+
+        // set the URL
+        if (url != null) {
+            captureUrl = url;
+        } else {
+            captureUrl = props.getProperty(PROPERTY_CAPTURE_URL);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.accada.epcis.captureclient.CaptureInterface#capture(java.lang.String)
+     */
+    public String capture(final String eventXml) throws IOException {
         byte[] data = ("event=" + eventXml).getBytes();
         return postData(data);
     }
 
     /**
-     * Sends data to the capture interface using HTTP POST.
+     * Send data to the capture service using HTTP POST.
      * 
      * @param data
      *            The data to send.
-     * @return The response from the capture interface.
+     * @return The HTTP response message
      * @throws IOException
-     *             If an underlying HTTP connection error occured.
+     *             If an error on the HTTP layer occured.
      */
     private String postData(final byte[] data) throws IOException {
-        String response;
 
         // the url where the capture interface listens
-        URL serviceUrl = new URL(CAPTURE_INTERFACE_URL);
+        URL serviceUrl = new URL(captureUrl);
 
         // open an http connection
         HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
@@ -71,13 +100,9 @@ public class CaptureClient {
         out.flush();
         out.close();
 
-        // check for http error
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            response = "Error " + connection.getResponseCode() + " "
-                    + connection.getResponseMessage() + ": ";
-        } else {
-            response = "200 OK: ";
-        }
+        // get response
+        String response = "HTTP/1.0 " + connection.getResponseCode() + " "
+                + connection.getResponseMessage() + ": ";
 
         // read and return response
         InputStream in = null;
@@ -92,5 +117,12 @@ public class CaptureClient {
             response = response + line + "\n";
         }
         return response.trim();
+    }
+
+    /**
+     * @return The URL String at which the Capture Operations Module listens.
+     */
+    public String getCaptureUrl() {
+        return captureUrl;
     }
 }
