@@ -1,6 +1,9 @@
 package org.accada.epcis.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -35,7 +39,9 @@ import org.accada.epcis.soapapi.TransactionEventExtensionType;
 import org.accada.epcis.soapapi.TransactionEventType;
 import org.accada.epcis.soapapi.VocabularyElementType;
 import org.accada.epcis.soapapi.VocabularyType;
+import org.apache.axis.encoding.SerializationContext;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.message.NullAttributes;
 import org.apache.axis.message.Text;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
@@ -1019,5 +1025,28 @@ public class QueryResultsParser {
         if (!check) {
             throw new AssertionError();
         }
+    }
+
+    /**
+     * Converts the given QueryResults object into its XML representation.
+     * 
+     * @param results
+     *            The QueryResults object to be converted.
+     * @return The XML representation of the QueryResults.
+     * @throws IOException
+     *             If an error serializing the QueryResults object occured.
+     */
+    public static String queryResultsToXML(final QueryResults results)
+            throws IOException {
+        // serialize the response
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStreamWriter writer = new OutputStreamWriter(baos);
+        SerializationContext serContext = new SerializationContext(writer);
+        QName xmlType = QueryResults.getTypeDesc().getXmlType();
+        serContext.setWriteXMLType(xmlType);
+        serContext.serialize(xmlType, new NullAttributes(), results, xmlType,
+                QueryResults.class, false, true);
+        writer.flush();
+        return baos.toString();
     }
 }
