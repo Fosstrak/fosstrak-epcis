@@ -6,8 +6,7 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.utils.QueryCallbackListener;
@@ -22,7 +21,7 @@ public class RecordTimeTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/";
 
-    QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if setting the initialRecordTime parameter has effect.
@@ -35,7 +34,7 @@ public class RecordTimeTest extends TestCase {
         // run first query
         String query = "Test-EPCIS10-SE66-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + "requests/" + query);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // wait for response callback
@@ -67,12 +66,12 @@ public class RecordTimeTest extends TestCase {
         } catch (AssertionError e) {
             fail(e.getMessage());
         }
-        client.unsubscribeQuery("QuerySE66");
+        client.unsubscribe("QuerySE66");
 
         // run second query
         query = "Test-EPCIS10-SE66-Request-2-Subscribe.xml";
         fis = new FileInputStream(PATH + "requests/" + query);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // wait for response callback
@@ -101,7 +100,7 @@ public class RecordTimeTest extends TestCase {
             fail(e.getMessage());
         }
 
-        client.unsubscribeQuery("QuerySE66");
+        client.unsubscribe("QuerySE66");
         listener.stopRunning();
     }
 
@@ -111,7 +110,7 @@ public class RecordTimeTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            client.unsubscribeQuery("QuerySE66");
+            client.unsubscribe("QuerySE66");
         } catch (NoSuchSubscriptionException e) {
         }
         super.tearDown();

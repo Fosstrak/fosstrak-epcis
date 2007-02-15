@@ -9,8 +9,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.DuplicateSubscriptionException;
 import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.InvalidURIException;
@@ -30,7 +29,7 @@ public class ErrorMessagesTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if QueryTooComplexException is raised.
@@ -47,7 +46,7 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE49-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             fis.close();
             fail("QueryTooComplexException expected");
         } catch (QueryTooComplexException e) {
@@ -71,7 +70,7 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE50-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             fis.close();
             fail("QueryTooLargeException expected");
         } catch (QueryTooLargeException e) {
@@ -95,7 +94,7 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE51-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             fis.close();
             fail("ImplementationException expected");
         } catch (ImplementationException e) {
@@ -119,9 +118,9 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE52-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             fis.close();
-            client.unsubscribeQuery("QuerySE52"); // clean up
+            client.unsubscribe("QuerySE52"); // clean up
             fail("InvalidURIException expected");
         } catch (InvalidURIException e) {
             fis.close();
@@ -145,21 +144,21 @@ public class ErrorMessagesTest extends TestCase {
         // subscribe first query
         final String query = "Test-EPCIS10-SE53-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // subscribe second query
         final String query2 = "Test-EPCIS10-SE53-Request-2-Subscribe.xml";
         fis = new FileInputStream(PATH + query2);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE53"); // clean up
+            client.unsubscribe("QuerySE53"); // clean up
             fail("DuplicateSubscriptionException expected");
         } catch (DuplicateSubscriptionException e) {
             fis.close();
-            client.unsubscribeQuery("QuerySE53"); // clean up
+            client.unsubscribe("QuerySE53"); // clean up
             assertEquals(
                     "SubscriptionID 'QuerySE53' already exists. Choose a different subscriptionID.",
                     e.getReason());
@@ -180,18 +179,18 @@ public class ErrorMessagesTest extends TestCase {
             IOException {
         final String query = "Test-EPCIS10-SE54-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // try to unsubscribe a non existing query
         try {
-            client.unsubscribeQuery("QuerySE54-2");
+            client.unsubscribe("QuerySE54-2");
             // fail
-            client.unsubscribeQuery("QuerySE54-1"); // clean up
+            client.unsubscribe("QuerySE54-1"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (NoSuchSubscriptionException e) {
             // ok
-            client.unsubscribeQuery("QuerySE54-1");
+            client.unsubscribe("QuerySE54-1");
             assertEquals("There is no subscription with ID 'QuerySE54-2'.",
                     e.getReason());
         }
@@ -213,10 +212,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE55-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE55"); // clean up
+            client.unsubscribe("QuerySE55"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -243,10 +242,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE56-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE56"); // clean up
+            client.unsubscribe("QuerySE56"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -272,10 +271,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE57-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE57"); // clean up
+            client.unsubscribe("QuerySE57"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -302,10 +301,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE58-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE58"); // clean up
+            client.unsubscribe("QuerySE58"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -332,10 +331,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE59-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE59"); // clean up
+            client.unsubscribe("QuerySE59"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -362,10 +361,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE60-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE60"); // clean up
+            client.unsubscribe("QuerySE60"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -392,10 +391,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE61-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE61"); // clean up
+            client.unsubscribe("QuerySE61"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -421,10 +420,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE62-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE62"); // clean up
+            client.unsubscribe("QuerySE62"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -451,10 +450,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE63-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE63"); // clean up
+            client.unsubscribe("QuerySE63"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -481,10 +480,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE64-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE64"); // clean up
+            client.unsubscribe("QuerySE64"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -511,10 +510,10 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE65-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             // fail
             fis.close();
-            client.unsubscribeQuery("QuerySE65"); // clean up
+            client.unsubscribe("QuerySE65"); // clean up
             fail("NoSuchSubscriptionException expected");
         } catch (SubscriptionControlsException e) {
             // ok
@@ -540,7 +539,7 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE70-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             // fail
             fis.close();
             fail("QueryParameterException expected");
@@ -567,7 +566,7 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE71-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             // fail
             fis.close();
             fail("QueryParameterException expected");
@@ -596,7 +595,7 @@ public class ErrorMessagesTest extends TestCase {
         final String query = "Test-EPCIS10-SE72-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             // fail
             fis.close();
             fail("QueryParameterException expected");

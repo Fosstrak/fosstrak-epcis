@@ -8,8 +8,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.QueryParameterException;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooLargeException;
@@ -27,7 +26,7 @@ public class EventQueryTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response-1-poll.xml";
 
-    QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests the GE_eventTime attribute.
@@ -41,7 +40,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 10;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -63,7 +62,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 11;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -85,7 +84,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 12;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -107,7 +106,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 13;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -129,7 +128,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 14;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -151,7 +150,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 15;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -173,7 +172,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 16;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         // response received
@@ -198,7 +197,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 17;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -220,7 +219,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 18;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -242,7 +241,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 19;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -264,7 +263,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 20;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -286,7 +285,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 21;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -308,7 +307,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 22;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -330,7 +329,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 23;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -352,7 +351,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 24;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -374,7 +373,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 25;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -396,7 +395,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 26;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -418,7 +417,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 27;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -444,7 +443,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 28;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -466,7 +465,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 29;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -488,7 +487,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 30;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -510,7 +509,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 31;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -532,7 +531,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 32;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -554,7 +553,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 33;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -576,7 +575,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 34;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -598,7 +597,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 35;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -620,7 +619,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 36;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -642,7 +641,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 37;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -664,7 +663,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 38;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -686,7 +685,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 39;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -709,7 +708,7 @@ public class EventQueryTest extends TestCase {
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             fail("should raise a QueryTooLargeException");
         } catch (QueryTooLargeException e) {
             // success
@@ -730,7 +729,7 @@ public class EventQueryTest extends TestCase {
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             fail("should raise a QueryParameterException");
         } catch (QueryParameterException e) {
             // success
@@ -750,7 +749,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 42;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -772,7 +771,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 43;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -792,7 +791,7 @@ public class EventQueryTest extends TestCase {
         int testNr = 73;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr

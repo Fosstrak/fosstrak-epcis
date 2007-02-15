@@ -6,8 +6,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.EPCISException;
 
 /**
@@ -17,7 +16,7 @@ import org.accada.epcis.soapapi.EPCISException;
  */
 public class VersionTest extends TestCase {
 
-    QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if the supported Standard Version is "1.0".
@@ -31,7 +30,7 @@ public class VersionTest extends TestCase {
      */
     public void testSE47() throws EPCISException, RemoteException,
             ServiceException {
-        String stdVersion = client.queryStandardVersion();
+        String stdVersion = client.getStandardVersion();
         assertEquals(stdVersion, "1.0");
     }
 
@@ -47,7 +46,7 @@ public class VersionTest extends TestCase {
      */
     public void testSE67() throws EPCISException, RemoteException,
             ServiceException {
-        String version = client.queryVendorVersion();
+        String version = client.getVendorVersion();
         assertTrue(version.startsWith("http://www.accada.org/releases/"));
     }
 }

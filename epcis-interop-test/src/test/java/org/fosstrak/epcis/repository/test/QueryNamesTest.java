@@ -1,15 +1,13 @@
 package org.accada.epcis.repository.test;
 
 import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.EPCISException;
 
 /**
@@ -19,7 +17,7 @@ import org.accada.epcis.soapapi.EPCISException;
  */
 public class QueryNamesTest extends TestCase {
 
-    QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if the two query types "SimpleEventQuery" and
@@ -34,13 +32,12 @@ public class QueryNamesTest extends TestCase {
      */
     public void testSE45() throws ServiceException, RemoteException,
             EPCISException {
-        String[] queryNames = client.queryNames();
+        List<String> queryNames = client.getQueryNames();
 
         // must contain SimpleEventQuery and SimpleMasterDataQuery
-        assertTrue(queryNames.length == 2);
+        assertTrue(queryNames.size() == 2);
 
-        List<String> queryNameList = Arrays.asList(queryNames);
-        assertTrue(queryNameList.contains("SimpleEventQuery"));
-        assertTrue(queryNameList.contains("SimpleMasterDataQuery"));
+        assertTrue(queryNames.contains("SimpleEventQuery"));
+        assertTrue(queryNames.contains("SimpleMasterDataQuery"));
     }
 }

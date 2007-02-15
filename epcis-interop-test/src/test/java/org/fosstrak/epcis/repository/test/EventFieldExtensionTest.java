@@ -8,9 +8,8 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.captureclient.CaptureInterfaceClient;
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.captureclient.CaptureClient;
+import org.accada.epcis.queryclient.QueryControlClient;
 
 /**
  * This Test first inserts two events each containing two fieldname extensions
@@ -31,17 +30,17 @@ public class EventFieldExtensionTest extends TestCase {
     public void testExtension() throws IOException, ServiceException {
 
         // send event1
-        CaptureInterfaceClient captureClient = new CaptureInterfaceClient();
-        String resp = captureClient.sendEvent(event1);
+        CaptureClient captureClient = new CaptureClient();
+        String resp = captureClient.capture(event1);
         assertEquals("200 OK: Request succeeded.", resp);
 
         // send event2
-        resp = captureClient.sendEvent(event2);
+        resp = captureClient.capture(event2);
         assertEquals("200 OK: Request succeeded.", resp);
 
         // send query
-        QueryClientInterface queryClient = new QueryClientSoapImpl();
-        queryClient.runQuery(new ByteArrayInputStream(query.getBytes()));
+        QueryControlClient queryClient = new QueryControlClient();
+        queryClient.poll(new ByteArrayInputStream(query.getBytes()));
 
         // TODO check response!
     }

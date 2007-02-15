@@ -12,8 +12,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.utils.QueryCallbackListener;
 import org.w3c.dom.Document;
@@ -32,7 +31,7 @@ public class CallbackReportIfEmptyTest extends TestCase {
     private static final String REQUEST_1 = "Test-EPCIS10-SE48-Request-1-Subscribe.xml";
     private static final String REQUEST_2 = "Test-EPCIS10-SE48-Request-2-Subscribe.xml";
 
-    private QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests that no response is provided if the reportIfEmpty tag is set to
@@ -52,7 +51,7 @@ public class CallbackReportIfEmptyTest extends TestCase {
 
         // subscribe the first query
         InputStream fis = new FileInputStream(PATH + REQUEST_1);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // start subscription response listener
@@ -78,13 +77,13 @@ public class CallbackReportIfEmptyTest extends TestCase {
 
         // unsubscribe first query
         try {
-            client.unsubscribeQuery("QuerySE48-1");
+            client.unsubscribe("QuerySE48-1");
         } catch (NoSuchSubscriptionException e) {
         }
 
         // subscribe the second query
         fis = new FileInputStream(PATH + REQUEST_2);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         System.out.println("waiting ...");
@@ -127,11 +126,11 @@ public class CallbackReportIfEmptyTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            client.unsubscribeQuery("QuerySE48-1");
+            client.unsubscribe("QuerySE48-1");
         } catch (NoSuchSubscriptionException e) {
         }
         try {
-            client.unsubscribeQuery("QuerySE48-2");
+            client.unsubscribe("QuerySE48-2");
         } catch (NoSuchSubscriptionException e) {
         }
         super.tearDown();

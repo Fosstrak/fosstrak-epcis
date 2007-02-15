@@ -12,8 +12,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.utils.QueryCallbackListener;
 import org.w3c.dom.Document;
@@ -30,7 +29,7 @@ public class CallbackUnsubscribeTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if we receive a notification for a subscribed query, and we receive
@@ -52,7 +51,7 @@ public class CallbackUnsubscribeTest extends TestCase {
 
         // subscribe a query
         InputStream fis = new FileInputStream(PATH + query);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // start subscription response listener
@@ -77,7 +76,7 @@ public class CallbackUnsubscribeTest extends TestCase {
         assertTrue(eventList.hasChildNodes());
 
         // unsubscribe the query and wait for any response
-        client.unsubscribeQuery("QuerySE44");
+        client.unsubscribe("QuerySE44");
         System.out.println("waiting ...");
         synchronized (listener) {
             try {
@@ -115,10 +114,9 @@ public class CallbackUnsubscribeTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            client.unsubscribeQuery("QuerySE44");
+            client.unsubscribe("QuerySE44");
         } catch (NoSuchSubscriptionException e) {
         }
     }
-    
-    
+
 }

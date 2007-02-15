@@ -11,8 +11,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.SubscribeNotPermittedException;
@@ -23,7 +22,7 @@ import org.accada.epcis.utils.QueryResultsParser;
  */
 public class MasterDataQueryTest extends TestCase {
 
-    QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     static String REQ_PATH = "src/test/resources/queries/webservice/requests/";
     static String REQ_PREFIX = "Test-EPCIS10-MD";
@@ -36,7 +35,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 1;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -50,7 +49,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 2;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -64,7 +63,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 3;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -78,7 +77,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 4;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -92,7 +91,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 5;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -106,7 +105,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 6;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -120,7 +119,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 7;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -136,7 +135,7 @@ public class MasterDataQueryTest extends TestCase {
         InputStream fis = new FileInputStream(query);
 
         try {
-            client.runQuery(fis);
+            client.poll(fis);
             // fail
             fis.close();
             fail("QueryTooLargeException expected!");
@@ -150,7 +149,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 9;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -164,7 +163,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 10;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -178,7 +177,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 11;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -192,7 +191,7 @@ public class MasterDataQueryTest extends TestCase {
         int testNr = 12;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = (QueryResults) client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -207,7 +206,7 @@ public class MasterDataQueryTest extends TestCase {
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         try {
-            client.subscribeQuery(fis);
+            client.subscribe(fis);
             fis.close();
 
             fail("SubscribeNotPermittedException expected");

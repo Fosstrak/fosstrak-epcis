@@ -8,8 +8,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.AggregationEventType;
 import org.accada.epcis.soapapi.BusinessTransactionType;
 import org.accada.epcis.soapapi.EPC;
@@ -33,13 +32,13 @@ public class InventoryTrackingTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response.xml";
 
-    QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     public void testSE8() throws IOException, ServiceException {
         int testNr = 8;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
@@ -53,7 +52,7 @@ public class InventoryTrackingTest extends TestCase {
         int testNr = 9;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
-        QueryResults actResults = (QueryResults) client.runQuery(fis);
+        QueryResults actResults = client.poll(fis);
         fis.close();
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;

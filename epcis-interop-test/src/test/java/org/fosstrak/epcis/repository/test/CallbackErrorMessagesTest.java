@@ -9,8 +9,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.queryclient.QueryClientInterface;
-import org.accada.epcis.queryclient.QueryClientSoapImpl;
+import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.utils.QueryCallbackListener;
 
@@ -24,7 +23,7 @@ public class CallbackErrorMessagesTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryClientInterface client = new QueryClientSoapImpl();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if QueryTooLargeException is raised (callback).
@@ -41,7 +40,7 @@ public class CallbackErrorMessagesTest extends TestCase {
         // subscribe query
         final String query = "Test-EPCIS10-SE68-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // start subscription response listener
@@ -60,7 +59,7 @@ public class CallbackErrorMessagesTest extends TestCase {
         String resp = listener.fetchResponse();
         assertNotNull(resp);
 
-        client.unsubscribeQuery("QuerySE68"); // clean up
+        client.unsubscribe("QuerySE68"); // clean up
         System.out.println("TODO SE68: check response: should contain QueryTooLargeException: ");
         System.out.println(resp);
         assertTrue(resp.contains("QueryTooLargeException"));
@@ -81,7 +80,7 @@ public class CallbackErrorMessagesTest extends TestCase {
         // subscribe query
         final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
-        client.subscribeQuery(fis);
+        client.subscribe(fis);
         fis.close();
 
         // start subscription response listener
@@ -100,7 +99,7 @@ public class CallbackErrorMessagesTest extends TestCase {
         String resp = listener.fetchResponse();
         assertNotNull(resp);
 
-        client.unsubscribeQuery("QuerySE69"); // clean up
+        client.unsubscribe("QuerySE69"); // clean up
         System.out.println("TODO SE69: check response: should contain ImplementationException: ");
         System.out.println(resp);
         assertTrue(resp.contains("ImplementationException"));
@@ -109,11 +108,11 @@ public class CallbackErrorMessagesTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            client.unsubscribeQuery("QuerySE68");
+            client.unsubscribe("QuerySE68");
         } catch (NoSuchSubscriptionException e) {
         }
         try {
-            client.unsubscribeQuery("QuerySE69");
+            client.unsubscribe("QuerySE69");
         } catch (NoSuchSubscriptionException e) {
         }
     }

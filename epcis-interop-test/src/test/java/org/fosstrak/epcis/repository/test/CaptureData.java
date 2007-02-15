@@ -6,7 +6,7 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.captureclient.CaptureInterfaceClient;
+import org.accada.epcis.captureclient.CaptureClient;
 
 /**
  * @author Marco Steybe
@@ -26,7 +26,7 @@ public class CaptureData extends TestCase {
     private static final String RECEIVE_ORDER_XML = "src/test/resources/events/7_receive_order_events.xml";
     private static final String STORE_INVENTORY_XML = "src/test/resources/events/8_store_inventory_events.xml";
 
-    private CaptureInterfaceClient client = new CaptureInterfaceClient();
+    private CaptureClient client = new CaptureClient();
 
     /**
      * Testing events: Test 1.
@@ -43,8 +43,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send the data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
     /**
@@ -62,8 +62,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send the data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
     /**
@@ -81,8 +81,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
     /**
@@ -100,8 +100,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
     /**
@@ -119,8 +119,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
     /**
@@ -138,8 +138,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
     /**
@@ -157,8 +157,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
     /**
@@ -176,8 +176,8 @@ public class CaptureData extends TestCase {
         String eventXml = new String(xml);
 
         // send data
-        String response = client.sendEvent(eventXml);
-        assertEquals("200 OK: Request succeeded.", response);
+        String response = client.capture(eventXml);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
 
 }
