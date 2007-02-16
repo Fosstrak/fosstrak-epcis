@@ -695,8 +695,8 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private URI[] handleEpcs(final Node epcNode)
-            throws MalformedURIException, SAXParseException {
+    private URI[] handleEpcs(final Node epcNode) throws MalformedURIException,
+            SAXParseException {
         List<URI> epcList = new ArrayList<URI>();
 
         for (int i = 0; i < epcNode.getChildNodes().getLength(); i++) {
@@ -731,8 +731,8 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private List<BusinessTransactionType> handleBizTransactions(final Node bizNode)
-            throws MalformedURIException, SAXParseException {
+    private List<BusinessTransactionType> handleBizTransactions(
+            final Node bizNode) throws MalformedURIException, SAXParseException {
         final List<BusinessTransactionType> bizList = new ArrayList<BusinessTransactionType>();
 
         for (int i = 0; i < bizNode.getChildNodes().getLength(); i++) {
@@ -740,8 +740,8 @@ public class CaptureOperationsModule extends HttpServlet {
             if (curNode.getNodeName().equals("bizTransaction")) {
                 String bizTransType = curNode.getAttributes().item(0).getTextContent();
                 String bizTrans = curNode.getTextContent();
-                BusinessTransactionType bt = new BusinessTransactionType();
-                bt.setValue(new URI(bizTrans));
+                BusinessTransactionType bt = new BusinessTransactionType(
+                        bizTrans);
                 bt.setType(new URI(bizTransType));
                 bizList.add(bt);
             } else {
@@ -765,10 +765,9 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SQLException
      *             If an SQL problem with the database ocurred.
      */
-    private long insertBusinessTransaction(final BusinessTransactionType bizTrans)
-            throws SQLException {
-        final long id = insertVocabulary("voc_BizTrans",
-                bizTrans.getValue());
+    private long insertBusinessTransaction(
+            final BusinessTransactionType bizTrans) throws SQLException {
+        final long id = insertVocabulary("voc_BizTrans", bizTrans);
         final long type = insertVocabulary("voc_BizTransType",
                 bizTrans.getType());
 

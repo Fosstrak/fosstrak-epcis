@@ -852,24 +852,40 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     }
 
                 } else if (paramName.equals("EQ_bizStep")) {
+                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                        // empty parameter provided -> no binding on events
+                        continue;
+                    }
                     query.append(" AND (`voc_BizStep`.uri IN (");
                     stringArrayToSQL(((ArrayOfString) paramValue).getString(),
                             query, queryArgs);
                     query.append(")) ");
 
                 } else if (paramName.equals("EQ_disposition")) {
+                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                        // empty parameter provided -> no binding on events
+                        continue;
+                    }
                     query.append(" AND (`voc_Disposition`.uri IN (");
                     stringArrayToSQL(((ArrayOfString) paramValue).getString(),
                             query, queryArgs);
                     query.append(")) ");
 
                 } else if (paramName.equals("EQ_readPoint")) {
+                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                        // empty parameter provided -> no binding on events
+                        continue;
+                    }
                     query.append(" AND (`voc_ReadPoint`.uri IN (");
                     stringArrayToSQL(((ArrayOfString) paramValue).getString(),
                             query, queryArgs);
                     query.append(")) ");
 
                 } else if (paramName.equals("WD_readPoint")) {
+                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                        // empty parameter provided -> no binding on events
+                        continue;
+                    }
                     // the % allows any possible ending, which should implement
                     // the semantics of "With Descendant"
                     String[] readPoints = ((ArrayOfString) paramValue).getString();
@@ -887,6 +903,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     query.append(") ");
 
                 } else if (paramName.equals("EQ_bizLocation")) {
+                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                        // empty parameter provided -> no binding on events
+                        continue;
+                    }
                     query.append(" AND (`voc_BizLoc`.uri IN (");
                     stringArrayToSQL(((ArrayOfString) paramValue).getString(),
                             query, queryArgs);

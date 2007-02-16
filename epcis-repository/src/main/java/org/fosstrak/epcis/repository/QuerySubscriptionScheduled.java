@@ -81,6 +81,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements
             Date nextSchedule = schedule.nextScheduledTime().getTime();
             LOG.debug("Next scheduled time for the subscribed query is '"
                     + nextSchedule + "'.");
+            LOG.debug("URI to which to send results for the subscribed query is " + dest.toString());
         }
         startThread();
     }

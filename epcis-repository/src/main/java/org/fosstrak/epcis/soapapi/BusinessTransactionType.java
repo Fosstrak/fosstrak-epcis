@@ -1,7 +1,5 @@
 package org.accada.epcis.soapapi;
 
-import org.apache.axis.types.URI;
-import org.apache.axis.types.URI.MalformedURIException;
 
 /**
  * BusinessTransactionType.java<br>
@@ -9,12 +7,11 @@ import org.apache.axis.types.URI.MalformedURIException;
  * (06:55:48 PDT) WSDL2Java emitter and has been hand edited to ensure proper
  * serialization.
  */
-public class BusinessTransactionType implements java.io.Serializable,
-        org.apache.axis.encoding.SimpleType {
+public class BusinessTransactionType extends org.apache.axis.types.URI
+        implements java.io.Serializable, org.apache.axis.encoding.SimpleType {
 
     private static final long serialVersionUID = -3930773846550143369L;
 
-    private org.apache.axis.types.URI value;
     private org.apache.axis.types.URI type; // attribute
 
     public BusinessTransactionType() {
@@ -23,21 +20,11 @@ public class BusinessTransactionType implements java.io.Serializable,
     // Simple Types must have a String constructor
     public BusinessTransactionType(java.lang.String _value)
             throws MalformedURIException {
-        value = new URI(_value);
+        super(_value);
     }
 
-    // Simple Types must have a String constructor
     public BusinessTransactionType(org.apache.axis.types.URI _value) {
-        value = _value;
-    }
-
-    /**
-     * Gets the value value for this BusinessTransactionType.
-     * 
-     * @return value
-     */
-    public org.apache.axis.types.URI getValue() {
-        return value;
+        super(_value);
     }
 
     /**
@@ -47,15 +34,6 @@ public class BusinessTransactionType implements java.io.Serializable,
      */
     public org.apache.axis.types.URI getType() {
         return type;
-    }
-
-    /**
-     * Sets the value value for this BusinessTransactionType.
-     * 
-     * @param value
-     */
-    public void setValue(org.apache.axis.types.URI value) {
-        this.value = value;
     }
 
     /**
@@ -80,8 +58,7 @@ public class BusinessTransactionType implements java.io.Serializable,
         __equalsCalc = obj;
         boolean _equals;
         _equals = super.equals(obj)
-                && ((this.type == null && other.getType() == null) || (this.type != null && this.type.equals(other.getType())))
-                && ((this.value == null && other.getValue() == null) || (this.value != null && this.value.equals(other.getValue())));
+                && ((this.type == null && other.getType() == null) || (this.type != null && this.type.equals(other.getType())));
         __equalsCalc = null;
         return _equals;
     }
@@ -96,9 +73,6 @@ public class BusinessTransactionType implements java.io.Serializable,
         int _hashCode = 1;
         if (getType() != null) {
             _hashCode += getType().hashCode();
-        }
-        if (getValue() != null) {
-            _hashCode += getValue().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
