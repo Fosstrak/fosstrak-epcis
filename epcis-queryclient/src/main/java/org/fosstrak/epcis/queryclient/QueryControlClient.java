@@ -243,7 +243,7 @@ public class QueryControlClient implements QueryControlInterface {
      * {@inheritDoc}
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#subscribe(java.lang.String,
-     *      org.accada.epcis.soapapi.QueryParam[], java.net.URI,
+     *      org.accada.epcis.soapapi.QueryParam[], org.apache.axis.types.URI,
      *      org.accada.epcis.soapapi.SubscriptionControls, java.lang.String)
      */
     public void subscribe(final String queryName, final QueryParam[] params,
