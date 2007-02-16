@@ -32,11 +32,11 @@ public class EventFieldExtensionTest extends TestCase {
         // send event1
         CaptureClient captureClient = new CaptureClient();
         String resp = captureClient.capture(event1);
-        assertEquals("200 OK: Request succeeded.", resp);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", resp);
 
         // send event2
         resp = captureClient.capture(event2);
-        assertEquals("200 OK: Request succeeded.", resp);
+        assertEquals("HTTP/1.0 200 OK: Request succeeded.", resp);
 
         // send query
         QueryControlClient queryClient = new QueryControlClient();

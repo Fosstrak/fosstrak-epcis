@@ -221,7 +221,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value for 'second' is out of range in the query schedule.",
+                    "The value '61' for parameter 'second' is invalid in the query schedule.",
                     e.getReason());
         }
     }
@@ -251,7 +251,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value for 'second' is out of range in the query schedule.",
+                    "The value '-1' for parameter 'second' is invalid in the query schedule.",
                     e.getReason());
         }
     }
@@ -310,7 +310,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value for 'DayOfWeek' is out of range in the query schedule.",
+                    "The value '[1-8]' for parameter 'dayOfWeek' is invalid in the query schedule.",
                     e.getReason());
         }
     }
@@ -340,7 +340,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value 'x' for parameter 'DayOfWeek' is invalid in the query schedule.",
+                    "The value 'x' for parameter 'dayOfWeek' is invalid in the query schedule.",
                     e.getReason());
         }
     }
@@ -370,7 +370,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value for 'minute' is out of range in the query schedule.",
+                    "The value '-1' for parameter 'minute' is invalid in the query schedule.",
                     e.getReason());
         }
     }
@@ -400,7 +400,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value for 'minute' is out of range in the query schedule.",
+                    "The value '61' for parameter 'minute' is invalid in the query schedule.",
                     e.getReason());
         }
     }
@@ -459,7 +459,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value for 'hour' is out of range in the query schedule.",
+                    "The value '24' for parameter 'hour' is invalid in the query schedule.",
                     e.getReason());
         }
     }
@@ -489,7 +489,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The value for 'hour' is out of range in the query schedule.",
+                    "The value '-1' for parameter 'hour' is invalid in the query schedule.",
                     e.getReason());
         }
     }

@@ -17,7 +17,7 @@ import org.accada.epcis.utils.QueryResultsParser;
  * 
  * @author Marco Steybe
  */
-public class RecordTimeTest extends TestCase {
+public class CallbackRecordTimeTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/";
 
