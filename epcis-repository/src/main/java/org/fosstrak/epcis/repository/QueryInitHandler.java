@@ -125,7 +125,7 @@ public class QueryInitHandler extends BasicHandler {
      * @see org.apache.axis.handlers.BasicHandler#onFault(org.apache.axis.MessageContext)
      */
     public void onFault(final MessageContext msgContext) {
-        log.info("There was an Axis Fault. If this was not an intended 'USER ERROR' check the axis log for more details.");
+        log.info("There was an Axis Fault, likely an intended 'USER ERROR'. Check log for stacktrace.");
 
         try {
             Connection dbconnection = (Connection) msgContext.getProperty("dbconnection");
