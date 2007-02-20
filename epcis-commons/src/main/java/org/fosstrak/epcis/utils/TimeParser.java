@@ -1,3 +1,33 @@
+/*
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.accada.epcis.utils;
 
 import java.sql.Timestamp;
@@ -17,24 +47,24 @@ import org.apache.log4j.Logger;
  * supported format is:
  * 
  * <pre>
- *            &amp;plusmnYYYY-MM-DDThh:mm:ss[.SSS]TZD
+ *             &amp;plusmnYYYY-MM-DDThh:mm:ss[.SSS]TZD
  * </pre>
  * 
  * where:
  * 
  * <pre>
- *            &amp;plusmnYYYY = four-digit year with optional sign where values &lt;= 0 are
- *                    denoting years BCE and values &gt; 0 are denoting years CE,
- *                    e.g. -0001 denotes the year 2 BCE, 0000 denotes the year 1 BCE,
- *                    0001 denotes the year 1 CE, and so on...
- *            MM    = two-digit month (01=January, etc.)
- *            DD    = two-digit day of month (01 through 31)
- *            hh    = two digits of hour (00 through 23) (am/pm NOT allowed)
- *            mm    = two digits of minute (00 through 59)
- *            ss    = two digits of second (00 through 59)
- *            SSS   = optional three digits of milliseconds (000 through 999)
- *            TZD   = time zone designator, Z for Zulu (i.e. UTC) or an offset from UTC
- *                    in the form of +hh:mm or -hh:mm
+ *             &amp;plusmnYYYY = four-digit year with optional sign where values &lt;= 0 are
+ *                     denoting years BCE and values &gt; 0 are denoting years CE,
+ *                     e.g. -0001 denotes the year 2 BCE, 0000 denotes the year 1 BCE,
+ *                     0001 denotes the year 1 CE, and so on...
+ *             MM    = two-digit month (01=January, etc.)
+ *             DD    = two-digit day of month (01 through 31)
+ *             hh    = two digits of hour (00 through 23) (am/pm NOT allowed)
+ *             mm    = two digits of minute (00 through 59)
+ *             ss    = two digits of second (00 through 59)
+ *             SSS   = optional three digits of milliseconds (000 through 999)
+ *             TZD   = time zone designator, Z for Zulu (i.e. UTC) or an offset from UTC
+ *                     in the form of +hh:mm or -hh:mm
  * </pre>
  */
 public final class TimeParser {
@@ -105,17 +135,18 @@ public final class TimeParser {
      * @throws ParseException
      *             If the date/time could not be parsed.
      */
-    private static Calendar parse(String text) throws ParseException {
-        if (text == null) {
+    private static Calendar parse(final String text) throws ParseException {
+        String time = text;
+        if (time == null) {
             throw new IllegalArgumentException("argument may not be null");
         }
-        text = text.trim();
+        time = time.trim();
         char sign;
         int curPos;
-        if (text.startsWith("-")) {
+        if (time.startsWith("-")) {
             sign = '-';
             curPos = 1;
-        } else if (text.startsWith("+")) {
+        } else if (time.startsWith("+")) {
             sign = '+';
             curPos = 1;
         } else {
@@ -127,82 +158,82 @@ public final class TimeParser {
         String tzID;
         char delimiter;
         try {
-            year = Integer.parseInt(text.substring(curPos, curPos + 4));
+            year = Integer.parseInt(time.substring(curPos, curPos + 4));
         } catch (NumberFormatException e) {
             throw new ParseException("Year (YYYY) has wrong format: "
                     + e.getMessage(), curPos);
         }
         curPos += 4;
         delimiter = '-';
-        if (text.charAt(curPos) != delimiter) {
+        if (time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
         try {
-            month = Integer.parseInt(text.substring(curPos, curPos + 2));
+            month = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
             throw new ParseException("Month (MM) has wrong format: "
                     + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = '-';
-        if (text.charAt(curPos) != delimiter) {
+        if (time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
         try {
-            day = Integer.parseInt(text.substring(curPos, curPos + 2));
+            day = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
             throw new ParseException("Day (DD) has wrong format: "
                     + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = 'T';
-        if (text.charAt(curPos) != delimiter) {
+        if (time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
         try {
-            hour = Integer.parseInt(text.substring(curPos, curPos + 2));
+            hour = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
             throw new ParseException("Hour (hh) has wrong format: "
                     + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = ':';
-        if (text.charAt(curPos) != delimiter) {
+        if (time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
         try {
-            min = Integer.parseInt(text.substring(curPos, curPos + 2));
+            min = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
             throw new ParseException("Minute (mm) has wrong format: "
                     + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = ':';
-        if (text.charAt(curPos) != delimiter) {
+        if (time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
         try {
-            sec = Integer.parseInt(text.substring(curPos, curPos + 2));
+            sec = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
             throw new ParseException("Second (ss) has wrong format: "
                     + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = '.';
-        if (curPos < text.length() && text.charAt(curPos) == '.') {
+        if (curPos < time.length() && time.charAt(curPos) == '.') {
             curPos++;
             try {
-                ms = Integer.parseInt(text.substring(curPos, curPos + 3));
+                ms = Integer.parseInt(time.substring(curPos, curPos + 3));
             } catch (NumberFormatException e) {
                 throw new ParseException("Millisecond (SSS) has wrong format: "
                         + e.getMessage(), curPos);
@@ -212,11 +243,11 @@ public final class TimeParser {
             ms = new Integer(0);
         }
         // time zone designator (Z or +00:00 or -00:00)
-        if (curPos < text.length()
-                && (text.charAt(curPos) == '+' || text.charAt(curPos) == '-')) {
+        if (curPos < time.length()
+                && (time.charAt(curPos) == '+' || time.charAt(curPos) == '-')) {
             // offset to UTC specified in the format +00:00/-00:00
-            tzID = "GMT" + text.substring(curPos);
-        } else if (curPos < text.length() && text.substring(curPos).equals("Z")) {
+            tzID = "GMT" + time.substring(curPos);
+        } else if (curPos < time.length() && time.substring(curPos).equals("Z")) {
             tzID = "GMT";
         } else {
             // throw new ParseException("invalid time zone designator", curPos);

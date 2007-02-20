@@ -1,3 +1,33 @@
+/*
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.accada.epcis.utils;
 
 import java.io.ByteArrayOutputStream;
@@ -58,18 +88,28 @@ import org.w3c.dom.NodeList;
  * 
  * @author Marco Steybe
  */
-public class QueryResultsParser {
+public final class QueryResultsParser {
 
     private static final Logger LOG = Logger.getLogger(QueryResultsParser.class);
+
+    /**
+     * Empty default contructor. Utility classes should not have public
+     * constructors.
+     */
+    private QueryResultsParser() {
+    }
 
     /**
      * A helper method to parse and convert the XML representation of an EPCIS
      * query results into a QueryResults object.
      * 
      * @param xmlQueryResults
-     * @return
+     *            The InputStream containing the XML representation of a
+     *            QueryResults object.
+     * @return The parsed QueryResults object.
      */
-    public static QueryResults parseQueryResults(InputStream xmlQueryResults) {
+    public static QueryResults parseQueryResults(
+            final InputStream xmlQueryResults) {
         QueryResults queryResults = null;
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -160,7 +200,15 @@ public class QueryResultsParser {
         return queryResults;
     }
 
-    private static ObjectEventType[] handleObjectEvents(NodeList objectEventList) {
+    /**
+     * Parses the object event inside the QueryResults event list.
+     * 
+     * @param objectEventList
+     *            The NodeList parsed from the XML containing the object events.
+     * @return An array of ObjectEventType.
+     */
+    private static ObjectEventType[] handleObjectEvents(
+            final NodeList objectEventList) {
         Vector<ObjectEventType> list = new Vector<ObjectEventType>();
 
         for (int i = 0; i < objectEventList.getLength(); i++) {
@@ -265,8 +313,16 @@ public class QueryResultsParser {
         return list.toArray(objectEvent);
     }
 
+    /**
+     * Parses the transaction event inside the QueryResults event list.
+     * 
+     * @param transEventList
+     *            The NodeList parsed from the XML containing the transaction
+     *            events.
+     * @return An array of TransactionEventType.
+     */
     private static TransactionEventType[] handleTransactionEvents(
-            NodeList transEventList) {
+            final NodeList transEventList) {
         Vector<TransactionEventType> list = new Vector<TransactionEventType>();
 
         for (int i = 0; i < transEventList.getLength(); i++) {
@@ -367,8 +423,16 @@ public class QueryResultsParser {
         return list.toArray(objectEvent);
     }
 
+    /**
+     * Parses the aggregation event inside the QueryResults event list.
+     * 
+     * @param aggrEventList
+     *            The NodeList parsed from the XML containing the aggregation
+     *            events.
+     * @return An array of AggregationEventType.
+     */
     private static AggregationEventType[] handleAggregationEvents(
-            NodeList aggrEventList) {
+            final NodeList aggrEventList) {
         Vector<AggregationEventType> list = new Vector<AggregationEventType>();
 
         for (int i = 0; i < aggrEventList.getLength(); i++) {
@@ -459,8 +523,16 @@ public class QueryResultsParser {
         return list.toArray(aggrEvent);
     }
 
+    /**
+     * Parses the quantity event inside the QueryResults event list.
+     * 
+     * @param quantityEventList
+     *            The NodeList parsed from the XML containing the quantity
+     *            events.
+     * @return An array of QuantityEventType.
+     */
     private static QuantityEventType[] handleQuantityEvents(
-            NodeList quantityEventList) {
+            final NodeList quantityEventList) {
         Vector<QuantityEventType> list = new Vector<QuantityEventType>();
 
         for (int i = 0; i < quantityEventList.getLength(); i++) {
@@ -548,7 +620,14 @@ public class QueryResultsParser {
         return list.toArray(quantityEvent);
     }
 
-    private static VocabularyType[] handleVocabularies(NodeList vocList) {
+    /**
+     * Parses the vocabularies of an event.
+     * 
+     * @param vocList
+     *            The NodeList parsed from the XML containing the vocabularies .
+     * @return An array of VocabularyType.
+     */
+    private static VocabularyType[] handleVocabularies(final NodeList vocList) {
         List<VocabularyType> vocabularies = new ArrayList<VocabularyType>();
 
         for (int i = 0; i < vocList.getLength(); i++) {
@@ -632,7 +711,14 @@ public class QueryResultsParser {
         return vocabularies.toArray(vocs);
     }
 
-    private static ActionType handleAction(Node actionNode) {
+    /**
+     * Parses an action value.
+     * 
+     * @param actionNode
+     *            The XML Node containign the action value.
+     * @return An ActionType.
+     */
+    private static ActionType handleAction(final Node actionNode) {
         ActionType action = null;
         if (actionNode != null) {
             String actionStr = actionNode.getTextContent();
@@ -642,10 +728,13 @@ public class QueryResultsParser {
     }
 
     /**
-     * @param epcArray
+     * Parses a list of EPCs.
+     * 
      * @param epcListNode
+     *            The XML Node containing the list of EPCs.
+     * @return An array of EPC.
      */
-    private static EPC[] handleEpcList(Node epcListNode) {
+    private static EPC[] handleEpcList(final Node epcListNode) {
         EPC[] epcList = null;
         if (epcListNode != null) {
             Element epcListElement = (Element) epcListNode;
@@ -680,8 +769,15 @@ public class QueryResultsParser {
         return cal;
     }
 
+    /**
+     * Parses a list of business transactions.
+     * 
+     * @param bizTransListNode
+     *            The XML Node containing the list of business transactions.
+     * @return An array of BusinessTransactionType.
+     */
     private static BusinessTransactionType[] handleBizTransList(
-            Node bizTransListNode) {
+            final Node bizTransListNode) {
         BusinessTransactionType[] bizTransList = null;
         if (bizTransListNode != null) {
             List<BusinessTransactionType> bizList = new Vector<BusinessTransactionType>();
@@ -704,7 +800,14 @@ public class QueryResultsParser {
         return bizTransList;
     }
 
-    private static URI handleUri(Node node) {
+    /**
+     * Parses an URI value.
+     * 
+     * @param node
+     *            The XML Node containing the URI value.
+     * @return The parsed URI.
+     */
+    private static URI handleUri(final Node node) {
         URI uri = null;
         if (node != null) {
             try {
@@ -717,8 +820,18 @@ public class QueryResultsParser {
         return uri;
     }
 
-    public static void compareResults(QueryResults expResults,
-            QueryResults actResults) {
+    /**
+     * Compares the two given QueryResults with each other. Throws an
+     * AssertionError if the two QueryResults are not equal. The error contains
+     * information about where the two objects differ.
+     * 
+     * @param expResults
+     *            The expected QueryResults object.
+     * @param actResults
+     *            The actual QueryResults object.
+     */
+    public static void compareResults(final QueryResults expResults,
+            final QueryResults actResults) {
         assertEquals(expResults == null, actResults == null);
         assertEquals(expResults.get_any(), actResults.get_any());
         assertEquals(expResults.getExtension(), actResults.getExtension());
@@ -741,8 +854,16 @@ public class QueryResultsParser {
         }
     }
 
-    private static void compareVocabularies(VocabularyType[] expVocs,
-            VocabularyType[] actVocs) {
+    /**
+     * Compares the two given VocabularyType arrays with each other.
+     * 
+     * @param expVocs
+     *            The expected VocabularyType array.
+     * @param actVocs
+     *            The actual VocabularyType array.
+     */
+    private static void compareVocabularies(final VocabularyType[] expVocs,
+            final VocabularyType[] actVocs) {
         assertEquals(expVocs.length, actVocs.length);
         for (int i = 0; i < expVocs.length; i++) {
             assertEquals(expVocs[i].getType(), actVocs[i].getType());
@@ -786,7 +907,6 @@ public class QueryResultsParser {
                             for (int l = 0; l < expME.length; l++) {
                                 assertEquals(expME[l].getNodeValue().trim(),
                                         actME[l].getNodeValue().trim());
-                                ;
                             }
                         }
                     }
@@ -806,8 +926,16 @@ public class QueryResultsParser {
         }
     }
 
-    private static void compareEvents(EventListType actEvents,
-            EventListType expEvents) {
+    /**
+     * Compare the two given EventListType with each other.
+     * 
+     * @param actEvents
+     *            The expected EventListType.
+     * @param expEvents
+     *            The actual EventListType.
+     */
+    private static void compareEvents(final EventListType actEvents,
+            final EventListType expEvents) {
         // compare ObjectEvent
         ObjectEventType[] actObjectEvent = actEvents.getObjectEvent();
         ObjectEventType[] expObjectEvent = expEvents.getObjectEvent();
@@ -1010,7 +1138,16 @@ public class QueryResultsParser {
         }
     }
 
-    private static void assertEquals(Object expected, Object actual) {
+    /**
+     * Ensures that the two given objects are equal, throws an AssertionError if
+     * not.
+     * 
+     * @param expected
+     *            The expected object.
+     * @param actual
+     *            The actual object.
+     */
+    private static void assertEquals(final Object expected, final Object actual) {
         if (expected == null && actual == null) {
             return;
         }
@@ -1021,7 +1158,14 @@ public class QueryResultsParser {
                 + actual + ">");
     }
 
-    private static void assertTrue(boolean check) {
+    /**
+     * Ensures that the given boolean value is <code>true</code>, throws an
+     * AssertionError if not.
+     * 
+     * @param check
+     *            the boolean value to check.
+     */
+    private static void assertTrue(final boolean check) {
         if (!check) {
             throw new AssertionError();
         }

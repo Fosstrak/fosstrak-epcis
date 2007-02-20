@@ -1,3 +1,33 @@
+/*
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.accada.epcis.utils;
 
 import java.io.BufferedReader;
@@ -21,7 +51,7 @@ import java.nio.charset.CharsetDecoder;
  * 
  * @author Marco Steybe
  */
-public class QueryCallbackListener extends Thread {
+public final class QueryCallbackListener extends Thread {
 
     private static final int PORT = 8899;
 
@@ -37,13 +67,12 @@ public class QueryCallbackListener extends Thread {
      * Instantiates a new SubscriptionResponseListener listening on the given
      * port.
      * 
-     * @param port
-     *            The port to listen for traffic.
      * @throws IOException
      *             If an error setting up the communication socket occured.
      */
     private QueryCallbackListener() throws IOException {
-        System.out.println("listening for query callbacks on port " + PORT + " ...");
+        System.out.println("listening for query callbacks on port " + PORT
+                + " ...");
         server = new ServerSocket(PORT);
     }
 
@@ -87,7 +116,16 @@ public class QueryCallbackListener extends Thread {
         }
     }
 
-    private void handleConnection(Socket client) throws IOException {
+    /**
+     * Handles an incoming HTTP connection, reading the contents, and parsing it
+     * as XML.
+     * 
+     * @param client
+     *            The client Socket.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    private void handleConnection(final Socket client) throws IOException {
         PrintWriter out = new PrintWriter(client.getOutputStream(), true);
         InputStream is = client.getInputStream();
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
@@ -132,7 +170,13 @@ public class QueryCallbackListener extends Thread {
         in.close();
     }
 
-    private void parseResponse(String resp) {
+    /**
+     * Extracts the XML contents from the given String.
+     * 
+     * @param resp
+     *            The response from which the XML contents should be extracted.
+     */
+    private void parseResponse(final String resp) {
         if (resp.startsWith("<?xml")) {
             // remove xml declaration
             int index = resp.indexOf("?>") + 2;
@@ -142,16 +186,25 @@ public class QueryCallbackListener extends Thread {
         }
     }
 
+    /**
+     * @return The received XML response.
+     */
     public String fetchResponse() {
         String resp = this.response;
         this.response = null; // reset
         return resp;
     }
 
+    /**
+     * @return Wheter this thread is running.
+     */
     public boolean isRunning() {
         return isRunning;
     }
 
+    /**
+     * Stops this thread from running.
+     */
     public void stopRunning() {
         isRunning = false;
         instance = null;
@@ -161,5 +214,5 @@ public class QueryCallbackListener extends Thread {
             e.printStackTrace();
         }
     }
-    
+
 }
