@@ -1,11 +1,33 @@
 /*
- * Copyright (c) 2006 ETH Zurich, Switzerland. All rights reserved. For copying
- * and distribution information, please see the file LICENSE.
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Separate package for Schedule to keep things a bit organized.
- */
 package org.accada.epcis.repository;
 
 import static java.util.Calendar.DAY_OF_MONTH;
@@ -330,7 +352,8 @@ public class Schedule implements Serializable {
      */
     private boolean secondMadeValid(final GregorianCalendar nextSchedule)
             throws ImplementationException {
-        // check whether the second value of the current time is a valid scheduled second
+        // check whether the second value of the current time is a valid
+        // scheduled second
         if (!seconds.isEmpty() && !seconds.contains(nextSchedule.get(SECOND))) {
             // no current second is not scheduled
             // set is to the next scheduled second
@@ -340,8 +363,8 @@ public class Schedule implements Serializable {
     }
 
     /**
-     * Sets the specified field of the given callendar to the next scheduled value. Returns whether
-     * the new value has been set and is valid.
+     * Sets the specified field of the given callendar to the next scheduled
+     * value. Returns whether the new value has been set and is valid.
      * 
      * @param cal
      *            Calendar to adjust.
@@ -397,7 +420,7 @@ public class Schedule implements Serializable {
             final int field, final int smallerField)
             throws ImplementationException {
         // FIXME marco: why this??? we set the field to next value twice!
-//      cal.add(field, 1);
+        // cal.add(field, 1);
         setFieldsToMinimum(cal, smallerField);
         return setToNextScheduledValue(cal, field);
     }
@@ -467,14 +490,14 @@ public class Schedule implements Serializable {
         case (SECOND):
             result = setFieldToMinimum(cal, SECOND) && result;
             break;
-        default: {
+        default:
             String msg = "Invalid field: " + largestField;
             ImplementationException iex = new ImplementationException();
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);
             iex.setReason(msg);
             LOG.error(msg, iex);
             throw iex;
-        }
+
         }
         return result;
     }
@@ -504,14 +527,13 @@ public class Schedule implements Serializable {
             return minutes;
         case (SECOND):
             return seconds;
-        default: {
+        default:
             String msg = "Invalid field: " + field;
             ImplementationException iex = new ImplementationException();
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);
             iex.setReason(msg);
             LOG.error(msg, iex);
             throw iex;
-        }
         }
     }
 
@@ -533,7 +555,7 @@ public class Schedule implements Serializable {
      *             between the <code>min</code> and <code>max</code> value.
      */
     private void handleValues(final String[] values, final String type,
-            int min, int max) throws SubscriptionControlsException {
+            final int min, final int max) throws SubscriptionControlsException {
         // we put values into this sorted set
         TreeSet<Integer> vals = new TreeSet<Integer>();
         for (String v : values) {
@@ -602,8 +624,8 @@ public class Schedule implements Serializable {
      *            The set of values to which the value should be added.
      * @return The modified set of values.
      */
-    private TreeSet<Integer> addValue(int value, String type,
-            TreeSet<Integer> vals) {
+    private TreeSet<Integer> addValue(final int value, final String type,
+            final TreeSet<Integer> vals) {
         if (type.equals("dayOfWeek")) {
             vals.add(new Integer((value % 7) + 1));
         } else if (type.equals("month")) {

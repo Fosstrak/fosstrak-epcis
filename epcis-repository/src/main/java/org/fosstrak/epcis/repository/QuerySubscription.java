@@ -1,6 +1,31 @@
 /*
- * Copyright (c) 2006 ETH Zurich, Switzerland. All rights reserved. For copying
- * and distribution information, please see the file LICENSE.
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.accada.epcis.repository;
@@ -23,7 +48,6 @@ import org.accada.epcis.soapapi.EPCISQueryDocumentType;
 import org.accada.epcis.soapapi.EPCISServiceBindingStub;
 import org.accada.epcis.soapapi.EPCglobalEPCISServiceLocator;
 import org.accada.epcis.soapapi.EventListType;
-import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.ObjectEventType;
 import org.accada.epcis.soapapi.Poll;
 import org.accada.epcis.soapapi.QuantityEventType;
@@ -55,7 +79,7 @@ public class QuerySubscription implements Serializable {
     /**
      * SubscriptionID.
      */
-    protected String subscriptionID;
+    private String subscriptionID;
 
     /**
      * Query parameters.
@@ -82,7 +106,7 @@ public class QuerySubscription implements Serializable {
      */
     private String queryName;
 
-    protected EPCglobalEPCISServiceLocator service = null;
+    private EPCglobalEPCISServiceLocator service = null;
 
     /**
      * Constructor to be used when recreating from storage.
@@ -133,9 +157,6 @@ public class QuerySubscription implements Serializable {
 
     /**
      * Runs the query assigned to this subscription. Advances lastTimeExecuted.
-     * 
-     * @throws ImplementationException
-     *             For various reasons.
      */
     public void executeQuery() {
         Poll poll = new Poll(queryName, queryParams);
@@ -249,7 +270,7 @@ public class QuerySubscription implements Serializable {
      * @throws IOException
      *             If a communication error occured.
      */
-    private int sendData(URL url, String data) throws IOException {
+    private int sendData(final URL url, final String data) throws IOException {
         data.concat("\n");
         // setup connection
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -287,6 +308,13 @@ public class QuerySubscription implements Serializable {
      */
     public GregorianCalendar getInitialRecordTime() {
         return initialRecordTime;
+    }
+
+    /**
+     * @return the subscriptionID
+     */
+    public String getSubscriptionID() {
+        return subscriptionID;
     }
 
 }

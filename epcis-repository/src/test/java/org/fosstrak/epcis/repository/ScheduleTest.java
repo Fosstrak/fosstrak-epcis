@@ -1,3 +1,33 @@
+/*
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.accada.epcis.repository;
 
 import java.util.Calendar;
@@ -16,6 +46,14 @@ import org.accada.epcis.soapapi.SubscriptionControlsException;
  */
 public class ScheduleTest extends TestCase {
 
+    /**
+     * Test for next scheduled year.
+     * 
+     * @throws ImplementationException
+     *             If an error in the implementation occured.
+     * @throws SubscriptionControlsException
+     *             If an error in the scheudle occured.
+     */
     public void testNextScheduledYear() throws ImplementationException,
             SubscriptionControlsException {
         // scheduled time is 1.1. 01:00.00
@@ -38,6 +76,14 @@ public class ScheduleTest extends TestCase {
         assertEquals(exp, act);
     }
 
+    /**
+     * Test for next scheduled half hour.
+     * 
+     * @throws ImplementationException
+     *             If an error in the implementation occured.
+     * @throws SubscriptionControlsException
+     *             If an error in the scheudle occured.
+     */
     public void testNextScheduledHalfHour() throws ImplementationException,
             SubscriptionControlsException {
         // scheduled time is every half an hour
@@ -69,6 +115,14 @@ public class ScheduleTest extends TestCase {
         assertEquals(exp, act);
     }
 
+    /**
+     * Test for next scheduled day of the week.
+     * 
+     * @throws ImplementationException
+     *             If an error in the implementation occured.
+     * @throws SubscriptionControlsException
+     *             If an error in the scheudle occured.
+     */
     public void testNextScheduledDayOfWeek() throws ImplementationException,
             SubscriptionControlsException {
         // scheduled time is every July, at a Thursday, 17:15.59
@@ -92,6 +146,14 @@ public class ScheduleTest extends TestCase {
         assertEquals(exp, act);
     }
 
+    /**
+     * Test for next scheduled leap year (Schaltjahr).
+     * 
+     * @throws ImplementationException
+     *             If an error in the implementation occured.
+     * @throws SubscriptionControlsException
+     *             If an error in the scheudle occured.
+     */
     public void testNextScheduledLeapYear() throws ImplementationException,
             SubscriptionControlsException {
         // scheduled time is 29.2. 23:00.00 -> must be a leap year
@@ -117,6 +179,14 @@ public class ScheduleTest extends TestCase {
         assertEquals(exp, act);
     }
 
+    /**
+     * Test for next scheduled minute (used in the query tests!).
+     * 
+     * @throws ImplementationException
+     *             If an error in the implementation occured.
+     * @throws SubscriptionControlsException
+     *             If an error in the scheudle occured.
+     */
     public void testNextScheduledMinute() throws ImplementationException,
             SubscriptionControlsException {
         // scheduled time is always at top of a minute
@@ -135,6 +205,14 @@ public class ScheduleTest extends TestCase {
         assertEquals(exp, act);
     }
 
+    /**
+     * Test for a complex next scheduled time.
+     * 
+     * @throws ImplementationException
+     *             If an error in the implementation occured.
+     * @throws SubscriptionControlsException
+     *             If an error in the scheudle occured.
+     */
     public void testComplexNextScheduledTime() throws ImplementationException,
             SubscriptionControlsException {
         // scheduled time is 1., 10., 20., or 30. of a month,
@@ -191,6 +269,14 @@ public class ScheduleTest extends TestCase {
         assertEquals(exp, act);
     }
 
+    /**
+     * Test for another complex next scheduled time.
+     * 
+     * @throws ImplementationException
+     *             If an error in the implementation occured.
+     * @throws SubscriptionControlsException
+     *             If an error in the scheudle occured.
+     */
     public void testLeapYearDayOfWeekNextScheduledTime()
             throws ImplementationException, SubscriptionControlsException {
 
@@ -237,7 +323,7 @@ public class ScheduleTest extends TestCase {
      * @param cal
      *            The calendar to print.
      */
-    private void printDateTime(GregorianCalendar cal) {
+    private void printDateTime(final GregorianCalendar cal) {
         System.out.println("Year: "
                 + cal.get(Calendar.YEAR)
                 // Calendar starts months with 0
@@ -249,5 +335,4 @@ public class ScheduleTest extends TestCase {
                 // Calendar week days start on sunday
                 + ", Weekday: " + (cal.get(Calendar.DAY_OF_WEEK) - 1));
     }
-
 }

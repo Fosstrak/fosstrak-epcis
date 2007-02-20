@@ -1,7 +1,33 @@
 /*
- * Copyright (c) 2006 ETH Zurich, Switzerland. All rights reserved. For copying
- * and distribution information, please see the file LICENSE.
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.accada.epcis.repository;
 
 import java.io.ByteArrayInputStream;
@@ -13,7 +39,6 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -207,8 +232,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
             + "LEFT JOIN `event_TransactionEvent_extensions` ON `event_TransactionEvent`.id = `event_TransactionEvent_extensions`.event_id "
             + "WHERE 1 ";
 
+    /**
+     * Constructs a new QueryOperationsModule.
+     */
     public QueryOperationsModule() {
-        LOG.info("EpcisQueryInterface invoked.");
+        LOG.info("QueryOperationsModule invoked.");
         MessageContext msgContext = MessageContext.getCurrentContext();
         delimiter = (String) msgContext.getProperty("delimiter");
         dbconnection = (Connection) msgContext.getProperty("dbconnection");
@@ -757,6 +785,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryParameterException
      *             If one of the given QueryParam is invalid.
      * @throws ImplementationException
+     *             If an error in the implementation occured.
      */
     private PreparedStatement createEventQuery(final QueryParam[] queryParams,
             final String eventType) throws SQLException,
@@ -852,7 +881,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     }
 
                 } else if (paramName.equals("EQ_bizStep")) {
-                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                    if (paramValue instanceof String
+                            || paramValue.toString().equals("")) {
                         // empty parameter provided -> no binding on events
                         continue;
                     }
@@ -862,7 +892,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     query.append(")) ");
 
                 } else if (paramName.equals("EQ_disposition")) {
-                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                    if (paramValue instanceof String
+                            || paramValue.toString().equals("")) {
                         // empty parameter provided -> no binding on events
                         continue;
                     }
@@ -872,7 +903,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     query.append(")) ");
 
                 } else if (paramName.equals("EQ_readPoint")) {
-                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                    if (paramValue instanceof String
+                            || paramValue.toString().equals("")) {
                         // empty parameter provided -> no binding on events
                         continue;
                     }
@@ -882,7 +914,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     query.append(")) ");
 
                 } else if (paramName.equals("WD_readPoint")) {
-                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                    if (paramValue instanceof String
+                            || paramValue.toString().equals("")) {
                         // empty parameter provided -> no binding on events
                         continue;
                     }
@@ -903,7 +936,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     query.append(") ");
 
                 } else if (paramName.equals("EQ_bizLocation")) {
-                    if (paramValue instanceof String || paramValue.toString().equals("")) {
+                    if (paramValue instanceof String
+                            || paramValue.toString().equals("")) {
                         // empty parameter provided -> no binding on events
                         continue;
                     }
@@ -1173,12 +1207,27 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     }
 
                 } else if (paramName.startsWith("HASATTR_")) {
-                    // TODO:
+                    String fieldname = paramName.substring(8);
+                    // TODO: restrict by fieldname
                     String msg = "HASATTR_fieldname is not implemented.";
                     LOG.info("USER ERROR: " + msg);
                     throw new UnsupportedOperationException(msg);
                 } else if (paramName.startsWith("EQATTR_")) {
-                    // TODO:
+                    String fieldname = paramName.substring(7);
+                    String attrname = null;
+                    String[] parts = fieldname.split("_");
+                    if (parts.length > 2) {
+                        String msg = "Parameter '"
+                                + paramName
+                                + "' is invalid as it does not follow the pattern 'EQATTR_fieldname_attrname'.";
+                        LOG.info("USER ERROR: " + msg);
+                        throw new QueryParameterException(msg);
+                    } else if (parts.length == 2) {
+                        // restrict also by attrname
+                        fieldname = parts[0];
+                        attrname = parts[1];
+                    }
+                    // TODO: restrict by fieldname and attrname
                     String msg = "EQATTR_fieldname_attrname is not implemented.";
                     LOG.info("USER ERROR: " + msg);
                     throw new UnsupportedOperationException(msg);
@@ -1289,7 +1338,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws NoSuchNameException
      *             If a query name is not implemented yet.
      */
-    public VoidHolder subscribe(final Subscribe parms) throws RemoteException {
+    public VoidHolder subscribe(final Subscribe parms)
+            throws ImplementationException, InvalidURIException,
+            SubscribeNotPermittedException, SubscriptionControlsException,
+            ValidationException, DuplicateSubscriptionException,
+            NoSuchNameException {
         QueryParam[] qParams = parms.getParams();
         URI dest = parms.getDest();
         String subscrId = parms.getSubscriptionID();
@@ -1525,6 +1578,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @return Nothing.
      * @throws ImplementationException
      *             If a problem with the EPCIS implementation occured.
+     * @throws NoSuchSubscriptionException
+     *             If the suscription id is not subscribed.
      */
     public VoidHolder unsubscribe(final Unsubscribe parms)
             throws ImplementationException, NoSuchSubscriptionException {
@@ -1584,6 +1639,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @return The map with the subscriptions.
      * @throws ImplementationException
      *             If the map could not be reloaded.
+     * @throws SQLException
+     *             If a database error occured.
      */
     private Map<String, QuerySubscriptionScheduled> loadSubscriptions()
             throws ImplementationException, SQLException {
@@ -1963,9 +2020,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *             If the actual number of returned vocabularies would exceed
      *             the given maxElementCount.
      */
-    private List<URI> fetchVocabularies(String table, String[] filterVocNames,
-            String[] filterVocNamesWd, Map<String, String[]> filterAttrs,
-            String[] attrs, int maxElementCount) throws SQLException,
+    private List<URI> fetchVocabularies(final String table,
+            final String[] filterVocNames, final String[] filterVocNamesWd,
+            final Map<String, String[]> filterAttrs, final String[] attrs,
+            final int maxElementCount) throws SQLException,
             ImplementationException, QueryTooLargeException {
         List<URI> vocs = new ArrayList<URI>();
 
@@ -2054,7 +2112,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             If an error converting a String to an URI occured.
      */
-    private Map<String, URI> fetchVocabularyTableNames(String[] uris)
+    private Map<String, URI> fetchVocabularyTableNames(final String[] uris)
             throws SQLException, ImplementationException {
         Map<String, URI> tableNames = new HashMap<String, URI>();
 
@@ -2100,8 +2158,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws SQLException
      *             If an error accessing the database occured.
      */
-    private Map<String, String> fetchAttributes(String vocTableName,
-            String vocName, String[] filterAttrNames) throws SQLException {
+    private Map<String, String> fetchAttributes(final String vocTableName,
+            final String vocName, final String[] filterAttrNames)
+            throws SQLException {
         Map<String, String> attributes = new HashMap<String, String>();
 
         List<String> queryArgs = new ArrayList<String>(filterAttrNames.length);
@@ -2153,7 +2212,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             If a String could not be converted into an URI.
      */
-    private List<URI> fetchChildren(String vocTableName, String vocUri)
+    private List<URI> fetchChildren(final String vocTableName, final String vocUri)
             throws SQLException, ImplementationException {
         List<URI> children = new ArrayList<URI>();
 
@@ -2204,12 +2263,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * of ADD, OBSERVE, or DELETE. Throws an exception if one of the values is
      * invalid.
      * 
-     * @param action
+     * @param actions
      *            The action values to be checked.
      * @throws QueryParameterException
      *             If one of the action values are invalid.
      */
-    private void checkActionValues(String[] actions)
+    private void checkActionValues(final String[] actions)
             throws QueryParameterException {
         for (int i = 0; i < actions.length; i++) {
             if (!(actions[i].equalsIgnoreCase("ADD")
