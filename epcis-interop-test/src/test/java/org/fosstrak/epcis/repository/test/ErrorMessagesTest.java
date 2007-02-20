@@ -1,9 +1,38 @@
+/*
+ * Copyright (c) 2006, 2007, ETH Zurich
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the ETH Zurich nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.rmi.RemoteException;
 
 import javax.xml.rpc.ServiceException;
 
@@ -20,7 +49,7 @@ import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.SubscriptionControlsException;
 
 /**
- * Tests for exceptions and error messages (SE49-SE65, SE68-SE72, SE74)
+ * Tests for exceptions and error messages (SE49-SE65, SE68-SE72, SE74).
  * 
  * @author Andrea Grössbauer
  * @author Marco Steybe
@@ -34,15 +63,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if QueryTooComplexException is raised.
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE49() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE49() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE49-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -58,15 +84,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if QueryTooLargeException is raised.
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE50() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE50() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE50-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -82,15 +105,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if ImplementationException is raised.
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE51() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE51() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE51-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -106,15 +126,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if InvalidURIException is raised.
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE52() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE52() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE52-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -132,15 +149,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if DuplicateSubscriptionException is raised.
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE53() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE53() throws IOException, ServiceException {
         // subscribe first query
         final String query = "Test-EPCIS10-SE53-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
@@ -168,15 +182,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if NoSuchSubscriptionException is raised.
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE54() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE54() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE54-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         client.subscribe(fis);
@@ -200,15 +211,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (second value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE55() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE55() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE55-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -230,15 +238,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (second value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE56() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE56() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE56-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -259,15 +264,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if SubscriptionControlsException is raised (second value invalid).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE57() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE57() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE57-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -289,15 +291,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (dayOfWeek value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE58() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE58() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE58-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -319,15 +318,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (dayOfWeek value
      * invalid).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE59() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE59() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE59-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -349,15 +345,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (minute value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE60() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE60() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE60-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -379,15 +372,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (minute value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE61() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE61() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE61-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -408,15 +398,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if SubscriptionControlsException is raised (minute value invalid).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE62() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE62() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE62-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -438,15 +425,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (hour value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE63() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE63() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE63-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -468,15 +452,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (hour value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE64() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE64() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE64-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -498,15 +479,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (hour value out of
      * range).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE65() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE65() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE65-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -527,15 +505,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if QueryParameterException is raised (parameter name not defined).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE70() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE70() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE70-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -554,15 +529,12 @@ public class ErrorMessagesTest extends TestCase {
     /**
      * Tests if QueryParameterException is raised (invalid parameter value).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE71() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE71() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE71-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -583,15 +555,12 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if QueryParameterException is raised (multiple occurences of same
      * parameter).
      * 
-     * @throws RemoteException
-     *             If an Axis error occured.
      * @throws ServiceException
      *             If an error in the EPCIS query service occured.
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE72() throws RemoteException, ServiceException,
-            IOException {
+    public void testSE72() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE72-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -607,5 +576,4 @@ public class ErrorMessagesTest extends TestCase {
                     e.getReason());
         }
     }
-
 }
