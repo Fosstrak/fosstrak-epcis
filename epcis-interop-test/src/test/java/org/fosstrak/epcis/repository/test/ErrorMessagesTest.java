@@ -40,16 +40,13 @@ import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.DuplicateSubscriptionException;
-import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.InvalidURIException;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.QueryParameterException;
-import org.accada.epcis.soapapi.QueryTooComplexException;
-import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.SubscriptionControlsException;
 
 /**
- * Tests for exceptions and error messages (SE49-SE65, SE68-SE72, SE74).
+ * Tests for exceptions and error messages (SE51-SE65, SE68-SE72, SE74).
  * 
  * @author Andrea Grössbauer
  * @author Marco Steybe
@@ -59,69 +56,6 @@ public class ErrorMessagesTest extends TestCase {
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
     private QueryControlClient client = new QueryControlClient();
-
-    /**
-     * Tests if QueryTooComplexException is raised.
-     * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
-     * @throws IOException
-     *             If an I/O error occured.
-     */
-    public void testSE49() throws IOException, ServiceException {
-        final String query = "Test-EPCIS10-SE49-Request-1-Poll.xml";
-        InputStream fis = new FileInputStream(PATH + query);
-        try {
-            client.poll(fis);
-            fis.close();
-            fail("QueryTooComplexException expected");
-        } catch (QueryTooComplexException e) {
-            // ok
-            fis.close();
-        }
-    }
-
-    /**
-     * Tests if QueryTooLargeException is raised.
-     * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
-     * @throws IOException
-     *             If an I/O error occured.
-     */
-    public void testSE50() throws IOException, ServiceException {
-        final String query = "Test-EPCIS10-SE50-Request-1-Poll.xml";
-        InputStream fis = new FileInputStream(PATH + query);
-        try {
-            client.poll(fis);
-            fis.close();
-            fail("QueryTooLargeException expected");
-        } catch (QueryTooLargeException e) {
-            // ok
-            fis.close();
-        }
-    }
-
-    /**
-     * Tests if ImplementationException is raised.
-     * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
-     * @throws IOException
-     *             If an I/O error occured.
-     */
-    public void testSE51() throws IOException, ServiceException {
-        final String query = "Test-EPCIS10-SE51-Request-1-Poll.xml";
-        InputStream fis = new FileInputStream(PATH + query);
-        try {
-            client.poll(fis);
-            fis.close();
-            fail("ImplementationException expected");
-        } catch (ImplementationException e) {
-            // ok
-            fis.close();
-        }
-    }
 
     /**
      * Tests if InvalidURIException is raised.
