@@ -30,10 +30,13 @@
 
 package org.accada.epcis.repository;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -86,6 +89,16 @@ public class QueryInitHandler extends BasicHandler {
             }
             log = Logger.getLogger("SoapPreHandler.class");
 
+            // read application properties
+            String appConfigFile = ctx.getInitParameter("appConfigFile");
+            Properties properties = new Properties();
+            try {
+                properties.load(new FileInputStream(servletPath + appConfigFile));
+            } catch (IOException e) {
+                log.error("Unable to load application properties from " + servletPath + appConfigFile);
+            }
+
+            // read db connection parameters
             Context initContext = new InitialContext();
             Context env = (Context) initContext.lookup("java:comp/env");
             DataSource db = (DataSource) env.lookup("jdbc/EPCISDB");
@@ -101,6 +114,7 @@ public class QueryInitHandler extends BasicHandler {
             msgContext.setProperty("dbconnection", dbconnection);
             msgContext.setProperty("delimiter", delimiter);
             msgContext.setProperty("subscribedMap", subscribedMap);
+            msgContext.setProperty("properties", properties);
         } catch (NamingException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "Unable to read configuration, check META-INF/context.xml for Resource 'jdbc/EPCISDB'.";
@@ -113,7 +127,7 @@ public class QueryInitHandler extends BasicHandler {
             String msg = "Unable to connect to the database: " + e.getMessage();
             iex.setReason(msg);
             iex.setStackTrace(e.getStackTrace());
-            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+            iex.setSeverity(ImplementationExceptionSeverity.SEVERE);
             throw iex;
         }
     }

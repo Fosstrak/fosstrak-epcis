@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Context docBase="${catalina.home}/webapps/epcis-repository" path="/epcis-repository" reloadable="true">
+<Context docBase="" path="/epcis-repository" reloadable="true">
 
-  <Parameter name="insertMissingVoc" value="true"/>
+  <!--
+     Parameters defined here are 'initial parameters' which are loaded at
+     startup. Changes to these parameters have no effect on the running
+     application! If parameter changes should be recognized on reloading the
+     context, then put them in application.properties file.
+   -->
 
   <Parameter name="schemaPath" value="WEB-INF/classes/wsdl"/>
   <Parameter name="schemaFile" value="EPCglobal-epcis-1_0.xsd"/>
 
   <Parameter name="log4jConfigFile" value="META-INF/log4j.properties"/>
+  <Parameter name="appConfigFile" value="META-INF/application.properties"/>
 
   <Resource
     name="jdbc/EPCISDB"
@@ -17,4 +23,8 @@
     driverClassName="com.mysql.jdbc.Driver"
     url="jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true">
   </Resource>
+
+  <WatchedResource>WEB-INF/web.xml</WatchedResource>
+  <WatchedResource>META-INF/context.xml</WatchedResource>
+  <WatchedResource>META-INF/application.properties</WatchedResource>
 </Context>

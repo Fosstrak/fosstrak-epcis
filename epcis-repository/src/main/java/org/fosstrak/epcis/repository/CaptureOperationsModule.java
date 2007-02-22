@@ -43,6 +43,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -308,10 +309,16 @@ public class CaptureOperationsModule extends HttpServlet {
             throw new ServletException(msg, e);
         }
 
-        // load parameters
+        // load properties
         String servletPath = getServletContext().getRealPath("/");
-        String bool = getServletContext().getInitParameter("insertMissingVoc");
-        insertMissingVoc = Boolean.parseBoolean(bool);
+        String appConfigFile = getServletContext().getInitParameter("appConfigFile");
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream(servletPath + appConfigFile));
+        } catch (IOException e) {
+            LOG.error("Unable to load application properties from " + servletPath + appConfigFile);
+        }
+        insertMissingVoc = Boolean.parseBoolean(properties.getProperty("insertMissingVoc", "true"));
 
         // load log4j config
         String log4jConfigFile = getServletContext().getInitParameter(

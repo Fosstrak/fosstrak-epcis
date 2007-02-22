@@ -37,6 +37,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -55,6 +56,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -83,6 +85,7 @@ import org.accada.epcis.soapapi.QueryParam;
 import org.accada.epcis.soapapi.QueryParameterException;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.QueryResultsBody;
+import org.accada.epcis.soapapi.QueryTooComplexException;
 import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.ReadPointType;
 import org.accada.epcis.soapapi.Subscribe;
@@ -149,6 +152,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
     private int maxEventCount;
 
     /**
+     * The maximum number of rows a query can return.
+     */
+    private int maxQueryRows;
+
+    /**
+     * The maximum timeout to wait for a query to return.
+     */
+    private int maxQueryTime;
+
+    /**
      * The names of all the implemented queries.
      */
     private final Set<String> queryNames = new HashSet<String>() {
@@ -162,7 +175,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
     /**
      * Basic SQL query string for object events.
      */
-    private String objectEventQueryBase = "SELECT DISTINCT "
+    private String objectEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
             + "`event_ObjectEvent`.id, eventTime, recordTime, "
             + "eventTimeZoneOffset, action, "
             + "`voc_BizStep`.uri AS bizStep, "
@@ -180,7 +193,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
     /**
      * Basic SQL query string for aggregation events.
      */
-    private String aggregationEventQueryBase = "SELECT DISTINCT "
+    private String aggregationEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
             + "`event_AggregationEvent`.id, eventTime, recordTime, "
             + "eventTimeZoneOffset, parentID, action, "
             + "`voc_BizStep`.uri AS bizStep, "
@@ -198,7 +211,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
     /**
      * Basic SQL query string for quantity events.
      */
-    private String quantityEventQueryBase = "SELECT DISTINCT "
+    private String quantityEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
             + "`event_QuantityEvent`.id, eventTime, recordTime, eventTimeZoneOffset, "
             + "`voc_EPCClass`.uri AS epcClass, quantity, "
             + "`voc_BizStep`.uri AS bizStep, "
@@ -217,7 +230,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
     /**
      * Basic SQL query string for transaction events.
      */
-    private String transactionEventQueryBase = "SELECT DISTINCT "
+    private String transactionEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
             + "`event_TransactionEvent`.id, eventTime, recordTime, "
             + "eventTimeZoneOffset, action, parentID, "
             + "`voc_BizStep`.uri AS bizStep, "
@@ -233,13 +246,23 @@ public class QueryOperationsModule implements EPCISServicePortType {
             + "WHERE 1 ";
 
     /**
-     * Constructs a new QueryOperationsModule.
+     * Constructs a new QueryOperationsModule. Reads the properties from the
+     * passed message context, which is set by the QueryInitHandler's invoke
+     * method.
      */
     public QueryOperationsModule() {
         LOG.info("QueryOperationsModule invoked.");
         MessageContext msgContext = MessageContext.getCurrentContext();
         delimiter = (String) msgContext.getProperty("delimiter");
+        LOG.debug("delimiter=" + delimiter);
         dbconnection = (Connection) msgContext.getProperty("dbconnection");
+        Properties properties = (Properties) msgContext.getProperty("properties");
+        maxQueryRows = Integer.parseInt(properties.getProperty(
+                "maxQueryResultRows", "-1"));
+        LOG.debug("maxQueryResultRows=" + maxQueryRows);
+        maxQueryTime = Integer.parseInt(properties.getProperty(
+                "maxQueryExecutionTime", "10000"));
+        LOG.debug("maxQueryExecutionTime=" + maxQueryTime);
     }
 
     /**
@@ -450,10 +473,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             Problem with data or on implementation side. (i.e. uri value
      *             in DB is actually not an uri)
+     * @throws QueryTooLargeException
+     *             If the rows returned by the query is larger than specified or
+     *             larger than this implementation is willing to accept.
+     * @throws QueryTooComplexException
+     *             If the query takes too long to return.
      */
     private ObjectEventType[] runObjectEventQuery(
             final PreparedStatement objectEventQuery) throws SQLException,
-            ImplementationException {
+            ImplementationException, QueryTooLargeException,
+            QueryTooComplexException {
         if (objectEventQuery == null) {
             return null;
         }
@@ -462,7 +491,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
         Calendar cal = Calendar.getInstance();
 
         // run the query and get all ObjectEvents
-        ResultSet rs = objectEventQuery.executeQuery();
+        ResultSet rs = executeStatement(objectEventQuery, maxQueryTime);
+        checkQueryRows();
 
         List<ObjectEventType> objectEventList = new ArrayList<ObjectEventType>();
         while (rs.next()) {
@@ -530,10 +560,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             May throw ImplementationException for various reasons (i.e.
      *             uri value in DB is actually not an uri)
+     * @throws QueryTooLargeException
+     *             If the rows returned by the query is larger than specified or
+     *             larger than this implementation is willing to accept.
+     * @throws QueryTooComplexException
+     *             If a query takes too long to return.
      */
     private AggregationEventType[] runAggregationEventQuery(
             final PreparedStatement aggregationEventQuery) throws SQLException,
-            ImplementationException {
+            ImplementationException, QueryTooLargeException,
+            QueryTooComplexException {
         if (aggregationEventQuery == null) {
             return null;
         }
@@ -542,7 +578,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
         Calendar cal = Calendar.getInstance();
 
         // run the query and get all AggregationEvents
-        ResultSet rs = aggregationEventQuery.executeQuery();
+        ResultSet rs = executeStatement(aggregationEventQuery, maxQueryTime);
+        checkQueryRows();
 
         List<AggregationEventType> aggrEventList = new ArrayList<AggregationEventType>();
         while (rs.next()) {
@@ -607,10 +644,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             May throw ImplementationException for various reasons (i.e.
      *             uri value in DB is actually not an uri)
+     * @throws QueryTooLargeException
+     *             If the rows returned by the query is larger than specified or
+     *             larger than this implementation is willing to accept.
+     * @throws QueryTooComplexException
+     *             If a query takes too long to return.
      */
     private QuantityEventType[] runQuantityEventQuery(
             final PreparedStatement quantityEventQuery) throws SQLException,
-            ImplementationException {
+            ImplementationException, QueryTooLargeException,
+            QueryTooComplexException {
         if (quantityEventQuery == null) {
             return null;
         }
@@ -619,7 +662,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
         Calendar cal = Calendar.getInstance();
 
         // run the query and get all QuantityEvents
-        ResultSet rs = quantityEventQuery.executeQuery();
+        ResultSet rs = executeStatement(quantityEventQuery, maxQueryTime);
+        checkQueryRows();
 
         List<QuantityEventType> quantEventList = new ArrayList<QuantityEventType>();
         while (rs.next()) {
@@ -680,10 +724,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             May throw ImplementationException for various reasons (i.e.
      *             uri value in DB is actually not an uri)
+     * @throws QueryTooLargeException
+     *             If the rows returned by the query is larger than specified or
+     *             larger than this implementation is willing to accept.
+     * @throws QueryTooComplexException
+     *             If a query takes too long to return.
      */
     private TransactionEventType[] runTransactionEventQuery(
             final PreparedStatement transactionEventQuery) throws SQLException,
-            ImplementationException {
+            ImplementationException, QueryTooLargeException,
+            QueryTooComplexException {
         if (transactionEventQuery == null) {
             return null;
         }
@@ -692,7 +742,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
         Calendar cal = Calendar.getInstance();
 
         // run the query and get all TransactionEvents
-        ResultSet rs = transactionEventQuery.executeQuery();
+        ResultSet rs = executeStatement(transactionEventQuery, maxQueryTime);
+        checkQueryRows();
 
         List<TransactionEventType> transEventList = new ArrayList<TransactionEventType>();
         while (rs.next()) {
@@ -741,6 +792,44 @@ public class QueryOperationsModule implements EPCISServicePortType {
         TransactionEventType[] transEvents = new TransactionEventType[transEventList.size()];
         transEvents = transEventList.toArray(transEvents);
         return transEvents;
+    }
+
+    /**
+     * Retrieves the number of rows resulted from the execution of the last
+     * query and throws a QueryTooLargeExsception if the number exceeds the
+     * value specified by the 'maxEventCount' argument or the implementation's
+     * global 'maxNrOfRows' parameter.
+     * 
+     * @throws SQLException
+     *             If a problem accessing the database occured.
+     * @throws QueryTooLargeException
+     *             If the rows returned by the query is larger than specified or
+     *             larger than this implementation is willing to accept.
+     */
+    private void checkQueryRows() throws SQLException, QueryTooLargeException {
+        // check the number of rows calculated for the query
+        Statement stmt = dbconnection.createStatement();
+        ResultSet rows = stmt.executeQuery("SELECT FOUND_ROWS() AS rowcount;");
+        int rowCount = maxQueryRows;
+        if (rows.first()) {
+            rowCount = rows.getInt(1);
+        }
+        if (rowCount > maxQueryRows
+                || (maxEventCount > -1 && rowCount > maxEventCount)) {
+            String msg = "The query returned more results (" + rowCount
+                    + ") than ";
+            if (rowCount > maxQueryRows) {
+                msg = msg + "this implementation is willing to handle ("
+                        + maxQueryRows + ").";
+            } else {
+                msg = msg + "specified by parameter 'maxEventCount' ("
+                        + maxEventCount + ").";
+            }
+            LOG.info("USER ERROR: " + msg);
+            QueryTooLargeException e = new QueryTooLargeException();
+            e.setReason(msg);
+            throw e;
+        }
     }
 
     /**
@@ -812,7 +901,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
         String orderBy = "";
         String orderDirection = "";
         int limit = -1;
-        int maxEvent = -1;
+        maxEventCount = -1;
         List<String> params = new LinkedList<String>();
         List<String> queryArgs = new ArrayList<String>();
 
@@ -1262,14 +1351,14 @@ public class QueryOperationsModule implements EPCISServicePortType {
             }
         }
 
-        if (maxEvent > -1 && limit > -1) {
-            String msg = "The maxEventCount and the eventCountLimit are mutually exclusive.";
+        if (maxEventCount > -1 && limit > -1) {
+            String msg = "Paramters 'maxEventCount' and 'eventCountLimit' are mutually exclusive.";
             LOG.info("USER ERROR: " + msg);
             throw new QueryParameterException(msg);
         }
 
         if (orderBy.equals("") && limit > -1) {
-            String msg = "eventCountLimit may only be used when orderBy is specified.";
+            String msg = "Parameter 'eventCountLimit' may only be used when 'orderBy' is specified.";
             LOG.info("USER ERROR: " + msg);
             throw new QueryParameterException(msg);
         }
@@ -1285,7 +1374,17 @@ public class QueryOperationsModule implements EPCISServicePortType {
         }
 
         if (limit > -1) {
-            query.append(" LIMIT " + ((Integer) limit).toString());
+            if (limit <= maxQueryRows) {
+                query.append(" LIMIT " + limit);
+            } else {
+                query.append(" LIMIT " + maxQueryRows);
+            }
+        } else if (maxEventCount > -1) {
+            if (maxEventCount <= maxQueryRows) {
+                query.append(" LIMIT " + maxEventCount);
+            } else {
+                query.append(" LIMIT " + maxQueryRows);
+            }
         }
 
         String q = query.toString();
@@ -1296,7 +1395,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
             ps.setString(i + 1, (String) queryArgs.get(i));
             LOG.debug("       query param " + (i + 1) + ": " + queryArgs.get(i));
         }
-
         return ps;
     }
 
@@ -1697,10 +1795,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *             If one of the query parameters is invalid.
      * @throws NoSuchNameException
      *             If an invalid query type was provided.
+     * @throws QueryTooComplexException
+     *             If a query takes too long to return.
      */
     public QueryResults poll(final Poll parms) throws ImplementationException,
             QueryTooLargeException, QueryParameterException,
-            NoSuchNameException {
+            NoSuchNameException, QueryTooComplexException {
 
         // query type must be implemented.
         if (!queryNames.contains(parms.getQueryName())) {
@@ -1744,14 +1844,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 TransactionEventType[] tempTransEvent = runTransactionEventQuery(ps);
                 if (tempTransEvent != null) {
                     actEventCount += tempTransEvent.length;
-                }
-
-                if (maxEventCount > -1 && actEventCount > maxEventCount) {
-                    String msg = "The actual result set (" + actEventCount
-                            + ") is larger than the specified maxEventCount ("
-                            + maxEventCount + ").";
-                    LOG.info("USER ERROR: " + msg);
-                    throw new QueryTooLargeException(msg, queryName, null);
                 }
 
                 // construct QueryResults
@@ -2212,8 +2304,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             If a String could not be converted into an URI.
      */
-    private List<URI> fetchChildren(final String vocTableName, final String vocUri)
-            throws SQLException, ImplementationException {
+    private List<URI> fetchChildren(final String vocTableName,
+            final String vocUri) throws SQLException, ImplementationException {
         List<URI> children = new ArrayList<URI>();
 
         StringBuffer sql = new StringBuffer();
@@ -2278,6 +2370,137 @@ public class QueryOperationsModule implements EPCISServicePortType {
                         + ". Must be one of ADD, OBSERVE, or DELETE.";
                 LOG.info("USER ERROR: " + msg);
                 throw new QueryParameterException(msg);
+            }
+        }
+    }
+
+    /**
+     * Executes the given PreparedStatement and throws a
+     * QueryTooComplexException if the query takes longer than the given
+     * timeout.
+     * 
+     * @param ps
+     *            The PreparedStatement to be executed.
+     * @param timeout
+     *            The time to wait for the query to finish.
+     * @return The ResultSet from query execution.
+     * @throws QueryTooComplexException
+     *             If the query takes longer than the gven timeout.
+     * @throws SQLException
+     *             If the execution of the query threw an exception.
+     */
+    private ResultSet executeStatement(final PreparedStatement ps,
+            final long timeout) throws QueryTooComplexException, SQLException {
+        if (timeout > 0) {
+            // start query execution in a new thread
+            Query query = new Query(ps);
+            query.start();
+
+            // wait some time for the query to execute
+            synchronized (query) {
+                try {
+                    query.wait(timeout);
+                } catch (InterruptedException e) {
+                }
+            }
+
+            // check if the query returned before the timeout
+            ResultSet rs = query.getResultSet();
+            query.checkException();
+            if (rs == null) {
+                // query has not yet finished and takes too long
+                String msg = "Execution of a query takes longer than this implementation is willing to accept.";
+                LOG.info("USER ERROR: " + msg);
+                throw new QueryTooComplexException(msg);
+            }
+
+            // query returned before timeout
+            if (LOG.isDebugEnabled()) {
+                BigDecimal bd = new BigDecimal(query.getExecutionTime() / 1000);
+                double time = bd.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                LOG.debug("Query took " + time + " sec.");
+            }
+            return query.getResultSet();
+        } else {
+            // timeout value is actually set to an invalid value!
+            String msg = "Execution of a query takes longer than this implementation is willing to accept.";
+            LOG.info("USER ERROR: " + msg);
+            throw new QueryTooComplexException(msg);
+        }
+    }
+
+    /**
+     * A Query which executes a given prepared statement upon Thread start and
+     * measures its execution time.
+     * 
+     * @author Marco Steybe
+     */
+    private final class Query extends Thread {
+
+        private PreparedStatement ps = null;
+        private ResultSet rs = null;
+        private long executionTime = 0;
+        private SQLException sqlException = null;
+
+        /**
+         * Constructs a new Query which executes the given prepared statement
+         * upon Thread start and measures the query execution time.
+         * 
+         * @param ps
+         *            The PreparedStatement to be executed.
+         */
+        public Query(final PreparedStatement ps) {
+            this.ps = ps;
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see java.lang.Thread#run()
+         */
+        public void run() {
+            try {
+                long t1 = System.currentTimeMillis();
+                rs = ps.executeQuery();
+                long t2 = System.currentTimeMillis();
+                executionTime = t2 - t1;
+            } catch (SQLException e) {
+                sqlException = e;
+            }
+        }
+
+        /**
+         * @return The executionTime.
+         */
+        public long getExecutionTime() {
+            return executionTime;
+        }
+
+        /**
+         * @return The ResultSet.
+         */
+        public ResultSet getResultSet() {
+            return rs;
+        }
+
+        /**
+         * @return The PreparedStatement.
+         */
+        public PreparedStatement getStatement() {
+            return ps;
+        }
+
+        /**
+         * Checks whether execution of the query threw an exception. If so, the
+         * exception is retrown here.
+         * 
+         * @throws SQLException
+         *             If the query threw an exception.
+         */
+        public void checkException() throws SQLException {
+            // execution of query threw an exception
+            if (sqlException != null) {
+                throw sqlException;
             }
         }
     }
