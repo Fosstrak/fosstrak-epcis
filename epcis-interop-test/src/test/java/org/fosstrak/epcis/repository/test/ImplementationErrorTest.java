@@ -41,6 +41,8 @@ import junit.framework.TestCase;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
+import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.utils.QueryCallbackListener;
 
 /**
  * Tests for some ImplementationException with severity SEVERE (SE50). Note: to
@@ -56,6 +58,16 @@ public class ImplementationErrorTest extends TestCase {
     private QueryControlClient client = new QueryControlClient();
 
     /**
+     * No testing, just print a message that reminds that the setup for an
+     * ImplementationException must be given.
+     */
+    public void testSetup() {
+        // the easiest (and maybe currently only) way to test for an
+        // ImplementationException is when an EPC is not in URI format.
+        System.out.println("SETUP: modify the URI of an ObjectEvent EPC in the DB so that it is not valid anymore!");
+    }
+
+    /**
      * Tests if ImplementationException is raised.
      * 
      * @throws ServiceException
@@ -63,9 +75,7 @@ public class ImplementationErrorTest extends TestCase {
      * @throws IOException
      *             If an I/O error occured.
      */
-    public void testSE50() throws IOException, ServiceException {
-        System.out.println("SETUP: shut down mysql instance!");
-
+    public void testSE51() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE51-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -75,7 +85,54 @@ public class ImplementationErrorTest extends TestCase {
         } catch (ImplementationException e) {
             // ok
             fis.close();
-            assertEquals(e.getSeverity(), ImplementationExceptionSeverity.SEVERE);
+            assertEquals(e.getSeverity(),
+                    ImplementationExceptionSeverity.ERROR);
+        }
+    }
+
+    /**
+     * Tests if ImplementationException is raised (callback).
+     * 
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE69() throws IOException, ServiceException {
+        // subscribe query
+        final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        client.subscribe(fis);
+        fis.close();
+
+        // start subscription response listener
+        QueryCallbackListener listener = QueryCallbackListener.getInstance();
+        if (!listener.isRunning()) {
+            listener.start();
+        }
+        System.out.println("waiting ...");
+        synchronized (listener) {
+            try {
+                listener.wait(60000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        String resp = listener.fetchResponse();
+        assertNotNull(resp);
+
+        client.unsubscribe("QuerySE69"); // clean up
+        assertTrue(resp.contains("ImplementationException"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void tearDown() throws Exception {
+        // make sure the query is unsubscribed!
+        try {
+            client.unsubscribe("QuerySE69");
+        } catch (NoSuchSubscriptionException e) {
         }
     }
 }

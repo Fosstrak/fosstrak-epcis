@@ -39,7 +39,9 @@ import javax.xml.rpc.ServiceException;
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
+import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.QueryTooLargeException;
+import org.accada.epcis.utils.QueryCallbackListener;
 
 /**
  * Tests for QueryTooLargeException (SE50). Note 'maxQueryResultRows' property
@@ -54,6 +56,18 @@ public class QueryTooLargeTest extends TestCase {
     private QueryControlClient client = new QueryControlClient();
 
     /**
+     * No testing, just make sure that the 'maxQueryResultRows' property is set
+     * to < 125!
+     */
+    public void testSetup() {
+        // the property 'maxQueryResultRows' determines when a
+        // QueryTooLargeException is thrown. For the other tests we need all
+        // events, for ObjectEvent that is 125 events. In order for this test
+        // to succeed we need to set the 'maxQueryResultRows' to less than 125
+        System.out.println("SETUP: 'maxQueryResultRows' property must be set to < 125!");
+    }
+
+    /**
      * Tests if QueryTooLargeException is raised.
      * 
      * @throws ServiceException
@@ -62,12 +76,6 @@ public class QueryTooLargeTest extends TestCase {
      *             If an I/O error occured.
      */
     public void testSE50() throws IOException, ServiceException {
-        // the property 'maxQueryResultRows' determines when a
-        // QueryTooLargeException is thrown. For the other tests we need all
-        // events, for ObjectEvent that is 125 events. In order for this test
-        // to succeed we need to set the 'maxQueryResultRows' to less than 125
-        System.out.println("SETUP: 'maxQueryResultRows' property must be set to < 125!");
-
         final String query = "Test-EPCIS10-SE50-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -77,6 +85,52 @@ public class QueryTooLargeTest extends TestCase {
         } catch (QueryTooLargeException e) {
             // ok
             fis.close();
+        }
+    }
+
+    /**
+     * Tests if QueryTooLargeException is raised (callback).
+     * 
+     * @throws ServiceException
+     *             If an error in the EPCIS query service occured.
+     * @throws IOException
+     *             If an I/O error occured.
+     */
+    public void testSE68() throws IOException, ServiceException {
+        // subscribe query
+        final String query = "Test-EPCIS10-SE68-Request-1-Subscribe.xml";
+        InputStream fis = new FileInputStream(PATH + query);
+        client.subscribe(fis);
+        fis.close();
+
+        // start subscription response listener
+        QueryCallbackListener listener = QueryCallbackListener.getInstance();
+        if (!listener.isRunning()) {
+            listener.start();
+        }
+        System.out.println("waiting ...");
+        synchronized (listener) {
+            try {
+                listener.wait(60000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        String resp = listener.fetchResponse();
+        assertNotNull(resp);
+
+        client.unsubscribe("QuerySE68"); // clean up
+        assertTrue(resp.contains("QueryTooLargeException"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void tearDown() throws Exception {
+        // make sure the query is unsubscribed!
+        try {
+            client.unsubscribe("QuerySE68");
+        } catch (NoSuchSubscriptionException e) {
         }
     }
 }
