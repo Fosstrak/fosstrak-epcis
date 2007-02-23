@@ -449,6 +449,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 return null;
             }
             URI uri = new URI(uriString);
+            LOG.debug("URI '"+uriString+"' is valid");
             return uri;
         } catch (URI.MalformedURIException e) {
             String msg = "Malformed URI value: " + uriString;

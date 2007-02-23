@@ -36,23 +36,25 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.rmi.RemoteException;
 import java.util.GregorianCalendar;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
 import org.accada.epcis.soapapi.AggregationEventType;
+import org.accada.epcis.soapapi.EPCISException;
 import org.accada.epcis.soapapi.EPCISQueryBodyType;
 import org.accada.epcis.soapapi.EPCISQueryDocumentType;
 import org.accada.epcis.soapapi.EPCISServiceBindingStub;
 import org.accada.epcis.soapapi.EPCglobalEPCISServiceLocator;
 import org.accada.epcis.soapapi.EventListType;
+import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.ObjectEventType;
 import org.accada.epcis.soapapi.Poll;
 import org.accada.epcis.soapapi.QuantityEventType;
 import org.accada.epcis.soapapi.QueryParam;
 import org.accada.epcis.soapapi.QueryResults;
+import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.soapapi.TransactionEventType;
 import org.apache.axis.MessageContext;
 import org.apache.axis.encoding.SerializationContext;
@@ -169,11 +171,27 @@ public class QuerySubscription implements Serializable {
             try {
                 EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
                 result = epcisQueryService.poll(poll);
-            } catch (RemoteException e) {
-                // FIXME this exception should be sent back to the client!!!
-                String msg = e.getMessage();
+            } catch (QueryTooLargeException e) {
+                // send exception back to client
+                EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
+                queryBody.setQueryTooLargeException(e);
+                serializeAndSend(queryBody);
+                return;
+            } catch (ImplementationException e) {
+                // send exception back to client
+                EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
+                queryBody.setImplementationException(e);
+                serializeAndSend(queryBody);
+                return;
+            } catch (EPCISException e) {
+                // log exception
+                String msg = "An error executing a subscribed query occured: "
+                        + e.getReason();
                 LOG.error(msg, e);
-                throw e; // re-throw exception for now ...
+            } catch (ServiceException e) {
+                String msg = "An error retrieving the EPCIS query service occured: "
+                        + e.getMessage();
+                LOG.error(msg, e);
             }
             result.setSubscriptionID(subscriptionID);
             EventListType eventList = result.getResultsBody().getEventList();
@@ -224,39 +242,46 @@ public class QuerySubscription implements Serializable {
             EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
             queryBody.setQueryResults(result);
 
-            EPCISQueryDocumentType queryDoc = new EPCISQueryDocumentType();
-            queryDoc.setCreationDate(new GregorianCalendar());
-            queryDoc.setEPCISBody(queryBody);
-
-            // serialize the response
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            OutputStreamWriter writer = new OutputStreamWriter(baos);
-            SerializationContext serContext = new SerializationContext(writer);
-            QName queryDocXMLType = EPCISQueryDocumentType.getTypeDesc().getXmlType();
-            serContext.setWriteXMLType(queryDocXMLType);
-            serContext.serialize(queryDocXMLType, new NullAttributes(),
-                    queryDoc, queryDocXMLType, EPCISQueryDocumentType.class,
-                    false, true);
-            writer.flush();
-            String data = baos.toString();
-
-            // set up connection and send data to given destination
-            URL serviceUrl = new URL(dest.toString());
-            LOG.debug("Sending results of subscribed query with ID '"
-                    + subscriptionID + "' to '" + serviceUrl + "'.");
-            int responseCode = sendData(serviceUrl, data);
-            LOG.debug("Response " + responseCode);
+            serializeAndSend(queryBody);
 
         } catch (IOException e) {
             String msg = "An error opening a connection to '" + dest
                     + "' or serializing and sending contents occured: "
                     + e.getMessage();
             LOG.error(msg, e);
-        } catch (ServiceException e) {
-            String msg = "An error retrieving the EPCIS query service occured: "
-                    + e.getMessage();
-            LOG.error(msg, e);
         }
+    }
+
+    /**
+     * Serializes and sends the query response back to the client.
+     * 
+     * @param body
+     *            The body of the EPCISQueryDocumentType.
+     * @throws IOException
+     *             If a serialization or sending error occured.
+     */
+    private void serializeAndSend(final EPCISQueryBodyType body) throws IOException {
+        EPCISQueryDocumentType queryDoc = new EPCISQueryDocumentType();
+        queryDoc.setCreationDate(new GregorianCalendar());
+        queryDoc.setEPCISBody(body);
+
+        // serialize the response
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStreamWriter writer = new OutputStreamWriter(baos);
+        SerializationContext serContext = new SerializationContext(writer);
+        QName queryDocXMLType = EPCISQueryDocumentType.getTypeDesc().getXmlType();
+        serContext.setWriteXMLType(queryDocXMLType);
+        serContext.serialize(queryDocXMLType, new NullAttributes(), queryDoc,
+                queryDocXMLType, EPCISQueryDocumentType.class, false, true);
+        writer.flush();
+        String data = baos.toString();
+
+        // set up connection and send data to given destination
+        URL serviceUrl = new URL(dest.toString());
+        LOG.debug("Sending results of subscribed query with ID '"
+                + subscriptionID + "' to '" + serviceUrl + "'.");
+        int responseCode = sendData(serviceUrl, data);
+        LOG.debug("Response " + responseCode);
     }
 
     /**
