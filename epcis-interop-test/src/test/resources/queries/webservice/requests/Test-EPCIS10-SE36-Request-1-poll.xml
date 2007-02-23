@@ -1,18 +1,20 @@
 <epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<params>
-		<param>
-			<name>EQATTR_bizLocation_urn:epcglobal:fmcg:mda:sslt</name>
-			<value>209</value>
-		</param>
-		<param>
-			<name>orderBy</name>
-			<value>eventTime</value>
-		</param>
-		<param>
-			<name>orderDirection</name>
-			<value>DESC</value>
-		</param>
+  <queryName>SimpleEventQuery</queryName>
+  <params>
+    <param>
+      <name>EQATTR_bizLocation_urn:epcglobal:fmcg:mda:sslt</name>
+      <value>
+        <string>209</string>
+      </value>
+    </param>
+    <param>
+      <name>orderBy</name>
+      <value>eventTime</value>
+    </param>
+    <param>
+      <name>orderDirection</name>
+      <value>DESC</value>
+    </param>
 
-	</params>
+  </params>
 </epcisq:poll>
