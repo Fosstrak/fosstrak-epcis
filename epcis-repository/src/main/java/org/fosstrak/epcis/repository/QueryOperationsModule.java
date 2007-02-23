@@ -399,14 +399,14 @@ public class QueryOperationsModule implements EPCISServicePortType {
             final String tableName, final int eventId) throws SQLException,
             ImplementationException {
         String query = "SELECT DISTINCT "
-                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS `typeuri`"
-                + "FROM ((`BizTransaction` JOIN `"
+                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri"
+                + " FROM ((`BizTransaction` JOIN `"
                 + tableName
                 + "` ON `BizTransaction`.id = `"
                 + tableName
-                + "`.`bizTrans_id`)"
-                + "JOIN `voc_BizTrans` ON `BizTransaction`.`bizTrans` = `voc_BizTrans`.id)"
-                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.`type` = `voc_BizTransType`.id"
+                + "`.bizTrans_id)"
+                + "JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
+                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
                 + " WHERE `" + tableName + "`.event_id = " + eventId;
         LOG.debug("QUERY: " + query);
         Statement stmt = dbconnection.createStatement();
@@ -1272,7 +1272,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                                 + "_EPCs`");
                         query.append("))");
                     } else if (fieldname.equals("bizTransactionList")) {
-                        query.append(" AND (`event_" + eventType + ".id IN (");
+                        query.append(" AND (`event_" + eventType + "`.id IN (");
                         query.append("SELECT event_id FROM `event_" + eventType
                                 + "_bizTrans`");
                         query.append("))");
@@ -1295,45 +1295,106 @@ public class QueryOperationsModule implements EPCISServicePortType {
                         }
                     }
 
-                } else if (paramName.startsWith("HASATTR_")) {
+                } else if (paramName.startsWith("HASATTR_")
+                        || paramName.startsWith("EQATTR_")) {
+                    // parse fieldname and attrname from paramName
                     String fieldname = paramName.substring(8);
-                    // TODO: restrict by fieldname
-                    String msg = "HASATTR_fieldname is not implemented.";
-                    LOG.info("USER ERROR: " + msg);
-                    throw new UnsupportedOperationException(msg);
-                } else if (paramName.startsWith("EQATTR_")) {
-                    String fieldname = paramName.substring(7);
                     String attrname = null;
-                    String[] parts = fieldname.split("_");
-                    if (parts.length > 2) {
-                        String msg = "Parameter '"
-                                + paramName
-                                + "' is invalid as it does not follow the pattern 'EQATTR_fieldname_attrname'.";
-                        LOG.info("USER ERROR: " + msg);
-                        throw new QueryParameterException(msg);
-                    } else if (parts.length == 2) {
-                        // restrict also by attrname
-                        fieldname = parts[0];
-                        attrname = parts[1];
+                    if (paramName.startsWith("EQATTR_")) {
+                        fieldname = paramName.substring(7);
+                        String[] parts = fieldname.split("_");
+                        if (parts.length > 2) {
+                            String msg = "Parameter '"
+                                    + paramName
+                                    + "' is invalid as it does not follow the pattern 'EQATTR_fieldname_attrname'.";
+                            LOG.info("USER ERROR: " + msg);
+                            throw new QueryParameterException(msg);
+                        } else if (parts.length == 2) {
+                            // restrict also by attrname
+                            fieldname = parts[0];
+                            attrname = parts[1];
+                        }
                     }
-                    // TODO: restrict by fieldname and attrname
-                    String msg = "EQATTR_fieldname_attrname is not implemented.";
-                    LOG.info("USER ERROR: " + msg);
-                    throw new UnsupportedOperationException(msg);
+
+                    // get correct tablename for voc table
+                    String tablename = null;
+                    String biztrans = null;
+                    if (fieldname.equalsIgnoreCase("epcClass")
+                            && eventType.equals("QuantityEvent")) {
+                        tablename = "EPCClass";
+                    } else if (fieldname.equalsIgnoreCase("bizStep")) {
+                        tablename = "BizStep";
+                    } else if (fieldname.equalsIgnoreCase("disposition")) {
+                        tablename = "Disposition";
+                    } else if (fieldname.equalsIgnoreCase("readPoint")) {
+                        tablename = "ReadPoint";
+                    } else if (fieldname.equalsIgnoreCase("bizLocation")) {
+                        tablename = "BizLoc";
+                    } else if (fieldname.equalsIgnoreCase("bizTransaction")) {
+                        tablename = "BizTrans";
+                        biztrans = "bizTrans";
+                    } else if (fieldname.equalsIgnoreCase("type")) {
+                        tablename = "BizTransType";
+                        biztrans = "type";
+                    } else {
+                        // try to parse fieldname as extension
+                        String[] parts = fieldname.split("#");
+                        if (parts.length == 2) {
+                            // TODO: marco: do we need attributes for fieldname
+                            // extensions?
+                            String msg = "Attributes for fielname extensions not implemented.";
+                            LOG.warn(msg);
+                            throw new UnsupportedOperationException(msg);
+                        }
+                    }
+
+                    // construct the query
+                    if (tablename != null) {
+                        if (biztrans != null) {
+                            query.append(" AND `event_");
+                            query.append(eventType);
+                            query.append("`.id IN (SELECT event_id FROM `event_");
+                            query.append(eventType);
+                            query.append("_BizTrans` AS btrans WHERE btrans.bizTrans_id IN (");
+                            query.append("SELECT id FROM `BizTransaction` WHERE `BizTransaction`.");
+                            query.append(biztrans);
+                            query.append(" IN (SELECT id FROM `voc_");
+                            query.append(tablename);
+                            query.append("` WHERE ");
+                        } else {
+                            query.append(" AND ");
+                        }
+                        query.append("`voc_");
+                        query.append(tablename);
+                        query.append("`.id IN (SELECT id FROM `voc_");
+                        query.append(tablename);
+                        query.append("_attr` WHERE `voc_");
+                        query.append(tablename);
+                        query.append("_attr`.attribute");
+                        if (attrname != null) {
+                            query.append("=? AND `voc_");
+                            query.append(tablename);
+                            query.append("_attr`.value");
+                            queryArgs.add(attrname);
+                        }
+                        query.append(" IN (");
+                        ArrayOfString attrs = (ArrayOfString) paramValue;
+                        stringArrayToSQL(attrs.getString(), query, queryArgs);
+                        query.append("))");
+                        if (biztrans != null) {
+                            query.append(")))");
+                        }
+                    }
+
                 } else if (paramName.equals("orderBy")) {
-                    // Does only work correct if we choose only one Event-Type
-                    // to query. Otherwise, the Results are ordered by
-                    // Event-Types and second according to the orderBy-Parameter
                     orderBy = (String) paramValue;
+
                 } else if (paramName.equals("orderDirection")) {
-                    // Does only work correct if we choose only one Event-Type
-                    // to query. Otherwise, the Results are ordered by
-                    // Event-Types and second according to the orderBy-Parameter
                     orderDirection = (String) paramValue;
+
                 } else if (paramName.equals("eventCountLimit")) {
-                    // Does only work properly if we choose only one type to
-                    // query.
                     limit = (Integer) paramValue;
+
                 } else if (paramName.equals("maxEventCount")) {
                     maxEventCount = ((Integer) paramValue).intValue();
                 } else {
@@ -1364,27 +1425,17 @@ public class QueryOperationsModule implements EPCISServicePortType {
         }
 
         if (!orderBy.equals("")) {
-            query.append(" ORDER BY (?)");
-            queryArgs.add(orderBy);
-            if (orderDirection.equals("ASC")) {
-                query.append(" ASC");
-            } else {
-                query.append(" DESC");
-            }
+            query.append(" ORDER BY ");
+            query.append(orderBy);
+            query.append(" " + orderDirection);
         }
 
-        if (limit > -1) {
-            if (limit <= maxQueryRows) {
-                query.append(" LIMIT " + limit);
-            } else {
-                query.append(" LIMIT " + maxQueryRows);
-            }
-        } else if (maxEventCount > -1) {
-            if (maxEventCount <= maxQueryRows) {
-                query.append(" LIMIT " + maxEventCount);
-            } else {
-                query.append(" LIMIT " + maxQueryRows);
-            }
+        if (limit > -1 && limit <= maxQueryRows) {
+            query.append(" LIMIT " + limit);
+        } else if (maxEventCount > -1 && maxEventCount <= maxQueryRows) {
+            query.append(" LIMIT " + maxEventCount);
+        } else {
+            query.append(" LIMIT " + maxQueryRows);
         }
 
         String q = query.toString();
@@ -1813,38 +1864,20 @@ public class QueryOperationsModule implements EPCISServicePortType {
         String queryName = parms.getQueryName();
         if (queryName.equals("SimpleEventQuery")) {
             try {
-                int actEventCount = 0;
-                maxEventCount = -1;
-
                 QueryParam[] queryParams = parms.getParams();
 
-                String event = "ObjectEvent";
-                PreparedStatement ps = createEventQuery(queryParams, event);
+                PreparedStatement ps = createEventQuery(queryParams,
+                        "ObjectEvent");
                 ObjectEventType[] tempObjectEvent = runObjectEventQuery(ps);
-                if (tempObjectEvent != null) {
-                    actEventCount += tempObjectEvent.length;
-                }
 
-                event = "AggregationEvent";
-                ps = createEventQuery(queryParams, event);
+                ps = createEventQuery(queryParams, "AggregationEvent");
                 AggregationEventType[] tempAggrEvent = runAggregationEventQuery(ps);
-                if (tempAggrEvent != null) {
-                    actEventCount += tempAggrEvent.length;
-                }
 
-                event = "QuantityEvent";
-                ps = createEventQuery(queryParams, event);
+                ps = createEventQuery(queryParams, "QuantityEvent");
                 QuantityEventType[] tempQuantityEvent = runQuantityEventQuery(ps);
-                if (tempQuantityEvent != null) {
-                    actEventCount += tempQuantityEvent.length;
-                }
 
-                event = "TransactionEvent";
-                ps = createEventQuery(queryParams, event);
+                ps = createEventQuery(queryParams, "TransactionEvent");
                 TransactionEventType[] tempTransEvent = runTransactionEventQuery(ps);
-                if (tempTransEvent != null) {
-                    actEventCount += tempTransEvent.length;
-                }
 
                 // construct QueryResults
                 EventListType eventList = new EventListType();
@@ -1876,6 +1909,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
             QueryParam[] queryParams = parms.getParams();
             try {
                 QueryResults results = createMasterDataQuery(queryParams);
+
+                LOG.info("poll request for '" + queryName + "' succeeded");
                 return results;
             } catch (SQLException e) {
                 ImplementationException iex = new ImplementationException();
@@ -1888,7 +1923,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 throw iex;
             }
         } else {
-            String msg = "Invalid query name '" + parms.getQueryName()
+            String msg = "Unsupported query name '" + parms.getQueryName()
                     + "' provided.";
             LOG.info("USER ERROR: " + msg);
             throw new NoSuchNameException(msg);
@@ -2121,7 +2156,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
         StringBuffer sql = new StringBuffer();
         List<String> queryArgs = new ArrayList<String>();
-        sql.append("SELECT DISTINCT `uri` FROM `voc_");
+        sql.append("SELECT DISTINCT uri FROM `voc_");
         sql.append(table);
         sql.append("` AS vocTable");
         // filter by attribute
@@ -2132,16 +2167,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
             sql.append("WHERE vocTable.id=attrTable.id");
             if (attrs.length > 0) {
                 // filter by attribute name
-                sql.append(" AND attrTable.`attribute` IN (");
+                sql.append(" AND attrTable.attribute IN (");
                 stringArrayToSQL(attrs, sql, queryArgs);
                 sql.append(")");
             }
             if (filterAttrs.size() > 0) {
                 // filter by attribute name & value
                 for (String attrname : filterAttrs.keySet()) {
-                    sql.append(" AND attrTable.`attribute`=?");
+                    sql.append(" AND attrTable.attribute=?");
                     queryArgs.add(attrname);
-                    sql.append(" AND attrTable.`value` IN (");
+                    sql.append(" AND attrTable.value IN (");
                     stringArrayToSQL(filterAttrs.get(attrname), sql, queryArgs);
                     sql.append(")");
                 }
@@ -2151,16 +2186,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
         }
         if (filterVocNames.length > 0) {
             // filter by voc name
-            sql.append(" AND vocTable.`uri` IN (");
+            sql.append(" AND vocTable.uri IN (");
             stringArrayToSQL(filterVocNames, sql, queryArgs);
             sql.append(")");
         }
         if (filterVocNamesWd.length > 0) {
             // filter by voc name with descendants
-            sql.append(" AND (vocTable.`uri` LIKE ?");
+            sql.append(" AND (vocTable.uri LIKE ?");
             queryArgs.add(filterVocNamesWd[0] + "%");
             for (int i = 1; i < filterVocNamesWd.length; i++) {
-                sql.append(" OR vocTable.`uri` LIKE ?");
+                sql.append(" OR vocTable.uri LIKE ?");
                 queryArgs.add(filterVocNamesWd[i] + "%");
             }
             sql.append(")");
@@ -2210,9 +2245,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
         List<String> queryArgs = new ArrayList<String>(uris.length);
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT `table_name`, `uri` FROM `vocabularies`");
+        sql.append("SELECT table_name, uri FROM `vocabularies`");
         if (uris.length > 0) {
-            sql.append(" WHERE `uri` IN (");
+            sql.append(" WHERE uri IN (");
             stringArrayToSQL(uris, sql, queryArgs);
             sql.append(")");
         }
@@ -2257,16 +2292,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
         List<String> queryArgs = new ArrayList<String>(filterAttrNames.length);
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT `attribute`, `value` FROM `voc_");
+        sql.append("SELECT attribute, value FROM `voc_");
         sql.append(vocTableName);
         sql.append("_attr` AS attrTable WHERE attrTable.id=(");
         sql.append("SELECT id FROM `voc_");
         sql.append(vocTableName);
-        sql.append("` WHERE `uri`=?)");
+        sql.append("` WHERE uri=?)");
         queryArgs.add(vocName);
         if (filterAttrNames.length > 0) {
             // filter by attribute names
-            sql.append(" AND `attribute` IN (");
+            sql.append(" AND attribute IN (");
             stringArrayToSQL(filterAttrNames, sql, queryArgs);
             sql.append(");");
         } else {
@@ -2309,9 +2344,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
         List<URI> children = new ArrayList<URI>();
 
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT DISTINCT `uri` FROM `voc_");
+        sql.append("SELECT DISTINCT uri FROM `voc_");
         sql.append(vocTableName);
-        sql.append("` AS vocTable WHERE vocTable.`uri` LIKE ?;");
+        sql.append("` AS vocTable WHERE vocTable.uri LIKE ?;");
 
         PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
         String arg = vocUri + "_%";
@@ -2416,8 +2451,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
             // query returned before timeout
             if (LOG.isDebugEnabled()) {
-                BigDecimal bd = new BigDecimal(query.getExecutionTime() / 1000);
-                double time = bd.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                double time = query.getExecutionTime() / 1000;
+                BigDecimal bd = new BigDecimal(time);
+                time = bd.setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
                 LOG.debug("Query took " + time + " sec.");
             }
             return query.getResultSet();
