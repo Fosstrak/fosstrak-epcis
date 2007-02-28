@@ -1,0 +1,8 @@
+Developer Guide
+
+* Architecture
+
+[]
+[images/EPCISArchitectureSmall.png]
+ 
+  The architectural style is client server. The clients are running either a Capture application or a query application or both. The server parses the requests and fulfills the request accessing the Repository. In case of a Query application it will send back a response. The protocols used are HTTP and SOAP. The Repository is implemented in a relational DB.

@@ -1,0 +1,37 @@
+Developer Guide
+
+
+* Query Client
+
+  The query interface binding was implemented using Axis 1.4. As Axis had some bugs and manual modification were unavoidable. These complications are elaborated in a special section.
+  An overview of all the classes comprised in this package are provided below.
+
+[images/queryclient.png]
+
+** QueryControlInterface
+  
+  The Query Client supports basically two services: 
+  
+  * Subscription 
+  
+  * Polling
+  
+  which is abstracted in this interface. Polling is the the querying mechanism for events fulfilling a certain specification which is evaluated once. Through a subscription one may achieve additionally that a query is evaluated multiple times. The frequency may be indicated through a specific time pattern defined in through a {{{repository.html#Schedule}<<<Schedule>>>}}.
+
+** QueryControlClient
+  
+  The SOAP connector to the {{{repository.html#QueryOperationsModule}<<<QueryOperationsModule>>>}} implementing the subscription and polling operations.
+
+** QueryCallbackInterface
+  
+
+** QueryCallbackClient
+
+** QueryClientGui 
+
+** QueryClientGuiHelper
+
+** Query
+
+* Axis
+

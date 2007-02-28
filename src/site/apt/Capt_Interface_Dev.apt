@@ -1,0 +1,42 @@
+Developer Guide
+
+* Capture Client
+
+  The Capture Interface can be accessed via a GUI or another implementation of CaptureClient. An Overview over all the classes shall be provided below.
+
+[]
+
+[images/captureclient.png]
+
+** CaptureInteface
+
+  This Class is a high-level abstraction of what the capture service does: It takes a String (one event or multiple concatenated events in XML format) and returns a string (the HTTP response code).
+
+** CaptureClient
+
+  A concrete instance of a binding implemented as a HTTP post request. The format of the request is:
+
++-------------------------------+
+
+event = [EventInXml]*  
+  	
++-------------------------------+
+
+** CaptureClientGui
+
+  User interface to create a single instance of an event which is transferred to the server via a client relationship with the CaptureClient. It will display as well the response in a separate window.
+
+** CaptureEvent
+
+  The representation as a java Object of an event. It represents one of the following depending on the value of the attributes:
+  
+    * ObjectEvent
+    
+    * AggregationEvent
+    
+    * QuantityEvent
+    
+    * Transaction
+
+
+
