@@ -24,8 +24,20 @@
     </menu>
     
     <menu name="EPCIS Documentation">
-      <item name="Developer Guide" href="DeveloperGuide.html"/>
-      <item name="User Guide" href="UserGuide.html"/>
+      <item name="Developer Guide">
+        <item name="Architecture" href="Architecture.html"/>
+        <item name="Query Client" href="Query_Interface_Dev.html"/>
+        <item name="Capture Client" href="Capt_Interface_Dev.html"/>
+        <item name="Repository" href="repository.html"/>
+        <item name="Unsupported Features" href="UnsupportedFeatures.html"/>
+        <item name="TODOs" href="todos.html"/>
+        <item name="Getting Started" href="Getting_Started_Dev.html"/>
+      </item>
+      <item name="User Guide">
+	<item name="Query Client" href="Query_Interface_User.html"/>
+	<item name="Capture Client" href="Capt_Interface_User.html"/>
+        <item name="Getting Started" href="Getting_Started_User.html"/>
+      </item>
     </menu>
     
   </body>
