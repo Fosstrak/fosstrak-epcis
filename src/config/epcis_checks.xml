@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	This configuration file was written by the eclipse-cs plugin configuration editor
--->
-<!--
-Checkstyle-Configuration: epcis checks
-Description:
-
+  This is a user defined checkstyle configuration file used throughout the EPCIS project.
+  It removes some ugly formatting warnings from the default configuration such that it
+  is feasible to work and rely on checkstyle.
 -->
 <!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 <module name="Checker">
     <property name="severity" value="warning"/>
     <module name="TreeWalker">
-        <module name="JavadocMethod">
-            <property name="allowThrowsTagsForSubclasses" value="true"/>
-            <property name="allowMissingPropertyJavadoc" value="true"/>
+        <module name="AbstractClassName"/>
+        <module name="ArrayTypeStyle"/>
+        <module name="AvoidNestedBlocks"/>
+        <module name="AvoidStarImport"/>
+        <module name="ConstantName"/>
+        <module name="DefaultComesLast"/>
+        <module name="DesignForExtension">
+            <property name="severity" value="ignore"/>
         </module>
+        <module name="DoubleCheckedLocking"/>
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+        </module>
+        <module name="EmptyForIteratorPad"/>
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="JavadocMethod"/>
         <module name="JavadocType"/>
         <module name="JavadocVariable">
-            <property name="excludeScope" value="private"/>
+            <!-- private variables need no javadoc -->
             <property name="scope" value="public"/>
+            <property name="excludeScope" value="private"/>
         </module>
         <module name="JavadocStyle"/>
-        <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
         <module name="MemberName"/>
@@ -30,19 +40,14 @@ Description:
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
-        <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="FileLength"/>
-        <module name="LineLength">
-            <property name="severity" value="ignore"/>
-        </module>
         <module name="MethodLength">
-            <property name="tokens" value="CTOR_DEF"/>
+            <property name="countEmpty" value="false"/>
         </module>
         <module name="ParameterNumber"/>
-        <module name="EmptyForIteratorPad"/>
         <module name="MethodParamPad"/>
         <module name="NoWhitespaceAfter"/>
         <module name="NoWhitespaceBefore"/>
@@ -56,14 +61,9 @@ Description:
         </module>
         <module name="ModifierOrder"/>
         <module name="RedundantModifier"/>
-        <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock"/>
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
         <module name="RightCurly"/>
-        <module name="DoubleCheckedLocking"/>
-        <module name="EmptyStatement"/>
-        <module name="EqualsHashCode"/>
         <module name="HiddenField">
             <property name="ignoreConstructorParameter" value="true"/>
             <property name="ignoreSetter" value="true"/>
@@ -71,21 +71,16 @@ Description:
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
         <module name="MagicNumber">
-            <metadata name="com.atlassw.tools.eclipse.checkstyle.lastEnabledSeverity" value="info"/>
             <property name="severity" value="ignore"/>
         </module>
         <module name="MissingSwitchDefault"/>
         <module name="RedundantThrows"/>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
-        <module name="DesignForExtension">
-            <property name="severity" value="ignore"/>
-        </module>
         <module name="FinalClass"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
         <module name="VisibilityModifier"/>
-        <module name="ArrayTypeStyle"/>
         <module name="FinalParameters"/>
         <module name="GenericIllegalRegexp">
             <property name="format" value="\s+$"/>
@@ -102,8 +97,7 @@ Description:
         <module name="DefaultComesLast"/>
         <module name="DeclarationOrder"/>
         <module name="Header">
-            <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="license declaration"/>
-            <property name="headerFile" value="D:\Projects\accada\epcis\trunk\HEADER.txt"/>
+            <property name="headerFile" value="${checkstyle.header.file}"/>
         </module>
     </module>
     <module name="PackageHtml"/>
