@@ -6,7 +6,7 @@ Developer Guide
 
 []
 
-[images/captureclient.png]
+[../../images/captureclient.png]
 
 ** CaptureInteface
 
@@ -19,7 +19,7 @@ Developer Guide
 +-------------------------------+
 
 event = [EventInXml]*  
-  	
+    
 +-------------------------------+
 
 ** CaptureClientGui

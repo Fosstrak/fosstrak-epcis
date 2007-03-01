@@ -2,13 +2,26 @@
 <project name="Accada">
   <body>
   
-    <menu ref="parent"/>
-    
-    <menu name="epcis-commons">
-      <item name="Overview" href="index.html"/>
+    <menu name="Modules">
+      <item name="EPCIS Repository" href="../epcis-repository/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Query Client" href="../epcis-queryclient/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Capture Client" href="../epcis-captureclient/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Commons" href="index.html">
+        <item name="Overview" href="index.html"/>
+        <item name="Dependencies" href="dependencies.html"/>
+        <item name="Surefire" href="surefire-report.html"/>
+        <item name="Checkstyle" href="checkstyle.html"/>
+      </item>
+      <item name="EPCIS Interop Test" href="../epcis-interop-test/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
     </menu>
-    
-    <menu ref="reports"/>
     
   </body>
 </project>

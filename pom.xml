@@ -31,14 +31,6 @@
   <!-- Dependencies                                                -->
   <!-- =========================================================== -->
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
 
   <!-- =========================================================== -->
@@ -66,7 +58,7 @@
 
 
   <!-- =========================================================== -->
-  <!-- Building                                                    -->
+  <!-- Plugins                                                     -->
   <!-- =========================================================== -->
 
   <build>
@@ -91,6 +83,9 @@
           <artifactId>maven-site-plugin</artifactId>
           <configuration>
             <locales>en</locales>
+            <publishDate position="left" format="yyyy-MM-dd hh:mm:ss"/>
+            <port>9000</port>
+            <tempWebappDirectory>${basedir}/target/site/temp</tempWebappDirectory>
           </configuration>
         </plugin>
         <plugin>
@@ -174,7 +169,7 @@
         <configuration>
           <includes>**/*.java</includes>
           <excludes>org/accada/epcis/soapapi/*.*</excludes>
-          <configLocation>epcis_checks.xml</configLocation>
+          <configLocation>${basedir}/epcis_checks.xml</configLocation>
         </configuration>
       </plugin>
       <plugin>

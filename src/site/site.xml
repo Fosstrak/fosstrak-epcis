@@ -1,44 +1,96 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Accada">
+  <bannerLeft>
+    <name>Accada</name>
+    <src>images/banner2_left.jpg</src>
+    <href>http://www.accada.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>images/banner2_middle.jpg</src>
+  </bannerRight>
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-stylus-skin</artifactId>
+    <version>1.0</version>
+  </skin>
+  <poweredBy>
+    <logo img="images/logos/supportedByAutoid4.png" name="Auto-ID" href="http://www.autoidlabs.org/" />
+  </poweredBy>
+
   <body>
-  
-    <menu name="Accada">
+    <links>
+      <item name="Accada" href="../index.html" />
+      <item name="Reader" href="../reader/index.html"/>
+      <item name="Filtering&amp;Collection" href="../fc/index.html"/>
+      <item name="EPCIS" href="index.html"/>
+      <item name="Tag Data Translation" href="../tdt/index.html"/>
+    </links>
+
+
+    <!-- =========================================================== -->
+    <!-- Navigation Menu                                             -->
+    <!-- =========================================================== -->
+
+    <menu name="Accada" inherit="top">
       <item name="Home" href="../index.html"/>
     </menu>
-    
-    <menu name="EPCIS Project">
+    <menu name="EPCIS" inherit="top">
       <item name="Overview" href="index.html"/>
       <item name="Features" href="features.html"/>
       <item name="Demo" href="demo.html"/>
-      <item name="Download" href="download.html"/>
+      <item name="Downloads" href="download.html"/>
+    </menu>
+    <menu name="Project Information" inherit="top">
+      <item name="Project Summary" href="project-summary.html"/>
       <item name="License" href="license.html"/>
       <item name="FAQ" href="faq.html"/>
+      <item name="Project Team" href="team-list.html"/>
+      <item name="Mailing Lists" href="mail-lists.html"/>
+      <item name="Issue Tracking" href="issue-tracking.html"/>
+      <item name="Source Repository" href="source-repository.html"/>
+      <item name="JavaDoc" href="apidocs/index.html"/>
     </menu>
-    
-    <!-- TODO: for testing only, in production replace links -->
-    <menu name="EPCIS Modules">
-      <item name="EPCIS Repository" href="../../epcis-repository/target/site/index.html"/>
-      <item name="EPCIS Query Client" href="../../epcis-queryclient/target/site/index.html"/>
-      <item name="EPCIS Capture Client" href="../../epcis-captureclient/target/site/index.html"/>
-      <item name="EPCIS Commons" href="../../epcis-commons/target/site/index.html"/>
-    </menu>
-    
-    <menu name="EPCIS Documentation">
-      <item name="Developer Guide">
-        <item name="Architecture" href="Architecture.html"/>
-        <item name="Query Client" href="Query_Interface_Dev.html"/>
-        <item name="Capture Client" href="Capt_Interface_Dev.html"/>
-        <item name="Repository" href="repository.html"/>
-        <item name="Unsupported Features" href="UnsupportedFeatures.html"/>
-        <item name="TODOs" href="todos.html"/>
-        <item name="Getting Started" href="Getting_Started_Dev.html"/>
+    <menu name="Guides" inherit="top">
+      <item name="Developer Guide" href="docs/dev/index.html" collapse="true">
+        <item name="Overview" href="docs/dev/index.html"/>
+        <item name="Architecture" href="docs/dev/architecture.html"/>
+        <item name="Query Client" href="docs/dev/query.html"/>
+        <item name="Capture Client" href="docs/dev/capture.html"/>
+        <item name="Repository" href="docs/dev/repository.html"/>
+        <item name="Unsupported Features" href="docs/dev/unsupported.html"/>
+        <item name="TODOs" href="docs/dev/todos.html"/>
+        <item name="Getting Started" href="docs/dev/getting-started.html"/>
       </item>
-      <item name="User Guide">
-	<item name="Query Client" href="Query_Interface_User.html"/>
-	<item name="Capture Client" href="Capt_Interface_User.html"/>
-        <item name="Getting Started" href="Getting_Started_User.html"/>
+      <item name="User Guide" href="docs/usr/index.html" collapse="true">
+        <item name="Overview" href="docs/usr/index.html"/>
+        <item name="Query Client" href="docs/usr/query.html"/>
+        <item name="Capture Client" href="docs/usr/capture.html"/>
+        <item name="Getting Started" href="docs/usr/getting-started.html"/>
       </item>
     </menu>
-    
+    <menu name="Modules" inherit="none">
+      <item name="EPCIS Repository" href="epcis-repository/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Query Client" href="epcis-queryclient/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Capture Client" href="epcis-captureclient/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Commons" href="epcis-commons/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Interop Test" href="epcis-interop-test/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+    </menu>
+
+    <breadcrumbs>
+      <item href="../index.html" name="Accada" />
+      <item name="EPCIS"/> <!-- href is derived from project.url -->
+    </breadcrumbs>
+  
   </body>
+     
 </project>

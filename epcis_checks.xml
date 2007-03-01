@@ -3,9 +3,9 @@
 	This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-Checkstyle-Configuration: epcis checkstyle
+Checkstyle-Configuration: epcis checks
 Description:
-Checkstyle configuration for EPCIS based on Sun-Coding-Conventions.
+
 -->
 <!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 <module name="Checker">
@@ -14,10 +14,6 @@ Checkstyle configuration for EPCIS based on Sun-Coding-Conventions.
         <module name="JavadocMethod">
             <property name="allowThrowsTagsForSubclasses" value="true"/>
             <property name="allowMissingPropertyJavadoc" value="true"/>
-            <!-- Cannot be used with this plugin
-            <property name="logLoadErrors" value="true"/>
-            <property name="suppressLoadErrors" value="true"/>
-            -->
         </module>
         <module name="JavadocType"/>
         <module name="JavadocVariable">
@@ -105,6 +101,10 @@ Checkstyle configuration for EPCIS based on Sun-Coding-Conventions.
         </module>
         <module name="DefaultComesLast"/>
         <module name="DeclarationOrder"/>
+        <module name="Header">
+            <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="license declaration"/>
+            <property name="headerFile" value="D:\Projects\accada\epcis\trunk\HEADER.txt"/>
+        </module>
     </module>
     <module name="PackageHtml"/>
     <module name="NewlineAtEndOfFile">

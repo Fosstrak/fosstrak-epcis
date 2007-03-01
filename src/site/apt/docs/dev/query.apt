@@ -6,7 +6,7 @@ Developer Guide
   The query interface binding was implemented using Axis 1.4. As Axis had some bugs and manual modification were unavoidable. These complications are elaborated in a special section.
   An overview of all the classes comprised in this package are provided below.
 
-[images/queryclient.png]
+[../../images/queryclient.png]
 
 ** QueryControlInterface
   

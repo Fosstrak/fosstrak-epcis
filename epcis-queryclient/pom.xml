@@ -51,9 +51,9 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis-ant</artifactId>
-      <version>1.4</version>
+      <groupId>axis</groupId>
+      <artifactId>axis-wsdl4j</artifactId>
+      <version>1.5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -72,12 +72,6 @@
       <groupId>commons-discovery</groupId>
       <artifactId>commons-discovery</artifactId>
       <version>0.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis-wsdl4j</artifactId>
-      <version>1.5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -220,6 +214,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <includes>**/*.java</includes>
+          <excludes>org/accada/epcis/soapapi/*.*</excludes>
+          <configLocation>${basedir}/../epcis_checks.xml</configLocation>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>
