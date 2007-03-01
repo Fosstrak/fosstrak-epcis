@@ -1048,7 +1048,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             serializer.transform(domsrc, streamResult);
 
             String eventXml = out.toString();
-            String postData = "event=" + eventXml;
+            String postData = eventXml;
 
             dwOutputTextArea.append("sending HTTP POST data:\n");
             dwOutputTextArea.append(postData);
