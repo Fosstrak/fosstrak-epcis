@@ -32,6 +32,7 @@ package org.accada.epcis.repository;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -54,6 +55,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
+ * This is an Axis message chain handler which handles incoming SOAP messages
+ * before they reach the EPCIS query service (QueryOperationsModule). This
+ * handler performs the initialization for the query service, such as reading
+ * configuration properties, setting up the database, and loading the
+ * subscriptions from the servlet context. On fault in the query service, this
+ * handler also performs the cleanup such as closing the database connection and
+ * storing the subscriptions back to the servlet context.
+ * 
  * @author Marco Steybe
  */
 public class QueryInitHandler extends BasicHandler {
@@ -65,7 +74,7 @@ public class QueryInitHandler extends BasicHandler {
     private Logger log = null;
 
     /**
-     * Invokes this SoapPreHandler which performs the initialization for the
+     * Invokes this QueryInitHandler which performs the initialization for the
      * EPCIS query service, such as reading configuration and setting up the
      * database.
      * 
@@ -93,9 +102,13 @@ public class QueryInitHandler extends BasicHandler {
             String appConfigFile = ctx.getInitParameter("appConfigFile");
             Properties properties = new Properties();
             try {
-                properties.load(new FileInputStream(servletPath + appConfigFile));
+                InputStream is = new FileInputStream(servletPath
+                        + appConfigFile);
+                properties.load(is);
+                is.close();
             } catch (IOException e) {
-                log.error("Unable to load application properties from " + servletPath + appConfigFile);
+                log.error("Unable to load application properties from "
+                        + servletPath + appConfigFile);
             }
 
             // read db connection parameters

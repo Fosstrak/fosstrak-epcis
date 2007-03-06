@@ -45,6 +45,11 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.log4j.Logger;
 
 /**
+ * This is an Axis message chain handler which handles outgoing SOAP messages
+ * when they leave the EPCIS query service (QueryOperationsModule). This handler
+ * performs the cleanup such as closing the database connection and storing the
+ * subscriptions back to the servlet context.
+ * 
  * @author Marco Steybe
  */
 public class QueryPostHandler extends BasicHandler {
@@ -77,7 +82,8 @@ public class QueryPostHandler extends BasicHandler {
             LOG.info("Subscriptions stored to servlet context.");
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
-            String msg = "Unable to close the database connection: " + e.getMessage();
+            String msg = "Unable to close the database connection: "
+                    + e.getMessage();
             iex.setReason(msg);
             iex.setStackTrace(e.getStackTrace());
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);

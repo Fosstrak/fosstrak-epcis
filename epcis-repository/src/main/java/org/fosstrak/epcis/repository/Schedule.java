@@ -636,26 +636,44 @@ public class Schedule implements Serializable {
         return vals;
     }
 
+    /**
+     * @return The days of month from this schedule.
+     */
     public TreeSet<Integer> getDaysOfMonth() {
         return daysOfMonth;
     }
 
+    /**
+     * @return The days of week from this schedule.
+     */
     public TreeSet<Integer> getDaysOfWeek() {
         return daysOfWeek;
     }
 
+    /**
+     * @return The hours from this schedule.
+     */
     public TreeSet<Integer> getHours() {
         return hours;
     }
 
+    /**
+     * @return The minutes from this schedule.
+     */
     public TreeSet<Integer> getMinutes() {
         return minutes;
     }
 
+    /**
+     * @return The months from this schedule.
+     */
     public TreeSet<Integer> getMonths() {
         return months;
     }
 
+    /**
+     * @return The seconds from this schedule.
+     */
     public TreeSet<Integer> getSeconds() {
         return seconds;
     }

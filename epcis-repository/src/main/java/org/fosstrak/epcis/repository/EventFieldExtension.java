@@ -100,38 +100,65 @@ public class EventFieldExtension {
         }
     }
 
+    /**
+     * @return The date value of the event field extension.
+     */
     public Timestamp getDateValue() {
         return dateValue;
     }
 
+    /**
+     * @return The name of the event field extension.
+     */
     public String getFieldname() {
         return fieldname;
     }
 
+    /**
+     * @return The float value of the event field extension.
+     */
     public Float getFloatValue() {
         return floatValue;
     }
 
+    /**
+     * @return The int value of the event field extension.
+     */
     public Integer getIntValue() {
         return intValue;
     }
 
+    /**
+     * @return The localname of the event field extension.
+     */
     public String getLocalname() {
         return localname;
     }
 
+    /**
+     * @return The namespace of the event field extension.
+     */
     public String getNamespace() {
         return namespace;
     }
 
+    /**
+     * @return The prefix of the event field extension.
+     */
     public String getPrefix() {
         return prefix;
     }
 
+    /**
+     * @return The string value of the event field extension.
+     */
     public String getStrValue() {
         return strValue;
     }
 
+    /**
+     * @return The value column name of the event field extension.
+     */
     public String getValueColumnName() {
         return valueColumnName;
     }
