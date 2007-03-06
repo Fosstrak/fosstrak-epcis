@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Accada">
+  <body>
+  
+    <menu name="Modules">
+      <item name="EPCIS Repository" href="../epcis-repository/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Query Client" href="../epcis-interop-test/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Capture Client" href="../epcis-captureclient/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Commons" href="../epcis-commons/index.html" collapse="true">
+        <item name="dummy"/>
+      </item>
+      <item name="EPCIS Interop Test" href="index.html">
+        <item name="Overview" href="project-reports.html"/>
+        <item name="Dependencies" href="dependencies.html"/>
+        <item name="Surefire" href="surefire-report.html"/>
+        <item name="Checkstyle" href="checkstyle.html"/>
+        <item name="PMD" href="pmd.html"/>
+        <item name="CPD" href="cpd.html"/>
+        <item name="JavaNCSS" href="javancss.html"/>
+        <item name="TagList" href="taglist.html"/>
+      </item>
+    </menu>
+    
+  </body>
+</project>
