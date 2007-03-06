@@ -1,3 +1,260 @@
-Developer Guide
+              -------------------
+              Developer Guide - Getting Started
+              -------------------
+              Marco Steybe, Andrea Groessbauer
+              -------------------
+              03/05/2007
+              -------------------
 
-* Getting Started
+Getting Started
+
+  This Getting-Started guide is intended for developers who wish to extend
+  or adopt Accada's EPCIS Repository implementation. It outlines the steps to
+  follow for setting up the development environment, finding your way through
+  the code, and using Maven to build and deploy everything.
+
+* Development Setup
+
+  The development setup includes installing a Web container, a database, and a
+  build tool. Here is the setup we used for our development purposes.
+
+** SVN Checkout
+
+   First thing you need to do is checking out the code from the SVN repository.
+   See {{{../../source-repository.html}Source Repository}} on how to access the
+   sources.
+
+** Installing Tomcat
+
+   We use {{{http://tomcat.apache.org/download-60.cgi}Apache Tomcat 6.x}} as
+   the Web container for running Accada's EPCIS Repository. After installation
+   it is important to check that you have the <<<CATALINA_HOME>>> environment
+   variable set to the Tomcat root installation directory and that your
+   <<<JAVA_HOME>>> environment variable points to a valid 1.5 JRE directory.
+   
+   The important notes here are the following two directories:
+   
+   * <<<$CATALINA_HOME/webapps>>> - the place where the application will be
+     deployed
+   
+   * <<<$CATALINA_HOME/logs>>> - the place where the logfiles for the
+     application will be kept
+
+** Installing MySQL
+
+   For storing the EPC-related data we use a
+   {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL 5.0 Community Server}}
+   instance. We also installed the
+   {{{http://dev.mysql.com/downloads/gui-tools/5.0.html}MySQL GUI Tools}} which
+   provide a convenient System Tray Monitor to start/stop the MySQL instance, a
+   handy Administrator, and Query Browser. Using the MySQL Administrator you
+   can log in as <<<root>>> (initially no password) on localhost (default port
+   3306) and setup a new user and database.
+   
+   Alternatively after installation of the MySQL Server you can log into the
+   MySQL Command Line Client as <<<root>>> and inject our database setup script
+   like this:
+   
+-------------------------------------------------------------------------
+source <path-to-trunk>/epcis-repository/src/main/sql/epcis_setup.sql
+-------------------------------------------------------------------------
+   
+   This sql script adds a new user 'epcis' and a new database 'epcisdb' (these
+   default names can be adjusted in the sql script).
+   
+   After you created a user and database, you need to load our database schema
+   from <<<epcis-repository/src/main/sql/epcis_schema.sql>>> and inject it into
+   MySQL as before, just make sure you are connected to the newly created db.
+   
+   The last step involves adjusting the database connection parameters in
+   Tomcat's Context container, i.e. you need to specify db name, user, and
+   password you created before in the following file:
+   <<<epcis-repository/src/main/webapp/META-INF/context.xml>>>
+
+** Installing Maven
+
+   We prefer to use {{{http://maven.apache.org/}Maven 2}} as our build tool.
+   After installation you need to have the <<<M2_HOME>>> environment variable
+   set to your Maven installation directory.
+
+
+* Project Layout
+
+** Project Modules
+
+   Currently our Maven project includes five modules:
+
+   * <<epcis-commons>>
+
+     This module contains the common functionality (such as parsers) as well as
+     the Axis generated code (which is used both by the epcis-repository and the
+     epcis-queryclient modules).
+
+   * <<epcis-captureclient>>
+
+     This module consists of a Capture Client GUI and a simple Client which
+     sends EPC events (XML) through HTTP POST requests to the EPCIS Capture
+     Interface.
+
+   * <<epcis-queryclient>>
+
+     This module consists of a Query Client GUI, the Query Callback Client and
+     the Query Control Client which send queries to the EPCIS Query Interface
+     using SOAP (Axis).
+
+   * <<epcis-repository>>
+
+     Here is the actual implementation of the EPCIS Repository.
+
+   * <<epcis-interop-test>>
+
+     This module contains interoperability tests.
+
+   []
+  
+** Directory Layout
+  
+   We use the standard Maven directory layout as follows:
+
+---------------------------------------------------------------------------
+|
++-- pom.xml                             -> top-level POM file
+|
++-- LICENSE.txt, README.txt
+|
++-- src/
+|   |
+|   +-- config/                         -> top-level configuration files, like checkstyle configs
+|   |
+|   `-- site/                           -> project documentation
+|
++-- epcis-captureclient/
+|   ¦
+|   '
+|
++-- epcis-commons/
+|   ¦
+|   '
+|
++-- epcis-interop-test/
+|   ¦
+|   '
+|
++-- epcis-queryclient/
+|   ¦
+|   '
+|
++-- epcis-repository/
+|   |
+|   +-- pom.xml                                    -> module POM file
+|   |
+|   `-- src/
+|       |
+|       +-- main/
+|       |   |
+|       |   +-- java/                              -> java source files
+|       |   |
+|       |   +-- resources/                         -> wsdl and xsd schema files
+|       |   |
+|       |   +-- sql/                               -> database scripts
+|       |   |
+|       |   `-- webapp/
+|       |       |
+|       |       +-- META-INF/
+|       |       |   |
+|       |       |   +-- application.properties     -> application properties
+|       |       |   |
+|       |       |   +-- context.xml                -> tomcat context properties
+|       |       |   |
+|       |       |   `-- log4j.properties           -> log4j properties
+|       |       |
+|       |       `-- WEB-INF/
+|       |           |
+|       |           +-- server-config.wsdd         -> axis web service deployment descriptor
+|       |           |
+|       |           `-- web.xml                    -> tomcat deployment descriptor
+|       |
+|       +-- site/                                  -> module documentation
+|       |
+|       `-- test/
+|           |
+|           `-- java/                              -> java unit test source files
+|
+`-- target/                                        -> generated contents
+---------------------------------------------------------------------------
+
+
+* Using Maven
+
+  Using Maven as our build tool has several advantages like the easy integration
+  of handy plugins. We use a Tomcat plugin for deployment, an Eclipse plugin for
+  generating an Eclipse project, and a handfull of reporting plugins.
+
+** Building
+
+   For building the sources the following command is enough:
+
+---------------------------------------------------------------------------
+mvn compile
+---------------------------------------------------------------------------
+
+** Deployment
+
+   For deploying/undeploying the Repository to/from Tomcat we use a Maven Tomcat
+   plugin. This plugin communicates with the Tomcat Manager and thus requires
+   the connection parameters which must be set in your settings.xml. Thus you
+   must add a corresponding server block to <<<$M2_HOME/conf/settings.xml>>>:
+
+---------------------------------------------------------------------------
+<server>
+  <id>tomcat-manager</id>
+  <username>admin</username>
+  <password>1234</password>
+</server>
+---------------------------------------------------------------------------
+
+   With the following commands you can then do the deployment or undeployment:
+
+---------------------------------------------------------------------------
+mvn tomcat:deploy
+
+mvn tomcat:undeploy
+---------------------------------------------------------------------------
+
+** Eclipse Integration
+
+   In order to work on the Accada EPCIS Repository using Eclipse, follow these
+   instructions:
+
+   [[1]] Eclipse needs to know the path to the local maven repository. Execute
+         the following command to automatically set up the corresponding classpath
+         variable <<<M2_REPO>>> accordingly:
+
+---------------------------------------------------------------------------
+mvn -Declipse.workspace=<path-to-eclipse-workspace> eclipse:add-maven-repo
+---------------------------------------------------------------------------
+
+   [[1]] For generating the .project and .classpath files used by Eclipse you
+         should execute this command:
+
+---------------------------------------------------------------------------
+mvn -Dwtpversion=1.0 eclipse:eclipse
+---------------------------------------------------------------------------
+
+         Make sure you indicate the correct version of the Web Tools Project
+         (WTP) you use in your Eclipse installation. <<<wtpversion=1.0>>> will
+         work fine with WTP 1.5.x. and also works for Eclipse without WTP.
+
+   [[1]] Inside Eclipse import all the modules (from the menu bar, select
+         File > Import > Existing Projects into Workspace).
+
+** Site Generation
+
+   The documentation site can be generated using <<<mvn site>>>. In order to
+   test the whole site navigation before an official deploy you can execute the
+   following command which will generate the Web site under the given directory:
+
+
+---------------------------------------------------------------------------
+mvn site:stage -DstagingDirectory=d:\testsite
+---------------------------------------------------------------------------
