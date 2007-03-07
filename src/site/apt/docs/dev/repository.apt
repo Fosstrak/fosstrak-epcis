@@ -46,18 +46,20 @@ msg  ->  | init handler | -> | service | -> | post handler |
 
 ** QuerySubscriptionScheduled
 
-  Represents a subscription associated with a query and a schedule. The query is invoked each time it times out. It has also an interface to delete a subscription.
+  Represents a subscription associated with a query and a schedule. The query is invoked each time it times out. It has also an interface to delete a subscription. Triggered subscriptions are also scheduled queries: instead of checking on the paramters on every captured event we periodically schedule to check the trigger condition in the db. 
   
 ** QuerySubscription
   
-  Represents a standing query. The query associated to this subscription is stored in the database. 
+  Represents a standing query. The subscription parameters are stored in the db. 
 
 
 ** {Schedule}
 
-  A Schedule is defined by <<<SubscriptionControls>>> parameters. These parameters define the  
-
+  A Schedule is defined by the <<<SubscriptionControls>>> parameters. It defines in what intervals a query (as indicated in the subscription parameters) is executed. 
   
 
 ** EventFieldExtension
+  
+  Allows to define new event parameters not specified in general as part of the extension mechanism.
+
 
