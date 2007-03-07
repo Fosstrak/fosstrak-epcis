@@ -50,12 +50,12 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements
     /**
      * Schedule indicating when subscription query is to be executed.
      */
-    private Schedule schedule;
+    protected static Schedule schedule;
 
     /**
      * Whether to continue with sending results.
      */
-    private Boolean doItAgain = true;
+    protected Boolean doItAgain = true;
 
     /**
      * Constructor to be used when recreating from storage.
