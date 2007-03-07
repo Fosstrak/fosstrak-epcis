@@ -159,7 +159,7 @@ public class CaptureOperationsModule extends HttpServlet {
         out.println("<html>");
         out.println("<head><title>EPCIS Capture Service</title></head>");
         out.println("<body>");
-        out.println("<p>This service captures ECPIS events sent to it using <br />");
+        out.println("<p>This service captures EPCIS events sent to it using <br />");
         out.println("HTTP POST requests. Expected POST parameter name is \"event\", <br />");
         out.println(" expected payload is an XML binding of an EPCISDocument <br />");
         out.println("containing ObjectEvents, AggregationEvents, QuantityEvents <br />");
