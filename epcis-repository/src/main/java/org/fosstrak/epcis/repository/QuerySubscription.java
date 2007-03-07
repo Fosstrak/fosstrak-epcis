@@ -69,34 +69,37 @@ public class QuerySubscription implements Serializable {
     /**
      * SubscriptionID.
      */
-    private String subscriptionID;
+    protected String subscriptionID;
 
     /**
      * Query parameters.
      */
-    private QueryParam[] queryParams;
+    protected QueryParam[] queryParams;
 
     /**
      * Destination URI to send results to.
      */
-    private URI dest;
+    protected URI dest;
 
     /**
      * Initial record time.
      */
-    private GregorianCalendar initialRecordTime;
+    protected GregorianCalendar initialRecordTime;
 
     /**
      * Whether to send results if nothing new available.
      */
-    private Boolean reportIfEmpty;
+    protected Boolean reportIfEmpty;
 
     /**
      * queryName.
      */
-    private String queryName;
+    protected String queryName;
 
-    private EPCglobalEPCISServiceLocator service = null;
+    /**
+     * the service locator through which the queries will be sent
+     */
+    protected EPCglobalEPCISServiceLocator service = null;
 
     /**
      * Constructor to be used when recreating from storage.
@@ -248,7 +251,7 @@ public class QuerySubscription implements Serializable {
      * @throws IOException
      *             If a serialization or sending error occured.
      */
-    private void serializeAndSend(final EPCISQueryBodyType body) throws IOException {
+    protected void serializeAndSend(final EPCISQueryBodyType body) throws IOException {
         EPCISQueryDocumentType queryDoc = new EPCISQueryDocumentType();
         queryDoc.setCreationDate(new GregorianCalendar());
         queryDoc.setEPCISBody(body);
