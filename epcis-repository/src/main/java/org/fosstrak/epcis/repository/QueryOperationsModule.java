@@ -146,6 +146,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
 	private int maxQueryTime;
 
 	/**
+	 * The seconds to wait to check a trigger condition.
+	 */
+	private String triggerConditionSeconds;
+	
+	/**
+	 * The minutes to wait to check a trigger condition.
+	 */
+	private String triggerConditionMinutes = null;
+
+	/**
 	 * The names of all the implemented queries.
 	 */
 	private final Set<String> queryNames = new HashSet<String>() {
@@ -248,6 +258,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
 		maxQueryTime = Integer.parseInt(properties.getProperty(
 				"maxQueryExecutionTime", "10000"));
 		LOG.debug("maxQueryExecutionTime=" + maxQueryTime);
+		triggerConditionSeconds = properties.getProperty("trigger.condition.check.sec", "0,30");
+		triggerConditionMinutes = properties.getProperty("trigger.condition.check.min");
+		
 	}
 
 	/**
@@ -1064,7 +1077,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
 						query.append(eventType);
 						query.append("_EPCs` WHERE ");
 						for (int j = 0; j < epcs.length; j++) {
-							String val = epcs[j].replaceAll("*", "%");
+							String val = epcs[j].replaceAll("\\*", "%");
 							query.append("epc LIKE '" + val + "' OR ");
 						}
 						query.append("0))");
@@ -1450,10 +1463,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
 		URI dest = parms.getDest();
 		String subscrId = parms.getSubscriptionID();
 		SubscriptionControls controls = parms.getControls();
+		URI triggerURI = controls.getTrigger();
 		QuerySubscriptionScheduled newSubscription = null;
 		String queryName = parms.getQueryName();
 		Schedule schedule = null;
-		boolean isTriggered = false;
 		GregorianCalendar initialRecordTime = (GregorianCalendar) parms
 				.getControls().getInitialRecordTime();
 		if (initialRecordTime == null) {
@@ -1521,12 +1534,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
 				LOG.info("USER ERROR: " + msg);
 				throw new SubscriptionControlsException(msg);
 			}
-			if (controls.getSchedule() == null && controls.getTrigger() != null) {
-				String msg = "Triggers are not supported.";
-				LOG.info("USER ERROR: " + msg);
-				throw new SubscriptionControlsException(msg);
-			}
-
 			if (controls.getSchedule() != null) {
 				// Scheduled Query -> parse schedule
 				schedule = new Schedule(controls.getSchedule());
@@ -1538,12 +1545,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
 				// -> Trigger
 				// need to set schedule which says how often the trigger
 				// condition is checked.
-				isTriggered = true;
 				QuerySchedule qSchedule = new QuerySchedule();
-				qSchedule.setSecond("30");
-				// qSchedule.setMinute("1,11,21,31,41,51");
+				qSchedule.setSecond(triggerConditionSeconds);
+				if (triggerConditionMinutes  != null) {
+				qSchedule.setMinute(triggerConditionMinutes);
+				}
 				schedule = new Schedule(qSchedule);
-				URI triggerURI = controls.getTrigger();
 				QuerySubscriptionTriggered trigger = new QuerySubscriptionTriggered(
 						subscrId, qParams, dest, controls.isReportIfEmpty(),
 						initialRecordTime, initialRecordTime, queryName,
@@ -1585,8 +1592,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
 				LOG.debug("       query param 4: [" + inStream.available()
 						+ " bytes]");
 
-				stmt.setString(5, "");
-				LOG.debug("       query param 5: ");
+				String trigger = "";
+				if (triggerURI != null) {
+					trigger = triggerURI.toString();
+				}
+				stmt.setString(5, trigger);
+				LOG.debug("       query param 5: " + trigger);
 
 				Calendar cal = newSubscription.getInitialRecordTime();
 				Timestamp ts = new Timestamp(cal.getTimeInMillis());
