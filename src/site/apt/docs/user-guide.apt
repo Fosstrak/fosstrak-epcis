@@ -1,0 +1,168 @@
+              -------------------
+              User Guide
+              -------------------
+              Marco Steybe, Andrea Groessbauer
+              -------------------
+              03/06/2007
+              -------------------
+
+User Guide
+
+* Contents
+
+   [[1]] {{{#About}About this Guide}}
+
+   [[1]] {{{#Getting}Getting Started}}
+
+   [[1]] {{{#Configuring}Configuring Accada EPCIS Clients}}
+
+   [[1]] {{{#How}How to use}}
+
+
+* {About} this Guide
+
+  The Accada EPCIS User Guide is intended to help those who whish to 
+  incorporate Accada's EPCIS Repository implementation into their project 
+  to provide a means of persistence for EPC-related data.
+
+* {Getting} Started
+
+  For those who just want to see Accada's EPCIS Repository in action and explore
+  its features and functionalities may simply start our Query and/or Capture Client
+  Applications through Java Web Start from our {{{../demo.html}Demo page}}.
+
+  If you intend to use our EPCIS Repository implementation for storing
+  EPC data and incorporate EPCIS into your own project you will have to send 
+  HTTP POST and Web service requests according to the EPCIS specification
+  to the following URLs:
+
+   * Capture Interface (HTTP binding): <http://demo.accada.org/EPCIS-Capture-v0.2.0>
+
+   []
+
+   * Query Interface (SOAP binding): <http://demo.accada.org/EPCIS-Query-v0.2.0>
+  
+  To get started you can download the Capture and Query Client from the 
+  {{{download.html}Download page}} and use its <<<CaptureClient>>> and
+  <<<QueryClient>>> Java classes which implement the communication details
+  for you. Please refer to {{{#Configuring}Configuring Accada EPCIS Clients}}
+  below for configuration information.
+
+  In case you want to have your own repository running you can download all the
+  binaries from the {{{download.html}Download page}}. Of course in this case you 
+  need to have an application server and a properly configured database instance
+  running. For more information on confuguration, deployment, and execution
+  please consult the {{{dev-guide.html}Developer's Guide}}.
+
+* {Configuring} Accada EPCIS Clients
+
+  There is really not much to configure in the Capture and Query Clients. All
+  there is is the default URLs to use when the client is connecting to the
+  Repository. The properties to set can be found in
+
+   * epcis-captureclient\src\main\resources\captureclient.properties
+
+   * epcis-queryclient\src\main\resources\queryclient.properties
+
+  respectively.
+
+* {How} to use
+
+  This section provides some basic information on how to use some fundamental
+  features of Accada's EPCIS Repository implementation.
+
+** How to use a Query Schedule
+
+   Subscibing a query to the repository to have it run every once in a while
+   requires submitting a query schedule together with the query to be executed.
+   The use of a QuerySchedule is somewhat tricky so we describe it here and
+   provide some quick examples.
+   
+   A <<<QuerySchedule>>> contains different fields for different time units,
+   e.g. a <seconds> field to specify in which seconds of a minute the query
+   should be executed. Whenever a field is set to some values the query will
+   be executed when time reaches the given values. If a field is ommitted the
+   query will be executed every unit of this field, i.e. if all the fields
+   in a schedule are ommitted the query will be executed every second.
+   
+   Here are two examples (taken from the EPCIS specification) for a
+   <<<QuerySchedule>>>:
+   
+   * Example Schedule 1
+
+     * <<<second=0>>>
+     
+     * <<<minute=0>>>
+     
+     * <all other fields ommitted>
+     
+     []
+     
+     This schedule tells to run the query once per hour, at the top of the hour
+     because the <<<hour>>> field is ommitted, meaning to run the query every
+     hour, and the <<<second>>> and <<<minute>>> fields must be 0, meaning to
+     run the query at the top of every hour.
+   
+   * Example Schedule 2
+
+     * <<<second=0>>>
+
+     * <<<minute=0>>>
+
+     * <<<dayOfWeek=[1-5]>>>
+     
+     []
+     
+     The query with this schedule will be executed once per hour, at the top of
+     the hour, but only on weekdays (days 1 through 5 in a week).
+
+   []
+
+   Note: The repository will send an empty result set back to the client or may
+   not send anything at all depending on whether new event data is available since
+   the last execution of a subscribed query if the <<<reportIfEmpty>>> flag is set.
+   
+   
+
+** How to use the Query Callback Interface
+
+   After subscribing a query, the EPCIS Repository will deliver results of query
+   execution through the Query Callback Interface by invoking the dedicated
+   commands, e.g. <<<callbackResults(QueryResults)>>>. Accada's EPCIS Repository
+   implements the HTTP Binding of the Query Callback Interface and thus delivers 
+   query results by sending an HTTP POST request to the URI specified by the 
+   <<<dest>>> parameter.
+   
+   That is, when subscribing a query you must specify an HTTP URL in the form of
+   <<<http://host:port/remainder-of-url>>> as the <<<dest>>> parameter. Our 
+   implementation will POST query results upon execution of the subscribed query
+   to the given URL. It is your responsibility to listen for the response at the
+   given URL, accept it, and assign it to the corresponding query (the
+   <<<subscriptionID>>> is part of the <<<QueryResults>>> object).
+   
+   To facialiate this task we have implemented a very simple
+   <<<QueryCallbackClient>>> which just listens for requests to a given URL,
+   caches any incoming POST data and delivers it to an application upon request.
+   You can also take a look at the <<<QueryCallbackListener>>> in epcis-commons,
+   where you will find a simple web server implementation listening for incoming
+   calls from the EPCIS Query Callback Interface. The listener can be used like
+   this:
+   
++----------------------------------------------------------------------------+
+QueryCallbackListener listener = QueryCallbackListener.getInstance();
+if (!listener.isRunning()) {
+    listener.start();
+}
+synchronized (listener) {
+    try {
+        listener.wait(timeout);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
+String response = listener.fetchResponse();
++----------------------------------------------------------------------------+
+
+   This is actually the code we use for running the tests that involve the
+   Query Callback Interface. The <<<wait()>>> method waits until either the 
+   listener received a response or the specified <<<timeout>>> has elapsed.

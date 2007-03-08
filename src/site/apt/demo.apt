@@ -1,64 +1,71 @@
-       ------
-                                    Demo
-                                    ------
-                                    ------
-
+              -------------------
+              Demo
+              -------------------
+              Christof Roduner
+              -------------------
+              03/06/2007
+              -------------------
 
 Demo
 
-* Public EPCIS Repository
+  For demonstration purposes we run a public available EPCIS Repository and
+  provide a generic EPCIS Capture and Query Application available via Java
+  Web Start.
 
-   We provide a public EPCIS Repository that can be used in connection with any Capture or Query Application. We provide an HTTP binding for the Capture Interface and a SOAP binding for the Query Interface. The two two interfaces are available at the following URLs:
+* Public Accada EPCIS Repository
 
-   Capture Interface (HTTP binding):
-   <http://demo.accada.org/EPCIS-Capture-v0.2.0>
+  We provide a public available Accada EPCIS Repository that can be used in
+  connection with any EPCIS conform Capture or Query Application. We support
+  the HTTP binding for the Capture Interface and the SOAP binding for the Query
+  Interface. The two interfaces are available at the following URLs:
 
-   Query Interface (SOAP binding):
-   <http://demo.accada.org/EPCIS-Query-v0.2.0>
+  Accada EPCIS Capture Interface (HTTP binding):
 
-   The EPCIS Repository is purged and initialized with some sample data every night.
+-------------------------------------------
+http://demo.accada.org/EPCIS-Capture-v0.2.0
+-------------------------------------------
 
-* Generic Capture Application and Query Application
+  Accada EPCIS Query Interface (SOAP binding):
 
-   We also provide a generic Capture Application and Query Application. You can use them to interact with our public EPCIS Repository or with any other EPCIS repository run by third parties. Both applications include sample queries and capture data to illustrate the functionality offered by EPCIS. You can also use them as templates for your own experiments.
+-----------------------------------------
+http://demo.accada.org/EPCIS-Query-v0.2.0
+-----------------------------------------
 
-   {{{http://www.accada.org/webstart/query-app.jnlp} Launch Query Application }} (via Java Web Start)
-   
-   {{{http://www.accada.org/webstart/capture-app.jnlp} Launch Capture Application }} (via Java Web Start)
+  The Accada EPCIS Repository is purged and initialized with some sample EPC
+  data every night.
+
+
+* Generic EPCIS Capture and Query Application
+
+  We also provide a generic EPCIS Capture Application and Query Application.
+  You can use them to interact with our public Accada EPCIS Repository or with
+  any other third party EPCIS Repository supporting the HTTP binding for the
+  Capture Interface and the SOAP binding for the Query Interface. Both
+  applications include sample queries and sample capture data to illustrate the
+  functionality offered by EPCIS. You can also use them as templates for your
+  own experiments.
+
+  {{{http://www.accada.org/webstart/query-app.jnlp} Launch Query Application }} (via Java Web Start)
+
+  {{{http://www.accada.org/webstart/capture-app.jnlp} Launch Capture Application }} (via Java Web Start)
  
 
-   In order to use these applications, you need to have the Java Runtime Environment (JRE) 1.5 or higher installed on your computer (Java Web Start is used to launch the applications). Please note that we currently use a self-signed certificate, which causes a security warning when the applications are launched. 
+  In order to use these applications, you need to have the Java Runtime
+  Environment (JRE) 1.5 or higher installed on your computer (Java Web Start is
+  used to launch the applications). Please note that we currently use a
+  self-signed certificate, which causes a security warning when the applications
+  are launched. 
 
 
-* Screenshots of Capture and Query Application
+* Screenshots
 
-[images/EPCISCaptureApp.png]
-
-[images/EPCISQueryApp.png]
-
+  The following two screenshots show the features available in our EPCIS Capture
+  and Query GUI Applications:
 
 
+[images/epcis_capture_gui.png] Accada EPCIS Capture GUI
 
+  .
 
+[images/epcis_query_gui.png] Accada EPCIS Query GUI
 
-
-
-
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-
- 
-
- 
- 
- 
- 

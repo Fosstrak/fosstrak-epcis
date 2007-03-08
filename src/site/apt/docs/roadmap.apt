@@ -1,0 +1,64 @@
+Roadmap
+
+* Axis
+
+** Motivation for the use of Axis v1.4
+
+   Axis 1.4 has been used for the generation of the service stubs, although
+   Version 2.0 is already available. Since Version 2.0 is a complete rewrite
+   using Axis 2.0 would have meant a major rewrite of the XML schema files.
+   This would consequently have to be done every time a new draft of the
+   upcoming standard is released. Therefore we didn't adapt the current
+   implementation.
+
+** {Axis Workarounds}
+
+   [[1]] {Making use of Axis for Query Callback}
+
+   As stated above sending the results of subscribed queries to their
+   destination URI needs serializing an EPCISQueryDocumentType instance with
+   all its parts into XML and then sending it via a HTTP POST request. As we've
+   got the Axis genereated Java classes for the needed elements anyway it was
+   obvious to reuse Axis' XML serializing framework. Unfortunately (ab)using
+   Axis for only getting XML back without using the rest of the invocation
+   framework wasn't envisioned by the Axis developers and therefore not
+   documented. With the help from the Axis user mailing list the solution for
+   serializing an instance of a class MyClass which has to be the result of a
+   WSDL2Java run was found which is listed below:
+
++-----------------------------------------------------------------------------+
+javax.xml.namespace.QName myClassXMLType = myClass Instance.getTypeDesc().getXmlType();
+OutputStream out = getYourStreamFromSomeObject.getOutputStream();
+OutputStreamWriter oWriter = new OutputStreamWriter(out);
+SerialisationContext serContext = new SerialisationContext(oWriter);
+serContext.setWriteXMLType(myClassXMLType);
+serContext.serialize(myClassXMLType, new NullAttributes(), myClass Instance, myClassXMLType, myClassInstance.class, false, true);
+oWriter.flush();
+out.flush();
+oWriter.close();
+out.close();
++-----------------------------------------------------------------------------+
+  
+   [[1]] The <<<ArrayOfString>>> Type and Axis
+  
+   The file <<<EPCglobal-epcis-query-1 0.xsd>>> defines the type
+   <<<ArrayOfString>>> as an element with a sequence of
+   <<<<string>content</string>>>> elements. Axis 1.4 doesn't generate a class
+   for this type, but treats it simply as a Java array of <<<String>>> objects.
+   This would be alright if it wouldn't mix everything up on deserialization
+   because it doesn't have any type information for <<<ArrayOfString>>>. Our
+   workaround isn't very elegant but functional. On the receiving (and
+   therefore deserializing) side of the service, add an extra line to
+   <<<EPCglobal-epcisquery-1 0.xsd>>> as shown below which forces Axis to
+   generate a class with an appropriate deserializer. As this lives only on
+   the deserializing end it doesn't affect the output or standard compliance
+   of the implementation.
+
++-----------------------------------------------------------------------------+
+<xsd:complexType name="ArrayOfString">
+  <xsd:sequence>
+    <xsd:element name="string" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element name="DoNotUseHackAroundBug" type="xsd:boolean" minOccurs="0" maxOccurs="0"/>
+  </xsd:sequence>
+</xsd:complexType>
++-----------------------------------------------------------------------------+
