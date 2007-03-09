@@ -79,10 +79,14 @@ Architecture
 
 ** {Business Tier}
 
-   Simply speaking this tier takes client requests, applies some parsing and
+   The business tier is made up of the EPCIS Repository implementation. Simply
+   speaking the Repository takes client requests, applies some parsing and
    error handling, transforms the requests into SQL INSERT and SELECT queries,
-   and submits them to the underlying database. In the case of an EPCIS query,
-   this tier sends back the resulting EPCIS response.
+   and submits them to the underlying resource tier (database). In the case of
+   an EPCIS query, this tier sends back the resulting EPCIS response. As
+   mentioned above Accada's EPCIS Repository consists of an implementation of
+   the SOAP binding for the Query Interface and an implementation of the HTTP
+   binding for the Capture Interface.
 
    The following class-diagram shows the components that make up the business
    tier:
@@ -92,82 +96,104 @@ Architecture
    In the remainder of this section we describe the most important components
    in more detail.
 
-   * [{QueryOperationsModule}]
+*** Query Operations Module
 
-     The QueryOperationsModule implements the SOAP binding of the EPCIS Query
-     Interface. Please refer to the specification for more details about the
-     operations available in the Query Operations Module.
+   In order to implement the SOAP binding on the Query side, the Axis framework
+   comes into play. We use Axis to support SOAP over HTTP and thus integrate
+   the Axis HTTP <TransportListener> through a servlet into our Web
+   container (Tomcat). In Axis the incoming SOAP messages pass the framework in
+   form of a <MessageContext> which contains the request or response message
+   as well as a number of attributes. The processing of the <MessageContext>
+   is made in <Handler>s. We provide two such <Handler>s, one for
+   pre-processing and one for post-processing. In between is the actual service
+   implementation:
 
-     ...
+-------------------------------------------------------------------------------
+         +------------------+    +-----------------------+    +------------------+
+msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler | ->
+         +------------------+    +-----------------------+    +------------------+
+-------------------------------------------------------------------------------
 
-     It takes the incoming requests from Axis, transforms them into
-     SQL SELECT queries ant returns the resulting query response back to Axis.
-     
+   The <Handler>s make up a <HandlerChain> which may be configured in the
+   deployment descriptor (see the {{{developer-guide.html}Developer Guide}}
+   for locating the corresponding <<<server-config.wsdd>>> file). The following
+   describes the <Handler>s and the <Service> in more detail:
 
-*** CaptureOperationsModule
+   * <<QueryInitHandler>>
 
-    EPCIS Capture Interface implementation. Converts the invocations from axis
-    to SQL queries. All data must enter the repository through this interface.
-    Masterdata cannot be inserted by this interface, as it is not yet specified
-    in the EPCIS v1.0 specification. Beware that there are no means to delete
-    the events through this interface as it is required by the specification.
+     The <<<QueryInitHandler>>> performs the initialization work for our
+     Repository implementation. That is, it sets up the database connection,
+     loads application and logging properties, and restores scheduled
+     subscriptions. It saves all necessary information back to the
+     <MessageContext> which will be passed on to the next <Handler>. The
+     <<<QueryInitHandler>>> is also responsible to clean up after a service
+     fault by undoing the initialization steps (closing the database connection
+     and making the scheduled subscriptions persistent).
 
-*** QueryInitHandler and QueryPostHandler
+   * <<QueryOperationsModule>>
 
-    Upon the arriavel of a SOAP message it is processed according to a handler
-    chain. In our implementation there are two handlers: one for pre-pocessing
-    and one for post-processing.
+     The <<<QueryOperationsModule>>> is the service implementation of the SOAP
+     binding for the EPCIS Query Interface. In here the actual business
+     functionality takes place. Basically the <<<QueryOperationsModule>>> takes
+     the incoming request from Axis, handles it according to the specification
+     (by interacting with the underlying database) and returns the resulting
+     query response back to Axis. Please refer to the specification
+     {{{#[1]}[1]}} for more details about the operations available in the Query
+     Operations Module.
 
-+-----------------------------------------------------------------------------+
-         +--------------+    +---------+    +--------------+
-msg  ->  | init handler | -> | service | -> | post handler |
-         +--------------+    +---------+    +--------------+
-+-----------------------------------------------------------------------------+
+   * <<QueryPostHandler>>
 
-    The handlers may configured through the deployment descriptor (in the
-    <<<server-config.wsdd>>> file).
+     The <<<QueryPostHandler>>> is invoked after the service has completed
+     its work successfully. It reverses the steps taken by the
+     <<<QueryInitHandler>>>, closing the database connection and storing the
+     scheduled subscriptions.
 
-*** QueryInitHandler
+   []
 
-    It collects information necessary for service execution such as
+*** A Framework for Subscriptions
 
-    * db connection properties
+   Unlike polled queries which are stateless, subscribed queries have to keep
+   track of things like their last execution time, the destination URL for
+   reporting results, the query parameters, and when or on what event the query
+   should be executed. To meet these requirenments we keep references to
+   subscriptions in the Web application context. This avoids subscriptions
+   being garbage collected and retains them across service invocations.
+   Furthermore we hold the subscriptions also in the database in order to save
+   them across application restarts.
 
-    * logging properties
+   In order to handle subscribed queries requested through the Query Control
+   Interface's <<<subscribe>>> operation we provide the <<<QuerySubscription>>>
+   module. It represents standing queries which are either scheduled or 
+   triggered:
 
-    * scheduled subscriptions
+   * <<QuerySubscriptionScheduled>>
 
-    []
+     A <<<QuerySubscriptionScheduled>>> represents a subscription associated
+     with a schedule and a query. The query is invoked whenever the timer of
+     the schedule times out.
 
-    All this information is delivered to the service in the message context.
-    The <<<QueryInitHandler>>> is responsible to clean up after a service
-    crashes, undoing initialisation steps and returning an <<<AxisFault>>>
-    message.
+   * <<QuerySubscriptionTriggered>>
 
-*** QueryPostHandler
-  
-    This handler is invoked after a the service was completed successfully. It
-    undoes the steps taken by the init handler to transfer it into the state it
-    was in before the init handler was called. 
+     A <<<QuerySubscriptionTriggered>>> represents a subscription associated
+     with a trigger URI and a query. The query is invoked whenever an event is
+     captured that includes the specified trigger URI.
 
-*** QuerySubscriptionScheduled
+   []
 
-    Represents a subscription associated with a query and a schedule. The query
-    is invoked each time it times out. It has also an interface to delete a
-    subscription.
-  
-*** QuerySubscription
+*** Capture Operations Module
 
-    Represents a standing query. The query associated to this subscription is
-    stored in the database. 
+    The <<<CaptureOperationsModule>>> is the implementation of the HTTP binding
+    for the EPCIS Capture Interface. It is responsible for storing incoming
+    capture events to the repository. Currently <<<MasterData>>> cannot be
+    inserted through this module, as the specification does not describe the
+    means how <<<MasterData>>> should be entered. Also note that currently
+    there is no way to delete event data once it is entered.
 
-*** {Schedule}
-
-    A Schedule is defined by <<<SubscriptionControls>>> parameters. These
-    parameters define the  
-
-*** EventFieldExtension
-
+    Technically the <<<CaptureOperationsModule>>> is an <HttpServlet> which
+    implements the <<<doPost>>> operation and thus waits on a specific HTTP
+    address for incoming POST requests. The payload of the POST request must
+    correspond to a valid EPCIS event in its XML representation as described
+    by the specification {{{#[1]}[1]}}.
 
 ** {Resource Tier}
 
