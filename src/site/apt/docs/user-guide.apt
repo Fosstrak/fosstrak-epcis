@@ -51,13 +51,13 @@ User Guide
   In case you want to have your own repository running you can download all the
   binaries from the {{{download.html}Download page}}. Of course in this case you 
   need to have an application server and a properly configured database instance
-  running. For more information on confuguration, deployment, and execution
+  running. For more information on configuration, deployment, and execution
   please consult the {{{dev-guide.html}Developer's Guide}}.
 
 * {Configuring} Accada EPCIS Clients
 
   There is really not much to configure in the Capture and Query Clients. All
-  there is is the default URLs to use when the client is connecting to the
+  there is the default URLs to use when the client is connecting to the
   Repository. The properties to set can be found in
 
    * epcis-captureclient\src\main\resources\captureclient.properties
@@ -81,9 +81,9 @@ User Guide
    A <<<QuerySchedule>>> contains different fields for different time units,
    e.g. a <seconds> field to specify in which seconds of a minute the query
    should be executed. Whenever a field is set to some values the query will
-   be executed when time reaches the given values. If a field is ommitted the
+   be executed when time reaches the given values. If a field is omitted the
    query will be executed every unit of this field, i.e. if all the fields
-   in a schedule are ommitted the query will be executed every second.
+   in a schedule are omitted the query will be executed every second.
    
    Here are two examples (taken from the EPCIS specification) for a
    <<<QuerySchedule>>>:
@@ -94,12 +94,12 @@ User Guide
      
      * <<<minute=0>>>
      
-     * <all other fields ommitted>
+     * <all other fields omitted>
      
      []
      
      This schedule tells to run the query once per hour, at the top of the hour
-     because the <<<hour>>> field is ommitted, meaning to run the query every
+     because the <<<hour>>> field is omitted, meaning to run the query every
      hour, and the <<<second>>> and <<<minute>>> fields must be 0, meaning to
      run the query at the top of every hour.
    
@@ -140,7 +140,7 @@ User Guide
    given URL, accept it, and assign it to the corresponding query (the
    <<<subscriptionID>>> is part of the <<<QueryResults>>> object).
    
-   To facialiate this task we have implemented a very simple
+   To facilitate this task we have implemented a very simple
    <<<QueryCallbackClient>>> which just listens for requests to a given URL,
    caches any incoming POST data and delivers it to an application upon request.
    You can also take a look at the <<<QueryCallbackListener>>> in epcis-commons,
