@@ -72,11 +72,15 @@ Architecture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * {EPCIS Repository}
 
-  The sections below describe our EPCIS Repository implementation and are
-  divided into so-called tiers. Some communication and accessing information
+   Some communication and accessing information
   are described in the {{{#Access Tier}Access Tier}}, the description of the 
   whole functionality is in the {{{#Business Tier}Business Tier}}, and the
   database details are given in the {{{#Resource Tier}Resource Tier}}.
+  
+  The sections below describe our EPCIS Repository implementation and are
+  divided into so-called tiers.
+  How the information and services of the repository are accessed and how applications may communicate with it are described in the section about the {{{#Access Tier}Access Tier}}.
+  The services, implementing the actual functionality, are in the {{{#Business Tier}Business Tier}}. Finally the database, storing the information surrounding the EPC's (so called events), is maintained in the {{{#Resource Tier}Resource Tier}}.
 
 ** {Access Tier}
 
