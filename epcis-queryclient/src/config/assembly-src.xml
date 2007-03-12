@@ -1,0 +1,27 @@
+<assembly>
+  <id>src</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+    <format>tar.bz2</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>../epcis-commons/src/main/java</directory>
+      <outputDirectory>src</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/java</directory>
+      <outputDirectory>src</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

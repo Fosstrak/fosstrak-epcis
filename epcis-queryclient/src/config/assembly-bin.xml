@@ -3,6 +3,7 @@
   <formats>
     <format>zip</format>
     <format>tar.gz</format>
+    <format>tar.bz2</format>
   </formats>
   <fileSets>
     <fileSet>
@@ -20,8 +21,6 @@
       </includes>
     </fileSet>
   </fileSets>
-<!--
-  currently there are no dependencies for epcis-captureclient
   <dependencySets>
     <dependencySet>
       <outputDirectory>/lib</outputDirectory>
@@ -29,5 +28,4 @@
       <scope>runtime</scope>
     </dependencySet>
   </dependencySets>
--->
 </assembly>

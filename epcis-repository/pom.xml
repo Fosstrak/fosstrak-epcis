@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- =========================================================== -->
-  <!-- POM basics                                                  -->
+  <!-- Basics                                                  -->
   <!-- =========================================================== -->
 
   <groupId>org.accada.epcis</groupId>
@@ -14,6 +14,7 @@
   </parent>
   <packaging>war</packaging>
   <modelVersion>4.0.0</modelVersion>
+  <name>epcis-repository</name>
 
 
   <!-- =========================================================== -->
@@ -113,28 +114,27 @@
 
   <build>
     <plugins>
-      <!--
+
+<!--
+  the following plugin allows the generation of axis classes.
+  we currently do not need this plugin!
+  
+  see http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration
+  for more information on Axis integration.
+-->
+<!--
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
-            -->
-            <!--
-            See http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration
-            for more information on Axis integration.
-            -->
-            <!--
             <id>wsdl2java</id>
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
-
                 <mkdir dir="target/generated-sources/main/java" />
-
                 <taskdef
                   resource="axis-tasks.properties"
                   classpathref="maven.compile.classpath" />
-
                 <axis-wsdl2java
                   output="target/generated-sources/main/java"
                   deployScope="Application" serverSide="true"
@@ -159,38 +159,30 @@
                     namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
                     package="${package.structure.soapapi}" />
                 </axis-wsdl2java>
-          
-            -->
+-->
                 <!--
-                Delete Axis-generated server side implementation of
-                BusinessTransactionType.java. We provide our own
-                implementation in src/main/java.
+                  delete Axis-generated server side implementation of
+                  BusinessTransactionType.java. We provide our own
+                  implementation in src/main/java.
                 -->
-            <!--
+<!--
                 <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/BusinessTransactionType.java" />
-
-            -->
+-->
                 <!--
-                Tie EPCISServiceBindingSkeleton to our existing
-                QueryOperationsModule implementation and delete
-                unneeded class.
+                  tie EPCISServiceBindingSkeleton to our existing
+                  QueryOperationsModule implementation and delete
+                  unneeded class.
                 -->
-            <!--
+<!--
                 <replace
                   file="target/generated-sources/main/java/${directory.structure.soapapi}/EPCISServiceBindingSkeleton.java"
                   token="new ${package.structure.soapapi}.EPCISServiceBindingImpl"
                   value="new ${package.structure.repository}.QueryOperationsModule"
                   summary="true" />
                 <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/EPCISServiceBindingImpl.java"/>
-
               </tasks>
-
-            -->
-              <!-- add "generated-sources" folders to the compile path -->
-            <!--
               <sourceRoot>target/generated-sources/main/java</sourceRoot>
               <testSourceRoot>target/generated-sources/test/java</testSourceRoot>
-              
             </configuration>
             <goals>
               <goal>run</goal>
@@ -199,11 +191,12 @@
 
         </executions>
       </plugin>
-      -->
-
-      <!--
-      Current version of plugin does not meet all of our requirements.
-      Reconsider replacing ant aith axistools-maven-plugin at a later time.
+-->
+<!--
+  current version of plugin does not meet all of our requirements.
+  reconsider replacing ant with axistools-maven-plugin at a later time.
+-->
+<!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>axistools-maven-plugin</artifactId>
@@ -221,7 +214,7 @@
           </execution>
         </executions>
       </plugin>
-      -->
+-->
 
       <!--
         the tomcat-maven-plugin used to deploy the application to tomcat.
@@ -270,11 +263,8 @@
 
 
   <!-- =========================================================== -->
-  <!-- Additional project information                              -->
+  <!-- Repositories                                                -->
   <!-- =========================================================== -->
-
-  <name>epcis-repository</name>
-
 
   <!--
     the tomcat-maven-plugin is not in maven's core set of plugins.

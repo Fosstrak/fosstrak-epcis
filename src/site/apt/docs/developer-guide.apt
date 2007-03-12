@@ -248,7 +248,10 @@ mvn compile
 </server>
 ---------------------------------------------------------------------------
 
-   With the following commands you can then do the deployment or undeployment. But before executing them, change to the epcis-repository directory, otherwise an error will be prompted. 
+   With the following commands you can then do the deployment or undeployment.
+   Make sure you switch to the epcis-repository directory, otherwise you will
+   be faced with a build error as the tomcat-plugin is only available to the
+   epcis-repository module! 
 
 ---------------------------------------------------------------------------
 mvn tomcat:deploy
@@ -290,7 +293,7 @@ mvn -Dwtpversion=1.0 eclipse:eclipse
 ---------------------------------------------------------------------------
 mvn site -N
 ---------------------------------------------------------------------------
-   
+
    In order to generate all module reports and to test the whole site navigation
    before an official deploy you can execute the following command which will
    generate the Web site under the given directory:
@@ -298,6 +301,18 @@ mvn site -N
 ---------------------------------------------------------------------------
 mvn site:stage -DstagingDirectory=d:\testsite
 ---------------------------------------------------------------------------
+
+** Generation of Binaries
+
+   The following command will generate the binaries for the modules, i.e.
+   it will generate assemblies for the epcis-captureclient and
+   epcis-queryclient modules and it will generate a WAR file for the
+   epcis-repository module.
+
+---------------------------------------------------------------------------
+mvn package
+---------------------------------------------------------------------------
+
 
 
 * {Configuring} Accada EPCIS Repository

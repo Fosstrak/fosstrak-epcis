@@ -3,8 +3,7 @@
   <body>
   
     <menu name="Modules">
-      <item name="EPCIS Repository" href="index.html">
-        <item name="Overview" href="project-reports.html"/>
+      <item name="EPCIS Repository" href="project-reports.html">
         <item name="Dependencies" href="dependencies.html"/>
         <item name="Surefire" href="surefire-report.html"/>
         <item name="Checkstyle" href="checkstyle.html"/>
@@ -13,16 +12,16 @@
         <item name="JavaNCSS" href="javancss.html"/>
         <item name="TagList" href="taglist.html"/>
       </item>
-      <item name="EPCIS Query Client" href="../epcis-queryclient/index.html" collapse="true">
+      <item name="EPCIS Query Client" href="../epcis-queryclient/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
-      <item name="EPCIS Capture Client" href="../epcis-captureclient/index.html" collapse="true">
+      <item name="EPCIS Capture Client" href="../epcis-captureclient/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
-      <item name="EPCIS Commons" href="../epcis-commons/index.html" collapse="true">
+      <item name="EPCIS Commons" href="../epcis-commons/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
-      <item name="EPCIS Interop Test" href="../epcis-interop-test/index.html" collapse="true">
+      <item name="EPCIS Interop Test" href="../epcis-interop-test/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
     </menu>

@@ -1,14 +1,60 @@
               -------------------
               Download
               -------------------
-              Christof Roduner
+              Marco Steybe
               -------------------
               03/06/2007
               -------------------
 
+
 Download
 
-  Source code will be made available for download as soon as the EPCIS
-  Specification is released by EPCglobal.
+* Accada EPCIS Repository 
 
-  Please check out our {{{demo.html} demo page}} in the meantime. 
+*--------+----------+--------+
+         | Binaries | Sources
+*--------+----------+--------+
+ EPCIS Repository 0.2.0 (WAR file) | {{{download/epcis-repository-0.2.0.war}epcis-repository-0.2.0.war}} | 
+*--------+----------+--------+
+
+
+* Accada EPCIS Capture Client
+
+*--------+----------+--------+
+         | Binaries | Sources
+*--------+----------+--------+
+ EPCIS Capture Client 0.2.0 with dependencies (zip) | {{{download/epcis-captureclient-0.2.0-bin-with-dependencies.zip}epcis-captureclient-0.2.0-bin-with-dependencies.zip}} | {{{download/epcis-captureclient-0.2.0-src.zip}epcis-captureclient-0.2.0-src.zip}}
+*--------+----------+--------+
+ EPCIS Capture Client 0.2.0 with dependencies (tar.gz) | {{{download/epcis-captureclient-0.2.0-bin-with-dependencies.tar.gz}epcis-captureclient-0.2.0-bin-with-dependencies.tar.gz}} | {{{download/epcis-captureclient-0.2.0-src.tar.gz}epcis-captureclient-0.2.0-src.tar.gz}}
+*--------+----------+--------+
+ EPCIS Capture Client 0.2.0 with dependencies (tar.bz2) | {{{download/epcis-captureclient-0.2.0-bin-with-dependencies.tar.bz2}epcis-captureclient-0.2.0-bin-with-dependencies.tar.bz2}} | {{{download/epcis-captureclient-0.2.0-src.tar.bz2}epcis-captureclient-0.2.0-src.tar.bz2}}
+*--------+----------+--------+
+
+
+* Accada EPCIS Query Client
+
+*--------+----------+--------+
+         | Binaries | Source
+*--------+----------+--------+
+ EPCIS Query Client 0.2.0 with dependencies (zip) | {{{download/epcis-queryclient-0.2.0-bin-with-dependencies.zip}epcis-queryclient-0.2.0-bin-with-dependencies.zip}} | {{{download/epcis-queryclient-0.2.0-src.zip}epcis-queryclient-0.2.0-src.zip}}
+*--------+----------+--------+
+ EPCIS Query Client 0.2.0 with dependencies (tar.gz) | {{{download/epcis-queryclient-0.2.0-bin-with-dependencies.tar.gz}epcis-queryclient-0.2.0-bin-with-dependencies.tar.gz}} | {{{download/epcis-queryclient-0.2.0-src.tar.gz}epcis-queryclient-0.2.0-src.tar.gz}}
+*--------+----------+--------+
+ EPCIS Query Client 0.2.0 with dependencies (tar.bz2) | {{{download/epcis-queryclient-0.2.0-bin-with-dependencies.tar.bz2}epcis-queryclient-0.2.0-bin-with-dependencies.tar.bz2}} | {{{download/epcis-queryclient-0.2.0-src.tar.bz2}epcis-queryclient-0.2.0-src.tar.bz2}}
+*--------+----------+--------+
+
+
+* System Requirements
+
+*---------------------+---------+
+ <<JDK>>              | 1.5 or above 
+*---------------------+---------+
+ <<Memory>>           | No minimum requirements.
+*---------------------+---------+
+ <<Operating System>> | No minimum requirements. Tested on Windows XP. 
+*---------------------+---------+
+
+
+* Installation and Usage Instructions
+
+  Please consult the {{{docs/user-guide.html} User Guide}} for installation and Usage instructions.
