@@ -60,7 +60,9 @@ Developer Guide
 
    For storing the EPC-related data we use a
    {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL 5.0 Community Server}}
-   instance. After installation you can log into the MySQL Command Line Client
+   instance.
+   
+   [[1]] After installation you can log into the MySQL Command Line Client
    as <<<root>>> and inject our database setup script like this:
    
 -------------------------------------------------------------------------
@@ -69,19 +71,37 @@ source <path-to-trunk>/epcis-repository/src/main/sql/epcis_setup.sql
    
    This sql script adds a new user 'epcis' and a new database 'epcisdb' (these
    default names can be adjusted in the sql script). Alternatively you could
-   use the MySQL Administrator shiped with the
+   use the MySQL Administrator shipped with the
    {{{http://dev.mysql.com/downloads/gui-tools/5.0.html}MySQL GUI Tools}} or
    any other database administration utility in order to setup a new user and
-   database.
+   database. (In the following we assume the defaults for user, password and databse names)
    
-   After you created a user and database, you need to load our database schema
+   [[2]] After you created a user and database, you need to load our database schema
    from <<<epcis-repository/src/main/sql/epcis_schema.sql>>> and inject it into
    MySQL as before, just make sure you are connected to the newly created db!
+
+-------------------------------------------------------------------------
+use epcisdb;
+
+source <path-to-trunk>/epcis-repository/src/main/sql/epcis_schema.sql
+-------------------------------------------------------------------------
    
-   The last step involves adjusting the database connection parameters in
+   [[3]] The last step involves adjusting the database connection parameters in
    Tomcat's Context container, i.e. you need to specify db name, user, and
    password you created before in the following file:
    <<<epcis-repository/src/main/webapp/META-INF/context.xml>>>
+
+---------------------------------------------------------------------------
+<Resource
+    name="jdbc/EPCISDB"
+    type="javax.sql.DataSource"
+    auth="Container"
+    username="epcis"
+    password="epcis"
+    driverClassName="com.mysql.jdbc.Driver"
+    url="jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true">
+</Resource>
+-----------------------------------------------------------------------------
 
 ** Installing Maven
 
@@ -227,7 +247,7 @@ mvn compile
 </server>
 ---------------------------------------------------------------------------
 
-   With the following commands you can then do the deployment or undeployment:
+   With the following commands you can then do the deployment or undeployment. But before executing them, change to the epcis-repository directory, otherwise an error will be prompted. 
 
 ---------------------------------------------------------------------------
 mvn tomcat:deploy
