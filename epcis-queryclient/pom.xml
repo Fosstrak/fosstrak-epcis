@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- =========================================================== -->
-  <!-- POM basics                                                  -->
+  <!-- Basics                                                  -->
   <!-- =========================================================== -->
 
   <groupId>org.accada.epcis</groupId>
@@ -14,6 +14,7 @@
   </parent>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
+  <name>epcis-queryclient</name>
 
 
   <!-- =========================================================== -->
@@ -22,7 +23,6 @@
 
   <properties>
     <package.structure.soapapi>org.accada.epcis.soapapi</package.structure.soapapi>
-    <package.structure.queryclient>org.accada.epcis.queryclient</package.structure.queryclient>
     <directory.structure.soapapi>org/accada/epcis/soapapi</directory.structure.soapapi>
   </properties>
 
@@ -57,34 +57,10 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis-saaj</artifactId>
-      <version>1.4</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-discovery</groupId>
-      <artifactId>commons-discovery</artifactId>
-      <version>0.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.12</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -111,28 +87,27 @@
           </archive>
         </configuration>
       </plugin>
+
+<!--
+  the following plugin allows the generation of axis classes.
+  we currently do not need this plugin!
+  
+  see http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration
+  for more information on Axis integration.
+-->
 <!--
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
--->
-            <!--
-            See http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration
-            for more information on Axis integration.
-            -->
-<!--
             <id>wsdl2java</id>
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
-
                 <mkdir dir="target/generated-sources/main/java" />
-
                 <taskdef
                   resource="axis-tasks.properties"
                   classpathref="maven.compile.classpath" />
-
                 <axis-wsdl2java
                   output="target/generated-sources/main/java"
                   deployScope="Application" serverSide="false"
@@ -157,24 +132,17 @@
                     namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
                     package="${package.structure.soapapi}" />
                 </axis-wsdl2java>
-          
 -->
                 <!--
-                Delete Axis-generated server side implementation of
-                BusinessTransactionType.java. We provide our own
-                implementation in src/main/java.
+                  delete Axis-generated server side implementation of
+                  BusinessTransactionType.java. We provide our own
+                  implementation in src/main/java.
                 -->
 <!--
                 <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/BusinessTransactionType.java" />
-
               </tasks>
-
--->
-              <!-- add "generated-sources" folders to the compile path -->
-<!--
               <sourceRoot>target/generated-sources/main/java</sourceRoot>
               <testSourceRoot>target/generated-sources/test/java</testSourceRoot>
-              
             </configuration>
             <goals>
               <goal>run</goal>
@@ -188,7 +156,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/assembly/bin-with-deps.xml</descriptor>
+            <descriptor>src/config/assembly.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
@@ -226,12 +194,5 @@
       </plugin>
     </plugins>
   </reporting>
-
-
-  <!-- =========================================================== -->
-  <!-- Additional project information                              -->
-  <!-- =========================================================== -->
-
-  <name>epcis-queryclient</name>
 
 </project>

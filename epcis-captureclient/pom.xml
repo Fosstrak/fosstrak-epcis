@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- =========================================================== -->
-  <!-- POM basics                                                  -->
+  <!-- Basics                                                  -->
   <!-- =========================================================== -->
 
   <groupId>org.accada.epcis</groupId>
@@ -14,6 +14,7 @@
   </parent>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
+  <name>epcis-captureclient</name>
 
 
   <!-- =========================================================== -->
@@ -44,6 +45,24 @@
           </archive>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/config/assembly.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -69,12 +88,5 @@
       </plugin>
     </plugins>
   </reporting>
-
-
-  <!-- =========================================================== -->
-  <!-- Additional project information                              -->
-  <!-- =========================================================== -->
-
-  <name>epcis-captureclient</name>
 
 </project>

@@ -11,12 +11,32 @@ Architecture
   The following sections describe the technical specification of Accada's
   EPCIS implementation. It is intended as an introduction to future
   developers who are somewhat familiar with the EPCglobal EPC Information
-  Services (EPCIS) specification {{{#[1]}[1]}}. We currently implement version 1.0 of
-  this specification.
+  Services (EPCIS) specification {{{#[1]}[1]}}. We currently implement version
+  1.0 of this specification.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Introduction
+* Contents
+
+  [[1]] {{{#Introduction}Introduction}}
+
+  [[1]] {{{#Architectural%20Overview}Architectural Overview}}
+
+  [[1]] {{{#EPCIS%20Repository}EPCIS Repository}}
+
+        [[1]] {{{#Access%20Tier}Access Tier}}
+
+        [[1]] {{{#Business%20Tier}Business Tier}}
+
+        [[1]] {{{#Resource%20Tier}Resource Tier}}
+
+  [[1]] {{{#EPCIS%20Capture%20Application}EPCIS Capture Application}}
+
+  [[1]] {{{#EPCIS%20Query%20Application}EPCIS Query Application}}
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* {Introduction}
 
   The goal of EPCIS is to enable applications to incorporate EPC-related data
   into their businesses. It provides means to store EPC data persistently and
@@ -32,11 +52,11 @@ Architecture
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Overview
+* {Architectural Overview}
 
   The following figure gives an overview of the EPCIS architecture.
 
-[../images/epcis_architecture.png] Architectural overview
+[../images/epcis_architecture.png] architectural overview
 
   The architectural style is client server. A client is either an EPCIS Capture
   Application or an EPCIS Query Application or both. The server is an EPCIS
@@ -54,13 +74,13 @@ Architecture
 
   The sections below describe our EPCIS Repository implementation and are
   divided into so-called tiers. Some communication and accessing information
-  are described in the {{{#Access Tier}Access Tier}}, the desfription of the 
+  are described in the {{{#Access Tier}Access Tier}}, the description of the 
   whole functionality is in the {{{#Business Tier}Business Tier}}, and the
   database details are given in the {{{#Resource Tier}Resource Tier}}.
 
 ** {Access Tier}
 
-   This tier provides the entry point into the EPCIS Repository and provides
+   This tier is the entry point into the EPCIS Repository and provides
    the interfaces used by the client applications accessing the Repository. In
    here also user authentication and authorisation should take place. Currently
    our implementation does neither provide authentication nor authorisation
@@ -70,16 +90,17 @@ Architecture
    Axis {{{#[3]}[3]}} as the framework to provide the SOAP interface. Thus an
    EPCIS Query Application implemented in Java may use the generated Axis
    classes available in our epcis-queryclient module in order to access the
-   Repository.
-
-   Concerning the Capture Interface we implement the HTTP binding and thus an
-   EPCIS Capture Application may send capture events through HTTP POST request
-   with the event (XML form) as payload.
+   Repository. Concerning the Capture Interface we implement the HTTP binding
+   and thus an EPCIS Capture Application may send capture events through HTTP
+   POST request with the event (XML form) as payload. More information about
+   the Capture and Query Applications follow in
+   {{{#EPCIS Capture Application}EPCIS Capture Application}} and
+   {{{#EPCIS Query Application}EPCIS Query Application}} further below.
 
 
 ** {Business Tier}
 
-   The business tier is made up of the EPCIS Repository implementation. Simply
+   The business tier consists of the EPCIS Repository implementation. Simply
    speaking the Repository takes client requests, applies some parsing and
    error handling, transforms the requests into SQL INSERT and SELECT queries,
    and submits them to the underlying resource tier (database). In the case of
@@ -91,7 +112,7 @@ Architecture
    The following class-diagram shows the components that make up the business
    tier:
 
-[../images/classdiagram_repository.png] Class-Diagram Respository
+[../images/classdiagram_repository.png] classdiagram repository
 
    In the remainder of this section we describe the most important components
    in more detail.
@@ -99,18 +120,17 @@ Architecture
 *** Query Operations Module
 
    In order to implement the SOAP binding on the Query side, the Axis framework
-   comes into play. We use Axis to support SOAP over HTTP and thus integrate
-   the Axis HTTP <TransportListener> through a servlet into our Web
-   container (Tomcat). In Axis the incoming SOAP messages pass the framework in
-   form of a <MessageContext> which contains the request or response message
-   as well as a number of attributes. The processing of the <MessageContext>
-   is made in <Handler>s. We provide two such <Handler>s, one for
-   pre-processing and one for post-processing. In between is the actual service
-   implementation:
+   {{{#[3]}[3]}} comes into play. We use Axis to support SOAP over HTTP and 
+   thus integrate the Axis HTTP <TransportListener> through a servlet into our
+   Web container. In Axis the incoming SOAP messages pass the framework in form
+   of a <MessageContext> which contains the request or response message as well
+   as a number of attributes. The processing of the <MessageContext> is made in
+   <Handler>s. We provide two such <Handler>s, one for pre-processing and one
+   for post-processing. In between is the actual service implementation:
 
 -------------------------------------------------------------------------------
          +------------------+    +-----------------------+    +------------------+
-msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler | ->
+msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler |
          +------------------+    +-----------------------+    +------------------+
 -------------------------------------------------------------------------------
 
@@ -124,8 +144,8 @@ msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler
      The <<<QueryInitHandler>>> performs the initialization work for our
      Repository implementation. That is, it sets up the database connection,
      loads application and logging properties, and restores scheduled
-     subscriptions. It saves all necessary information back to the
-     <MessageContext> which will be passed on to the next <Handler>. The
+     subscriptions. It saves all necessary information to the
+     <MessageContext> which will be passed on to the <Service>. The
      <<<QueryInitHandler>>> is also responsible to clean up after a service
      fault by undoing the initialization steps (closing the database connection
      and making the scheduled subscriptions persistent).
@@ -137,7 +157,7 @@ msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler
      functionality takes place. Basically the <<<QueryOperationsModule>>> takes
      the incoming request from Axis, handles it according to the specification
      (by interacting with the underlying database) and returns the resulting
-     query response back to Axis. Please refer to the specification
+     query responses back to Axis. Please refer to the specification
      {{{#[1]}[1]}} for more details about the operations available in the Query
      Operations Module.
 
@@ -163,7 +183,7 @@ msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler
 
    In order to handle subscribed queries requested through the Query Control
    Interface's <<<subscribe>>> operation we provide the <<<QuerySubscription>>>
-   module. It represents standing queries which are either scheduled or 
+   component. It represents standing queries which are either scheduled or 
    triggered:
 
    * <<QuerySubscriptionScheduled>>
@@ -197,141 +217,123 @@ msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler
 
 ** {Resource Tier}
 
-   DB schema ...
+   The resource tier consists of a relational database which stores all the
+   event data, the vocabularies, and the subscriptions. The figure below shows
+   the database schema for holding ObjectEvents. The schemas for Transaction-,
+   Quantity-, and AggregationsEvents are similar to the one below and are not
+   reproduced here.
+
+[../images/db_objectEv.png] database schema ObjectEvent
+
+   Vocabularies each have their own database table. Below we exemplary give the
+   schema for BizTransaction, Disposition, and ReadPoint vocabularies. The
+   <<<vocabularies>>> table holds the mapping from vocabulary names to our
+   vocabulary database table names.
+
+[../images/db_vocabularies.png] database schema vocabularies
+
+   As mentioned before we also store the subscriptions to the database. The
+   corresponding schema looks like this:
+
+[../images/db_subscription.png] database schema subscriptions
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* EPCIS Capture Client
+* {EPCIS Capture Application}
 
-  The Capture Interface can be accessed via a GUI or another implementation of
-  CaptureClient. An Overview over all the classes shall be provided below.
-  
-[../images/classdiagram_capture.png]
-  
-** CaptureInteface
+  An EPCIS Capture Application is used for capturing events to the
+  Repository. Since we only implement the HTTP/POST binding of the EPCIS
+  Capture Interface, a capture application must send events in their XML form
+  through HTTP POST requests to our Repository. The following diagram shows the
+  components available in our epcis-captureclient module:
 
-   This Class is a high-level abstraction of what the capture service does: It
-   takes a String (one event or multiple concatenated events in XML format) and
-   returns a string (the HTTP response code).
+[../images/classdiagram_capture.png] classdiagram captureclient
+
+  Basically we provide the <<<CaptureClient>>> and the <<<CaptureClientGui>>>
+  as described in the following sections:
 
 ** CaptureClient
 
-   A concrete instance of a binding implemented as a HTTP post request. The
-   format of the request is:
-  
-+-------------------------------+
-event=[EventInXml]*
-+-------------------------------+
+   The <<<CaptureClient>>> implementing the <<<CaptureClientInterface>>>
+   provides transparent access to the Repository. It supports the <<<capture>>>
+   operation and sends the given events in their XML form to the Repository
+   using HTTP POST requests.
 
 ** CaptureClientGui
 
-   User interface to create a single instance of an event which is transferred
-   to the server via a client relationship with the CaptureClient. It will
-   display the server response in a separate window.
-
-** CaptureEvent
-
-   Mapping of a real world event to a java class. It represents one of the
-   following events depending on the value of the attributes:
-
-   * ObjectEvent
-
-   * AggregationEvent
-
-   * QuantityEvent
-
-   * TransactionEvent
-   
-   []
- 
-   The parameters as a whole describe the change of the physical state that the
-   products were transferred to with this event.
+   This graphical user interface provides the capturing functionalities for
+   use by humans. Technically the <<<CaptureClientGui>>> is an implementation
+   of the Model-View-Controller (MVC) pattern: The <<<CaptureEvent>>>
+   represents a real world event (the <model> in the MVC pattern). The 
+   <<<CaptureClientGui>>> is the actual <view> in the MVC pattern. And the
+   <<<CaptureClient>>> implements the <controller> part of the MVC pattern.
+   Please refer to the {{{user-guide.html}User Guide}} for further information
+   on the use of the capture gui.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* EPCIS Query Client
+* {EPCIS Query Application}
 
-  The query interface binding is implemented using Axis 1.4. Although the
-  generation of code is supposed to be automatic, manual modification was
-  sometimes unavoidable. These complications are elaborated
-  {{{query.html#Axis Workaround}here}}. An overview of all the classes
-  comprising this package are provided below.
+  An EPCIS Query Application sends queries through the EPCIS Query Interface
+  to the EPCIS Repository. Because we currently only implement the SOAP/HTTP
+  binding of the Query Interface, a query application must use SOAP requests.
+  For this reason we provide the epcis-queryclient module which includes the
+  Axis generated classes for use in a Java query client. The following diagram
+  outlines the components that make up the epcis-queryclient module:
 
-[../images/classdiagram_query.png]
+[../images/classdiagram_query.png] classdiagram queryclient
 
-** QueryControlInterface
-
-   The Query Client supports basically two services: 
-
-   * Subscription 
-
-   * Polling
-
-   []
-
-   Polling is a querying mechanism which returns all events satisfying some
-   requirements which are specified through the query parameters. The request
-   is evaluated immediately. Through a <subscription> one may achieve that a
-   query is evaluated multiple times. The frequency is determined by a pattern
-   as defined in the a {{{repository.html#Schedule}<<<Schedule>>>}}. A
-   subscription therefore may also be referred to as a "standing query". This
-   subsription may be revoked by a <<<unsubscribe()>>> command.
+  The main components are the <<<QueryControlClient>>>, the
+  <<<QueryCallbackClient>>>, and the <<<QueryClientGui>>>. In the following we
+  describe these components briefly:
 
 ** QueryControlClient
 
-   The SOAP connector to the
-   {{{repository.html#QueryOperationsModule}<<<QueryOperationsModule>>>}}
-   implementing the subscription and polling operations. The url to which the
-   SOAP request is delivered must be set in the according
-   <<<queryclient.property>>> file.
-
-** QueryCallbackInterface
-  
-   Query callback is the mechanism how the results of a standing query are
-   delivered. This interface offers a method to report the subscribed query's
-   results. 
+   The <<<QueryControlClient>>> is a simple Java class that can help in getting
+   started with a query application. It uses the Axis framework and the Axis
+   generated Java classes in order to connect and send queries to the Repository. 
+   The <<<QueryControlClient>>> implements the <<<QueryControlInterface>>> and
+   thus provides the operations available in the EPCIS Query Control Interface.
+   It acts as an application-side layer providing transparent access to the
+   Query Operations Module at the EPCIS Repository.
 
 ** QueryCallbackClient
 
-   The <<<QueryCallbackclient>>> is our implementation of a
-   <<<QueryCallbackInterface>>>. The application subscribing a query at the
-   <<<QueryControlclient>>> must indicate a callback destination url in the
-   request. At this destination url a <<<HttpServlet>>> is accepting post
-   requests containing query results. The servlet returns a "Callback OK"
-   message if the results were received successfully. These results ar cached
-   until some other application fetches them. An overview of the query callback
-   mechanism is provided {{{query.html#Query Callback}here}}. Implementation
-   details are found {{{query.html#Making use of Axis for query callback}here}}.
+   A query callback is the mechanism for returning results of a standing query
+   (subscribed query) back to the requesting client. The
+   <<<QueryCallbackClient>>> provides very simple support for this mechanism:
+   It can be started as a new <<<Thread>>> and will then be listening at a
+   specific <<<ServerSocket>>> for incoming HTTP POST connections. Once such a
+   connection is established, it parses and caches the POST payload, and
+   notifies everyone waiting for a response.
 
-** QueryClientGui
-
-   The User Interface which allows for manual insertion of query attributes.
-   The same interface is used for polling as well as subscription.
-
-** QueryClientGuiHelper
-  
-   The controller (as in the MVC pattern) of the GUI. It performs integrity
-   checks on the data, does the error handling, marshalls the parameters into
-   a query and forwards it to the stub. In contrast to the capturing interface
-   no DOM tree has to be constructed. The conversion from the query parameters
-   to xml and vice versa is done by axis.
-
-** Query
-
-   A model object of a of a real world query. Has mostly setter and getter
-   procedures.
-
-** {Query Callback}
-
-   This sequence diagram shall give an overview over the processing steps a
-   subscribed query goes through, from the time of the subscription until the
-   results are fetched.
+   The following sequence diagram gives an overview for the query callback
+   mechanism. It shows the processing steps a subscribed query takes, from the
+   time of subscription to the delivery of results to the client.
 
 [../images/sequence_callback.png]
 
+** QueryClientGui
+
+   We also provide a graphical user interface for composing and sending queries
+   manually. The gui makes use of the <<<QueryControlClient>>> described above
+   for sending the queries to our Repository. Technically this component
+   is also implemented according to the MVC pattern: The <<<Query>>> models a
+   real world query (the <model> in the MVC pattern) and has merely setter and
+   getter functionalities. The <<<QueryClientGui>>> is the actual <view> in the
+   MVC pattern. And finally the <<<QueryClientGuiHelper>>> which performs
+   integrity checks, does the error handling, marshalls parameters and
+   transfers queries to the <<<QueryControlClient>>> is the <controller> in the
+   MVC pattern. Please consult the {{{user-guide.html}User Guide}} for further
+   notes on how to use this gui.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * References
 
   {[1]} <EPC Information Services (EPCIS) Version 1.0 Specification>, Proposed
         Specification Version of 29 November 2006
   
   {[2]} <Distributed Systems Groups, ETH Zurich>, {{http://www.vs.inf.ethz.ch/}}
+  
+  {[3]} <Apache Axis, The Apache Software Foundation>, {{http://ws.apache.org/axis/java/index.html}}

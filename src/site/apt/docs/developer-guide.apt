@@ -116,7 +116,8 @@ source <path-to-trunk>/epcis-repository/src/main/sql/epcis_schema.sql
 
 ** Project Modules
 
-   Currently our Maven project includes five modules:
+   Accada's EPCIS project is a multimodule project. Currently it includes five
+   modules which are aggregated and inherited in the base <<<epcis>>> module:
 
    * <<epcis-commons>>
 

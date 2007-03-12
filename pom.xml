@@ -8,7 +8,7 @@
   <groupId>org.accada.epcis</groupId>
   <artifactId>epcis</artifactId>
   <version>0.2.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>pom</packaging> <!-- aggregator projects require 'pom' as packaging -->
   <modelVersion>4.0.0</modelVersion>
 
 
@@ -21,9 +21,7 @@
     <module>epcis-repository</module>
     <module>epcis-queryclient</module>
     <module>epcis-captureclient</module>
-    <!--
     <module>epcis-interop-test</module>
-    -->
   </modules>
 
 
@@ -80,12 +78,11 @@
           </configuration>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <configuration>
             <locales>en</locales>
             <publishDate position="left" format="yyyy-MM-dd hh:mm:ss"/>
-            <port>9000</port>
-            <tempWebappDirectory>${basedir}/target/site/temp</tempWebappDirectory>
           </configuration>
         </plugin>
         <plugin>

@@ -15,8 +15,8 @@ INSERT INTO `voc_bizstep` (`id`, `uri`) VALUES
 ('NULL', 'urn:epcglobal:fmcg:bizstep:shipping');
 
 INSERT INTO `voc_bizloc` (`id`, `uri`) VALUES
-('1', 'urn:epcglobal:fmcg:loc:0614141073467.1'),
-('2', 'urn:epcglobal:fmcg:loc:0614141073467'),
+('1', 'urn:epcglobal:fmcg:loc:0614141073467'),
+('2', 'urn:epcglobal:fmcg:loc:0614141073467.1'),
 ('3', 'urn:epcglobal:fmcg:loc:0614141073468'),
 ('4', 'urn:epcglobal:fmcg:loc:0614141073468.1'),
 ('5', 'urn:epcglobal:fmcg:loc:0614141073468.2'),

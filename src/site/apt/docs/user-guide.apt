@@ -29,42 +29,60 @@ User Guide
 
   For those who just want to see Accada's EPCIS Repository in action and explore
   its features and functionalities may simply start our Query and/or Capture Client
-  Applications through Java Web Start from our {{{../demo.html}Demo page}}.
+  Applications through Java Web Start available at the {{{../demo.html}demo page}}.
 
-  If you intend to use our EPCIS Repository implementation for storing
-  EPC data and incorporate EPCIS into your own project you will have to send 
-  HTTP POST and Web service requests according to the EPCIS specification
+** Use Accada's EPCIS Repository
+
+  If you intend to use our running EPCIS Repository available at 
+  {{http://demo.accada.org/}} for testing or prototyping your own clients you
+  may send HTTP POST and Web service requests according to the EPCIS specification
   to the following URLs:
 
-   * Capture Interface (HTTP binding): <http://demo.accada.org/EPCIS-Capture-v0.2.0>
+  * Capture Interface (HTTP binding): {{http://demo.accada.org/EPCIS-Capture-v0.2.0}}
 
-   []
+  []
 
-   * Query Interface (SOAP binding): <http://demo.accada.org/EPCIS-Query-v0.2.0>
-  
-  To get started you can download the Capture and Query Client from the 
-  {{{download.html}Download page}} and use its <<<CaptureClient>>> and
-  <<<QueryClient>>> Java classes which implement the communication details
-  for you. Please refer to {{{#Configuring}Configuring Accada EPCIS Clients}}
-  below for configuration information.
+  * Query Interface (SOAP binding): {{http://demo.accada.org/EPCIS-Query-v0.2.0}}
 
-  In case you want to have your own repository running you can download all the
-  binaries from the {{{download.html}Download page}}. Of course in this case you 
-  need to have an application server and a properly configured database instance
-  running. For more information on configuration, deployment, and execution
-  please consult the {{{dev-guide.html}Developer's Guide}}.
+** Setup your own EPCIS Repository
+
+   In order to setup an EPCIS Repository using our implementation, you need to
+   get the epcis-repository WAR file from our {{{download.html}download page}}
+   and simply place it into your Tomcat's webapp directory. After restarting
+   Tomcat, the WAR file will be exploded and the Repository is ready for use.
+
+   Note: You will also need to have a properly configured database running. For
+   more information on configuration, deployment, and execution please consult
+   the {{{dev-guide.html}Developer's Guide}}.
+
+** Use Accada's EPCIS Capture Client to send events to an EPCIS Repository
+
+   Download the capture client binaries from the {{{download.html}download page}}
+   and run the contained executable JAR file. This will launch the Accada EPCIS
+   Capture Client. In the GUI you need to specify the URL of the EPCIS Repository
+   you wish to connect to in order to start sending EPCIS events.
+
+   If you intend to use our capture client library for use in your Java project
+   you should refer to the
+   {{{architecture.html#EPCIS%20Capture%20Application}architecture description}}.
+
+** Use Accada's EPCIS Query Client to browse an EPCIS Repository
+
+   Download the query client binaries from the {{{download.html}download page}}
+   and follow the same steps as above.
+
+   If you intend to use our query client library for use in your Java project
+   you should refer to the
+   {{{architecture.html#EPCIS%20Query%20Application}architecture description}}.
+
 
 * {Configuring} Accada EPCIS Clients
 
   There is really not much to configure in the Capture and Query Clients. All
-  there is the default URLs to use when the client is connecting to the
-  Repository. The properties to set can be found in
-
-   * epcis-captureclient\src\main\resources\captureclient.properties
-
-   * epcis-queryclient\src\main\resources\queryclient.properties
-
-  respectively.
+  there is is the default URLs to use when the client is connecting to the
+  Repository. The properties to set can be found in the JAR archive of the
+  downloaded binaries or in the <<<src\main\resources>>> directory of the
+  project modules respectively.
 
 * {How} to use
 
