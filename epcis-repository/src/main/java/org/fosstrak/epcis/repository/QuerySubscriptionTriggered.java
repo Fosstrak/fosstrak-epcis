@@ -55,11 +55,6 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
 		super(subscriptionID, queryParams, dest, reportIfEmpty,
 				initialRecordTime, lastTimeExecuted, every10min, queryName);
 		this.trigger = aTrigger;
-		prepareTriggerQuery();
-	}
-
-	private void prepareTriggerQuery() {
-		// TODO This part may be clear in subsequent versions of the spec
 	}
 
 	/**
