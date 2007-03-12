@@ -11,7 +11,7 @@
   <dest>http://127.0.0.1:8899/</dest>
   <controls>
     <schedule>
-      <second>0</second>
+      <second>0,10,20,30,40,50</second>
     </schedule>
     <!-- FIXME -->
     <!-- Candidate spec of EPCIS 1.0 does not allow omission of 

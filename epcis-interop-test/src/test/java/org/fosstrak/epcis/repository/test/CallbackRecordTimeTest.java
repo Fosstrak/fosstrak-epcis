@@ -63,7 +63,7 @@ public class CallbackRecordTimeTest extends TestCase {
         System.out.println("waiting ...");
         synchronized (listener) {
             try {
-                listener.wait(2 * 60 * 1000);
+                listener.wait(15000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -96,7 +96,7 @@ public class CallbackRecordTimeTest extends TestCase {
         System.out.println("waiting ...");
         synchronized (listener) {
             try {
-                listener.wait(2 * 60 * 1000);
+                listener.wait(15000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

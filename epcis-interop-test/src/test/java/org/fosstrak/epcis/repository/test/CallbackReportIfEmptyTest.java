@@ -80,7 +80,7 @@ public class CallbackReportIfEmptyTest extends TestCase {
         System.out.println("waiting ...");
         synchronized (listener) {
             try {
-                listener.wait(60000);
+                listener.wait(15000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -107,7 +107,7 @@ public class CallbackReportIfEmptyTest extends TestCase {
         System.out.println("waiting ...");
         synchronized (listener) {
             try {
-                listener.wait(60000);
+                listener.wait(15000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
