@@ -299,14 +299,17 @@ public class CaptureOperationsModule extends HttpServlet {
 
         // load properties
         String servletPath = getServletContext().getRealPath("/");
-        String appConfigFile = getServletContext().getInitParameter("appConfigFile");
+        String appConfigFile = getServletContext().getInitParameter(
+                "appConfigFile");
         Properties properties = new Properties();
         try {
             properties.load(new FileInputStream(servletPath + appConfigFile));
         } catch (IOException e) {
-            LOG.error("Unable to load application properties from " + servletPath + appConfigFile);
+            LOG.error("Unable to load application properties from "
+                    + servletPath + appConfigFile);
         }
-        insertMissingVoc = Boolean.parseBoolean(properties.getProperty("insertMissingVoc", "true"));
+        insertMissingVoc = Boolean.parseBoolean(properties.getProperty(
+                "insertMissingVoc", "true"));
 
         // load log4j config
         String log4jConfigFile = getServletContext().getInitParameter(
@@ -515,10 +518,11 @@ public class CaptureOperationsModule extends HttpServlet {
 
         // parameters 1-7 of the sql query are shared by all events
         ps.setTimestamp(1, eventTime);
-        // TODO: marco: what value should recordTime be set to? current time,
-        // same as eventTime, value from request?
-        // ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-        ps.setTimestamp(2, eventTime);
+        // according to specification: if recordTime is ommitted we have to
+        // include the capturing time, i.e. current time
+        ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+        // note: for the tests it is handy to set recordTime=eventTime
+        // ps.setTimestamp(2, eventTime);
         ps.setString(3, eventTimeZoneOffset);
         if (bizStep != null) {
             ps.setLong(4, insertVocabulary("voc_BizStep", bizStep));

@@ -50,7 +50,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements
     /**
      * Schedule indicating when subscription query is to be executed.
      */
-    protected static Schedule schedule;
+    protected Schedule schedule;
 
     /**
      * Whether to continue with sending results.

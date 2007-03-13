@@ -227,7 +227,7 @@ msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler
    Quantity-, and AggregationsEvents are similar to the one below and are not
    reproduced here.
 
-[../images/db_objectEv.png] database schema ObjectEvent
+[../images/db_objectevents.png] database schema ObjectEvent
 
    Vocabularies each have their own database table. Below we exemplary give the
    schema for BizTransaction, Disposition, and ReadPoint vocabularies. The
@@ -239,7 +239,7 @@ msg  ->  | QueryInitHandler | -> | QueryOperationsModule | -> | QueryPostHandler
    As mentioned before we also store the subscriptions to the database. The
    corresponding schema looks like this:
 
-[../images/db_subscription.png] database schema subscriptions
+[../images/db_subscriptions.png] database schema subscriptions
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

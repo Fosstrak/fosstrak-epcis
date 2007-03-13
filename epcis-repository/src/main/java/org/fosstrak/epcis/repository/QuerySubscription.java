@@ -165,12 +165,14 @@ public class QuerySubscription implements Serializable {
             } catch (QueryTooLargeException e) {
                 // send exception back to client
                 EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
+                e.setSubscriptionID(subscriptionID);
                 queryBody.setQueryTooLargeException(e);
                 serializeAndSend(queryBody);
                 return;
             } catch (ImplementationException e) {
                 // send exception back to client
                 EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
+                e.setSubscriptionID(subscriptionID);
                 queryBody.setImplementationException(e);
                 serializeAndSend(queryBody);
                 return;
@@ -251,7 +253,8 @@ public class QuerySubscription implements Serializable {
      * @throws IOException
      *             If a serialization or sending error occured.
      */
-    protected void serializeAndSend(final EPCISQueryBodyType body) throws IOException {
+    protected void serializeAndSend(final EPCISQueryBodyType body)
+            throws IOException {
         EPCISQueryDocumentType queryDoc = new EPCISQueryDocumentType();
         queryDoc.setCreationDate(new GregorianCalendar());
         queryDoc.setEPCISBody(body);
