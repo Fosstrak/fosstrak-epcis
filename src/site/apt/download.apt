@@ -9,12 +9,14 @@
 
 Download
 
+  Current version of Accada EPCIS is 0.2.0 SNAPSHOT.
+
 * Accada EPCIS Repository 
 
 *--------+----------+--------+
          | Binaries | Sources
 *--------+----------+--------+
- EPCIS Repository 0.2.0 (WAR file) | {{{download/epcis-repository-0.2.0.war}epcis-repository-0.2.0.war}} | 
+ EPCIS Repository 0.2.0 SNAPSHOT (WAR file) | {{{../releases/epcis-repository-0.2.0-SNAPSHOT.war}epcis-repository-0.2.0-SNAPSHOT.war}} | 
 *--------+----------+--------+
 
 
@@ -23,11 +25,11 @@ Download
 *--------+----------+--------+
          | Binaries | Sources
 *--------+----------+--------+
- EPCIS Capture Client 0.2.0 with dependencies (zip) | {{{download/epcis-captureclient-0.2.0-bin-with-dependencies.zip}epcis-captureclient-0.2.0-bin-with-dependencies.zip}} | {{{download/epcis-captureclient-0.2.0-src.zip}epcis-captureclient-0.2.0-src.zip}}
+ EPCIS Capture Client 0.2.0 SNAPSHOT with dependencies (zip) | {{{../releases/epcis-captureclient-0.2.0-SNAPSHOT-bin-with-dependencies.zip}epcis-captureclient-0.2.0-SNAPSHOT-bin-with-dependencies.zip}} | {{{../releases/epcis-captureclient-0.2.0-SNAPSHOT-src.zip}epcis-captureclient-0.2.0-SNAPSHOT-src.zip}}
 *--------+----------+--------+
- EPCIS Capture Client 0.2.0 with dependencies (tar.gz) | {{{download/epcis-captureclient-0.2.0-bin-with-dependencies.tar.gz}epcis-captureclient-0.2.0-bin-with-dependencies.tar.gz}} | {{{download/epcis-captureclient-0.2.0-src.tar.gz}epcis-captureclient-0.2.0-src.tar.gz}}
+ EPCIS Capture Client 0.2.0 SNAPSHOT with dependencies (tar.gz) | {{{../releases/epcis-captureclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.gz}epcis-captureclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.gz}} | {{{../releases/epcis-captureclient-0.2.0-SNAPSHOT-src.tar.gz}epcis-captureclient-0.2.0-SNAPSHOT-src.tar.gz}}
 *--------+----------+--------+
- EPCIS Capture Client 0.2.0 with dependencies (tar.bz2) | {{{download/epcis-captureclient-0.2.0-bin-with-dependencies.tar.bz2}epcis-captureclient-0.2.0-bin-with-dependencies.tar.bz2}} | {{{download/epcis-captureclient-0.2.0-src.tar.bz2}epcis-captureclient-0.2.0-src.tar.bz2}}
+ EPCIS Capture Client 0.2.0 SNAPSHOT with dependencies (tar.bz2) | {{{../releases/epcis-captureclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.bz2}epcis-captureclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.bz2}} | {{{../releases/epcis-captureclient-0.2.0-SNAPSHOT-src.tar.bz2}epcis-captureclient-0.2.0-SNAPSHOT-src.tar.bz2}}
 *--------+----------+--------+
 
 
@@ -36,12 +38,17 @@ Download
 *--------+----------+--------+
          | Binaries | Source
 *--------+----------+--------+
- EPCIS Query Client 0.2.0 with dependencies (zip) | {{{download/epcis-queryclient-0.2.0-bin-with-dependencies.zip}epcis-queryclient-0.2.0-bin-with-dependencies.zip}} | {{{download/epcis-queryclient-0.2.0-src.zip}epcis-queryclient-0.2.0-src.zip}}
+ EPCIS Query Client 0.2.0 SNAPSHOT with dependencies (zip) | {{{../releases/epcis-queryclient-0.2.0-SNAPSHOT-bin-with-dependencies.zip}epcis-queryclient-0.2.0-SNAPSHOT-bin-with-dependencies.zip}} | {{{../releases/epcis-queryclient-0.2.0-SNAPSHOT-src.zip}epcis-queryclient-0.2.0-SNAPSHOT-src.zip}}
 *--------+----------+--------+
- EPCIS Query Client 0.2.0 with dependencies (tar.gz) | {{{download/epcis-queryclient-0.2.0-bin-with-dependencies.tar.gz}epcis-queryclient-0.2.0-bin-with-dependencies.tar.gz}} | {{{download/epcis-queryclient-0.2.0-src.tar.gz}epcis-queryclient-0.2.0-src.tar.gz}}
+ EPCIS Query Client 0.2.0 SNAPSHOT with dependencies (tar.gz) | {{{../releases/epcis-queryclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.gz}epcis-queryclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.gz}} | {{{../releases/epcis-queryclient-0.2.0-SNAPSHOT-src.tar.gz}epcis-queryclient-0.2.0-SNAPSHOT-src.tar.gz}}
 *--------+----------+--------+
- EPCIS Query Client 0.2.0 with dependencies (tar.bz2) | {{{download/epcis-queryclient-0.2.0-bin-with-dependencies.tar.bz2}epcis-queryclient-0.2.0-bin-with-dependencies.tar.bz2}} | {{{download/epcis-queryclient-0.2.0-src.tar.bz2}epcis-queryclient-0.2.0-src.tar.bz2}}
+ EPCIS Query Client 0.2.0 SNAPSHOT with dependencies (tar.bz2) | {{{../releases/epcis-queryclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.bz2}epcis-queryclient-0.2.0-SNAPSHOT-bin-with-dependencies.tar.bz2}} | {{{../releases/epcis-queryclient-0.2.0-SNAPSHOT-src.tar.bz2}epcis-queryclient-0.2.0-SNAPSHOT-src.tar.bz2}}
 *--------+----------+--------+
+
+
+* Previous Releases
+
+  All previous releases of Accada EPICS can be found in the {{{http://www.accada.org/repository/}distribution repository}}.
 
 
 * System Requirements

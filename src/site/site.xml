@@ -16,6 +16,7 @@
   <poweredBy>
     <logo img="images/logos/supportedByAutoid4.png" name="Auto-ID" href="http://www.autoidlabs.org/" />
   </poweredBy>
+  <publishDate position="left" format="MMM d, yyyy HH:mm:ss z"/>
 
   <body>
     <links>

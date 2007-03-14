@@ -12,11 +12,11 @@ User Guide
 
    [[1]] {{{#About}About this Guide}}
 
-   [[1]] {{{#Getting}Getting Started}}
+   [[2]] {{{#Getting}Getting Started}}
 
-   [[1]] {{{#Configuring}Configuring Accada EPCIS Clients}}
+   [[3]] {{{#Configuring}Configuring Accada EPCIS Clients}}
 
-   [[1]] {{{#How}How to use}}
+   [[4]] {{{#How}How to use}}
 
 
 * {About} this Guide
@@ -44,23 +44,32 @@ User Guide
 
   * Query Interface (SOAP binding): {{http://demo.accada.org/EPCIS-Query-v0.2.0}}
 
+  []
+
 ** Setup your own EPCIS Repository
 
    In order to setup an EPCIS Repository using our implementation, you need to
-   get the epcis-repository WAR file from our {{{download.html}download page}}
+   <get the epcis-repository WAR file> from our {{{download.html}download page}}
    and simply place it into your Tomcat's webapp directory. After restarting
    Tomcat, the WAR file will be exploded and the Repository is ready for use.
 
-   Note: You will also need to have a properly configured database running. For
+   Note: You will also need to have a properly configured database running! For
    more information on configuration, deployment, and execution please consult
    the {{{dev-guide.html}Developer's Guide}}.
 
 ** Use Accada's EPCIS Capture Client to send events to an EPCIS Repository
 
-   Download the capture client binaries from the {{{download.html}download page}}
-   and run the contained executable JAR file. This will launch the Accada EPCIS
-   Capture Client. In the GUI you need to specify the URL of the EPCIS Repository
-   you wish to connect to in order to start sending EPCIS events.
+   [[1]] <Download> the capture client binaries from the
+         {{{download.html}download page}}.
+
+   [[2]] <Run> the contained executable JAR file. This will launch the Accada
+         EPCIS Capture Client. 
+
+   [[3]] In the GUI you need to <specify the URL> of the EPCIS Repository,
+         fill in event data and submit the EPCIS event to the Repository for
+         capturing.
+
+   []
 
    If you intend to use our capture client library for use in your Java project
    you should refer to the
@@ -95,32 +104,32 @@ User Guide
    requires submitting a query schedule together with the query to be executed.
    The use of a QuerySchedule is somewhat tricky so we describe it here and
    provide some quick examples.
-   
+
    A <<<QuerySchedule>>> contains different fields for different time units,
    e.g. a <seconds> field to specify in which seconds of a minute the query
    should be executed. Whenever a field is set to some values the query will
    be executed when time reaches the given values. If a field is omitted the
    query will be executed every unit of this field, i.e. if all the fields
    in a schedule are omitted the query will be executed every second.
-   
+
    Here are two examples (taken from the EPCIS specification) for a
    <<<QuerySchedule>>>:
-   
+
    * Example Schedule 1
 
      * <<<second=0>>>
-     
+
      * <<<minute=0>>>
-     
+
      * <all other fields omitted>
-     
+
      []
-     
+
      This schedule tells to run the query once per hour, at the top of the hour
      because the <<<hour>>> field is omitted, meaning to run the query every
      hour, and the <<<second>>> and <<<minute>>> fields must be 0, meaning to
      run the query at the top of every hour.
-   
+
    * Example Schedule 2
 
      * <<<second=0>>>
@@ -128,9 +137,9 @@ User Guide
      * <<<minute=0>>>
 
      * <<<dayOfWeek=[1-5]>>>
-     
+
      []
-     
+
      The query with this schedule will be executed once per hour, at the top of
      the hour, but only on weekdays (days 1 through 5 in a week).
 
@@ -139,8 +148,6 @@ User Guide
    Note: The repository will send an empty result set back to the client or may
    not send anything at all depending on whether new event data is available since
    the last execution of a subscribed query if the <<<reportIfEmpty>>> flag is set.
-   
-   
 
 ** How to use the Query Callback Interface
 
@@ -150,14 +157,20 @@ User Guide
    implements the HTTP Binding of the Query Callback Interface and thus delivers 
    query results by sending an HTTP POST request to the URI specified by the 
    <<<dest>>> parameter.
-   
+
    That is, when subscribing a query you must specify an HTTP URL in the form of
-   <<<http://host:port/remainder-of-url>>> as the <<<dest>>> parameter. Our 
-   implementation will POST query results upon execution of the subscribed query
-   to the given URL. It is your responsibility to listen for the response at the
-   given URL, accept it, and assign it to the corresponding query (the
-   <<<subscriptionID>>> is part of the <<<QueryResults>>> object).
-   
+   <<<http://host:port/remainder-of-url>>> as a subsription parameter. The
+   following image is an excerpt from the Query Client GUI and shows where to
+   specify the destination URL:
+
+[../images/gui_destfield.png]
+
+   Our implementation will then POST query results upon execution of the
+   subscribed query query to this destination URL. It is your responsibility to
+   listen for the response at the given URL, accept it, and assign it to the
+   corresponding query (the <<<subscriptionID>>> is part of the
+   <<<QueryResults>>> object).
+
    To facilitate this task we have implemented a very simple
    <<<QueryCallbackClient>>> which just listens for requests to a given URL,
    caches any incoming POST data and delivers it to an application upon request.
@@ -165,7 +178,7 @@ User Guide
    where you will find a simple web server implementation listening for incoming
    calls from the EPCIS Query Callback Interface. The listener can be used like
    this:
-   
+
 +----------------------------------------------------------------------------+
 QueryCallbackListener listener = QueryCallbackListener.getInstance();
 if (!listener.isRunning()) {
