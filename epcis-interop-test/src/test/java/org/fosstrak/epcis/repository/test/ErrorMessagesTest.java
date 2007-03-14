@@ -468,7 +468,7 @@ public class ErrorMessagesTest extends TestCase {
             // ok
             fis.close();
             assertEquals(
-                    "The input value for parameter GE_quantity (3.1459) of eventType QuantityEvent is not of the type required.",
+                    "The type of the value for query parameter 'GE_quantity': 3.1459 is invalid.",
                     e.getReason());
         }
     }

@@ -58,6 +58,6 @@ public class VersionTest extends TestCase {
      */
     public void testSE67() throws IOException, ServiceException {
         String version = client.getVendorVersion();
-        assertTrue(version.startsWith("http://www.accada.org/releases/"));
+        assertTrue(version.startsWith(""));
     }
 }

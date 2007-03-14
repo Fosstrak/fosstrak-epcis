@@ -907,10 +907,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
             Object paramValue = queryParams[i].getValue();
 
             // check if empty param value is provided
-            if (paramValue == null
-                    || (paramValue instanceof String && paramValue.toString().equals(
-                            ""))) {
+            if ((paramValue == null || (paramValue instanceof String && paramValue.toString().equals(
+                    "")))
+                    && !paramName.startsWith("EXISTS_")) {
                 // ignore this parameter
+                LOG.debug("Ignoring parameter '" + paramName
+                        + "' as no corresponding parameter value was provided!");
                 continue;
             }
 
@@ -926,11 +928,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
             try {
                 if (paramName.equals("eventType")) {
-                    // check if the eventType argument (given to this method)
-                    // matches one of the values of this 'eventType' parameter
+                    // check if current eventType argument is contained in the
+                    // 'eventType' query parameter, otherwise return
                     String[] eventTypes = ((ArrayOfString) paramValue).getString();
                     List<String> eventTypeList = Arrays.asList(eventTypes);
-                    if (eventTypeList.contains(eventType)) {
+                    if (!eventTypeList.contains(eventType)) {
                         return null;
                     }
 
@@ -2413,10 +2415,13 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
             // query returned before timeout
             if (LOG.isDebugEnabled()) {
+                rs.last();
+                int rowcount = rs.getRow();
+                rs.beforeFirst();
                 BigDecimal bd = new BigDecimal(query.getExecutionTime()).divide(new BigDecimal(
                         1000));
                 String time = bd.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
-                LOG.debug("Query took " + time + " sec.");
+                LOG.debug(rowcount + " rows fetched (" + time + "s).");
             }
             return query.getResultSet();
         } else {
