@@ -50,8 +50,8 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/config/assembly-bin.xml</descriptor>
-            <descriptor>src/config/assembly-src.xml</descriptor>
+            <descriptor>src/main/assembly/bin-with-dependencies.xml</descriptor>
+            <descriptor>src/main/assembly/src.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
