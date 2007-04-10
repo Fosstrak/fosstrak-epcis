@@ -56,7 +56,9 @@ import org.apache.log4j.Logger;
  * Implements a subscription to a query. Created upon using subscribe() on the
  * querying interface side.
  * 
- * @author Alain Remund, Arthur van Dorp
+ * @author Alain Remund
+ * @author Arthur van Dorp
+ * @author Marco Steybe
  */
 public class QuerySubscription implements Serializable {
 
@@ -104,6 +106,11 @@ public class QuerySubscription implements Serializable {
     protected EPCglobalEPCISServiceLocator service = null;
 
     /**
+     * Last time the query got executed. Used to restrict results to new ones.
+     */
+    private GregorianCalendar lastTimeExecuted;
+
+    /**
      * Constructor to be used when recreating from storage.
      * 
      * @param subscriptionID
@@ -127,21 +134,13 @@ public class QuerySubscription implements Serializable {
             final Boolean reportIfEmpty,
             final GregorianCalendar initialRecordTime,
             final GregorianCalendar lastTimeExecuted, final String queryName) {
+        this.queryParams = queryParams;
         this.subscriptionID = subscriptionID;
         this.dest = dest;
         this.initialRecordTime = initialRecordTime;
         this.reportIfEmpty = reportIfEmpty;
         this.queryName = queryName;
-
-        // add time restriction to query params
-        QueryParam restrictTime = new QueryParam();
-        restrictTime.setName("GE_recordTime");
-        restrictTime.setValue(lastTimeExecuted);
-
-        this.queryParams = new QueryParam[queryParams.length + 1];
-        System.arraycopy(queryParams, 0, this.queryParams, 0,
-                queryParams.length);
-        this.queryParams[queryParams.length] = restrictTime;
+        this.lastTimeExecuted = lastTimeExecuted;
 
         // initialize the service locator through which the queries will be sent
         MessageContext msgContext = MessageContext.getCurrentContext();
@@ -154,10 +153,21 @@ public class QuerySubscription implements Serializable {
      * Runs the query assigned to this subscription. Advances lastTimeExecuted.
      */
     public void executeQuery() {
+        // add time restriction to query params
+        QueryParam restrictedParams = new QueryParam();
+        restrictedParams.setName("GE_recordTime");
+        restrictedParams.setValue(lastTimeExecuted);
+        this.queryParams = new QueryParam[queryParams.length + 1];
+        System.arraycopy(queryParams, 0, this.queryParams, 0,
+                queryParams.length);
+        this.queryParams[queryParams.length] = restrictedParams;
+
+        // update lastTimeExecuted
+        this.lastTimeExecuted = new GregorianCalendar();
+
+        // poll the query
         Poll poll = new Poll(queryName, queryParams);
         try {
-
-            // run the query
             LOG.debug("Running the subscribed query with ID '" + subscriptionID
                     + "'.");
             QueryResults result = null;
@@ -337,5 +347,4 @@ public class QuerySubscription implements Serializable {
     public String getSubscriptionID() {
         return subscriptionID;
     }
-
 }
