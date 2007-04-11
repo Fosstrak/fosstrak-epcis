@@ -137,28 +137,45 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private JFrame mainWindow;
 
     private JPanel mwMainPanel;
+
     private JPanel mwConfigPanel;
+
     private JPanel mwSubscribeManagementPanel;
+
     private JPanel mwEventTypeSelectPanel;
+
     private JPanel mwQueryPanel;
+
     private JPanel mwSubscriptionPanel;
+
     private JPanel mwQueryArgsPanel;
+
     private JPanel mwQueryExamplesPanel;
+
     private JPanel mwButtonPanel;
 
     private JLabel mwServiceUrlLabel;
+
     private JTextField mwServiceUrlTextField;
+
     private JButton mwServiceInfoButton;
 
     private JLabel mwUnsubscribeQueryLabel;
+
     private JTextField mwUnsubscribeQueryTextField;
+
     private JButton mwUnsubscribeQueryButton;
+
     private JButton mwSubscriptionIdButton;
 
     private JCheckBox mwShowDebugWindowCheckBox;
+
     private JCheckBox mwObjectEventsCheckBox;
+
     private JCheckBox mwAggregationEventsCheckBox;
+
     private JCheckBox mwQuantityEventsCheckBox;
+
     private JCheckBox mwTransactionEventsCheckBox;
 
     /*
@@ -168,50 +185,75 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * drop-down box
      */
     private LinkedList<JComboBox> mwQuerySelectComboBoxes;
+
     private LinkedList<JTextFieldEnhanced> mwQueryArgumentTextFields;
 
     private int mwQueryArgumentTextFieldsExtraWidth = 550;
+
     private int mwHeightDifference;
 
     private JButton mwRunQueryButton;
+
     private JButton mwFillInExampleButton;
 
     /* subscribe Query */
     private JCheckBox isSubscribed;
+
     private JTextField mwScheduleMinuteField;
+
     private JTextField mwScheduleSecField;
+
     private JTextField mwScheduleHourField;
+
     private JTextField mwScheduleWeekField;
+
     private JTextField mwScheduleMonthField;
+
     private JTextField mwScheduleDayField;
+
     private JTextField mwSubIdField;
+
     private JTextField mwInitRecTimeField;
+
     private JTextField mwDestUriTextField;
+
     private JCheckBox reportIf;
+
+    private JCheckBox triggerIf;
 
     /* results window */
     private JFrame resultsWindow;
 
     private JPanel rwResultsPanel;
+
     private JTable rwResultsTable;
+
     private JScrollPane rwResultsScrollPane;
 
     /* example selection window */
     private JFrame exampleWindow;
 
     private JPanel ewMainPanel;
+
     private JPanel ewListPanel;
+
     private JPanel ewButtonPanel;
+
     private JList ewExampleList;
+
     private JScrollPane ewExampleScrollPane;
+
     private JButton ewOkButton;
 
     /* debug window */
     private JFrame debugWindow;
 
     private JTextArea dwOutputTextArea;
+
     private JScrollPane dwOutputScrollPane;
+
     private JPanel dwButtonPanel;
+
     private JButton dwClearButton;
 
     /**
@@ -699,6 +741,35 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         reportIf.setSelected(true);
         mwSubscriptionPanel.add(reportIf);
 
+        c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 5, 5, 0);
+        c.weightx = 0;
+        c.gridx = 1;
+        c.gridy = 0;
+        triggerIf = new JCheckBox("Use trigger instead of schedule?");
+        triggerIf.setSelected(false);
+        mwSubscriptionPanel.add(triggerIf);
+        triggerIf.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (mwScheduleMonthField.isEnabled()) {
+                    mwScheduleMonthField.setEnabled(false);
+                    mwScheduleWeekField.setEnabled(false);
+                    mwScheduleDayField.setEnabled(false);
+                    mwScheduleHourField.setEnabled(false);
+                    mwScheduleMinuteField.setEnabled(false);
+                    mwScheduleSecField.setEnabled(false);
+                } else {
+                    mwScheduleMonthField.setEnabled(true);
+                    mwScheduleWeekField.setEnabled(true);
+                    mwScheduleDayField.setEnabled(true);
+                    mwScheduleHourField.setEnabled(true);
+                    mwScheduleMinuteField.setEnabled(true);
+                    mwScheduleSecField.setEnabled(true);
+                }
+            }
+        });
+
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 1;
@@ -760,7 +831,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
 
         c.gridx = 3;
         c.insets = new Insets(10, 5, 5, 0);
-        JLabel mwScheduleMonth = new JLabel("Mont: ");
+        JLabel mwScheduleMonth = new JLabel("Month: ");
         mwSubscriptionPanel.add(mwScheduleMonth, c);
 
         c.gridx = 4;
@@ -1069,13 +1140,18 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 controls.setInitialRecordTime(valueCalendar);
                 controls.setReportIfEmpty(reportIf.isSelected());
                 QuerySchedule sched = new QuerySchedule();
-                sched.setSecond(mwScheduleSecField.getText());
-                sched.setMinute(mwScheduleMinuteField.getText());
-                sched.setHour(mwScheduleHourField.getText());
-                sched.setDayOfMonth(mwScheduleDayField.getText());
-                sched.setMonth(mwScheduleMonthField.getText());
-                sched.setDayOfWeek(mwScheduleWeekField.getText());
-                controls.setSchedule(sched);
+
+                if (!triggerIf.isSelected()) {
+                    sched.setSecond(mwScheduleSecField.getText());
+                    sched.setMinute(mwScheduleMinuteField.getText());
+                    sched.setHour(mwScheduleHourField.getText());
+                    sched.setDayOfMonth(mwScheduleDayField.getText());
+                    sched.setMonth(mwScheduleMonthField.getText());
+                    sched.setDayOfWeek(mwScheduleWeekField.getText());
+                    controls.setSchedule(sched);
+                } else {
+                    controls.setTrigger(new URI(mwDestUriTextField.getText()));
+                }
                 subcr.setControls(controls);
                 client.subscribeQuery(subcr);
                 JFrame frame = new JFrame();
@@ -1464,8 +1540,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     }
 
     /**
-     * Implements a class that holds examples for the EPCIS Query Interface Client.
-     * Uses class QueryInterfaceQueryExampleExample to store them.
+     * Implements a class that holds examples for the EPCIS Query Interface
+     * Client. Uses class QueryInterfaceQueryExampleExample to store them.
      * 
      * @author David Gubler
      */
@@ -1484,7 +1560,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             ex.setReturnAggregationEvents(true);
             ex.getQueryParameters().add(new QueryParam("EQ_action", "ADD"));
             ex.getQueryParameters().add(
-                    new QueryParam("MATCH_parentID", "urn:x:bar:5:036544:007325"));
+                    new QueryParam("MATCH_parentID",
+                            "urn:x:bar:5:036544:007325"));
             examples.add(ex);
 
             ex = new Query();
@@ -1520,7 +1597,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
              * QueryInterfaceQueryExample(); ex.setDescription("Get status
              * information about shipment"); ex.setReturnObjectEvents(true);
              * ex.setReturnTransactionEvents(true);
-             * ex.getQueryParametersVector().add(new QueryParam("EQ_bizTransaction",
+             * ex.getQueryParametersVector().add(new
+             * QueryParam("EQ_bizTransaction",
              * "http://transaction.acme.com/po/12345678")); examples.add(ex);
              */
 
@@ -1537,14 +1615,16 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             /*
-             * ex = new QueryInterfaceQueryExample(); ex.setDescription("Find all
-             * events caused by two EPCs (only " + "ObjectEvent and AggragationEvent
-             * may be queried this way)"); ex.setReturnObjectEvents(true);
+             * ex = new QueryInterfaceQueryExample(); ex.setDescription("Find
+             * all events caused by two EPCs (only " + "ObjectEvent and
+             * AggragationEvent may be queried this way)");
+             * ex.setReturnObjectEvents(true);
              * ex.setReturnAggregationEvents(true);
              * ex.getQueryParametersVector().add(new QueryParam("MATCH_epc",
              * "urn:epc:id:sgtin:0057000.123430.2028 " +
              * "urn:epc:id:sgtin:0034000.987650.3542"));
-             * ex.getQueryParametersVector().add(new QueryParam("MATCH_childEPC",
+             * ex.getQueryParametersVector().add(new
+             * QueryParam("MATCH_childEPC",
              * "urn:epc:id:sgtin:0057000.123430.2028 " +
              * "urn:epc:id:sgtin:0034000.987650.3542")); examples.add(ex);
              */
