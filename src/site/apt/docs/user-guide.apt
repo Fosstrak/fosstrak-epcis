@@ -28,34 +28,39 @@ User Guide
 * {Getting} Started
 
   For those who just want to see Accada's EPCIS Repository in action and explore
-  its features and functionalities may simply start our Query and/or Capture Client
-  Applications through Java Web Start available at the {{{../demo.html}demo page}}.
+  its features and functionalities, trying out our Query and/or Capture Client
+  Applications (available as through Java Web Start applications on the {{{../demo.html}demo page}})
+  might be a good idea.
 
 ** Use Accada's EPCIS Repository
 
   If you intend to use our running EPCIS Repository available at 
-  {{http://demo.accada.org/}} for testing or prototyping your own clients you
-  may send HTTP POST and Web service requests according to the EPCIS specification
+  {{http://demo.accada.org/}} for testing or prototyping your own clients, you
+  may send HTTP POST and Web Service requests according to the EPCIS specification
   to the following URLs:
 
-  * Capture Interface (HTTP binding): {{http://demo.accada.org/EPCIS-Capture-v0.2.0}}
+  * Capture Interface (HTTP binding): {{http://demo.accada.org/epcis/capture}}
 
   []
 
-  * Query Interface (SOAP binding): {{http://demo.accada.org/EPCIS-Query-v0.2.0}}
+  * Query Interface (SOAP binding): {{http://demo.accada.org/epcis/query}}
 
   []
 
 ** Setup your own EPCIS Repository
 
-   In order to setup an EPCIS Repository using our implementation, you need to
+   In order to setup your own EPCIS Repository, you need to
    <get the epcis-repository WAR file> from our {{{download.html}download page}}
-   and simply place it into your Tomcat's webapp directory. After restarting
-   Tomcat, the WAR file will be exploded and the Repository is ready for use.
+   and simply place it in your Tomcat's webapp directory. After restarting
+   Tomcat, the WAR file will be exploded and the repository is ready for use.
+   In a default installation of Tomcat, the capture interface will be available
+   at <<<http://localhost:8080/epcis-repository-<version>/capture>>>, while the
+   query interface will be available at
+   <<<http://localhost:8080/epcis-repository-<version>/services/EPCglobalEPCISService>>>.
 
-   Note: You will also need to have a properly configured database running! For
+   Note: You will also need to have a properly configured database running. For
    more information on configuration, deployment, and execution please consult
-   the {{{dev-guide.html}Developer's Guide}}.
+   the {{{developer-guide.html}Developer's Guide}}.
 
 ** Use Accada's EPCIS Capture Client to send events to an EPCIS Repository
 
