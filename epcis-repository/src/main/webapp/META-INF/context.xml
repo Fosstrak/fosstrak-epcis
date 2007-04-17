@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Context docBase="" path="/epcis-repository" reloadable="true">
+<Context docBase="" reloadable="true">
 
   <!--
      Parameters defined here are 'initial parameters' which are loaded at
@@ -21,7 +21,7 @@
     username="epcis"
     password="epcis"
     driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true">
+    url="jdbc:mysql://localhost:3306/epcis?autoReconnect=true">
   </Resource>
 
   <WatchedResource>WEB-INF/web.xml</WatchedResource>
