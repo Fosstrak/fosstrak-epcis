@@ -9,5 +9,68 @@
 
 Download
 
-  The Accada EPCIS implementation is complete and will be available for download
-  as soon as the specification is ratified by EPCglobal.
+  Current version of Accada EPCIS is 0.2.0.
+
+* Accada EPCIS Repository 
+
+*--------+----------+
+         | Binaries |
+*--------+----------+
+ EPCIS Repository 0.2.0 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-repository/0.2.0/epcis-repository-0.2.0-bin-with-dependencies.zip}epcis-repository-0.2.0-bin-with-dependencies.zip}}
+*--------+----------+
+ EPCIS Repository 0.2.0 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-repository/0.2.0/epcis-repository-0.2.0-bin-with-dependencies.tar.gz}epcis-repository-0.2.0-bin-with-dependencies.tar.gz}}
+*--------+----------+
+
+
+* Accada EPCIS Capture Client
+
+*--------+----------+
+         | Binaries |
+*--------+----------+
+ EPCIS Capture Client 0.2.0 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-captureclient/0.2.0/epcis-captureclient-0.2.0-bin-with-dependencies.zip}epcis-captureclient-0.2.0-bin-with-dependencies.zip}}
+*--------+----------+
+ EPCIS Capture Client 0.2.0 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-captureclient/0.2.0/epcis-captureclient-0.2.0-bin-with-dependencies.tar.gz}epcis-captureclient-0.2.0-bin-with-dependencies.tar.gz}}
+*--------+----------+
+
+
+* Accada EPCIS Query Client
+
+*--------+----------+
+         | Binaries |
+*--------+----------+
+ EPCIS Query Client 0.2.0 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-queryclient/0.2.0/epcis-queryclient-0.2.0-bin-with-dependencies.zip}epcis-queryclient-0.2.0-bin-with-dependencies.zip}}
+*--------+----------+
+ EPCIS Query Client 0.2.0 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-queryclient/0.2.0/epcis-queryclient-0.2.0-bin-with-dependencies.tar.gz}epcis-queryclient-0.2.0-bin-with-dependencies.tar.gz}}
+*--------+----------+
+
+
+* Source Distribution (including all submodules)
+
+*--------+----------+
+         | Sources  |
+*--------+----------+
+ EPCIS Source 0.2.0 (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/epcis-0.2.0-src.zip}epcis-0.2.0-src.zip}}
+*--------+----------+
+ EPCIS Source 0.2.0 (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/epcis-0.2.0-src.tar.gz}epcis-0.2.0-src.tar.gz}}
+*--------+----------+
+
+
+* Previous Releases
+
+  All previous releases of Accada EPICS can be found in the {{{http://maven-repository.accada.org/releases}distribution repository}}.
+
+
+* System Requirements
+
+*---------------------+---------+
+ <<JDK>>              | 1.5 or above 
+*---------------------+---------+
+ <<Memory>>           | No minimum requirements.
+*---------------------+---------+
+ <<Operating System>> | No minimum requirements. Tested on Windows XP. 
+*---------------------+---------+
+
+
+* Installation and Usage Instructions
+
+  Please consult the {{{docs/user-guide.html} User Guide}} for installation and usage instructions.
