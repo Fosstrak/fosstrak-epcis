@@ -2,17 +2,16 @@
 <faqs title="Accada EPCIS - Frequently Asked Questions">
 
 <part id="about">
+
 <faq>
 <question>Is this a reference implementation of the EPCglobal EPC Information Services (EPCIS) Specification?</question>
 <answer>No. It is currently alpha software that is intended to facilitate rapid prototyping.</answer>
 </faq>
+
 <faq>
 <question>Can I contribute to this project even, if I am not part of the Auto-ID Labs or EPCglobal?</question>
 <answer>Yes. While initiated by the Auto-ID Lab at ETH Zurich/University St. Gallen and the Distributed Systems Group at ETH Zurich, it is open for participation by everyone.</answer>
 </faq>
-<faq>
-<question>Do I have to publish any modifications and extension I make again as open source?</question>
-<answer>No, have a look at the <a href="license.html">license </a> or at the explanation of BSD-style licences at <a href="http://en.wikipedia.org/wiki/BSD_licenses"> wikipedia.</a></answer>
-</faq>
+
 </part>								     
 </faqs>								      
