@@ -1,0 +1,31 @@
+<assembly>
+  <id>bin-with-dependencies</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/sql</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>epcis_schema.sql</include>
+        <include>insert_md.sql</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>target</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>*.war</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>
