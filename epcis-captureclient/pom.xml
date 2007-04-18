@@ -51,7 +51,6 @@
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/bin-with-dependencies.xml</descriptor>
-            <descriptor>src/main/assembly/src.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>

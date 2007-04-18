@@ -1,0 +1,37 @@
+<assembly>
+  <id>src</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <includes>
+        <include>org.accada.epcis:epcis-commons</include>
+        <include>org.accada.epcis:epcis-repository</include>
+        <include>org.accada.epcis:epcis-captureclient</include>
+        <include>org.accada.epcis:epcis-queryclient</include>
+        <include>org.accada.epcis:epcis-interop-test</include>
+      </includes>
+      <sources>
+        <outputDirectory>epcis/${artifactId}</outputDirectory>
+      </sources>
+    </moduleSet>
+  </moduleSets>
+  <fileSets>
+    <fileSet>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+        <include>pom.xml</include>
+      </includes>
+      <outputDirectory>epcis</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src</directory>
+      <outputDirectory>epcis/src</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>
