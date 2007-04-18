@@ -17,7 +17,7 @@
       <outputDirectory></outputDirectory>
       <includes>
         <include>epcis_schema.sql</include>
-        <include>insert_md.sql</include>
+        <include>insert_masterdata.sql</include>
       </includes>
     </fileSet>
     <fileSet>
