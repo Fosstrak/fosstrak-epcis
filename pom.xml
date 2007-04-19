@@ -114,6 +114,13 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <extensions>
+      <extension>
+	    <groupId>org.apache.maven.wagon</groupId>
+	    <artifactId>wagon-webdav</artifactId>
+	    <version>1.0-beta-2</version>
+      </extension>
+    </extensions>
   </build>
 
 
@@ -131,17 +138,17 @@
     <repository>
       <id>accada-repository</id>
       <name>Accada repository</name>
-      <url>sftp://maven-repository.accada.org/local/home/accadarep/public_html/releases</url>
+      <url>dav:https://svn.accada.org/maven-repository/releases</url>
     </repository>
     <snapshotRepository>
       <id>accada-repository</id>
       <name>Accada repository</name>
-      <url>sftp://maven-repository.accada.org/local/home/accadarep/public_html/snapshots</url>
+      <url>dav:https://svn.accada.org/maven-repository/snapshots</url>
     </snapshotRepository>
     <site>
       <id>accada-website</id>
       <name>Accada website</name>
-      <url>sftp://www.accada.org/local/home/accadaweb/public_html/epcis</url>
+      <url>dav:https://svn.accada.org/website/epcis</url>
     </site>
   </distributionManagement>
   <issueManagement>
