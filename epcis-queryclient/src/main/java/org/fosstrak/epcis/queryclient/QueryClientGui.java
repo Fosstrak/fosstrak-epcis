@@ -28,8 +28,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +43,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -73,6 +78,12 @@ import org.apache.axis.types.URI;
  * @author David Gubler
  */
 public class QueryClientGui extends WindowAdapter implements ActionListener {
+
+    private static final String PROPERTY_FILE = "/queryclient.properties";
+
+    private static final String PROPERTY_QUERY_URL = "default.url";
+
+    private static final String DEFAULT_URL = "http://demo.accada.org/EPCIS-Query-v0.2.0";
 
     /**
      * The enumaration of all possible Types a Queryparameter can have.
@@ -119,9 +130,9 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             "yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /**
-     * The default URL for the service.
+     * The endpoint URL for the query service.
      */
-    private String defaultUrl = "http://demo.accada.org/EPCIS-Query-v0.2.0";
+    private String queryUrl = null;
 
     /**
      * The query client instance. Has methods to actually execute a query.
@@ -260,18 +271,46 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * The constructor. Starts a new thread which draws the main window.
      */
     public QueryClientGui() {
-        initWindow();
+        this(null);
     }
 
     /**
      * Constructs a new QueryClientGui which sends its queries to the given
-     * address.
+     * endpoint address. If no such address is provided, the properties file is
+     * checked; if there is an error with reading the properties, a default url
+     * will be provided.
      * 
      * @param address
      *            The address to send the queries to.
      */
     public QueryClientGui(final String address) {
-        this.defaultUrl = address;
+        String url = DEFAULT_URL;
+        if (address != null) {
+            try {
+                new URL(address);
+                url = address;
+            } catch (MalformedURLException e) {
+                // unable to parse address as url!
+                // read properties
+            }
+        } else {
+            // read properties
+            Properties props = new Properties();
+            InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
+            if (is != null) {
+                try {
+                    props.load(is);
+                } catch (IOException e) {
+                    // unable to load properties
+                    // use default address
+                }
+                url = props.getProperty(PROPERTY_QUERY_URL);
+                if (url == null) {
+                    url = DEFAULT_URL;
+                }
+            }
+        }
+        this.queryUrl = url;
         initWindow();
     }
 
@@ -641,7 +680,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwServiceUrlLabel = new JLabel("Query interface URL: ");
-        mwServiceUrlTextField = new JTextField(defaultUrl, 40);
+        mwServiceUrlTextField = new JTextField(queryUrl, 40);
         mwServiceInfoButton = new JButton("Info");
         mwServiceInfoButton.addActionListener(this);
 
@@ -895,7 +934,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         /*
          * set up query client. The supplied JTextArea is used for debug output
          */
-        client = new QueryClientGuiHelper(defaultUrl, dwOutputTextArea);
+        client = new QueryClientGuiHelper(queryUrl, dwOutputTextArea);
 
         /*
          * Find out how much the window has to be scaled whenever new components
