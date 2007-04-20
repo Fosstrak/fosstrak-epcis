@@ -26,7 +26,10 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
@@ -78,7 +81,7 @@ public class QuerySubscription implements Serializable {
     /**
      * Query parameters.
      */
-    protected QueryParam[] queryParams;
+    private QueryParam[] queryParams;
 
     /**
      * Destination URI to send results to.
@@ -101,9 +104,9 @@ public class QuerySubscription implements Serializable {
     protected String queryName;
 
     /**
-     * the service locator through which the queries will be sent
+     * The URL at which the query service is available.
      */
-    protected EPCglobalEPCISServiceLocator service = null;
+    protected String queryUrl = null;
 
     /**
      * Last time the query got executed. Used to restrict results to new ones.
@@ -134,6 +137,9 @@ public class QuerySubscription implements Serializable {
             final Boolean reportIfEmpty,
             final GregorianCalendar initialRecordTime,
             final GregorianCalendar lastTimeExecuted, final String queryName) {
+        LOG.debug("Constructing Query Subscription with ID '" + subscriptionID
+                + "'.");
+
         this.queryParams = queryParams;
         this.subscriptionID = subscriptionID;
         this.dest = dest;
@@ -142,27 +148,62 @@ public class QuerySubscription implements Serializable {
         this.queryName = queryName;
         this.lastTimeExecuted = lastTimeExecuted;
 
-        // initialize the service locator through which the queries will be sent
+        // initialize the query URL
         MessageContext msgContext = MessageContext.getCurrentContext();
-        String queryUrl = (String) msgContext.getProperty(MessageContext.TRANS_URL);
-        service = new EPCglobalEPCISServiceLocator();
-        service.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
+        this.queryUrl = (String) msgContext.getProperty(MessageContext.TRANS_URL);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initial record time is '" + lastTimeExecuted.getTime()
+                    + "'.");
+            LOG.debug("URL of the query service is '" + queryUrl + "'.");
+        }
+
+        // update/add GE_recordTime restriction to query params (we only need to
+        // return results not previously returned!)
+        updateRecordTime(queryParams, initialRecordTime);
+    }
+
+    /**
+     * Updates or adds the 'GE_recordTime' query parameter in the given query
+     * parameter array and sets its value to the given time.
+     * 
+     * @param queryParams
+     *            The (old) query parameter array.
+     * @param initialRecordTime
+     *            The time to which the 'GE_recordTime' parameter will be
+     *            updated.
+     */
+    private void updateRecordTime(QueryParam[] queryParams,
+            GregorianCalendar initialRecordTime) {
+        // update or add GE_recordTime restriction
+        boolean foundRecordTime = false;
+        List<QueryParam> tempParams = Arrays.asList(queryParams);
+        for (QueryParam p : tempParams) {
+            if (p.getName().equalsIgnoreCase("GE_recordTime")) {
+                LOG.debug("Updating query parameter 'GE_recordTime'.");
+                p.setValue(initialRecordTime);
+                foundRecordTime = true;
+                break;
+            }
+        }
+        this.queryParams = tempParams.toArray(queryParams);
+        if (!foundRecordTime) {
+            List<QueryParam> arrayList = new ArrayList<QueryParam>();
+            arrayList.addAll(tempParams);
+            LOG.debug("Adding query parameter 'GE_recordTime'.");
+            QueryParam newParam = new QueryParam();
+            newParam.setName("GE_recordTime");
+            newParam.setValue(initialRecordTime);
+            arrayList.add(newParam);
+            this.queryParams = arrayList.toArray(queryParams);
+        }
     }
 
     /**
      * Runs the query assigned to this subscription. Advances lastTimeExecuted.
      */
     public void executeQuery() {
-        // add time restriction to query params
-        QueryParam restrictedParams = new QueryParam();
-        restrictedParams.setName("GE_recordTime");
-        restrictedParams.setValue(lastTimeExecuted);
-        this.queryParams = new QueryParam[queryParams.length + 1];
-        System.arraycopy(queryParams, 0, this.queryParams, 0,
-                queryParams.length);
-        this.queryParams[queryParams.length] = restrictedParams;
-
-        // update lastTimeExecuted
+        // get new lastTimeExecuted (must be <= to time when query is executed,
+        // otherwise we loose results)
         this.lastTimeExecuted = new GregorianCalendar();
 
         // poll the query
@@ -172,7 +213,12 @@ public class QuerySubscription implements Serializable {
                     + "'.");
             QueryResults result = null;
             try {
-                EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
+                // initialize the query service
+                EPCglobalEPCISServiceLocator queryLocator = new EPCglobalEPCISServiceLocator();
+                queryLocator.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
+                EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) queryLocator.getEPCglobalEPCISServicePort();
+
+                // send the query
                 result = epcisQueryService.poll(poll);
             } catch (QueryTooLargeException e) {
                 // send exception back to client
@@ -255,6 +301,9 @@ public class QuerySubscription implements Serializable {
                     + e.getMessage();
             LOG.error(msg, e);
         }
+
+        // update query params with new lastTimeExecuted
+        updateRecordTime(queryParams, lastTimeExecuted);
     }
 
     /**

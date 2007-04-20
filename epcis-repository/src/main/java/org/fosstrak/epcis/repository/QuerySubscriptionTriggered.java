@@ -28,6 +28,7 @@ import javax.management.timer.Timer;
 
 import org.accada.epcis.soapapi.ArrayOfString;
 import org.accada.epcis.soapapi.EPCISServiceBindingStub;
+import org.accada.epcis.soapapi.EPCglobalEPCISServiceLocator;
 import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.Poll;
 import org.accada.epcis.soapapi.QueryParam;
@@ -70,7 +71,6 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
      */
     @Override
     public void handleNotification(Notification pNotification, Object pHandback) {
-        EPCISServiceBindingStub epcisQueryService;
         if (pHandback == null) {
             LOG.error("The timer stating the next scheduled query execution time is null!");
             return;
@@ -80,7 +80,6 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
         } else {
             try {
                 LOG.debug("Checking trigger condition ...");
-                epcisQueryService = (EPCISServiceBindingStub) this.service.getEPCglobalEPCISServicePort();
                 String queryName = "SimpleEventQuery";
                 String[] epcs = {
                     trigger.toString()
@@ -90,6 +89,13 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
                                 null)),
                         new QueryParam("GE_recordTime", initialRecordTime)
                 };
+
+                // initialize the query service
+                EPCglobalEPCISServiceLocator queryLocator = new EPCglobalEPCISServiceLocator();
+                queryLocator.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
+                EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) queryLocator.getEPCglobalEPCISServicePort();
+
+                // send the query
                 QueryResults results = epcisQueryService.poll(new Poll(
                         queryName, queryParam));
                 if (results.getResultsBody().getEventList() != null) {
