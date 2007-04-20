@@ -202,4 +202,15 @@ public class CaptureData extends TestCase {
         String response = client.capture(eventXml);
         assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
     }
+    
+    public void captureAll() throws IOException {
+        this.testCommissionCases();
+        this.testCommissionPallets();
+        this.testPackCases();
+        this.testPickOrder();
+        this.testReceiveOrder();
+        this.testReceivePallets();
+        this.testShipOrder();
+        this.testStoreInventory();
+    }
 }

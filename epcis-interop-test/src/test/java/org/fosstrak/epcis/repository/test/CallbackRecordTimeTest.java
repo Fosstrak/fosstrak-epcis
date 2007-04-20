@@ -26,6 +26,7 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.QueryResults;
@@ -42,6 +43,17 @@ public class CallbackRecordTimeTest extends TestCase {
     private static final String PATH = "src/test/resources/queries/webservice/";
 
     private QueryControlClient client = new QueryControlClient();
+
+    /**
+     * Reset database.
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        new CaptureClient().purgeRepository();
+        new CaptureData().captureAll();
+    }
 
     /**
      * Tests if setting the initialRecordTime parameter has effect.
@@ -125,15 +137,18 @@ public class CallbackRecordTimeTest extends TestCase {
     }
 
     /**
+     * Clears all event data from the repository.
+     * 
      * {@inheritDoc}
      * 
      * @see junit.framework.TestCase#tearDown()
      */
+    @Override
     protected void tearDown() throws Exception {
         try {
             client.unsubscribe("QuerySE66");
         } catch (NoSuchSubscriptionException e) {
         }
-        super.tearDown();
+        //new CaptureClient().purgeRepository();
     }
 }

@@ -20,24 +20,35 @@
 
 package org.accada.epcis.repository.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import junit.framework.TestCase;
+
 import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
-import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.utils.QueryCallbackListener;
-import org.accada.epcis.utils.QueryResultsParser;
-
-import junit.framework.TestCase;
 
 public class CallbackTriggerTest extends TestCase {
-	private static final String PATH = "src/test/resources/queries/webservice/";
+    private static final String PATH = "src/test/resources/queries/webservice/";
 
     private QueryControlClient client = new QueryControlClient();
+
+    /**
+     * Reset database.
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        CaptureClient captureClient = new CaptureClient();
+        captureClient.purgeRepository();
+        CaptureData captureData = new CaptureData();
+        captureData.captureAll();
+    }
 
     /**
      * Tests if setting the initialRecordTime parameter has effect.
@@ -52,7 +63,7 @@ public class CallbackTriggerTest extends TestCase {
         InputStream fis = new FileInputStream(PATH + "requests/" + query);
         client.subscribe(fis);
         fis.close();
-        
+
         new CaptureTrigger().start();
 
         // wait for response callback
@@ -88,57 +99,57 @@ public class CallbackTriggerTest extends TestCase {
         }
         super.tearDown();
     }
-    
-    private class CaptureTrigger extends Thread {
-    	
-    	private StringBuilder event = new StringBuilder();
-    	
-    	public CaptureTrigger() {
-    		event.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-    		event.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
-    		event.append("<EPCISBody>");
-    		event.append("<EventList>");
-    		event.append("<ObjectEvent>");
-    		event.append("<eventTime>2006-08-25T00:01:00Z</eventTime>");
-    		event.append("<eventTimeZoneOffset>-06:00</eventTimeZoneOffset>");
-    		event.append("<epcList>");
-    		event.append("<epc>urn:epc:id:sgtin:0614141.107340.1</epc>");
-    		event.append("</epcList>");
-    		event.append("<action>OBSERVE</action>");
-    		event.append("<bizStep>urn:epcglobal:hls:bizstep:commissioning</bizStep>");
-    		event.append("<disposition>urn:epcglobal:hls:disp:active</disposition>");
-    		event.append("<readPoint>");              
-    		event.append("<id>urn:epcglobal:fmcg:loc:0614141073467.RP-1</id>");
-    		event.append("</readPoint>");    
-    		event.append("<bizLocation>");    
-    		event.append("<id>urn:epcglobal:fmcg:loc:0614141073467.1</id>");    
-    		event.append("</bizLocation>");    
-    		event.append("</ObjectEvent>");    
-    		event.append("</EventList>");    
-    		event.append("</EPCISBody>");
-    		event.append("</epcis:EPCISDocument>");
-    	}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Thread#run()
-		 */
-		@Override
-		public void run() {
-			CaptureClient client = new CaptureClient();
-			try {
-				this.sleep(10000);
-				client.capture(event.toString());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			
-		}
-    	
-    	
+    private class CaptureTrigger extends Thread {
+
+        private StringBuilder event = new StringBuilder();
+
+        public CaptureTrigger() {
+            event.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+            event.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
+            event.append("<EPCISBody>");
+            event.append("<EventList>");
+            event.append("<ObjectEvent>");
+            event.append("<eventTime>2006-08-25T00:01:00Z</eventTime>");
+            event.append("<eventTimeZoneOffset>-06:00</eventTimeZoneOffset>");
+            event.append("<epcList>");
+            event.append("<epc>urn:epc:id:sgtin:0614141.107340.1</epc>");
+            event.append("</epcList>");
+            event.append("<action>OBSERVE</action>");
+            event.append("<bizStep>urn:epcglobal:hls:bizstep:commissioning</bizStep>");
+            event.append("<disposition>urn:epcglobal:hls:disp:active</disposition>");
+            event.append("<readPoint>");
+            event.append("<id>urn:epcglobal:fmcg:loc:0614141073467.RP-1</id>");
+            event.append("</readPoint>");
+            event.append("<bizLocation>");
+            event.append("<id>urn:epcglobal:fmcg:loc:0614141073467.1</id>");
+            event.append("</bizLocation>");
+            event.append("</ObjectEvent>");
+            event.append("</EventList>");
+            event.append("</EPCISBody>");
+            event.append("</epcis:EPCISDocument>");
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {
+            CaptureClient client = new CaptureClient();
+            try {
+                this.sleep(10000);
+                client.capture(event.toString());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
 }

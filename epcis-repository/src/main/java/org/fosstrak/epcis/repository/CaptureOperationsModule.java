@@ -29,6 +29,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -98,6 +99,11 @@ public class CaptureOperationsModule extends HttpServlet {
      * Wheter we should insert new vocabulary or throw an error message.
      */
     private boolean insertMissingVoc = true;
+
+    /**
+     * Wheter the purgeRepository operation is allowed or not.
+     */
+    private boolean purgeRepositoryAllowed = false;
 
     /**
      * The ObjectEvent-query without data.
@@ -199,14 +205,26 @@ public class CaptureOperationsModule extends HttpServlet {
             dbconnection = db.getConnection();
             LOG.debug("DB connection opened.");
 
+            LOG.warn(req.getParameter("event"));
+            LOG.warn(req.getParameter("purgeRepository"));
             // get POST data
-            String event;
+            String event = null;
             try {
                 event = (String) req.getParameterValues("event")[0];
             } catch (final NullPointerException e) {
-                throw new IOException(
-                        "HTTP POST argument \"event=\" not found in request.");
+                try {
+                    String purgeRepository = (String) req.getParameterValues("purgeRepository")[0];
+                    if (purgeRepositoryAllowed) {
+                        LOG.info("Purging repository! All event data will be erased from the db.");
+                        purgeRepository();
+                    }
+                    return;
+                } catch (final NullPointerException e1) {
+                    throw new IOException(
+                            "HTTP POST argument \"event=\" or \"purgeRepository=\" not found in request.");
+                }
             }
+
             LOG.debug("incoming HTTP POST data: " + event.length() + " bytes");
 
             // parse the payload into a DOM tree
@@ -283,6 +301,34 @@ public class CaptureOperationsModule extends HttpServlet {
     }
 
     /**
+     * Cleans all event data from the epcis repository database.
+     * 
+     * @throws SQLException
+     *             If an error with the databse occured.
+     */
+    private void purgeRepository() throws SQLException {
+        Statement stmt = dbconnection.createStatement();
+        stmt.addBatch("DELETE FROM bizTransaction");
+        stmt.addBatch("DELETE FROM event_AggregationEvent");
+        stmt.addBatch("DELETE FROM event_AggregationEvent_bizTrans");
+        stmt.addBatch("DELETE FROM event_AggregationEvent_EPCs");
+        stmt.addBatch("DELETE FROM event_AggregationEvent_extensions");
+        stmt.addBatch("DELETE FROM event_ObjectEvent");
+        stmt.addBatch("DELETE FROM event_ObjectEvent_bizTrans");
+        stmt.addBatch("DELETE FROM event_ObjectEvent_EPCs");
+        stmt.addBatch("DELETE FROM event_ObjectEvent_extensions");
+        stmt.addBatch("DELETE FROM event_QuantityEvent");
+        stmt.addBatch("DELETE FROM event_QuantityEvent_bizTrans");
+        stmt.addBatch("DELETE FROM event_QuantityEvent_extensions");
+        stmt.addBatch("DELETE FROM event_TransactionEvent");
+        stmt.addBatch("DELETE FROM event_TransactionEvent_bizTrans");
+        stmt.addBatch("DELETE FROM event_TransactionEvent_EPCs");
+        stmt.addBatch("DELETE FROM event_TransactionEvent_extensions");
+        stmt.addBatch("DELETE FROM subscription");
+        stmt.executeBatch();
+    }
+
+    /**
      * @see javax.servlet.GenericServlet#init()
      * @throws ServletException
      *             If the context could not be loaded.
@@ -312,6 +358,9 @@ public class CaptureOperationsModule extends HttpServlet {
         }
         insertMissingVoc = Boolean.parseBoolean(properties.getProperty(
                 "insertMissingVoc", "true"));
+        String purgeAllowedStr = getServletContext().getInitParameter(
+                "purgeRepositoryAllowed");
+        purgeRepositoryAllowed = Boolean.parseBoolean(purgeAllowedStr);
 
         // load log4j config
         String log4jConfigFile = getServletContext().getInitParameter(

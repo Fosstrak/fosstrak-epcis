@@ -97,6 +97,20 @@ public class CaptureClient implements CaptureInterface {
     }
 
     /**
+     * Invokes the purgeRepository operation in the Capture Module deleting all
+     * event data in the EPCIS database. This operation is only allowed if the
+     * corresponding property is set.
+     * 
+     * @return The response from the capture module.
+     * @throws IOException
+     *             If a communication error occured.
+     */
+    public String purgeRepository() throws IOException {
+        byte[] data = ("purgeRepository=true").getBytes();
+        return postData(data);
+    }
+
+    /**
      * Send data to the capture service using HTTP POST.
      * 
      * @param data

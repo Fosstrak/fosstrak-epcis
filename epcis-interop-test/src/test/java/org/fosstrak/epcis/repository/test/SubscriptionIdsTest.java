@@ -29,6 +29,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 
@@ -44,6 +45,20 @@ public class SubscriptionIdsTest extends TestCase {
     private static final String REQUEST_2 = "Test-EPCIS10-SE46-Request-2-Subscribe.xml";
 
     private QueryControlClient client = new QueryControlClient();
+
+    /**
+     * Reset database.
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        CaptureClient captureClient = new CaptureClient();
+        captureClient.purgeRepository();
+        CaptureData captureData = new CaptureData();
+        captureData.captureAll();
+    }
 
     /**
      * Tests if the getSubscriptionIDs() function returns the correct values for

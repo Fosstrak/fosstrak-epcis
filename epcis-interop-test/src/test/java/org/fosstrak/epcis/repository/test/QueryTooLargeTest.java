@@ -28,6 +28,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.QueryTooLargeException;
@@ -46,15 +47,22 @@ public class QueryTooLargeTest extends TestCase {
     private QueryControlClient client = new QueryControlClient();
 
     /**
-     * No testing, just make sure that the 'maxQueryResultRows' property is set
-     * to < 125!
+     * Reset database.
+     * 
+     * @see junit.framework.TestCase#setUp()
      */
-    public void testSetup() {
+    @Override
+    protected void setUp() throws Exception {
         // the property 'maxQueryResultRows' determines when a
         // QueryTooLargeException is thrown. For the other tests we need all
         // events, for ObjectEvent that is 125 events. In order for this test
         // to succeed we need to set the 'maxQueryResultRows' to less than 125
         System.out.println("SETUP: 'maxQueryResultRows' property must be set to < 125!");
+        super.setUp();
+        CaptureClient captureClient = new CaptureClient();
+        captureClient.purgeRepository();
+        CaptureData captureData = new CaptureData();
+        captureData.captureAll();
     }
 
     /**

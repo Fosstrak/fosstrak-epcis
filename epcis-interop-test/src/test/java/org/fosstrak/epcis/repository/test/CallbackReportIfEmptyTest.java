@@ -32,6 +32,7 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.utils.QueryCallbackListener;
@@ -52,6 +53,17 @@ public class CallbackReportIfEmptyTest extends TestCase {
     private static final String REQUEST_2 = "Test-EPCIS10-SE48-Request-2-Subscribe.xml";
 
     private QueryControlClient client = new QueryControlClient();
+
+    /**
+     * Reset database.
+     * 
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        new CaptureClient().purgeRepository();
+        new CaptureData().captureAll();
+    }
 
     /**
      * Tests that no response is provided if the reportIfEmpty tag is set to
@@ -153,6 +165,5 @@ public class CallbackReportIfEmptyTest extends TestCase {
             client.unsubscribe("QuerySE48-2");
         } catch (NoSuchSubscriptionException e) {
         }
-        super.tearDown();
     }
 }
