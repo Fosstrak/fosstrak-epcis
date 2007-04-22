@@ -35,6 +35,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -205,52 +206,56 @@ public class CaptureOperationsModule extends HttpServlet {
             dbconnection = db.getConnection();
             LOG.debug("DB connection opened.");
 
-            LOG.warn(req.getParameter("event"));
-            LOG.warn(req.getParameter("purgeRepository"));
             // get POST data
-            String event = null;
-            try {
-                event = (String) req.getParameterValues("event")[0];
-            } catch (final NullPointerException e) {
-                try {
-                    String purgeRepository = (String) req.getParameterValues("purgeRepository")[0];
+            String event = req.getParameter("event");
+            String purgeRepository = req.getParameter("purgeRepository");
+
+            if (event == null || event.equals("")) {
+                // no 'event=' POST parameter
+                if (purgeRepository != null || !purgeRepository.equals("")) {
+                    LOG.debug("Found 'purgeRepository=' POST parameter with value '"
+                            + purgeRepository + "'.");
                     if (purgeRepositoryAllowed) {
                         LOG.info("Purging repository! All event data will be erased from the db.");
                         purgeRepository();
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "'purgeRepository' operation not allowed.");
                     }
-                    return;
-                } catch (final NullPointerException e1) {
-                    throw new IOException(
-                            "HTTP POST argument \"event=\" or \"purgeRepository=\" not found in request.");
-                }
-            }
-
-            LOG.debug("incoming HTTP POST data: " + event.length() + " bytes");
-
-            // parse the payload into a DOM tree
-            final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(new ByteArrayInputStream(event.getBytes()));
-
-            // validate the DOM tree
-            if (validator != null) {
-                try {
-                    validator.validate(new DOMSource(document), null);
-                } catch (SAXException e) {
-                    String msg = "Unable to validate the document: "
-                            + (e.getException() == null
-                                    ? e.getMessage()
-                                    : e.getException().getMessage());
-                    LOG.error(msg, e);
-                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.println(msg);
+                } else {
+                    throw new UnsupportedOperationException(
+                            "Incomplete POST request: Neither 'event=' nor 'purgeRepository=' parameter found.");
                 }
             } else {
-                LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
-            }
+                LOG.debug("Found 'event=' POST parameter with "
+                        + event.length() + " bytes payload.");
 
-            // handle the dpcument
-            handleDocument();
+                // parse the payload into a DOM tree
+                final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                final DocumentBuilder builder = factory.newDocumentBuilder();
+                document = builder.parse(new ByteArrayInputStream(
+                        event.getBytes()));
+
+                // validate the DOM tree
+                if (validator != null) {
+                    try {
+                        validator.validate(new DOMSource(document), null);
+                    } catch (SAXException e) {
+                        String msg = "Unable to validate the document: "
+                                + (e.getException() == null
+                                        ? e.getMessage()
+                                        : e.getException().getMessage());
+                        LOG.error(msg, e);
+                        rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        out.println(msg);
+                    }
+                } else {
+                    LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
+                }
+
+                // handle the dpcument
+                handleDocument();
+            }
 
             LOG.info("EPCIS Capture Interface request succeeded.");
             rsp.setStatus(HttpServletResponse.SC_OK);
@@ -281,6 +286,12 @@ public class CaptureOperationsModule extends HttpServlet {
             String msg = "Database error: " + e.getMessage();
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.println(msg);
+
+        } catch (final UnsupportedOperationException e) {
+            String msg = e.getMessage();
+            LOG.error(msg, e);
+            rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.println(msg);
 
         } catch (final Exception e) {
@@ -489,6 +500,10 @@ public class CaptureOperationsModule extends HttpServlet {
                     LOG.debug("    eventTime in xml is '" + xmlTime + "'");
                     try {
                         eventTime = TimeParser.parseAsTimestamp(xmlTime);
+                        int offset = TimeZone.getDefault().getRawOffset()
+                                + TimeZone.getDefault().getDSTSavings();
+                        eventTime = new Timestamp(eventTime.getTime() - offset);
+
                     } catch (ParseException e) {
                         throw new SAXException(
                                 "Invalid date/time (must be ISO8601).", e);
@@ -568,6 +583,7 @@ public class CaptureOperationsModule extends HttpServlet {
         }
 
         // parameters 1-7 of the sql query are shared by all events
+
         ps.setTimestamp(1, eventTime);
         // according to specification: if recordTime is ommitted we have to
         // include the capturing time, i.e. current time
