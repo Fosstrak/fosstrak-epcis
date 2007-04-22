@@ -28,8 +28,8 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.soapapi.QueryTooLargeException;
 import org.accada.epcis.utils.QueryCallbackListener;
 
@@ -44,17 +44,43 @@ public class QueryTooLargeTest extends TestCase {
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
     private QueryControlClient client = new QueryControlClient();
+    private CaptureClient capture = new CaptureClient();
 
     /**
-     * No testing, just print a message that reminds that the setup for an
-     * QueryTooLargeException must be given.
+     * {@inheritDoc} The property 'maxQueryResultRows' determines when a
+     * QueryTooLargeException is thrown. Default it is set to 125. So fill in
+     * another object event such that there are more than 125.
+     * 
+     * @see junit.framework.TestCase#setUp()
      */
-    public void testSetup() {
-        // the property 'maxQueryResultRows' determines when a
-        // QueryTooLargeException is thrown. For the other tests we need all
-        // events, for ObjectEvent that is 125 events. In order for this test
-        // to succeed we need to set the 'maxQueryResultRows' to less than 125
-        System.out.println("SETUP: 'maxQueryResultRows' property must be set to < 125!");
+    @Override
+    protected void setUp() throws Exception {
+        // construct the object event to insert
+        StringBuilder sb = new StringBuilder();
+        sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
+        sb.append("<EPCISBody>");
+        sb.append("<EventList>");
+        sb.append("<ObjectEvent>");
+        sb.append("<eventTime>2007-04-22T22:58:00Z</eventTime>");
+        sb.append("<eventTimeZoneOffset>+02:00</eventTimeZoneOffset>");
+        sb.append("<epcList>");
+        sb.append("<epc>urn:epc:id:sgtin:0614141.107340.1</epc>");
+        sb.append("</epcList>");
+        sb.append("<action>ADD</action>");
+        sb.append("<bizStep>urn:epcglobal:hls:bizstep:commissioning</bizStep>");
+        sb.append("<disposition>urn:epcglobal:hls:disp:active</disposition>");
+        sb.append("<readPoint>");
+        sb.append("<id>urn:epcglobal:fmcg:loc:0614141073467.RP-1</id>");
+        sb.append("</readPoint>");
+        sb.append("<bizLocation>");
+        sb.append("<id>urn:epcglobal:fmcg:loc:0614141073467.1</id>");
+        sb.append("</bizLocation>");
+        sb.append("</ObjectEvent>");
+        sb.append("</EventList>");
+        sb.append("</EPCISBody>");
+        sb.append("</epcis:EPCISDocument>");
+        String event = sb.toString();
+        capture.capture(event);
     }
 
     /**
@@ -117,10 +143,6 @@ public class QueryTooLargeTest extends TestCase {
      * {@inheritDoc}
      */
     protected void tearDown() throws Exception {
-        // make sure the query is unsubscribed!
-        try {
-            client.unsubscribe("QuerySE68");
-        } catch (NoSuchSubscriptionException e) {
-        }
+        capture.purgeRepository();
     }
 }
