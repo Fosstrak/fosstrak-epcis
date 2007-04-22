@@ -78,11 +78,14 @@ public class CallbackTriggerTest extends TestCase {
      * 
      * @see junit.framework.TestCase#tearDown()
      */
+    @Override
     protected void tearDown() throws Exception {
         try {
             client.unsubscribe("QuerySE75");
         } catch (NoSuchSubscriptionException e) {
         }
+        // reset the database
+        new CaptureClient().purgeRepository();
     }
 
     private class CaptureTrigger extends Thread {

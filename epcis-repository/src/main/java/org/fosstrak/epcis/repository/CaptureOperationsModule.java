@@ -20,9 +20,11 @@
 
 package org.accada.epcis.repository;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -105,6 +107,12 @@ public class CaptureOperationsModule extends HttpServlet {
      * Wheter the purgeRepository operation is allowed or not.
      */
     private boolean purgeRepositoryAllowed = false;
+
+    /**
+     * The name of the SQL script used to clean and refill the database with
+     * test data.
+     */
+    private String dbResetScript = null;
 
     /**
      * The ObjectEvent-query without data.
@@ -315,27 +323,38 @@ public class CaptureOperationsModule extends HttpServlet {
      * Cleans all event data from the epcis repository database.
      * 
      * @throws SQLException
-     *             If an error with the databse occured.
+     *             If an error with the database occured.
+     * @throws Exception
+     *             If an exception reading from the SQL script occured.
      */
-    private void purgeRepository() throws SQLException {
+    private void purgeRepository() throws SQLException, Exception {
         Statement stmt = dbconnection.createStatement();
-        stmt.addBatch("DELETE FROM bizTransaction");
-        stmt.addBatch("DELETE FROM event_AggregationEvent");
-        stmt.addBatch("DELETE FROM event_AggregationEvent_bizTrans");
-        stmt.addBatch("DELETE FROM event_AggregationEvent_EPCs");
-        stmt.addBatch("DELETE FROM event_AggregationEvent_extensions");
-        stmt.addBatch("DELETE FROM event_ObjectEvent");
-        stmt.addBatch("DELETE FROM event_ObjectEvent_bizTrans");
-        stmt.addBatch("DELETE FROM event_ObjectEvent_EPCs");
-        stmt.addBatch("DELETE FROM event_ObjectEvent_extensions");
-        stmt.addBatch("DELETE FROM event_QuantityEvent");
-        stmt.addBatch("DELETE FROM event_QuantityEvent_bizTrans");
-        stmt.addBatch("DELETE FROM event_QuantityEvent_extensions");
-        stmt.addBatch("DELETE FROM event_TransactionEvent");
-        stmt.addBatch("DELETE FROM event_TransactionEvent_bizTrans");
-        stmt.addBatch("DELETE FROM event_TransactionEvent_EPCs");
-        stmt.addBatch("DELETE FROM event_TransactionEvent_extensions");
-        stmt.addBatch("DELETE FROM subscription");
+        if (dbResetScript != null) {
+            BufferedReader reader = new BufferedReader(new FileReader(
+                    dbResetScript));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                LOG.debug(line);
+                stmt.addBatch(line);
+            }
+        }
+        // stmt.addBatch("DELETE FROM bizTransaction");
+        // stmt.addBatch("DELETE FROM event_AggregationEvent");
+        // stmt.addBatch("DELETE FROM event_AggregationEvent_bizTrans");
+        // stmt.addBatch("DELETE FROM event_AggregationEvent_EPCs");
+        // stmt.addBatch("DELETE FROM event_AggregationEvent_extensions");
+        // stmt.addBatch("DELETE FROM event_ObjectEvent");
+        // stmt.addBatch("DELETE FROM event_ObjectEvent_bizTrans");
+        // stmt.addBatch("DELETE FROM event_ObjectEvent_EPCs");
+        // stmt.addBatch("DELETE FROM event_ObjectEvent_extensions");
+        // stmt.addBatch("DELETE FROM event_QuantityEvent");
+        // stmt.addBatch("DELETE FROM event_QuantityEvent_bizTrans");
+        // stmt.addBatch("DELETE FROM event_QuantityEvent_extensions");
+        // stmt.addBatch("DELETE FROM event_TransactionEvent");
+        // stmt.addBatch("DELETE FROM event_TransactionEvent_bizTrans");
+        // stmt.addBatch("DELETE FROM event_TransactionEvent_EPCs");
+        // stmt.addBatch("DELETE FROM event_TransactionEvent_extensions");
+        // stmt.addBatch("DELETE FROM subscription");
         stmt.executeBatch();
     }
 
@@ -372,6 +391,8 @@ public class CaptureOperationsModule extends HttpServlet {
         String purgeAllowedStr = getServletContext().getInitParameter(
                 "purgeRepositoryAllowed");
         purgeRepositoryAllowed = Boolean.parseBoolean(purgeAllowedStr);
+        dbResetScript = servletPath
+                + getServletContext().getInitParameter("dbResetScript");
 
         // load log4j config
         String log4jConfigFile = getServletContext().getInitParameter(

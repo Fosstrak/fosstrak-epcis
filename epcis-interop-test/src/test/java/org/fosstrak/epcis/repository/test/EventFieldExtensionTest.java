@@ -166,7 +166,6 @@ public class EventFieldExtensionTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         // reset the database
-        // new CaptureClient().purgeRepository();
-        // new CaptureData().captureAll();
+        new CaptureClient().purgeRepository();
     }
 }
