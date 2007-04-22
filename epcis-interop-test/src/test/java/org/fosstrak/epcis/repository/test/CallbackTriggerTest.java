@@ -37,20 +37,6 @@ public class CallbackTriggerTest extends TestCase {
     private QueryControlClient client = new QueryControlClient();
 
     /**
-     * Reset database.
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        CaptureClient captureClient = new CaptureClient();
-        captureClient.purgeRepository();
-        CaptureData captureData = new CaptureData();
-        captureData.captureAll();
-    }
-
-    /**
      * Tests if setting the initialRecordTime parameter has effect.
      * 
      * @throws Exception
@@ -97,7 +83,6 @@ public class CallbackTriggerTest extends TestCase {
             client.unsubscribe("QuerySE75");
         } catch (NoSuchSubscriptionException e) {
         }
-        super.tearDown();
     }
 
     private class CaptureTrigger extends Thread {
@@ -139,7 +124,7 @@ public class CallbackTriggerTest extends TestCase {
         public void run() {
             CaptureClient client = new CaptureClient();
             try {
-                this.sleep(10000);
+                sleep(10000);
                 client.capture(event.toString());
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -147,9 +132,6 @@ public class CallbackTriggerTest extends TestCase {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
         }
-
     }
-
 }

@@ -28,7 +28,6 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.QueryParameterException;
 import org.accada.epcis.soapapi.QueryResults;
@@ -50,20 +49,6 @@ public class EventQueryTest extends TestCase {
     private static final String RESP_SUFFIX = "-Response-1-poll.xml";
 
     private QueryControlClient client = new QueryControlClient();
-
-    /**
-     * Reset database.
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        CaptureClient captureClient = new CaptureClient();
-        captureClient.purgeRepository();
-        CaptureData captureData = new CaptureData();
-        captureData.captureAll();
-    }
 
     /**
      * Tests the GE_eventTime attribute.

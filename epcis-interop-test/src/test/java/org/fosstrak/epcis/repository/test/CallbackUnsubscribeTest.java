@@ -32,7 +32,6 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.NoSuchSubscriptionException;
 import org.accada.epcis.utils.QueryCallbackListener;
@@ -51,20 +50,6 @@ public class CallbackUnsubscribeTest extends TestCase {
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
     private QueryControlClient client = new QueryControlClient();
-
-    /**
-     * Reset database.
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        CaptureClient captureClient = new CaptureClient();
-        captureClient.purgeRepository();
-        CaptureData captureData = new CaptureData();
-        captureData.captureAll();
-    }
 
     /**
      * Tests if we receive a notification for a subscribed query, and we receive

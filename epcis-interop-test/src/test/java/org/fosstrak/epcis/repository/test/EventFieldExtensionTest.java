@@ -76,11 +76,6 @@ public class EventFieldExtensionTest extends TestCase {
      * @see junit.framework.TestCase#setUp()
      */
     public void setUp() throws IOException {
-        CaptureClient captureClient = new CaptureClient();
-        captureClient.purgeRepository();
-        CaptureData captureData = new CaptureData();
-        captureData.captureAll();
-        
         StringBuilder sb = new StringBuilder();
         sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
         sb.append("<EPCISBody>");
@@ -163,5 +158,15 @@ public class EventFieldExtensionTest extends TestCase {
         sb.append("  <hls:batchNumber xmlns:hls=\"http://schema.hls.com/extension\">2</hls:batchNumber>\n");
         sb.append("</ObjectEvent>");
         response = sb.toString();
+    }
+
+    /**
+     * @see junit.framework.TestCase#tearDown()
+     */
+    @Override
+    protected void tearDown() throws Exception {
+        // reset the database
+        // new CaptureClient().purgeRepository();
+        // new CaptureData().captureAll();
     }
 }

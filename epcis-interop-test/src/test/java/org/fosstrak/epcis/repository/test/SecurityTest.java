@@ -20,8 +20,6 @@
 
 package org.accada.epcis.repository.test;
 
-import org.accada.epcis.captureclient.CaptureClient;
-
 import junit.framework.TestCase;
 
 /**
@@ -31,20 +29,6 @@ import junit.framework.TestCase;
  * @author Marco Steybe
  */
 public class SecurityTest extends TestCase {
-
-    /**
-     * Reset database.
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        CaptureClient captureClient = new CaptureClient();
-        captureClient.purgeRepository();
-        CaptureData captureData = new CaptureData();
-        captureData.captureAll();
-    }
 
     /**
      * Tests if SecurityException is raised.

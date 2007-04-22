@@ -28,7 +28,6 @@ import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soapapi.ImplementationException;
 import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
@@ -47,20 +46,6 @@ public class ImplementationErrorTest extends TestCase {
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
     private QueryControlClient client = new QueryControlClient();
-
-    /**
-     * Reset database.
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        CaptureClient captureClient = new CaptureClient();
-        captureClient.purgeRepository();
-        CaptureData captureData = new CaptureData();
-        captureData.captureAll();
-    }
 
     /**
      * No testing, just print a message that reminds that the setup for an
