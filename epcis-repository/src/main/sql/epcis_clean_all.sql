@@ -15,9 +15,9 @@
 -- License along with Accada; if not, write to the Free
 -- Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 -- Boston, MA  02110-1301  USA
---
---
--- deletes all data from all the tables in your epcis db
+
+
+-- Deletes all data from all the tables in your EPCIS database
 
 BEGIN;
 
@@ -25,22 +25,33 @@ DELETE FROM `bizTransaction`;
 DELETE FROM `event_AggregationEvent`;
 DELETE FROM `event_AggregationEvent_bizTrans`;
 DELETE FROM `event_AggregationEvent_EPCs`;
+DELETE FROM `event_AggregationEvent_extensions`;
 DELETE FROM `event_ObjectEvent`;
 DELETE FROM `event_ObjectEvent_bizTrans`;
 DELETE FROM `event_ObjectEvent_EPCs`;
 DELETE FROM `event_ObjectEvent_extensions`;
 DELETE FROM `event_QuantityEvent`;
 DELETE FROM `event_QuantityEvent_bizTrans`;
+DELETE FROM `event_QuantityEvent_extensions`;
 DELETE FROM `event_TransactionEvent`;
 DELETE FROM `event_TransactionEvent_bizTrans`;
 DELETE FROM `event_TransactionEvent_EPCs`;
+DELETE FROM `event_TransactionEvent_extensions`;
 DELETE FROM `subscription`;
 DELETE FROM `voc_bizLoc`;
+DELETE FROM `voc_bizLoc_attr`;
 DELETE FROM `voc_bizStep`;
+DELETE FROM `voc_bizStep_attr`;
 DELETE FROM `voc_bizTrans`;
+DELETE FROM `voc_bizTrans_attr`;
 DELETE FROM `voc_bizTransType`;
+DELETE FROM `voc_bizTransType_attr`;
 DELETE FROM `voc_disposition`;
+DELETE FROM `voc_disposition_attr`;
 DELETE FROM `voc_epcClass`;
+DELETE FROM `voc_epcClass_attr`;
 DELETE FROM `voc_readPoint`;
+DELETE FROM `voc_readPoint_attr`;
+DELETE FROM `vocabularies`;
 
 COMMIT;

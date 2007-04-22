@@ -15,43 +15,32 @@
 -- License along with Accada; if not, write to the Free
 -- Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 -- Boston, MA  02110-1301  USA
---
---
--- DB creation for mysql. If you make changes, please change 
--- EPCIS_Schema_Template first and other .sql-files accordingly.
---
--- For easy conversion from template, replace:
--- bigint CHECK("id">0) PRIMARY KEY => bigint PRIMARY KEY auto_increment
--- " => `
---
--- Also add or change:
--- SET storage_engine=INNODB;
--- Remove all UNIQUE constraints on varchar attributes which can be
--- longer than 767 bytes because mysql can't handle them.
+
+
+-- This is the EPCIS database schema file for the creation of the
+-- tables in MySQL. Note: this schema is MySQL specific!
 --
 -- CAVEATS: 
 -- bigint(20) replaced by bigint, only difference is display length not specified.
 -- datetime replaced by timestamp (SQL standard, any caveats?).
 -- enum('ADD','OBSERVE','DELETE') replaced with
--- varchar(8) CHECK (action IN ('ADD','OBSERVE','DELETE'))
+--   varchar(8) CHECK (action IN ('ADD','OBSERVE','DELETE'))
 -- rechecked action type with new standard -> ok.
 -- Vocabularies: All uris are now UNIQUE.
 -- BizTransactions have now a defined type.
 -- All identifiers are double quoted and therefore case sensitive:
--- Use double quotes in queries as well.
---
--- Mysql specific:
--- auto_increment
+--   Use double quotes in queries as well.
+-- MySql specific: auto_increment
 
--- CREATE DB with UTF8
 
 BEGIN;
 
 SET storage_engine=INNODB;
 
 
--- Vocabularies --
-
+-- ---------------------------------------------
+-- Vocabularies
+-- ---------------------------------------------
 
 CREATE TABLE `Vocabularies` (  -- maps vocabulary tpyes to their table names
 `id` bigint PRIMARY KEY auto_increment,
@@ -137,8 +126,9 @@ CREATE TABLE `voc_EPCClass_attr` (
 );
 
 
--- Business transactions --
-
+-- ---------------------------------------------
+-- Business Transactions
+-- ---------------------------------------------
 
 CREATE TABLE `BizTransaction` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
@@ -146,7 +136,10 @@ CREATE TABLE `BizTransaction` (
 `type` bigint REFERENCES `voc_BizTransType` (`id`)
 );
 
--- Aggregation events --
+
+-- ---------------------------------------------
+-- Aggregation Events
+-- ---------------------------------------------
 
 CREATE TABLE `event_AggregationEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
@@ -186,7 +179,10 @@ CREATE TABLE `event_AggregationEvent_extensions` (
 `strValue` varchar(1024)
 );
 
--- Object events --
+
+-- ---------------------------------------------
+-- Object Events
+-- ---------------------------------------------
 
 CREATE TABLE `event_ObjectEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment -> cross platform sequence???
@@ -223,8 +219,10 @@ CREATE TABLE `event_ObjectEvent_extensions` (
 `strValue` varchar(1024)
 );
 
--- Quantity events --
 
+-- ---------------------------------------------
+-- Quantity Events
+-- ---------------------------------------------
 
 CREATE TABLE `event_QuantityEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
@@ -256,7 +254,10 @@ CREATE TABLE `event_QuantityEvent_extensions` (
 `strValue` varchar(1024)
 );
 
--- Transactions events --
+
+-- ---------------------------------------------
+-- Transaction Events
+-- ---------------------------------------------
 
 CREATE TABLE `event_TransactionEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
@@ -294,7 +295,10 @@ CREATE TABLE `event_TransactionEvent_extensions` (
 `strValue` varchar(1024)
 );
 
--- --- Stored subscriptions -----
+
+-- ---------------------------------------------
+-- Subscriptions
+-- ---------------------------------------------
 
 CREATE TABLE subscription (
 subscriptionid varchar(767) NOT NULL PRIMARY KEY,
