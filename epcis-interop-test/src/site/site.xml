@@ -18,7 +18,6 @@
       <item name="EPCIS Interop Test" href="project-reports.html">
         <item name="Dependencies" href="dependencies.html"/>
         <item name="Surefire" href="surefire-report.html"/>
-        <item name="JavaNCSS" href="javancss.html"/>
         <item name="TagList" href="taglist.html"/>
       </item>
     </menu>
