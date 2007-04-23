@@ -13,5 +13,10 @@
 <answer>Yes. While initiated by the Auto-ID Lab at ETH Zurich/University St. Gallen and the Distributed Systems Group at ETH Zurich, it is open for participation by everyone.</answer>
 </faq>
 
-</part>								     
-</faqs>								      
+<faq>
+<question>Why do not all the interoperability tests run successfully?</question>
+<answer>Our EPCIS implementation currently does not support authentication or authorization mechanisms which is not an ECPIS specification requirement. Nevertheless testSE2, testSE5, and testSE74 of the interoperability test kit require the client to be authenticated and/or authorized. Therefore these tests will fail.</answer>
+</faq>
+
+</part>                    
+</faqs>                     
