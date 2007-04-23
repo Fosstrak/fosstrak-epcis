@@ -50,8 +50,8 @@
       <item name="Source Repository" href="source-repository.html"/>
     </menu>
     <menu name="Guides &amp;amp; Documentation" inherit="top">
-      <item name="Developer Guide" href="docs/developer-guide.html"/>
       <item name="User Guide" href="docs/user-guide.html"/>
+      <item name="Developer Guide" href="docs/developer-guide.html"/>
       <item name="Architecture" href="docs/architecture.html"/>
       <item name="JavaDoc" href="apidocs/index.html"/>
     </menu>
