@@ -175,8 +175,74 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/bin-with-dependencies.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>webstart-maven-plugin</artifactId>
+        <version>1.0-alpha-1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jnlp</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <workDirectory>${project.build.directory}/site/jnlp</workDirectory>
+          <dependencies>
+            <includes>
+              <include>org.apache.axis:axis</include>
+              <include>org.apache.axis:axis-jaxrpc</include>
+              <include>axis:axis-wsdl4j</include>
+              <include>commons-logging:commons-logging</include>
+              <include>commons-discovery:commons-discovery</include>
+            </includes>
+          </dependencies>
+
+          <!-- JNLP generation -->
+          <jnlp>
+            <outputFile>epcis-queryclient.jnlp</outputFile>
+            <mainClass>org.accada.epcis.queryclient.QueryClientGui</mainClass>
+          </jnlp>
+
+          <!-- kestore management (do not generate a new kestore) -->
+          <keystore>
+            <delete>false</delete>
+            <gen>false</gen>
+          </keystore>
+
+          <!-- signing the jar files -->
+          <sign>
+            <!-- values are provided via command line using -Dkeystore=... etc -->
+            <keystore>${keystore}</keystore>
+            <keypass>${keypass}</keypass>
+            <storepass>${storepass}</storepass>
+            <alias>${alias}</alias>
+            <storetype>jks</storetype>
+            <verify>true</verify>
+          </sign>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
 
 
   <!-- =========================================================== -->

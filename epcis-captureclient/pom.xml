@@ -63,6 +63,44 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>webstart-maven-plugin</artifactId>
+        <version>1.0-alpha-1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jnlp</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <workDirectory>${project.build.directory}/site/jnlp</workDirectory>
+
+          <!-- JNLP generation -->
+          <jnlp>
+            <outputFile>epcis-captureclient.jnlp</outputFile>
+            <mainClass>org.accada.epcis.captureclient.CaptureClientGui</mainClass>
+          </jnlp>
+
+          <!-- kestore management (do not generate a new kestore) -->
+          <keystore>
+            <delete>false</delete>
+            <gen>false</gen>
+          </keystore>
+
+          <!-- signing the jar files -->
+          <sign>
+            <!-- values are provided via command line using -Dkeystore=... etc -->
+            <keystore>${keystore}</keystore>
+            <keypass>${keypass}</keypass>
+            <storepass>${storepass}</storepass>
+            <alias>${alias}</alias>
+            <storetype>jks</storetype>
+            <verify>true</verify>
+          </sign>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
