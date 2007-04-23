@@ -111,6 +111,11 @@
           -->
           <configuration>
             <testFailureIgnore>true</testFailureIgnore>
+            <excludes>
+               <!-- these tests require special setup, see FAQ -->
+              <exclude>**/ImplementationErrorTest.java</exclude>
+              <exclude>**/QueryTooComplexTest.java</exclude>
+            </excludes>
           </configuration>
         </plugin>
       </plugins>
