@@ -58,54 +58,11 @@ Developer Guide
 
 ** Installing MySQL
 
-   For storing the EPC-related data we use a
-   {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL 5.0 Community Server}}
-   instance.
-   
-   [[1]] After installation you can log into the MySQL Command Line Client
-   as <<<root>>> and inject our database setup script like this:
-   
--------------------------------------------------------------------------
-source <path-to-trunk>/epcis-repository/src/main/sql/epcis_setup.sql
--------------------------------------------------------------------------
-   
-   This sql script adds a new user 'epcis' and a new database 'epcisdb' (these
-   default names can be adjusted in the sql script). Alternatively you could
-   use the MySQL Administrator shipped with the
-   {{{http://dev.mysql.com/downloads/gui-tools/5.0.html}MySQL GUI Tools}} or
-   any other database administration utility in order to setup a new user and
-   database. (In the following we assume the defaults for user, password and databse names)
-   
-   [[2]] After you created a user and database, you need to load our database schema
-   from <<<epcis-repository/src/main/sql/epcis_schema.sql>>> and inject it into
-   MySQL as before, just make sure you are connected to the newly created db!
-
--------------------------------------------------------------------------
-use epcisdb;
-
-source <path-to-trunk>/epcis-repository/src/main/sql/epcis_schema.sql
--------------------------------------------------------------------------
-   
-   [[3]] The last step involves adjusting the database connection parameters in
-   Tomcat's Context container, i.e. you need to specify db name, user, and
-   password you created before in the following file:
-   <<<epcis-repository/src/main/webapp/META-INF/context.xml>>>
-
----------------------------------------------------------------------------
-<Resource
-    name="jdbc/EPCISDB"
-    type="javax.sql.DataSource"
-    auth="Container"
-    username="epcis"
-    password="epcis"
-    driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true">
-</Resource>
------------------------------------------------------------------------------
+  See the section on MySQL database setup in the {{{developer-guide.html#MySQL}User Guide}}.
 
 ** Installing Maven
 
-   We prefer to use {{{http://maven.apache.org/}Maven 2}} as our build tool.
+   We use {{{http://maven.apache.org/}Maven 2}} as our build tool.
    After installation you need to have the <<<M2_HOME>>> environment variable
    set to your Maven installation directory.
 
@@ -116,14 +73,14 @@ source <path-to-trunk>/epcis-repository/src/main/sql/epcis_schema.sql
 
 ** Project Modules
 
-   Accada's EPCIS project is a multimodule project. Currently it includes five
-   modules which are aggregated and inherited in the base <<<epcis>>> module:
+   Accada's EPCIS project is a multimodule project. Currently, it includes five
+   modules which are aggregated in and inherit from the base <<<epcis>>> module:
 
    * <<epcis-commons>>
 
      This module contains the common functionality (such as parsers) as well as
-     the Axis generated code (which is used both by the epcis-repository and the
-     epcis-queryclient modules).
+     the Axis generated code (which is used both by the <epcis-repository> and the
+     <epcis-queryclient> modules).
 
    * <<epcis-captureclient>>
 
@@ -134,16 +91,17 @@ source <path-to-trunk>/epcis-repository/src/main/sql/epcis_schema.sql
    * <<epcis-queryclient>>
 
      This module consists of a Query Client GUI, the Query Callback Client and
-     the Query Control Client which send queries to the EPCIS Query Interface
+     the Query Control Client, which send queries to the EPCIS Query Interface
      using SOAP (Axis).
 
    * <<epcis-repository>>
 
-     Here is the actual implementation of the EPCIS Repository.
+     This module contains the actual implementation of the EPCIS Repository.
 
    * <<epcis-interop-test>>
 
-     This module contains interoperability tests.
+     This module contains interoperability tests to test compliance with
+     EPCglobal's standard.
 
    []
   
@@ -221,13 +179,13 @@ source <path-to-trunk>/epcis-repository/src/main/sql/epcis_schema.sql
 
 * {Using} Maven
 
-  Using Maven as our build tool has several advantages like the easy integration
-  of handy plugins. We use a Tomcat plugin for deployment, an Eclipse plugin for
+  Using Maven as our build tool has several advantages (such as the easy integration
+  of handy plugins). We use the Tomcat plugin for deployment, the Eclipse plugin for
   generating the Eclipse project, and a handfull of reporting plugins.
 
 ** Building
 
-   For building the sources the following command is enough:
+   For building the sources, it is sufficient to run the following command:
 
 ---------------------------------------------------------------------------
 mvn compile
@@ -235,7 +193,7 @@ mvn compile
 
 ** Deployment
 
-   For deploying/undeploying the Repository to/from Tomcat we use a Maven Tomcat
+   For deploying/undeploying the repository to/from Tomcat, we use the Maven Tomcat
    plugin. This plugin communicates with the Tomcat Manager and thus requires
    the connection parameters which must be set in your settings.xml. Thus you
    must add a corresponding server block to <<<$M2_HOME/conf/settings.xml>>>:
@@ -249,9 +207,9 @@ mvn compile
 ---------------------------------------------------------------------------
 
    With the following commands you can then do the deployment or undeployment.
-   Make sure you switch to the epcis-repository directory, otherwise you will
-   be faced with a build error as the tomcat-plugin is only available to the
-   epcis-repository module! 
+   Make sure you switch to the <<<epcis-repository>>> directory. Otherwise you
+   will face a build error as the tomcat-plugin is only available to the
+   epcis-repository module.
 
 ---------------------------------------------------------------------------
 mvn tomcat:deploy

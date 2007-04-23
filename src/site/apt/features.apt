@@ -9,7 +9,7 @@
 Features
 
   The following outlines the features available in Accada's EPCIS Repository
-  implementation and in its Capture and Query Applications.
+  implementation and in its Capture and Query Clients.
 
 * Accada EPCIS Modules
 
@@ -19,44 +19,43 @@ Features
 
   []
 
-  * an interactive EPCIS Capture Application
+  * an interactive EPCIS Capture Client
 
   []
 
-  * an interactive EPCIS Query Application
+  * an interactive EPCIS Query Client
 
   []
 
   The modules implement the EPC Information Services (EPCIS) Specification
-  defined by EPCglobal and its members. Note: Up to now, the EPCIS Specification
-  has not yet been publicly released by EPCglobal!
+  defined by EPCglobal and its members.
 
 
 * Accada EPCIS Repository Features
 
-  We have currently implemented both the EPCIS Capture Interface and the EPCIS
-  Query Interface (including the Query Control Interface and the Query Callback
-  Interface). We provide an HTTP binding for the Capture Interface and a SOAP
-  binding for the Query Interface. Our implementation requires Java 1.5 (or
+  Our implementation features the EPCIS capture interface and the EPCIS
+  query interface (including the query control interface and the query callback
+  interface) as defined by EPCglobal. We provide an HTTP binding for the capture interface and a SOAP
+  binding for the query interface. Our implementation requires Java 1.5 (or
   higher) and a MySQL database (version 5.0.15 or higher) as a storage engine.
 
 
-* Accada EPCIS Capture and Query Application Features
+* Accada EPCIS Capture and Query Client Features
 
-  The Accada EPCIS Capture and Query Applications provide an intuitive graphical
+  The Accada EPCIS Capture and Query Clients provide an intuitive graphical
   user interface to store EPCIS events to and retrieve EPCIS events from an EPCIS
   Repository. They can be used to interactively test and explore any EPCIS
-  Repository supporting the HTTP binding for the Capture Interface and the SOAP
-  binding for the Query Interface.
+  Repository (based on Accada or third-party products) supporting the HTTP binding 
+  for the capture cnterface and the SOAP binding for the query interface.
   
   The following two screenshots show the features available in our EPCIS Capture
-  and Query GUI Applications:
+  and Query Clients:
 
 
-[images/epcis_capture_gui.png] Accada EPCIS Capture GUI
+[images/epcis_capture_gui.png] Accada EPCIS Capture Client
 
   .
 
-[images/epcis_query_gui.png] Accada EPCIS Query GUI
+[images/epcis_query_gui.png] Accada EPCIS Query Client
 
 
