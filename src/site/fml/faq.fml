@@ -4,6 +4,15 @@
 <part id="about">
 
 <faq>
+<question>Why do not all the interoperability tests run successfully?</question>
+<answer>Our EPCIS implementation does not currently support authentication or authorization mechanisms as they are not required by EPCglobal's EPCIS specification. Nevertheless testSE2, testSE5, and testSE74 of EPCglobal's interoperability test kit (which our <epcis-interop-test> module adheres to) require the client to be authenticated and/or authorized. Therefore these tests will fail. The bottom line is that these test failures are nothing to worry about.</answer>
+</faq>
+
+<faq>
+<question>How can I get authentication and authorization in order to secure my repository?</question>
+<answer>You can easily add these features to an Accada-based EPCIS installation by setting up an instance of the Apache Webserver as a proxy and using Apache's authentication mechanisms.</answer>
+
+<faq>
 <question>Is this a reference implementation of the EPCglobal EPC Information Services (EPCIS) Specification?</question>
 <answer>No. It is currently alpha software that is intended to facilitate rapid prototyping.</answer>
 </faq>
@@ -11,11 +20,6 @@
 <faq>
 <question>Can I contribute to this project even, if I am not part of the Auto-ID Labs or EPCglobal?</question>
 <answer>Yes. While initiated by the Auto-ID Lab at ETH Zurich/University St. Gallen and the Distributed Systems Group at ETH Zurich, it is open for participation by everyone.</answer>
-</faq>
-
-<faq>
-<question>Why do not all the interoperability tests run successfully?</question>
-<answer>Our EPCIS implementation currently does not support authentication or authorization mechanisms which is not an ECPIS specification requirement. Nevertheless testSE2, testSE5, and testSE74 of the interoperability test kit require the client to be authenticated and/or authorized. Therefore these tests will fail.</answer>
 </faq>
 
 </part>                    
