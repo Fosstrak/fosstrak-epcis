@@ -13,7 +13,13 @@
 
   <Parameter name="log4jConfigFile" value="META-INF/log4j.properties"/>
   <Parameter name="appConfigFile" value="META-INF/application.properties"/>
-  <Parameter name="purgeRepositoryAllowed" value="true"/>
+  
+  <!-- Allow remote clients to invoke the database reset script (see
+       parameter "dbResetScript). -->
+  <Parameter name="dbResetAllowed" value="true"/>
+
+  <!-- Script containing SQL statements to initialize repository to a
+       predefined state. (Used for JUnit testing only.) -->
   <Parameter name="dbResetScript" value="WEB-INF/classes/sql/epcis_test_data_reset.sql"/>
 
   <Resource

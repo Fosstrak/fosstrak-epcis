@@ -85,7 +85,7 @@ public class CallbackTriggerTest extends TestCase {
         } catch (NoSuchSubscriptionException e) {
         }
         // reset the database
-        new CaptureClient().purgeRepository();
+        new CaptureClient().dbReset();
     }
 
     private class CaptureTrigger extends Thread {

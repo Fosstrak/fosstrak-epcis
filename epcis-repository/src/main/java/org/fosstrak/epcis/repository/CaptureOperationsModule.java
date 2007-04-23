@@ -104,9 +104,9 @@ public class CaptureOperationsModule extends HttpServlet {
     private boolean insertMissingVoc = true;
 
     /**
-     * Wheter the purgeRepository operation is allowed or not.
+     * Whether the dbReset operation is allowed or not.
      */
-    private boolean purgeRepositoryAllowed = false;
+    private boolean dbResetAllowed = false;
 
     /**
      * The name of the SQL script used to clean and refill the database with
@@ -216,23 +216,23 @@ public class CaptureOperationsModule extends HttpServlet {
 
             // get POST data
             String event = req.getParameter("event");
-            String purgeRepository = req.getParameter("purgeRepository");
+            String dbReset = req.getParameter("dbReset");
 
             if (event == null || event.equals("")) {
                 // no 'event=' POST parameter
-                if (purgeRepository != null || !purgeRepository.equals("")) {
-                    LOG.debug("Found 'purgeRepository=' POST parameter with value '"
-                            + purgeRepository + "'.");
-                    if (purgeRepositoryAllowed) {
-                        LOG.info("Purging repository! All event data will be erased from the db.");
-                        purgeRepository();
+                if (dbReset != null || !dbReset.equals("")) {
+                    LOG.debug("Found 'dbReset=' POST parameter with value '"
+                            + dbReset + "'.");
+                    if (dbResetAllowed) {
+                        LOG.info("Running db reset script.");
+                        dbReset();
                     } else {
                         throw new UnsupportedOperationException(
-                                "'purgeRepository' operation not allowed.");
+                                "'dbReset' operation not allowed.");
                     }
                 } else {
                     throw new UnsupportedOperationException(
-                            "Incomplete POST request: Neither 'event=' nor 'purgeRepository=' parameter found.");
+                            "Incomplete POST request: Neither 'event=' nor 'dbReset=' parameter found.");
                 }
             } else {
                 LOG.debug("Found 'event=' POST parameter with "
@@ -327,7 +327,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws Exception
      *             If an exception reading from the SQL script occured.
      */
-    private void purgeRepository() throws SQLException, Exception {
+    private void dbReset() throws SQLException, Exception {
         Statement stmt = dbconnection.createStatement();
         if (dbResetScript != null) {
             BufferedReader reader = new BufferedReader(new FileReader(
@@ -388,9 +388,9 @@ public class CaptureOperationsModule extends HttpServlet {
         }
         insertMissingVoc = Boolean.parseBoolean(properties.getProperty(
                 "insertMissingVoc", "true"));
-        String purgeAllowedStr = getServletContext().getInitParameter(
-                "purgeRepositoryAllowed");
-        purgeRepositoryAllowed = Boolean.parseBoolean(purgeAllowedStr);
+        String dbResetAllowedStr = getServletContext().getInitParameter(
+                "dbResetAllowed");
+        dbResetAllowed = Boolean.parseBoolean(dbResetAllowedStr);
         dbResetScript = servletPath
                 + getServletContext().getInitParameter("dbResetScript");
 

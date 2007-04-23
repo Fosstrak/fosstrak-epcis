@@ -143,6 +143,6 @@ public class QueryTooLargeTest extends TestCase {
      * {@inheritDoc}
      */
     protected void tearDown() throws Exception {
-        capture.purgeRepository();
+        capture.dbReset();
     }
 }

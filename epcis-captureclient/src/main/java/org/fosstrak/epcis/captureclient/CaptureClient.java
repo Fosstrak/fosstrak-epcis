@@ -97,16 +97,16 @@ public class CaptureClient implements CaptureInterface {
     }
 
     /**
-     * Invokes the purgeRepository operation in the Capture Module deleting all
+     * Invokes the dbReset operation in the Capture Module deleting all
      * event data in the EPCIS database. This operation is only allowed if the
-     * corresponding property is set.
+     * corresponding property is set in the repository's configuration.
      * 
      * @return The response from the capture module.
      * @throws IOException
      *             If a communication error occured.
      */
-    public String purgeRepository() throws IOException {
-        byte[] data = ("purgeRepository=true").getBytes();
+    public String dbReset() throws IOException {
+        byte[] data = ("dbReset=true").getBytes();
         return postData(data);
     }
 
