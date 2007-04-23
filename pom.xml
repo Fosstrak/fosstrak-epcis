@@ -151,14 +151,14 @@
   </issueManagement>
   <mailingLists>
     <mailingList>
-      <name>EPC Information System user mailing list</name>
+      <name>EPCIS user mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</unsubscribe>
       <post>accada-epcis-user@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum=accada-epcis-user</archive>
     </mailingList>
     <mailingList>
-      <name>EPC Information System developer mailing list</name>
+      <name>EPCIS developer mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
       <post>accada-epcis-developer@lists.sourceforge.net</post>
