@@ -21,7 +21,7 @@
 
 BEGIN;
 
-DELETE FROM `bizTransaction`;
+DELETE FROM `BizTransaction`;
 DELETE FROM `event_AggregationEvent`;
 DELETE FROM `event_AggregationEvent_bizTrans`;
 DELETE FROM `event_AggregationEvent_EPCs`;
@@ -38,20 +38,20 @@ DELETE FROM `event_TransactionEvent_bizTrans`;
 DELETE FROM `event_TransactionEvent_EPCs`;
 DELETE FROM `event_TransactionEvent_extensions`;
 DELETE FROM `subscription`;
-DELETE FROM `voc_bizLoc`;
-DELETE FROM `voc_bizLoc_attr`;
-DELETE FROM `voc_bizStep`;
-DELETE FROM `voc_bizStep_attr`;
-DELETE FROM `voc_bizTrans`;
-DELETE FROM `voc_bizTrans_attr`;
-DELETE FROM `voc_bizTransType`;
-DELETE FROM `voc_bizTransType_attr`;
-DELETE FROM `voc_disposition`;
-DELETE FROM `voc_disposition_attr`;
-DELETE FROM `voc_epcClass`;
-DELETE FROM `voc_epcClass_attr`;
-DELETE FROM `voc_readPoint`;
-DELETE FROM `voc_readPoint_attr`;
-DELETE FROM `vocabularies`;
+DELETE FROM `voc_BizLoc`;
+DELETE FROM `voc_BizLoc_attr`;
+DELETE FROM `voc_BizStep`;
+DELETE FROM `voc_BizStep_attr`;
+DELETE FROM `voc_BizTrans`;
+DELETE FROM `voc_BizTrans_attr`;
+DELETE FROM `voc_BizTransType`;
+DELETE FROM `voc_BizTransType_attr`;
+DELETE FROM `voc_Disposition`;
+DELETE FROM `voc_Disposition_attr`;
+DELETE FROM `voc_EPCClass`;
+DELETE FROM `voc_EPCClass_attr`;
+DELETE FROM `voc_ReadPoint`;
+DELETE FROM `voc_ReadPoint_attr`;
+DELETE FROM `Vocabularies`;
 
 COMMIT;

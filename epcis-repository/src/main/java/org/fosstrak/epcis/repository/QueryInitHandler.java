@@ -86,7 +86,7 @@ public class QueryInitHandler extends BasicHandler {
                 // to load it (the application runs without logging)
                 PropertyConfigurator.configure(servletPath + log4jConfigFile);
             }
-            log = Logger.getLogger("SoapPreHandler.class");
+            log = Logger.getLogger("QueryInitHandler.class");
 
             // read application properties
             String appConfigFile = ctx.getInitParameter("appConfigFile");

@@ -334,27 +334,9 @@ public class CaptureOperationsModule extends HttpServlet {
                     dbResetScript));
             String line;
             while ((line = reader.readLine()) != null) {
-                LOG.debug(line);
                 stmt.addBatch(line);
             }
         }
-        // stmt.addBatch("DELETE FROM bizTransaction");
-        // stmt.addBatch("DELETE FROM event_AggregationEvent");
-        // stmt.addBatch("DELETE FROM event_AggregationEvent_bizTrans");
-        // stmt.addBatch("DELETE FROM event_AggregationEvent_EPCs");
-        // stmt.addBatch("DELETE FROM event_AggregationEvent_extensions");
-        // stmt.addBatch("DELETE FROM event_ObjectEvent");
-        // stmt.addBatch("DELETE FROM event_ObjectEvent_bizTrans");
-        // stmt.addBatch("DELETE FROM event_ObjectEvent_EPCs");
-        // stmt.addBatch("DELETE FROM event_ObjectEvent_extensions");
-        // stmt.addBatch("DELETE FROM event_QuantityEvent");
-        // stmt.addBatch("DELETE FROM event_QuantityEvent_bizTrans");
-        // stmt.addBatch("DELETE FROM event_QuantityEvent_extensions");
-        // stmt.addBatch("DELETE FROM event_TransactionEvent");
-        // stmt.addBatch("DELETE FROM event_TransactionEvent_bizTrans");
-        // stmt.addBatch("DELETE FROM event_TransactionEvent_EPCs");
-        // stmt.addBatch("DELETE FROM event_TransactionEvent_extensions");
-        // stmt.addBatch("DELETE FROM subscription");
         stmt.executeBatch();
     }
 
@@ -511,7 +493,7 @@ public class CaptureOperationsModule extends HttpServlet {
                 if (nodeName.equals("#text") || nodeName.equals("#comment")) {
                     // ignore text or comments
                     LOG.debug("  ignoring text or comment: '"
-                            + curEventNode.getTextContent() + "'");
+                            + curEventNode.getTextContent().trim() + "'");
                     continue;
                 }
 
@@ -744,7 +726,7 @@ public class CaptureOperationsModule extends HttpServlet {
      */
     private long getLastAutoIncrementedId(final String tableName)
             throws SQLException {
-        String stmt = "SELECT LAST_INSERT_ID() as id " + "FROM " + tableName;
+        String stmt = "SELECT LAST_INSERT_ID() as id FROM " + tableName;
         PreparedStatement ps = dbconnection.prepareStatement(stmt);
         final ResultSet rs = ps.executeQuery();
         rs.next();

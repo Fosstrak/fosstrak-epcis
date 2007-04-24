@@ -279,7 +279,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
      */
     private boolean fetchExistsSubscriptionId(final String subscrId)
             throws SQLException {
-        String query = "SELECT EXISTS(SELECT subscriptionid FROM subscription WHERE subscriptionid = (?))";
+        String query = "SELECT EXISTS(SELECT subscriptionid FROM " + delimiter
+                + "subscription" + delimiter + " WHERE subscriptionid = (?))";
         PreparedStatement pstmt = dbconnection.prepareStatement(query);
         pstmt.setString(1, subscrId);
         LOG.debug("QUERY: " + query);
@@ -629,7 +630,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
             EPC[] epcs = fetchEPCs("event_AggregationEvent_EPCs", eventId);
             aggrEvent.setChildEPCs(epcs);
 
-            // TODO: marco: fetchMessageElements()
+            // set field extensions
+            MessageElement[] any = fetchMessageElements(
+                    "event_AggregationEvent_extensions", eventId);
+            aggrEvent.set_any(any);
 
             aggrEventList.add(aggrEvent);
         }
@@ -713,6 +717,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
             BusinessTransactionType[] bizTrans = fetchBizTransactions(
                     "event_QuantityEvent_bizTrans", eventId);
             quantEvent.setBizTransactionList(bizTrans);
+
+            // set field extensions
+            MessageElement[] any = fetchMessageElements(
+                    "event_QuantityEvent_extensions", eventId);
+            quantEvent.set_any(any);
 
             quantEventList.add(quantEvent);
         }
@@ -800,6 +809,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
             // set associated EPCs
             EPC[] epcs = fetchEPCs("event_TransactionEvent_EPCs", eventId);
             transEvent.setEpcList(epcs);
+
+            // set field extensions
+            MessageElement[] any = fetchMessageElements(
+                    "event_TransactionEvent_extensions", eventId);
+            transEvent.set_any(any);
 
             transEventList.add(transEvent);
         }
@@ -1299,8 +1313,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
                         // try to parse fieldname as extension
                         String[] parts = fieldname.split("#");
                         if (parts.length == 2) {
-                            // TODO: do we need attributes for fieldname
-                            // extensions?
                             String msg = "Attributes for fieldname extensions not implemented.";
                             LOG.warn(msg);
                             throw new UnsupportedOperationException(msg);
@@ -2185,8 +2197,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
         }
         sql.append(";");
 
-        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
-        LOG.debug("QUERY: " + sql);
+        String q = sql.toString();
+        String qs = q.replaceAll("`", delimiter);
+        PreparedStatement ps = dbconnection.prepareStatement(qs);
+        LOG.debug("QUERY: " + qs);
         int i = 1;
         for (String arg : queryArgs) {
             LOG.debug("       query param " + i + ": " + arg);
@@ -2228,15 +2242,17 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
         List<String> queryArgs = new ArrayList<String>(uris.length);
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT table_name, uri FROM `vocabularies`");
+        sql.append("SELECT table_name, uri FROM `Vocabularies`");
         if (uris.length > 0) {
             sql.append(" WHERE uri IN (");
             stringArrayToSQL(uris, sql, queryArgs);
             sql.append(")");
         }
         sql.append(";");
-        LOG.debug("QUERY: " + sql);
-        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
+        String q = sql.toString();
+        String qs = q.replaceAll("`", delimiter);
+        LOG.debug("QUERY: " + qs);
+        PreparedStatement ps = dbconnection.prepareStatement(qs);
         int i = 1;
         for (String arg : queryArgs) {
             LOG.debug("       query param " + i + ": " + arg);
@@ -2290,8 +2306,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
         } else {
             sql.append(";");
         }
-        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
-        LOG.debug("QUERY: " + sql);
+
+        String q = sql.toString();
+        String qs = q.replaceAll("`", delimiter);
+        PreparedStatement ps = dbconnection.prepareStatement(qs);
+        LOG.debug("QUERY: " + qs);
         int i = 1;
         for (String arg : queryArgs) {
             LOG.debug("       query param " + i + ": " + arg);
@@ -2331,9 +2350,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
         sql.append(vocTableName);
         sql.append("` AS vocTable WHERE vocTable.uri LIKE ?;");
 
-        PreparedStatement ps = dbconnection.prepareStatement(sql.toString());
+        String q = sql.toString();
+        String qs = q.replaceAll("`", delimiter);
+        PreparedStatement ps = dbconnection.prepareStatement(qs);
         String arg = vocUri + "_%";
-        LOG.debug("QUERY: " + sql);
+        LOG.debug("QUERY: " + qs);
         LOG.debug("       query param 1: " + arg);
         ps.setString(1, arg);
         ResultSet rs = ps.executeQuery();
