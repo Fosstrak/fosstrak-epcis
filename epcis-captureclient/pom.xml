@@ -75,13 +75,14 @@
         <version>1.0-alpha-1</version>
         <executions>
           <execution>
+            <phase>deploy</phase>
             <goals>
               <goal>jnlp</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
-          <workDirectory>${project.build.directory}/site/jnlp</workDirectory>
+          <workDirectory>${project.build.directory}/site/webstart</workDirectory>
          <jnlp>
             <outputFile>epcis-captureclient.jnlp</outputFile>
             <mainClass>org.accada.epcis.captureclient.CaptureClientGui</mainClass>

@@ -18,16 +18,6 @@
 
 
   <!-- =========================================================== -->
-  <!-- Properties                                                  -->
-  <!-- =========================================================== -->
-
-  <properties>
-    <package.structure.soapapi>org.accada.epcis.soapapi</package.structure.soapapi>
-    <directory.structure.soapapi>org/accada/epcis/soapapi</directory.structure.soapapi>
-  </properties>
-
-
-  <!-- =========================================================== -->
   <!-- Dependencies                                                -->
   <!-- =========================================================== -->
 
@@ -123,13 +113,14 @@
         <version>1.0-alpha-1</version>
         <executions>
           <execution>
+            <phase>deploy</phase>
             <goals>
               <goal>jnlp</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
-          <workDirectory>${project.build.directory}/site/jnlp</workDirectory>
+          <workDirectory>${project.build.directory}/site/webstart</workDirectory>
           <dependencies>
             <includes>
               <include>org.apache.axis:axis</include>

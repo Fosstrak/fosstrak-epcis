@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://www.accada.org/jnlp/" href="$outputFile">
+<jnlp spec="1.0+" codebase="http://www.accada.org/epcis/epcis-captureclient/webstart/" href="$outputFile">
   <information>
     <title>Accada EPCIS Capture Client GUI</title>
     <vendor>Auto-ID Lab St. Gallen / Zurich</vendor>
