@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://maven-repository.accada.org/releases/org/accada/epcis/epcis-captureclient/0.2.0/" href="epcis-captureclient.jnlp">
+<jnlp spec="1.0+" codebase="http://www.accada.org/jnlp/" href="$outputFile">
   <information>
     <title>Accada EPCIS Capture Client GUI</title>
     <vendor>Auto-ID Lab St. Gallen / Zurich</vendor>
@@ -9,7 +9,7 @@
   <offline-allowed/>
   <resources>
     <j2se version="1.5+" />
-    <jar href="epcis-captureclient-0.2.0-SNAPSHOT.jar"/>
+    $dependencies
   </resources>
   <application-desc main-class="$mainClass" />
 </jnlp>
