@@ -19,6 +19,16 @@
 
 
   <!-- =========================================================== -->
+  <!-- Properties                                                  -->
+  <!-- =========================================================== -->
+
+  <properties>
+    <package.structure.soapapi>org.accada.epcis.soapapi</package.structure.soapapi>
+    <directory.structure.soapapi>org/accada/epcis/soapapi</directory.structure.soapapi>
+  </properties>
+
+
+  <!-- =========================================================== -->
   <!-- Dependencies                                                -->
   <!-- =========================================================== -->
 
@@ -42,12 +52,106 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>axis</groupId>
+      <artifactId>axis-wsdl4j</artifactId>
+      <version>1.5.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.axis</groupId>
+      <artifactId>axis-ant</artifactId>
+      <version>1.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.12</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-discovery</groupId>
+      <artifactId>commons-discovery</artifactId>
+      <version>0.4</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!-- Build settings                                              -->
+  <!-- =========================================================== -->
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- this plugin allows the generation of axis stubs -->
+        <!-- see http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration for more info -->
+        <!-- also consider replacing ant with axistools-maven-plugin at a later time -->
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>wsdl2java</id>
+            <!-- run wsdl2java during maven's generate-sources phase -->
+            <phase>generate-sources</phase>
+            <configuration>
+              <tasks>
+                <mkdir dir="target/generated-sources/main/java" />
+                <taskdef
+                  resource="axis-tasks.properties"
+                  classpathref="maven.compile.classpath" />
+                <axis-wsdl2java
+                  output="target/generated-sources/main/java"
+                  deployScope="Application" serverSide="false"
+                  verbose="false"
+                  url="../epcis-repository/src/main/resources/wsdl/EPCglobal-epcis-query-1_0.wsdl">
+                  <mapping
+                    namespace="urn:epcglobal:epcis:wsdl:1"
+                    package="${package.structure.soapapi}" />
+                  <mapping
+                    namespace="urn:epcglobal:xsd:1"
+                    package="${package.structure.soapapi}" />
+                  <mapping
+                    namespace="urn:epcglobal:epcis:xsd:1"
+                    package="${package.structure.soapapi}" />
+                  <mapping
+                    namespace="urn:epcglobal:epcis-masterdata:xsd:1"
+                    package="${package.structure.soapapi}" />
+                  <mapping
+                    namespace="urn:epcglobal:epcis-query:xsd:1"
+                    package="${package.structure.soapapi}" />
+                  <mapping
+                    namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
+                    package="${package.structure.soapapi}" />
+                </axis-wsdl2java>
+
+                <!--
+                  delete Axis-generated BusinessTransactionType.java and AttributeType.java,
+                  we provide our own implementation in src/main/java.
+                -->
+                <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/BusinessTransactionType.java" />
+                <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/AttributeType.java" />
+              </tasks>
+              
+              <!-- add the "generated-sources" folders to the compile path -->
+              <sourceRoot>target/generated-sources/main/java</sourceRoot>
+              <testSourceRoot>target/generated-sources/test/java</testSourceRoot>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 
 
   <!-- =========================================================== -->

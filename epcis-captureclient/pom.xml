@@ -64,6 +64,12 @@
         </executions>
       </plugin>
       <plugin>
+        <!--
+           This plugin generates the webstart app, the template for the
+           jnlp file is taken from src/jnlp/template.vm.
+           The plugin will be executed during the install phase, otherwise
+           an error will occur!
+        -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>webstart-maven-plugin</artifactId>
         <version>1.0-alpha-1</version>
@@ -76,22 +82,30 @@
         </executions>
         <configuration>
           <workDirectory>${project.build.directory}/site/jnlp</workDirectory>
-
-          <!-- JNLP generation -->
-          <jnlp>
+         <jnlp>
             <outputFile>epcis-captureclient.jnlp</outputFile>
             <mainClass>org.accada.epcis.captureclient.CaptureClientGui</mainClass>
           </jnlp>
-
           <!-- kestore management (do not generate a new kestore) -->
           <keystore>
             <delete>false</delete>
             <gen>false</gen>
           </keystore>
-
-          <!-- signing the jar files -->
           <sign>
-            <!-- values are provided via command line using -Dkeystore=... etc -->
+            <!--
+               values are provided via command line using -Dkeystore=... etc,
+               or may be specified as properties in a profile in your settings.xml
+               file like so
+               <profile>
+                 <id>webstart</id>
+                 <properties>
+                   <keystore>...</keystore>
+                   <storepass>...</storepass>
+                   <keypass>...</keypass>
+                   <alias>...</alias>
+                 </properties>
+               </profile>
+            -->
             <keystore>${keystore}</keystore>
             <keypass>${keypass}</keypass>
             <storepass>${storepass}</storepass>

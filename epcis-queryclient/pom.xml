@@ -93,70 +93,6 @@
           </archive>
         </configuration>
       </plugin>
-
-<!--
-  the following plugin allows the generation of axis classes.
-  we currently do not need this plugin!
-  
-  see http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration
-  for more information on Axis integration.
--->
-<!--
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>wsdl2java</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <tasks>
-                <mkdir dir="target/generated-sources/main/java" />
-                <taskdef
-                  resource="axis-tasks.properties"
-                  classpathref="maven.compile.classpath" />
-                <axis-wsdl2java
-                  output="target/generated-sources/main/java"
-                  deployScope="Application" serverSide="false"
-                  verbose="false"
-                  url="src/main/wsdl/EPCglobal-epcis-query-1_0.wsdl">
-                  <mapping
-                    namespace="urn:epcglobal:epcis:wsdl:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis-masterdata:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis-query:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
-                    package="${package.structure.soapapi}" />
-                </axis-wsdl2java>
--->
-                <!--
-                  delete Axis-generated server side implementation of
-                  BusinessTransactionType.java. We provide our own
-                  implementation in src/main/java.
-                -->
-<!--
-                <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/BusinessTransactionType.java" />
-              </tasks>
-              <sourceRoot>target/generated-sources/main/java</sourceRoot>
-              <testSourceRoot>target/generated-sources/test/java</testSourceRoot>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
--->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -176,24 +112,12 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/bin-with-dependencies.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
+        <!--
+           This plugin generates the webstart app, the template for the
+           jnlp file is taken from src/jnlp/template.vm.
+           The plugin will be executed during the install phase, otherwise
+           an error will occur!
+        -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>webstart-maven-plugin</artifactId>
         <version>1.0-alpha-1</version>
@@ -215,22 +139,30 @@
               <include>commons-discovery:commons-discovery</include>
             </includes>
           </dependencies>
-
-          <!-- JNLP generation -->
           <jnlp>
             <outputFile>epcis-queryclient.jnlp</outputFile>
             <mainClass>org.accada.epcis.queryclient.QueryClientGui</mainClass>
           </jnlp>
-
           <!-- kestore management (do not generate a new kestore) -->
           <keystore>
             <delete>false</delete>
             <gen>false</gen>
           </keystore>
-
-          <!-- signing the jar files -->
           <sign>
-            <!-- values are provided via command line using -Dkeystore=... etc -->
+            <!--
+               values are provided via command line using -Dkeystore=... etc,
+               or may be specified as properties in a profile in your settings.xml
+               file like so
+               <profile>
+                 <id>webstart</id>
+                 <properties>
+                   <keystore>...</keystore>
+                   <storepass>...</storepass>
+                   <keypass>...</keypass>
+                   <alias>...</alias>
+                 </properties>
+               </profile>
+            -->
             <keystore>${keystore}</keystore>
             <keypass>${keypass}</keypass>
             <storepass>${storepass}</storepass>

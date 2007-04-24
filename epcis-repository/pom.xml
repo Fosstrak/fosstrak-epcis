@@ -108,114 +108,12 @@
 
   <build>
     <plugins>
-
-<!--
-  the following plugin allows the generation of axis classes.
-  we currently do not need this plugin!
-  
-  see http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration
-  for more information on Axis integration.
--->
-<!--
       <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>wsdl2java</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <tasks>
-                <mkdir dir="target/generated-sources/main/java" />
-                <taskdef
-                  resource="axis-tasks.properties"
-                  classpathref="maven.compile.classpath" />
-                <axis-wsdl2java
-                  output="target/generated-sources/main/java"
-                  deployScope="Application" serverSide="true"
-                  skeletonDeploy="true" verbose="false"
-                  url="src/main/wsdl/EPCglobal-epcis-query-1_0.wsdl">
-                  <mapping
-                    namespace="urn:epcglobal:epcis:wsdl:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis-masterdata:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis-query:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
-                    package="${package.structure.soapapi}" />
-                </axis-wsdl2java>
--->
-                <!--
-                  delete Axis-generated server side implementation of
-                  BusinessTransactionType.java. We provide our own
-                  implementation in src/main/java.
-                -->
-<!--
-                <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/BusinessTransactionType.java" />
--->
-                <!--
-                  tie EPCISServiceBindingSkeleton to our existing
-                  QueryOperationsModule implementation and delete
-                  unneeded class.
-                -->
-<!--
-                <replace
-                  file="target/generated-sources/main/java/${directory.structure.soapapi}/EPCISServiceBindingSkeleton.java"
-                  token="new ${package.structure.soapapi}.EPCISServiceBindingImpl"
-                  value="new ${package.structure.repository}.QueryOperationsModule"
-                  summary="true" />
-                <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/EPCISServiceBindingImpl.java"/>
-              </tasks>
-              <sourceRoot>target/generated-sources/main/java</sourceRoot>
-              <testSourceRoot>target/generated-sources/test/java</testSourceRoot>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-
-        </executions>
-      </plugin>
--->
-<!--
-  current version of plugin does not meet all of our requirements.
-  reconsider replacing ant with axistools-maven-plugin at a later time.
--->
-<!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>axistools-maven-plugin</artifactId>
-        <version>1.1-SNAPSHOT</version>
-        <configuration>
-          <packageSpace>${package.structure.soapapi}</packageSpace>
-          <serverSide>true</serverSide>
-          <skeletonDeploy>true</skeletonDeploy>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>wsdl2java</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
--->
-
       <!--
         the tomcat-maven-plugin used to deploy the application to tomcat.
         this requires a corresponding server block in your settings.xml
         stating username and password for the tomcat-manager application.
       -->
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>tomcat-maven-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
