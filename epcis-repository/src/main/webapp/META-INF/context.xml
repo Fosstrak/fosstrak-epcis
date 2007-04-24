@@ -29,7 +29,7 @@
     username="epcis"
     password="epcis"
     driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true">
+    url="jdbc:mysql://localhost:3306/epcis?autoReconnect=true">
   </Resource>
 
   <WatchedResource>WEB-INF/web.xml</WatchedResource>
