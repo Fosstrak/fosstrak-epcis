@@ -16,7 +16,9 @@ User Guide
    
    [[3]] {{{#Configuration}Runtime Configuration of EPCIS Repository}}
 
-   [[4]] {{{#Advanced}Advanced Features}}
+   [[4]] {{{#Basic}Basic Features}}
+
+   [[5]] {{{#Advanced}Advanced Features}}
 
 
 * {About} this Guide
@@ -48,8 +50,8 @@ User Guide
    
    [[3]] Setup a {MySQL} database for the EPCIS Repository to use.
  
-   Log into the MySQL Command Line Client as <root> and perform the
-   following steps:
+         Log into the MySQL Command Line Client as <root> and perform the
+         following steps:
  
      [[a]] Create the database (in this example, we'll use <epcis> as a database name).
 
@@ -72,17 +74,18 @@ mysql> GRANT SELECT, INSERT, UPDATE, DELETE ON epcis.* TO epcis IDENTIFIED BY 'e
 mysql> USE epcis;
 mysql> source <path-to-unpacked-download>/epcis_schema.sql
 ----------------------------------------------------------
-   
+
      [[d]] Optionally populate the repository with some sample data.
-     
+
 -------------------------------------------------------------
 mysql> source <path-to-unpacked-download>/epcis_demo_data.sql
 -------------------------------------------------------------
 
-  [[4]] Configure the repository to connect to the newly created database.
-  In a default installation of Tomcat, the database connection settings
-  can be found in <<<$TOMCAT_HOME/conf/Catalina/localhost/epcis-repository-\<version\>.xml>>>.
-  The relevant attributes that must be adjusted are <username>, <password>, and <url>.
+   [[4]] Configure the repository to connect to the newly created database.
+
+        In a default installation of Tomcat, the database connection settings
+        can be found in <<<$TOMCAT_HOME/conf/Catalina/localhost/epcis-repository-\<version\>.xml>>>.
+        The relevant attributes that must be adjusted are <username>, <password>, and <url>.
 
 ---------------------------------------------------------------------------
 <Resource
@@ -96,16 +99,16 @@ mysql> source <path-to-unpacked-download>/epcis_demo_data.sql
 </Resource>
 -----------------------------------------------------------------------------
 
-  [[5]] Restart Tomcat.
+   [[5]] Restart Tomcat.
 
-  In a default installation of Tomcat, the capture interfac will now be
-  available at
-  <<<http://localhost:8080/epcis-repository-\<version\>/capture>>>, while the
-  query interface will be available at
-  <<<http://localhost:8080/epcis-repository-\<version\>/services/EPCglobalEPCISService>>>.
+        In a default installation of Tomcat, the capture interface will now be
+        available at
+        <<<http://localhost:8080/epcis-repository-\<version\>/capture>>>, while the
+        query interface will be available at
+        <<<http://localhost:8080/epcis-repository-\<version\>/services/EPCglobalEPCISService>>>.
 
-  Proceed to the next sections to test your repository installation using one
-  of our client applications.
+        Proceed to the next sections to test your repository installation using one
+        of our client applications.
 
 ** Use Accada's EPCIS Capture Client to send events to an EPCIS Repository
 
@@ -142,7 +145,8 @@ java -jar epcis-captureclient-<version>.jar
    {{{architecture.html#EPCIS%20Query%20Client}architecture description}}.
 
 
-* {Configuration} Runtime Configuration of EPCIS Repository
+
+* Runtime {Configuration} of EPCIS Repository
 
   In this section, we describe the properties you may use to configure Accada's
   EPCIS Repository implementation.
@@ -171,7 +175,9 @@ maxQueryExecutionTime=20000
 # whether to insert new vocabularies when they are missing in the db
 insertMissingVoc=true
 
-# the schedule for checking trigger conditions
+# the schedule used to check for trigger conditions. the values provided
+# here are parsed into a query schedule which is used to periodically
+# check whether incoming events contain a specific trigger URI
 trigger.condition.check.sec=0,20,40
 trigger.condition.check.min=
 ---------------------------------------------------------------------------
@@ -211,7 +217,7 @@ trigger.condition.check.min=
 
   <!-- Allow remote clients to invoke the database reset script (see
        parameter "dbResetScript). -->
-  <Parameter name="dbResetAllowed" value="true"/>
+  <Parameter name="dbResetAllowed" value="false"/>
 
   <!-- Script containing SQL statements to initialize repository to a
        predefined state. (Used for JUnit testing only.) -->
@@ -236,14 +242,129 @@ trigger.condition.check.min=
   * <<log4j.properties>>
 
     These properties affect the logging behaviour of the application. In a default
-    installation, the logfile will be written to your Tomcat's
-    <<<logs/epcis-repository.log>>> directory.
+    installation, the logfile will be written to <<<epcis-repository.log>>> in your
+    Tomcat's log directory.
 
   []
 
 
 
-* {Advanced} Advanced Features
+* {Basic} Features
+
+  This section shows how to use the basic features of Accada's EPCIS Repository
+  implementation, i.e. how to send an EPCIS event to the capture interface and
+  how to create an EPCIS query for retrieving information from the repository.
+
+** How to capture an EPCIS event
+
+   In order to capture EPC data at the repository you need to wrap this data
+   into XML conforming to the EPCIS XML schema for event types. This EPCIS event
+   must then be sent as payload in an HTTP POST request to the repository's
+   capture interface. An example event, an ObjectEvent, rendered into XML might
+   look like this:
+
+---------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<epcis:EPCISDocument
+    xmlns:epcis="urn:epcglobal:epcis:xsd:1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    creationDate="2005-07-11T11:30:47.0Z"
+    schemaVersion="1">
+  <EPCISBody>
+    <EventList>
+      <ObjectEvent>
+        <eventTime>2007-04-25T11:33:00.000+02:00</eventTime>
+        <eventTimeZoneOffset>+02:00</eventTimeZoneOffset>
+        <epcList>
+          <epc>urn:epc:id:sgtin:0614141.107346.2017</epc>
+        </epcList>
+        <action>OBSERVE</action>
+        <bizStep>urn:epcglobal:epcis:bizstep:fmcg:shipped</bizStep>
+        <disposition>urn:epcglobal:epcis:disp:fmcg:unknown</disposition>
+        <readPoint>
+          <id>urn:epc:id:sgln:0614141.07346.1234</id>
+        </readPoint>
+        <bizLocation>
+          <id>urn:epcglobal:fmcg:loc:0614141073467.A23-49</id>
+        </bizLocation>
+        <bizTransactionList>
+          <bizTransaction type="urn:epcglobal:fmcg:btt:po">
+            http://transaction.acme.com/po/12345678
+          </bizTransaction>
+        </bizTransactionList>
+      </ObjectEvent>
+    </EventList>
+  </EPCISBody>
+</epcis:EPCISDocument>
+---------------------------------------------------------------------------
+
+  In order to programmatically send this EPCIS event to the repository you may
+  take advantage of our capture client which takes care of the HTTP communication
+  for you. All you need to do is read the event given in XML, use the client to
+  send the event to the repository, and check its response. A corresponding
+  Java code snippet might look like the following:
+
+---------------------------------------------------------------------------
+// read the event xml
+Inputstream event = ...
+
+// get the capture client and capture the event
+CaptureClient client = new CaptureClient();
+String httpResponse = client.capture(event);
+
+// check response
+System.out.println(httpResponse);
+---------------------------------------------------------------------------
+
+  If you like to do the HTTP communication yourself you can have a look at the
+  <<<doPost>>> method of the <<<CaptureClient>>> class.
+
+
+** How to query an EPCIS repository
+
+   Because Accada's EPCIS Repository implements the SOAP/HTTP Binding for the
+   query interface, you need to construct a query, wrap it into a SOAP request
+   and send it to the repository. A sample query asking for ObjectEvents having
+   a ReadPoint equal to 'urn:epc:id:sgln:0614141.07346.1234' looks like this:
+
+---------------------------------------------------------------------------
+<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+  <queryName>SimpleEventQuery</queryName>
+  <params>
+    <param>
+      <name>eventType</name>
+      <value>
+        <string>ObjectEvent</string>
+      </value>
+    </param>
+    <param>
+      <name>EQ_readPoint</name>
+      <value>
+        <string>urn:epcglobal:fmcg:loc:0614141073469.RP-1</string>
+      </value>
+    </param>
+  </params>
+</epcisq:poll>
+---------------------------------------------------------------------------
+
+   You can now wrap this query into a SOAP request and send it to the repository
+   or you can use our query client which does all this for you:
+
+---------------------------------------------------------------------------
+// read the query subscription
+Inputstream query = ...
+
+// get the query client and poll the query
+QueryControlClient client = new QueryControlClient();
+QueryResults results = client.poll(query);
+
+// check results of query
+results.getResultsBody(); // etc.
+---------------------------------------------------------------------------
+
+
+
+* {Advanced} Features
 
   This section explains how to use the advanced features of Accada's EPCIS
   Repository implementation.
@@ -297,10 +418,117 @@ trigger.condition.check.min=
 
    []
 
+
+** How to subscribe a Scheduled Query
+
+   A query may be associated with a query schedule (see above) and can be
+   subscribed to the repository. This query will be executed whenever the
+   schedule times out.
+
+   A query subscription with the schedule from example 1 would look like this:
+
+---------------------------------------------------------------------------
+<epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+  <queryName>SimpleEventQuery</queryName>
+  <params>
+    <param>
+      <name>eventType</name>
+      <value>
+        <string>ObjectEvent</string>
+      </value>
+    </param>
+    <param>
+      <name>EQ_readPoint</name>
+      <value>
+        <string>urn:epcglobal:fmcg:loc:0614141073469.RP-1</string>
+      </value>
+    </param>
+  </params>
+  <dest>http://localhost:8888/</dest> <!-- this is where query results will be delivered to -->
+  <controls>
+    <schedule>
+      <second>0</second>
+      <minute>0</minute>
+    </schedule>
+    <initialRecordTime>2007-04-25T11:33:00.000+02:00</initialRecordTime>
+    <reportIfEmpty>false</reportIfEmpty>
+  </controls>
+  <subscriptionID>mySubscrId001</subscriptionID>
+</epcisq:Subscribe>
+---------------------------------------------------------------------------
+
+   This scheduled query can then be subscribed at the repository as follows:
+
+---------------------------------------------------------------------------
+// read the query
+Inputstream query = ...
+
+// get the query client and subscribe the query
+QueryControlClient client = new QueryControlClient();
+QueryResults results = client.subscribe(query);
+---------------------------------------------------------------------------
+
+   The results of the query once it is executed are delivered via the query
+   callback interface (see below).
+
+   To unsubscribe the query do the following:
+
+---------------------------------------------------------------------------
+// the id of the subscribed query
+String queryId = "mySubscrId001";
+
+// get the query client and unsubscribe
+QueryControlClient client = new QueryControlClient();
+client.unsubscribe(queryId);
+---------------------------------------------------------------------------
+
    Note: If no new data is available since the last execution of a subscribed
    query, the repository will either send an empty result set back to the
    client or will not send anything at all. The desired behaviour can be
    configured with the <<<reportIfEmpty>>> flag.
+
+
+** How to subscribe a Triggered Query
+
+   A triggered query is much like a scheduled query except that it is associated
+   with a trigger instead of a schedule. In Accada's EPCIS repository, triggers
+   are implemented as subscribed queries. This subscribed query, executed every
+   couple of seconds, checks if incoming event data matches the trigger condition.
+   If this condition is met, the trigger fires, and the query associated with
+   the trigger will be executed.
+   
+   The schedule which determines in what time intervals to check for the trigger
+   condition can be configured in properties.
+
+   A query subscription with a trigger would look as follows:
+
+---------------------------------------------------------------------------
+<epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+  <queryName>SimpleEventQuery</queryName>
+  <params>
+    <param>
+      <name>eventType</name>
+      <value>
+        <string>ObjectEvent</string>
+      </value>
+    </param>
+    <param>
+      <name>EQ_readPoint</name>
+      <value>
+        <string>urn:epcglobal:fmcg:loc:0614141073469.RP-1</string>
+      </value>
+    </param>
+  </params>
+  <dest>http://localhost:8888/</dest> <!-- this is where query results will be delivered to -->
+  <controls>
+   <trigger>urn:epc:id:sgtin:0614141.107340.1</trigger>
+   <initialRecordTime>2007-04-25T11:33:00.000+02:00</initialRecordTime>
+   <reportIfEmpty>false</reportIfEmpty>
+  </controls>
+  <subscriptionID>mySubscrId002</subscriptionID>
+</epcisq:Subscribe>
+---------------------------------------------------------------------------
+
 
 ** How to use the Query Callback Interface
 

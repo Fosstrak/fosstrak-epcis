@@ -87,6 +87,23 @@ public class CaptureClient implements CaptureInterface {
     }
 
     /**
+     * Captures an event given as input stream.
+     */
+    public String capture(final InputStream eventXml) throws IOException {
+        byte[] xml = new byte[eventXml.available()];
+        eventXml.read(xml);
+        return capture(xml);
+    }
+
+    /**
+     * Captures an event given as byte array.
+     */
+    public String capture(final byte[] eventXml) throws IOException {
+        String event = new String(eventXml);
+        return capture(event);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.accada.epcis.captureclient.CaptureInterface#capture(java.lang.String)
