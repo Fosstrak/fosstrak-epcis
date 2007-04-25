@@ -13,8 +13,10 @@ User Guide
    [[1]] {{{#About}About this Guide}}
 
    [[2]] {{{#Getting}Getting Started}}
+   
+   [[3]] {{{#Configuration}Runtime Configuration of EPCIS Repository}}
 
-   [[3]] {{{#How}How to Use}}
+   [[4]] {{{#Advanced}Advanced Features}}
 
 
 * {About} this Guide
@@ -140,10 +142,111 @@ java -jar epcis-captureclient-<version>.jar
    {{{architecture.html#EPCIS%20Query%20Client}architecture description}}.
 
 
-* {How} to use
+* {Configuration} Runtime Configuration of EPCIS Repository
 
-  This section provides some basic information on how to use some fundamental
-  features of Accada's EPCIS Repository implementation.
+  In this section, we describe the properties you may use to configure Accada's
+  EPCIS Repository implementation.
+  
+  The following configuration files reside in the
+  <<<epcis-repository/src/main/webapp/META-INF/>>> directory and describe the
+  default configuration:
+
+  * <<application.properties>>
+
+    The <<<application.properties>>> file is located in your Tomcat's <<<webapps/epcis-repository-\<version\>/META-INF/>>>
+    directory. It contains some basic configuration directives that control the
+    repository's basic behaviour when processing queries and new events.
+
+---------------------------------------------------------------------------
+# application.properties
+
+# maximum number of result rows allowed for a single query before a
+# QueryTooLarge exception is raised
+maxQueryResultRows=125
+
+# maximum time in milliseconds to wait for a query to finish before a
+# QueryTooComplex exception is raised
+maxQueryExecutionTime=20000
+
+# whether to insert new vocabularies when they are missing in the db
+insertMissingVoc=true
+
+# the schedule for checking trigger conditions
+trigger.condition.check.sec=0,20,40
+trigger.condition.check.min=
+---------------------------------------------------------------------------
+
+    You do not need to manually restart Tomcat after editing this file as
+    it is monitored by the application server and a restart is initiated
+    automatically after any changes.
+
+
+  * <<context.xml>>
+
+    The <<<context.xml>>> file is located in your Tomcat's <<<webapps/epcis-repository-\<version\>/META-INF/>>>
+    directory. The main options you can configure here are the database
+    connection details of the storage backend you want the repository to use.
+    
+    Moreover, you can specify a script containing SQL statements (<dbResetScript>) that is
+    executed by the repository whenever it receives a HTTP POST request at the capture
+    interface with the HTTP parameter <dbReset> set to <true>. This behaviour is not
+    part of the EPCIS specification. It can be used to remotely initialize a repository to
+    a predefined state. Please note that this feature is not protected by any security
+    mechanisms. It is intended for internal use only and therefore disabled by default
+    (i.e., the <dbResetAllowed> parameter is set to <false> in <<<context.xml>>>).
+    (Future versions may provide more sophisticated remote management capabilities.)
+    
+    The other parameters in <<<context.xml>>> specify the location of specific files
+    and need not be changed.
+
+---------------------------------------------------------------------------
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Context docBase="" path="/epcis-repository" reloadable="true">
+
+  <Parameter name="schemaPath" value="WEB-INF/classes/wsdl"/>
+  <Parameter name="schemaFile" value="EPCglobal-epcis-1_0.xsd"/>
+
+  <Parameter name="log4jConfigFile" value="META-INF/log4j.properties"/>
+  <Parameter name="appConfigFile" value="META-INF/application.properties"/>
+
+  <!-- Allow remote clients to invoke the database reset script (see
+       parameter "dbResetScript). -->
+  <Parameter name="dbResetAllowed" value="true"/>
+
+  <!-- Script containing SQL statements to initialize repository to a
+       predefined state. (Used for JUnit testing only.) -->
+  <Parameter name="dbResetScript" value="WEB-INF/classes/sql/epcis_test_data_reset.sql"/>
+
+  <Resource
+    name="jdbc/EPCISDB"
+    type="javax.sql.DataSource"
+    auth="Container"
+    username="epcis"
+    password="epcis"
+    driverClassName="com.mysql.jdbc.Driver"
+    url="jdbc:mysql://localhost:3306/epcis?autoReconnect=true">
+  </Resource>
+
+  <WatchedResource>WEB-INF/web.xml</WatchedResource>
+  <WatchedResource>META-INF/context.xml</WatchedResource>
+  <WatchedResource>META-INF/application.properties</WatchedResource>
+</Context>
+---------------------------------------------------------------------------
+
+  * <<log4j.properties>>
+
+    These properties affect the logging behaviour of the application. In a default
+    installation, the logfile will be written to your Tomcat's
+    <<<logs/epcis-repository.log>>> directory.
+
+  []
+
+
+
+* {Advanced} Advanced Features
+
+  This section explains how to use the advanced features of Accada's EPCIS
+  Repository implementation.
 
 ** How to use a Query Schedule
 
