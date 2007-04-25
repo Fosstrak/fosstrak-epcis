@@ -193,7 +193,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
         <configuration>
-          <aggregate>true</aggregate>
+          <aggregate>false</aggregate>
         </configuration>
       </plugin>
       <plugin>
