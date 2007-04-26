@@ -16,7 +16,7 @@
   
   <!-- Allow remote clients to invoke the database reset script (see
        parameter "dbResetScript). -->
-  <Parameter name="dbResetAllowed" value="true"/>
+  <Parameter name="dbResetAllowed" value="false"/>
 
   <!-- Script containing SQL statements to initialize repository to a
        predefined state. (Used for JUnit testing only.) -->
