@@ -46,9 +46,9 @@ http://demo.accada.org/epcis/query
   functionality offered by EPCIS. You can also use them as templates for your
   own experiments.
 
-  {{{http://www.accada.org/webstart/epcis-queryclient.jnlp} Launch Query Client }} (via Java Web Start)
+  {{{/epcis/epcis-queryclient/webstart/epcis-queryclient.jnlp} Launch Query Client }} (via Java Web Start)
 
-  {{{http://www.accada.org/webstart/epcis-captureclient.jnlp} Launch Capture Client }} (via Java Web Start)
+  {{{/epcis/epcis-captureclient/webstart/epcis-captureclient.jnlp} Launch Capture Client }} (via Java Web Start)
  
 
   In order to use these applications, you need to have the Java Runtime
