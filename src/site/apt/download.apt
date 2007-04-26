@@ -49,9 +49,9 @@ Download
 *--------+----------+
          | Sources  |
 *--------+----------+
- EPCIS Source 0.2.0 (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/epcis-0.2.0-src.zip}epcis-0.2.0-src.zip}}
+ EPCIS Source 0.2.0 (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/0.2.0/epcis-0.2.0-src.zip}epcis-0.2.0-src.zip}}
 *--------+----------+
- EPCIS Source 0.2.0 (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/epcis-0.2.0-src.tar.gz}epcis-0.2.0-src.tar.gz}}
+ EPCIS Source 0.2.0 (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/0.2.0/epcis-0.2.0-src.tar.gz}epcis-0.2.0-src.tar.gz}}
 *--------+----------+
 
 
