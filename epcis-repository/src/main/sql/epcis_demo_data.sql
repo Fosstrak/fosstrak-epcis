@@ -48,7 +48,7 @@ INSERT INTO `event_AggregationEvent_bizTrans` (`event_id`, `bizTrans_id`) VALUES
 (1, 3);
 
 INSERT INTO `event_AggregationEvent_extensions` (`id`, `event_id`, `fieldname`, `prefix`, `intValue`) VALUES
-(1, 1, 'temperature', 'xyz', 25);
+(1, 1, 'http://www.example.com/epcis/extensions/#temperature', 'xyz', 25);
 
 
 -- ---------------------------------------------
@@ -84,9 +84,9 @@ INSERT INTO `event_ObjectEvent_bizTrans` (`event_id`, `bizTrans_id`) VALUES
 (2, 2);
 
 INSERT INTO `event_ObjectEvent_extensions` (`id`, `event_id`, `fieldname`, `prefix`, `intValue`, `floatValue`, `strValue`) VALUES
-(1, 1, 'temperature', 'xyz', 21, NULL, NULL),
-(2, 4, 'origin', 'abc', NULL, NULL, 'Germany'),
-(3, 5, 'cost', 'uvw', NULL, 4.5, NULL);
+(1, 1, 'http://www.example.com/epcis/extensions/#temperature', 'xyz', 21, NULL, NULL),
+(2, 4, 'http://www.example.com/epcis/extensions/#origin', 'abc', NULL, NULL, 'Germany'),
+(3, 5, 'http://www.example.com/epcis/extensions/#cost', 'uvw', NULL, 4.5, NULL);
 
 
 -- ---------------------------------------------
