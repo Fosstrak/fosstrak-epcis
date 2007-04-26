@@ -206,34 +206,25 @@ public class QuerySubscription implements Serializable {
      * Runs the query assigned to this subscription. Advances lastTimeExecuted.
      */
     public void executeQuery() {
-        LOG.debug("------------------------------------");
-        LOG.debug("It's time to run a subscribed query.");
-
-        // get new lastTimeExecuted (must be <= to time when query is executed,
-        // otherwise we loose results)
-        GregorianCalendar cal = new GregorianCalendar();
-        int offset = TimeZone.getDefault().getRawOffset()
-                + TimeZone.getDefault().getDSTSavings();
-        cal.add(Calendar.MILLISECOND, offset);
-        this.lastTimeExecuted = cal;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("--------------------------------------------");
+            LOG.debug("Executing subscribed query '" + subscriptionID
+                    + "' which has " + queryParams.length + " parameters:");
+            for (int i = 0; i < queryParams.length; i++) {
+                LOG.debug(" param name:  " + queryParams[i].getName());
+                Object val = queryParams[i].getValue();
+                if (val instanceof GregorianCalendar) {
+                    LOG.debug(" param value: "
+                            + ((GregorianCalendar) val).getTime());
+                } else {
+                    LOG.debug(" param value: " + val);
+                }
+            }
+        }
 
         // poll the query
         Poll poll = new Poll(queryName, queryParams);
         try {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Executing subscribed query '" + subscriptionID
-                        + "' which has " + queryParams.length + " parameters:");
-                for (int i = 0; i < queryParams.length; i++) {
-                    LOG.debug(" param name:  " + queryParams[i].getName());
-                    Object val = queryParams[i].getValue();
-                    if (val instanceof GregorianCalendar) {
-                        LOG.debug(" param value: "
-                                + ((GregorianCalendar) val).getTime());
-                    } else {
-                        LOG.debug(" param value: " + val);
-                    }
-                }
-            }
             QueryResults result = null;
             try {
                 // initialize the query service
@@ -241,8 +232,17 @@ public class QuerySubscription implements Serializable {
                 queryLocator.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
                 EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) queryLocator.getEPCglobalEPCISServicePort();
 
-                // send the query
+                // send the query and get current time
+                GregorianCalendar cal = new GregorianCalendar();
                 result = epcisQueryService.poll(poll);
+
+                // set new lastTimeExecuted (must be <= to time when query is
+                // executed, otherwise we loose results)
+                int offset = TimeZone.getDefault().getRawOffset()
+                        + TimeZone.getDefault().getDSTSavings();
+                cal.add(Calendar.MILLISECOND, offset);
+                cal.add(Calendar.SECOND, 1);
+                this.lastTimeExecuted = cal;
             } catch (QueryTooLargeException e) {
                 // send exception back to client
                 EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
