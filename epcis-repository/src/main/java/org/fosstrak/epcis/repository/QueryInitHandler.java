@@ -113,6 +113,9 @@ public class QueryInitHandler extends BasicHandler {
                     + delimiter + "'.");
 
             Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) ctx.getAttribute("subscribedMap");
+            if (subscribedMap != null && log.isDebugEnabled()) {
+                log.debug("Restored " + subscribedMap.size() + " subscriptions from servlet context.");
+            }
 
             msgContext.setProperty("dbconnection", dbconnection);
             msgContext.setProperty("delimiter", delimiter);

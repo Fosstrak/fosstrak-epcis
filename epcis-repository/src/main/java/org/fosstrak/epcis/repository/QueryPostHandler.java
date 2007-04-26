@@ -69,7 +69,9 @@ public class QueryPostHandler extends BasicHandler {
             HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
             servlet.getServletContext().setAttribute("subscribedMap",
                     subscribedMap);
-            LOG.info("Subscriptions stored to servlet context.");
+            if (subscribedMap != null && LOG.isDebugEnabled()) {
+                LOG.debug("Stored " + subscribedMap.size() + " subscriptions to servlet context.");
+            }
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "Unable to close the database connection: "

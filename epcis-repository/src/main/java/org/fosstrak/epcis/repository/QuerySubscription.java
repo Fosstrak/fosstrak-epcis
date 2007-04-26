@@ -28,8 +28,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
@@ -179,7 +181,8 @@ public class QuerySubscription implements Serializable {
         List<QueryParam> tempParams = Arrays.asList(queryParams);
         for (QueryParam p : tempParams) {
             if (p.getName().equalsIgnoreCase("GE_recordTime")) {
-                LOG.debug("Updating query parameter 'GE_recordTime'.");
+                LOG.debug("Updating query parameter 'GE_recordTime' with value '"
+                        + initialRecordTime.getTime() + "'.");
                 p.setValue(initialRecordTime);
                 foundRecordTime = true;
                 break;
@@ -189,7 +192,8 @@ public class QuerySubscription implements Serializable {
         if (!foundRecordTime) {
             List<QueryParam> arrayList = new ArrayList<QueryParam>();
             arrayList.addAll(tempParams);
-            LOG.debug("Adding query parameter 'GE_recordTime'.");
+            LOG.debug("Adding query parameter 'GE_recordTime' with value '"
+                    + initialRecordTime.getTime() + "'.");
             QueryParam newParam = new QueryParam();
             newParam.setName("GE_recordTime");
             newParam.setValue(initialRecordTime);
@@ -202,15 +206,34 @@ public class QuerySubscription implements Serializable {
      * Runs the query assigned to this subscription. Advances lastTimeExecuted.
      */
     public void executeQuery() {
+        LOG.debug("------------------------------------");
+        LOG.debug("It's time to run a subscribed query.");
+
         // get new lastTimeExecuted (must be <= to time when query is executed,
         // otherwise we loose results)
-        this.lastTimeExecuted = new GregorianCalendar();
+        GregorianCalendar cal = new GregorianCalendar();
+        int offset = TimeZone.getDefault().getRawOffset()
+                + TimeZone.getDefault().getDSTSavings();
+        cal.add(Calendar.MILLISECOND, offset);
+        this.lastTimeExecuted = cal;
 
         // poll the query
         Poll poll = new Poll(queryName, queryParams);
         try {
-            LOG.debug("Running the subscribed query with ID '" + subscriptionID
-                    + "'.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Executing subscribed query '" + subscriptionID
+                        + "' which has " + queryParams.length + " parameters:");
+                for (int i = 0; i < queryParams.length; i++) {
+                    LOG.debug(" param name:  " + queryParams[i].getName());
+                    Object val = queryParams[i].getValue();
+                    if (val instanceof GregorianCalendar) {
+                        LOG.debug(" param value: "
+                                + ((GregorianCalendar) val).getTime());
+                    } else {
+                        LOG.debug(" param value: " + val);
+                    }
+                }
+            }
             QueryResults result = null;
             try {
                 // initialize the query service
