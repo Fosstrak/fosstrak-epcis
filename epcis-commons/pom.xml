@@ -7,11 +7,11 @@
 
   <groupId>org.accada.epcis</groupId>
   <artifactId>epcis-commons</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.2.0</version>
   <parent>
     <artifactId>epcis</artifactId>
     <groupId>org.accada.epcis</groupId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
   </parent>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
@@ -103,32 +103,14 @@
             <configuration>
               <tasks>
                 <mkdir dir="target/generated-sources/main/java" />
-                <taskdef
-                  resource="axis-tasks.properties"
-                  classpathref="maven.compile.classpath" />
-                <axis-wsdl2java
-                  output="target/generated-sources/main/java"
-                  deployScope="Application" serverSide="false"
-                  verbose="false"
-                  url="../epcis-repository/src/main/resources/wsdl/EPCglobal-epcis-query-1_0.wsdl">
-                  <mapping
-                    namespace="urn:epcglobal:epcis:wsdl:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis-masterdata:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="urn:epcglobal:epcis-query:xsd:1"
-                    package="${package.structure.soapapi}" />
-                  <mapping
-                    namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
-                    package="${package.structure.soapapi}" />
+                <taskdef resource="axis-tasks.properties" classpathref="maven.compile.classpath" />
+                <axis-wsdl2java output="target/generated-sources/main/java" deployScope="Application" serverSide="false" verbose="false" url="../epcis-repository/src/main/resources/wsdl/EPCglobal-epcis-query-1_0.wsdl">
+                  <mapping namespace="urn:epcglobal:epcis:wsdl:1" package="${package.structure.soapapi}" />
+                  <mapping namespace="urn:epcglobal:xsd:1" package="${package.structure.soapapi}" />
+                  <mapping namespace="urn:epcglobal:epcis:xsd:1" package="${package.structure.soapapi}" />
+                  <mapping namespace="urn:epcglobal:epcis-masterdata:xsd:1" package="${package.structure.soapapi}" />
+                  <mapping namespace="urn:epcglobal:epcis-query:xsd:1" package="${package.structure.soapapi}" />
+                  <mapping namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader" package="${package.structure.soapapi}" />
                 </axis-wsdl2java>
 
                 <!--

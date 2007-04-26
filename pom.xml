@@ -7,7 +7,7 @@
 
   <groupId>org.accada.epcis</groupId>
   <artifactId>epcis</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.2.0</version>
   <packaging>pom</packaging> <!-- aggregator projects require 'pom' as packaging -->
   <modelVersion>4.0.0</modelVersion>
 
@@ -95,7 +95,7 @@
           <artifactId>maven-site-plugin</artifactId>
           <configuration>
             <locales>en</locales>
-            <publishDate position="left" format="yyyy-MM-dd hh:mm:ss"/>
+            <publishDate position="left" format="yyyy-MM-dd hh:mm:ss" />
           </configuration>
         </plugin>
         <plugin>
@@ -129,9 +129,9 @@
   
   <scm>
     <!-- keep empty tags here to avoid release:prepare crashes -->
-    <connection></connection>
-    <developerConnection>scm:svn:https://svn.accada.org/repos/epcis</developerConnection>
-    <url></url>
+    <connection>scm:svn:https://svn.accada.org/repos/epcis/tags/epcis-0.2.0</connection>
+    <developerConnection>scm:svn:https://svn.accada.org/repos/epcis/tags/epcis-0.2.0</developerConnection>
+    <url>https://svn.accada.org/repos/epcis/tags/epcis-0.2.0</url>
   </scm>
   <distributionManagement>
     <repository>
