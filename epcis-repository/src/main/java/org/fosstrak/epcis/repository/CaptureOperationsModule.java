@@ -22,8 +22,8 @@ package org.accada.epcis.repository;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -50,7 +50,6 @@ import javax.sql.DataSource;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -240,23 +239,15 @@ public class CaptureOperationsModule extends HttpServlet {
 
                 // parse the payload into a DOM tree
                 final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
                 final DocumentBuilder builder = factory.newDocumentBuilder();
                 document = builder.parse(new ByteArrayInputStream(
                         event.getBytes()));
 
                 // validate the DOM tree
                 if (validator != null) {
-                    try {
-                        validator.validate(new DOMSource(document), null);
-                    } catch (SAXException e) {
-                        String msg = "Unable to validate the document: "
-                                + (e.getException() == null
-                                        ? e.getMessage()
-                                        : e.getException().getMessage());
-                        LOG.error(msg, e);
-                        rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        out.println(msg);
-                    }
+                    validator.validate(new DOMSource(document), null);
+                    LOG.info("Incoming capture request was successfully validated against the EPCIS schema.");
                 } else {
                     LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
                 }
@@ -270,31 +261,28 @@ public class CaptureOperationsModule extends HttpServlet {
             out.println("Request succeeded.");
 
         } catch (final SAXException e) {
-            String msg = "Unable to parse the document: "
+            String userMsg = "Unable to read or validate your request, check the data you provided and try again.";
+            String msg = "Unable to parse or validate capture request: "
                     + (e.getException() == null
                             ? e.getMessage()
                             : e.getException().getMessage());
             LOG.error(msg, e);
-            rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.println(msg);
-
-        } catch (final ParserConfigurationException e) {
-            String msg = "Parser configuration error: " + e.getMessage();
-            LOG.error(msg, e);
-            rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.println(msg);
+            rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.println(userMsg);
 
         } catch (final IOException e) {
+            String userMsg = "An internal error occured. The service might not be available at the moment.";
             String msg = "I/O error: " + e.getMessage();
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.println(msg);
+            out.println(userMsg);
 
         } catch (final SQLException e) {
+            String userMsg = "There is a problem with the database. The service is currently not available.";
             String msg = "Database error: " + e.getMessage();
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.println(msg);
+            out.println(userMsg);
 
         } catch (final UnsupportedOperationException e) {
             String msg = e.getMessage();
@@ -303,8 +291,7 @@ public class CaptureOperationsModule extends HttpServlet {
             out.println(msg);
 
         } catch (final Exception e) {
-            String msg = "Unable to complete request due to unknown exception: "
-                    + e.getMessage();
+            String msg = "Unable to complete the request due to unknown problems. The service might not be available at the moment.";
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.println(msg);
@@ -391,25 +378,26 @@ public class CaptureOperationsModule extends HttpServlet {
                     + getServletContext().getInitParameter("schemaPath");
             String schemaFile = getServletContext().getInitParameter(
                     "schemaFile");
-            System.setProperty("user.dir", schemaPath);
-            String xsd = schemaPath + System.getProperty("file.separator")
-                    + schemaFile;
-            LOG.debug("Reading schema from '" + xsd + "'.");
+            File xsd = new File(schemaPath
+                    + System.getProperty("file.separator") + schemaFile);
+            LOG.debug("Reading schema from '" + xsd.getAbsolutePath() + "'.");
+            if (!xsd.exists()) {
+                LOG.warn("Unable to find the schema file (check "
+                        + "'pathToSchemaFiles' parameter in META-INF/context.xml)");
+                LOG.warn("Schema validation will not be available!");
+                validator = null;
+            } else {
+                // load the schema to validate against
+                SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Source schemaSrc = new StreamSource(xsd);
+                Schema schema = schemaFact.newSchema(schemaSrc);
 
-            // load the schema to validate against
-            SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Source schemaSrc = new StreamSource(new FileInputStream(xsd));
-            Schema schema = schemaFact.newSchema(schemaSrc);
-
-            validator = schema.newValidator();
-        } catch (FileNotFoundException e) {
-            LOG.warn("Unable to find the schema file (check "
-                    + "'pathToSchemaFiles' parameter in META-INF/context.xml)",
-                    e);
-            LOG.warn("Schema validation will not be available!");
+                validator = schema.newValidator();
+            }
         } catch (Exception e) {
             LOG.warn("Unable to load the schema validator.", e);
             LOG.warn("Schema validation will not be available!");
+            validator = null;
         }
     }
 

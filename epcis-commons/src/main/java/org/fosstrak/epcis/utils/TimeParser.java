@@ -241,8 +241,7 @@ public final class TimeParser {
             tzID = "GMT";
         } else {
             // throw new ParseException("invalid time zone designator", curPos);
-            LOG.warn("No time zone designator found!", new ParseException(
-                    "invalid time zone designator", curPos));
+            LOG.warn("No time zone designator found, using default 'GMT'");
             tzID = "GMT";
         }
 
