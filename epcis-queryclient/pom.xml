@@ -27,36 +27,12 @@
       <artifactId>epcis-commons</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis</artifactId>
-      <version>1.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis-jaxrpc</artifactId>
-      <version>1.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis-wsdl4j</artifactId>
-      <version>1.5.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-discovery</groupId>
-      <artifactId>commons-discovery</artifactId>
-      <version>0.4</version>
-      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.axis</groupId>
+          <artifactId>axis-ant</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -123,11 +99,13 @@
           <workDirectory>${project.build.directory}/site/webstart</workDirectory>
           <dependencies>
             <includes>
+              <include>org.accada.epcis:epcis-commons</include>
               <include>org.apache.axis:axis</include>
               <include>org.apache.axis:axis-jaxrpc</include>
-              <include>axis:axis-wsdl4j</include>
-              <include>commons-logging:commons-logging</include>
+              <include>org.apache.axis:axis-saaj</include>
+              <include>org.apache.axis:axis-wsdl4j</include>
               <include>commons-discovery:commons-discovery</include>
+              <include>commons-logging:commons-logging</include>
             </includes>
           </dependencies>
           <jnlp>

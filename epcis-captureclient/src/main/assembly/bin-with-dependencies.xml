@@ -25,6 +25,9 @@
       <outputDirectory>/lib</outputDirectory>
       <unpack>false</unpack>
       <scope>runtime</scope>
+      <excludes>
+        <exclude>org.accada.epcis:epcis-captureclient</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>
