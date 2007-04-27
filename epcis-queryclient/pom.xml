@@ -103,7 +103,7 @@
               <include>org.apache.axis:axis</include>
               <include>org.apache.axis:axis-jaxrpc</include>
               <include>org.apache.axis:axis-saaj</include>
-              <include>org.apache.axis:axis-wsdl4j</include>
+              <include>axis:axis-wsdl4j</include>
               <include>commons-discovery:commons-discovery</include>
               <include>commons-logging:commons-logging</include>
             </includes>
