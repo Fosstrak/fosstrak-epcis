@@ -239,6 +239,9 @@ trigger.condition.check.min=
 </Context>
 ---------------------------------------------------------------------------
 
+    Please note that, once your webapp has been deployed, Tomcat reads these configuration
+    settings from the file <<<conf/Catalina/localhost/epcis-repository-\<version\>.xml>>>.
+
   * <<log4j.properties>>
 
     These properties affect the logging behaviour of the application. In a default
