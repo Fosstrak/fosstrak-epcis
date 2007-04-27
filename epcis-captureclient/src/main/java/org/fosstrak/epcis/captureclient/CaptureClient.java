@@ -114,8 +114,8 @@ public class CaptureClient implements CaptureInterface {
     }
 
     /**
-     * Invokes the dbReset operation in the Capture Module deleting all
-     * event data in the EPCIS database. This operation is only allowed if the
+     * Invokes the dbReset operation in the Capture Module deleting all event
+     * data in the EPCIS database. This operation is only allowed if the
      * corresponding property is set in the repository's configuration.
      * 
      * @return The response from the capture module.
@@ -175,5 +175,13 @@ public class CaptureClient implements CaptureInterface {
      */
     public String getCaptureUrl() {
         return captureUrl;
+    }
+
+    /**
+     * @param url
+     *            The new URL String to which this client should connect.
+     */
+    public void setCaptureUrl(String url) {
+        this.captureUrl = url;
     }
 }

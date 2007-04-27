@@ -779,6 +779,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            for the Action
      */
     public void actionPerformed(final ActionEvent e) {
+        client.setCaptureUrl(mwServiceUrlTextField.getText());
         if (e.getSource() == mwEventTypeChooserComboBox) {
             mwEventTypeChooserComboBoxChanged();
             return;
