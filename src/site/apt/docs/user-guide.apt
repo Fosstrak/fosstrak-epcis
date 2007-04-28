@@ -44,7 +44,7 @@ User Guide
    (version 5.0 or higher) running. It will be used by the EPCIS Repository
    to store event data.
 
-   [[2]] {{{download.html}Download}} the <Accada EPCIS Repository> distribution
+   [[2]] {{{../download.html}Download}} the <Accada EPCIS Repository> distribution
    and place the WAR file contained in the archive in your Tomcat's <webapp>
    directory. After restarting Tomcat, the WAR file will be exploded.
    
