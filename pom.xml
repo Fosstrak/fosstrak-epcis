@@ -160,14 +160,14 @@
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</unsubscribe>
       <post>accada-epcis-user@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=accada-epcis-user</archive>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-user</archive>
     </mailingList>
     <mailingList>
       <name>EPCIS developer mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
       <post>accada-epcis-developer@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=accada-epcis-developer</archive>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-developer</archive>
     </mailingList>
   </mailingLists>
 
