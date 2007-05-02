@@ -21,12 +21,30 @@
     <module>epcis-repository</module>
     <module>epcis-captureclient</module>
     <module>epcis-queryclient</module>
-    <module>epcis-interop-test</module>
   </modules>
+  <profiles>
+    <profile>
+      <!--
+          the epcis-interop-test module is included into a profile in order
+          to build it only on demand: running "mvn install" will not build
+          the epcis-interop-test module, but "mvn install -Pinterop-test" will
+      -->
+      <id>interop-test</id>
+      <activation>
+        <property>
+          <name>enableTestProfile</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>epcis-interop-test</module>
+      </modules>
+    </profile>
+  </profiles>
 
 
   <!-- =========================================================== -->
-  <!-- Repositories                                                  -->
+  <!-- Repositories                                                -->
   <!-- =========================================================== -->
 
   <repositories>
