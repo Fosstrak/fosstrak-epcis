@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- =========================================================== -->
-  <!-- Basics                                                  -->
+  <!-- Basics                                                      -->
   <!-- =========================================================== -->
 
   <groupId>org.accada.epcis</groupId>
@@ -12,7 +12,7 @@
     <groupId>org.accada.epcis</groupId>
     <version>0.2.1-SNAPSHOT</version>
   </parent>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <modelVersion>4.0.0</modelVersion>
   <name>epcis-interop-test</name>
 
@@ -23,10 +23,21 @@
 
   <dependencies>
     <dependency>
+      <!--
+          we need this dependency because it will be deployed by
+          the cargo plugin
+      -->
+      <groupId>org.accada.epcis</groupId>
+      <artifactId>epcis-repository</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.accada.epcis</groupId>
       <artifactId>epcis-commons</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
+      <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>org.apache.axis</groupId>
@@ -52,7 +63,149 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.cargo</groupId>
+      <artifactId>cargo-core-uberjar</artifactId>
+      <version>0.9</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.cargo</groupId>
+      <artifactId>cargo-ant</artifactId>
+      <version>0.9</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!-- Build settings                                              -->
+  <!-- =========================================================== -->
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-maven2-plugin</artifactId>
+        <!--
+            the cargo plugin is used to automatically start/stop tomcat and
+            to automatically deploy the application
+        -->
+        <configuration>
+          <wait>false</wait>
+          <container>
+            <containerId>tomcat5x</containerId>
+            <home>${CATALINA_HOME}</home>
+            <log>${project.build.directory}/interop-test.log</log>
+          </container>
+          <configuration>
+            <home>${project.build.directory}/tomcat</home>
+          </configuration>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start-container</id>
+            <!-- start container and deploy before tests are run -->
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+              <goal>deploy</goal>
+            </goals>
+            <configuration>
+              <deployer>
+                <deployables>
+                  <deployable>
+                    <groupId>org.accada.epcis</groupId>
+                    <artifactId>epcis-repository</artifactId>
+                    <type>war</type>
+                    <pingURL>http://localhost:8080/epcis-repository-${project.version}/capture</pingURL>
+                  </deployable>
+                </deployables>
+              </deployer>
+            </configuration>
+          </execution>
+          <execution>
+            <id>stop-container</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dbunit-maven-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.0.5</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <driver>com.mysql.jdbc.Driver</driver>
+          <url>jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true</url>
+          <username>epcis</username>
+          <password>epcis</password>
+        </configuration>
+        <executions>
+          <execution>
+            <id>init-db</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>export</goal>
+              <goal>operation</goal>
+            </goals>
+            <configuration>
+              <type>CLEAN_INSERT</type>
+              <src>${basedir}/src/test/dbunit/epcis_test_data.xml</src>
+              <format>xml</format>
+              <dest>${project.build.directory}/dbunit/backup.xml</dest>
+            </configuration>
+          </execution>
+          <execution>
+            <id>reset-db</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>operation</goal>
+            </goals>
+            <configuration>
+              <type>CLEAN_INSERT</type>
+              <src>${project.build.directory}/dbunit/backup.xml</src>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- run tests as integration-tests -->
+            <phase>integration-test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 
   <!-- =========================================================== -->
