@@ -158,9 +158,9 @@
         </dependencies>
         <configuration>
           <driver>com.mysql.jdbc.Driver</driver>
-          <url>jdbc:mysql://localhost:3306/epcisdb?autoReconnect=true</url>
-          <username>epcis</username>
-          <password>epcis</password>
+          <url>jdbc:mysql://localhost:3306/${db.database}?autoReconnect=true</url>
+          <username>${db.username}</username>
+          <password>${db.password}</password>
         </configuration>
         <executions>
           <execution>

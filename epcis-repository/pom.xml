@@ -48,7 +48,24 @@
   <!-- =========================================================== -->
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/webapp</directory>
+        <filtering>true</filtering>
+        <targetPath>../webapp-filtered</targetPath>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
     <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <warSourceDirectory>${project.build.directory}/webapp-filtered</warSourceDirectory>
+        </configuration>
+      </plugin>
       <plugin>
         <!--
           the tomcat-maven-plugin used to deploy the application to tomcat.

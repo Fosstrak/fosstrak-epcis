@@ -22,23 +22,77 @@
     <module>epcis-captureclient</module>
     <module>epcis-queryclient</module>
   </modules>
+
+
+  <!-- =========================================================== -->
+  <!-- Profiles                                                    -->
+  <!-- =========================================================== -->
+
   <profiles>
     <profile>
+      <id>interop-test</id>
       <!--
           the epcis-interop-test module is included into a profile in order
           to build it only on demand: running "mvn install" will not build
-          the epcis-interop-test module, but "mvn install -Pinterop-test" will
+          the epcis-interop-test module, but "mvn install -Dinterop-test" will
       -->
-      <id>interop-test</id>
       <activation>
         <property>
-          <name>enableTestProfile</name>
-          <value>true</value>
+          <name>interop-test</name>
         </property>
       </activation>
       <modules>
         <module>epcis-interop-test</module>
       </modules>
+    </profile>
+    <profile>
+      <id>env-dev</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev</value>
+        </property>
+      </activation>
+      <properties>
+        <!--
+            consider moving these properties to an external properties file, e.g. 
+            src/main/filters/dev.properties, and add a filter element to the <build>
+            element below:
+            <filters>
+              <filter>src/main/filters/dev.properties</filter>
+            </filters>
+            see http://maven.apache.org/guides/getting-started/index.html#how_do_i_filter_resource_files
+            
+            a developer may want to activate this profile permanently by specifying
+            <activeProfile>env-dev</activeProfile> in the activeProfiles element of
+            his local settings.xml. additionally he might want to override values
+            for some of these parameters there
+        -->
+        <url.capture>http://127.0.0.1:8080/epcis-repository-${project.version}/capture</url.capture>
+        <url.query>http://127.0.0.1:8080/epcis-repository-${project.version}/services/EPCglobalEPCISService</url.query>
+        <db.database>epcis</db.database>
+        <db.username>epcis</db.username>
+        <db.password>epcis</db.password>
+        <db.reset.allowed>true</db.reset.allowed>
+      </properties>
+    </profile>
+    <profile>
+      <id>env-prod</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>prod</value>
+        </property>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <url.capture>http://demo.accada.org/epcis/capture</url.capture>
+        <url.query>http://demo.accada.org/epcis/query</url.query>
+        <db.database>epcis</db.database>
+        <db.username>epcis</db.username>
+        <db.password>epcis</db.password>
+        <db.reset.allowed>false</db.reset.allowed>
+      </properties>
     </profile>
   </profiles>
 
@@ -66,7 +120,7 @@
 
 
   <!-- =========================================================== -->
-  <!-- Plugins                                                     -->
+  <!-- Build settings                                              -->
   <!-- =========================================================== -->
 
   <build>

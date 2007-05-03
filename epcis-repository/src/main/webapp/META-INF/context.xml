@@ -16,7 +16,7 @@
   
   <!-- Allow remote clients to invoke the database reset script (see
        parameter "dbResetScript). -->
-  <Parameter name="dbResetAllowed" value="false"/>
+  <Parameter name="dbResetAllowed" value="${db.reset.allowed}"/>
 
   <!-- Script containing SQL statements to initialize repository to a
        predefined state. (Used for JUnit testing only.) -->
@@ -26,10 +26,10 @@
     name="jdbc/EPCISDB"
     type="javax.sql.DataSource"
     auth="Container"
-    username="epcis"
-    password="epcis"
+    username="${db.username}"
+    password="${db.password}"
     driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/epcis?autoReconnect=true">
+    url="jdbc:mysql://localhost:3306/${db.database}?autoReconnect=true">
   </Resource>
 
   <WatchedResource>WEB-INF/web.xml</WatchedResource>
