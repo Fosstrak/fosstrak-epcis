@@ -65,7 +65,8 @@ INSERT INTO `event_ObjectEvent` (`id`, `eventTime`, `recordTime`, `eventTimeZone
 (7, '2006-06-27 16:55:08', '2006-09-01 00:06:16', '+01:00', 'OBSERVE', 3, NULL, 10, 8),
 (8, '2006-06-16 14:28:23', '2006-09-01 00:07:46', '+01:00', 'ADD', 5, NULL, 8, 6),
 (9, '2006-08-13 17:07:50', '2006-09-01 00:09:37', '+01:00', 'OBSERVE', 3, NULL, 11, 9),
-(10, '2006-09-15 11:45:06', '2006-09-01 00:10:12', '+01:00', 'OBSERVE', 3, NULL, 10, 8);
+(10, '2006-09-15 11:45:06', '2006-09-01 00:10:12', '+01:00', 'OBSERVE', 3, NULL, 10, 8),
+(11, '2007-04-23 12:26:52', '2007-04-23 12:26:52', '+01:00', 'OBSERVE', 6, NULL, 5, 4);
 
 INSERT INTO `event_ObjectEvent_EPCs` (`event_id`, `epc`) VALUES
 (1, 'urn:epc:id:sgtin:0034000.987650.2686'),
@@ -78,7 +79,8 @@ INSERT INTO `event_ObjectEvent_EPCs` (`event_id`, `epc`) VALUES
 (7, 'urn:epc:id:sgtin:0000001.000001.0001'),
 (8, 'urn:epc:id:sgtin:0000001.000001.0002'),
 (9, 'urn:epc:id:sgtin:0000001.000001.0002'),
-(10, 'urn:epc:id:sgtin:0000001.000001.0002');
+(10, 'urn:epc:id:sgtin:0000001.000001.0002'),
+(11, 'urn:epc:id:sgtin:0057000.123430.2028');
 
 INSERT INTO `event_ObjectEvent_bizTrans` (`event_id`, `bizTrans_id`) VALUES
 (2, 2);
@@ -143,7 +145,8 @@ INSERT INTO `voc_BizStep` (`id`, `uri`) VALUES
 (2, 'urn:epcglobal:epcis:bizstep:fmcg:pickandpack'),
 (3, 'urn:epcglobal:epcis:bizstep:fmcg:received'),
 (4, 'urn:epcglobal:epcis:bizstep:fmcg:loading'),
-(5, 'urn:epcglobal:epcis:bizstep:fmcg:production');
+(5, 'urn:epcglobal:epcis:bizstep:fmcg:production'),
+(6, 'urn:epcglobal:epcis:bizstep:fmcg:shipping');
 
 INSERT INTO `voc_BizTrans` (`id`, `uri`) VALUES
 (1, 'http://transaction.acme.com/tracker/6677150'),
