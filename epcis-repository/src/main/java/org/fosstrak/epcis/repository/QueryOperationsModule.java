@@ -1594,7 +1594,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 LOG.debug("       query param 4: [" + inStream.available()
                         + " bytes]");
 
-                String trigger = "";
+                String trigger = null;
                 if (triggerURI != null) {
                     trigger = triggerURI.toString();
                 }
@@ -1682,8 +1682,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 boolean exportifempty = rs.getBoolean("exportifempty");
 
                 String queryName = rs.getString("queryname");
+                String trigger = rs.getString("trigg");
 
-                if (rs.getString("trigg") == null) {
+                if (trigger == null || trigger.length() == 0) {
                     storedSubscription = new QuerySubscriptionScheduled(
                             subscrId, params, dest, exportifempty, initrectime,
                             new GregorianCalendar(), sched, queryName);
