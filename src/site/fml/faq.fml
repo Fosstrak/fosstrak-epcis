@@ -4,6 +4,11 @@
 <part id="about">
 
 <faq>
+<question>What is EPCIS?</question>
+<answer>EPCIS is a standard to exchange RFID-related events between businesses. For more information, please see EPCglobal's EPCIS FAQ at <a href="http://www.epcglobalinc.org/standards/FINAL-EPCIS_FAQ042707.pdf">www.epcglobalinc.org/standards/FINAL-EPCIS_FAQ042707.pdf</a>.</answer>
+</faq>
+
+<faq>
 <question>Why do not all the interoperability tests run successfully?</question>
 <answer>Our EPCIS implementation does not currently support authentication or authorization mechanisms as they are not required by EPCglobal's EPCIS specification. Nevertheless testSE2, testSE5, and testSE74 of EPCglobal's interoperability test kit (which our 'epcis-interop-test' module adheres to) require the client to be authenticated and/or authorized. Therefore these tests will fail. The bottom line is that these test failures are nothing to worry about.</answer>
 </faq>
