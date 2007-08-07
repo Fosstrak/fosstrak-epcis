@@ -4,7 +4,7 @@
     <format>zip</format>
     <format>tar.gz</format>
   </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
+  <includeBaseDirectory>true</includeBaseDirectory>
   <moduleSets>
     <moduleSet>
       <includes>
@@ -12,10 +12,22 @@
         <include>org.accada.epcis:epcis-repository</include>
         <include>org.accada.epcis:epcis-captureclient</include>
         <include>org.accada.epcis:epcis-queryclient</include>
-        <include>org.accada.epcis:epcis-interop-test</include>
       </includes>
       <sources>
-        <outputDirectory>epcis/${artifactId}</outputDirectory>
+        <fileSets>
+          <fileSet>
+            <includes>
+              <include>README*</include>
+              <include>LICENSE*</include>
+              <include>NOTICE*</include>
+              <include>pom.xml</include>
+            </includes>
+          </fileSet>
+          <fileSet>
+            <directory>src</directory>
+            <outputDirectory>src</outputDirectory>
+          </fileSet>
+        </fileSets>
       </sources>
     </moduleSet>
   </moduleSets>
@@ -27,11 +39,24 @@
         <include>NOTICE*</include>
         <include>pom.xml</include>
       </includes>
-      <outputDirectory>epcis</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src</directory>
-      <outputDirectory>epcis/src</outputDirectory>
+      <outputDirectory>src</outputDirectory>
+    </fileSet>
+    <!-- Manually select files from epcis-interop-test. As this module is
+         not actually a sub-module of epcis, it can't be simply included 
+         in the module set above. -->
+    <fileSet>
+      <directory>epcis-interop-test</directory>
+      <outputDirectory>epcis-interop-test</outputDirectory>
+      <includes>
+        <include>src/**</include>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+        <include>pom.xml</include>
+      </includes>
     </fileSet>
   </fileSets>
 </assembly>
