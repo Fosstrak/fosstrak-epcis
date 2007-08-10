@@ -6,11 +6,11 @@
 
   <groupId>org.accada.epcis</groupId>
   <artifactId>epcis-captureclient</artifactId>
-  <version>0.2.1-SNAPSHOT</version>
+  <version>0.2.1</version>
   <parent>
     <artifactId>epcis</artifactId>
     <groupId>org.accada.epcis</groupId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.2.1</version>
   </parent>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
