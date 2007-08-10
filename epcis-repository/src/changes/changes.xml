@@ -1,0 +1,21 @@
+<document>
+  <properties>
+    <title>Changes epcis-repository</title>
+  </properties>
+  <body>
+    <release version="0.2.1" date="2007-08-10">
+      <action dev="steybem" type="fix" issue="1725569">
+        Scheduled queries were not restored properly after a service restart.
+      </action>
+      <action dev="roduner" type="update">
+        Changed demo database to make all examples shown in Query Client work.
+      </action>
+      <action dev="steybem" type="update">
+        Changed build environment: Added profiles (dev, prod) to the build
+        environment with specific settings for a development and a
+        productive environment (you can activate a profile by adding e.g.
+        "-Denv=dev" to your mvn build command).
+      </action>
+    </release>
+  </body>
+</document>

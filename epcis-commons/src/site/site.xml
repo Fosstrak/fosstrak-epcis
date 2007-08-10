@@ -13,6 +13,7 @@
         <item name="dummy"/>
       </item>
       <item name="EPCIS Commons" href="project-reports.html">
+        <item name="Changes Report" href="changes-report.html"/>
         <item name="Dependencies" href="dependencies.html"/>
         <item name="Checkstyle" href="checkstyle.html"/>
         <item name="PMD" href="pmd.html"/>

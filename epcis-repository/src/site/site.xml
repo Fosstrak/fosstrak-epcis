@@ -4,6 +4,7 @@
   
     <menu name="Modules">
       <item name="EPCIS Repository" href="project-reports.html">
+        <item name="Changes Report" href="changes-report.html"/>
         <item name="Dependencies" href="dependencies.html"/>
         <item name="Surefire" href="surefire-report.html"/>
         <item name="Checkstyle" href="checkstyle.html"/>

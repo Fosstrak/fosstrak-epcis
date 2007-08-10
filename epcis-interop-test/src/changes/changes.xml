@@ -1,0 +1,19 @@
+<document>
+  <properties>
+    <title>Changes epcis-interop-test</title>
+  </properties>
+  <body>
+    <release version="0.2.1" date="2007-08-10">
+      <action dev="steybem" type="update">
+        Changed build environment: Included epcis-interop-test module to a profile in order
+        to execute it only on demand (add "-Dinterop-test" to your
+        mvn build command to run the tests).
+      </action>
+      <action dev="steybem" type="update">      
+        Changed build environment: Servlet container is automatically started
+        and test data is automatically inserted into the database
+        prior to running the interop tests.
+      </action>    
+    </release>
+  </body>
+</document>
