@@ -24,7 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Properties;
@@ -109,8 +109,7 @@ public class CaptureClient implements CaptureInterface {
      * @see org.accada.epcis.captureclient.CaptureInterface#capture(java.lang.String)
      */
     public String capture(final String eventXml) throws IOException {
-        byte[] data = ("event=" + eventXml).getBytes();
-        return postData(data);
+        return doPost(eventXml);
     }
 
     /**
@@ -123,39 +122,31 @@ public class CaptureClient implements CaptureInterface {
      *             If a communication error occured.
      */
     public String dbReset() throws IOException {
-        byte[] data = ("dbReset=true").getBytes();
-        return postData(data);
+        String queryString = "?dbReset=true";
+        return doGet(queryString);
+
     }
 
     /**
-     * Send data to the capture service using HTTP POST.
+     * Makes a GET request to the capture interface using the given URL query
+     * string.
      * 
-     * @param data
-     *            The data to send.
-     * @return The HTTP response message
+     * @param queryString
+     *            The queryString to be appended to the URL of the capture
+     *            interface.
+     * @return The response from the server.
      * @throws IOException
-     *             If an error on the HTTP layer occured.
+     *             If an I/O error ocurred.
      */
-    private String postData(final byte[] data) throws IOException {
-
-        // the url where the capture interface listens
-        URL serviceUrl = new URL(captureUrl);
-
-        // open an http connection
+    private String doGet(String queryString) throws IOException {
+        URL serviceUrl = new URL(captureUrl + queryString);
         HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setDoInput(true);
+        connection.connect();
 
-        // post the data
-        connection.setDoOutput(true);
-        OutputStream out = connection.getOutputStream();
-        out.write(data);
-        out.flush();
-        out.close();
-
-        // get response
-        String response = "HTTP/1.0 " + connection.getResponseCode() + " "
-                + connection.getResponseMessage() + ": ";
-
-        // read and return response
+        // read response
+        String response = null;
         InputStream in = null;
         try {
             in = connection.getInputStream();
@@ -167,6 +158,53 @@ public class CaptureClient implements CaptureInterface {
         while ((line = br.readLine()) != null) {
             response = response + line + "\n";
         }
+
+        br.close();
+        return response.trim();
+    }
+
+    /**
+     * Send data to the capture service using HTTP POST.
+     * 
+     * @param data
+     *            The data to send.
+     * @return The HTTP response message
+     * @throws IOException
+     *             If an error on the HTTP layer occured.
+     */
+    private String doPost(final String data) throws IOException {
+        // the url where the capture interface listens
+        URL serviceUrl = new URL(captureUrl);
+
+        // open an http connection
+        HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
+        connection.setRequestProperty("content-type", "text/xml");
+        connection.setRequestMethod("POST");
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+
+        // post the data
+        OutputStreamWriter wr = new OutputStreamWriter(
+                connection.getOutputStream());
+        wr.write(data);
+        wr.flush();
+
+        // read response
+        String response = "";
+        InputStream in = null;
+        try {
+            in = connection.getInputStream();
+        } catch (IOException e) {
+            in = connection.getErrorStream();
+        }
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        String line;
+        while ((line = br.readLine()) != null) {
+            response = response + line + "\n";
+        }
+
+        wr.close();
+        br.close();
         return response.trim();
     }
 

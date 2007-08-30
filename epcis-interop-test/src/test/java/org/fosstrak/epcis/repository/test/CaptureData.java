@@ -48,6 +48,8 @@ public class CaptureData extends TestCase {
     private static final String SHIP_ORDER_XML = "src/test/resources/events/6_ship_order_events.xml";
     private static final String RECEIVE_ORDER_XML = "src/test/resources/events/7_receive_order_events.xml";
     private static final String STORE_INVENTORY_XML = "src/test/resources/events/8_store_inventory_events.xml";
+    
+    private static final String ok = "Capture request succeeded.";
 
     private CaptureClient client = new CaptureClient();
 
@@ -67,7 +69,7 @@ public class CaptureData extends TestCase {
 
         // send the data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
 
     /**
@@ -86,7 +88,7 @@ public class CaptureData extends TestCase {
 
         // send the data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
 
     /**
@@ -105,7 +107,7 @@ public class CaptureData extends TestCase {
 
         // send data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
 
     /**
@@ -124,7 +126,7 @@ public class CaptureData extends TestCase {
 
         // send data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
 
     /**
@@ -143,7 +145,7 @@ public class CaptureData extends TestCase {
 
         // send data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
 
     /**
@@ -162,7 +164,7 @@ public class CaptureData extends TestCase {
 
         // send data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
 
     /**
@@ -181,7 +183,7 @@ public class CaptureData extends TestCase {
 
         // send data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
 
     /**
@@ -200,7 +202,7 @@ public class CaptureData extends TestCase {
 
         // send data
         String response = client.capture(eventXml);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", response);
+        assertEquals(ok, response);
     }
     
     public void captureAll() throws IOException {

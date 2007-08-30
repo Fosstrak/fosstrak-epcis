@@ -3,6 +3,21 @@
     <title>Changes epcis-repository</title>
   </properties>
   <body>
+    <release version="0.2.2" date="">
+      <action dev="steybem" type="fix" issue="1781884">
+        HTTP Capture Interface in 0.2.1 was not EPCIS compliant. Fixed 
+        capture operation which now expects the EPCISDocument as payload
+        in the HTTP POST request.
+      </action>
+      <action dev="steybem" type="fix" issue="1781885">
+        Fixed Null pointer exception.
+      </action>
+      <action dev="steybem" type="update">
+        Changed access method for invoking dbReset operation from HTTP POST
+        form parameter to HTTP GET url parameter. Calling the capture
+        operation URL with ?dbReset=true will now invoke the db-reset-script.
+      </action>
+    </release>
     <release version="0.2.1" date="2007-08-10">
       <action dev="steybem" type="fix" issue="1725569">
         Scheduled queries were not restored properly after a service restart.

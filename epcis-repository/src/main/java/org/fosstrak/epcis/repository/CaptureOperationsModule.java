@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,6 +51,7 @@ import javax.sql.DataSource;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -169,31 +171,70 @@ public class CaptureOperationsModule extends HttpServlet {
      */
     public void doGet(final HttpServletRequest req,
             final HttpServletResponse rsp) throws IOException {
-        rsp.setContentType("text/html");
         final PrintWriter out = rsp.getWriter();
 
-        out.println("<html>");
-        out.println("<head><title>EPCIS Capture Service</title></head>");
-        out.println("<body>");
-        out.println("<p>This service captures EPCIS events sent to it using <br />");
-        out.println("HTTP POST requests. Expected POST parameter name is \"event\", <br />");
-        out.println(" expected payload is an XML binding of an EPCISDocument <br />");
-        out.println("containing ObjectEvents, AggregationEvents, QuantityEvents <br />");
-        out.println("and/or TransactionEvents.</p>");
-        out.println("<p>For further information refer to the xml schema files or check the Example <br />");
-        out.println("in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.</p>");
-        out.println("</body>");
-        out.println("</html>");
+        // check for the dbReset parameter
+        String dbReset = req.getParameter("dbReset");
+        if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
+            LOG.debug("Found 'dbReset' parameter set to 'true'.");
+            rsp.setContentType("text/plain");
+            if (dbResetAllowed) {
+                try {
+                    dbconnection = db.getConnection();
+                    LOG.debug("DB connection opened.");
+                    dbReset();
+                    LOG.debug("DB connection closed.");
+                    dbconnection.close();
+
+                    String msg = "db reset successfull";
+                    LOG.info(msg);
+                    rsp.setStatus(HttpServletResponse.SC_OK);
+                    out.println(msg);
+                } catch (final SQLException e) {
+                    String msg = "An error involving the database ocurred.";
+                    LOG.error(msg, e);
+                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.println(msg);
+                } catch (final Exception e) {
+                    String msg = "An unknown error ocurred.";
+                    LOG.error(msg, e);
+                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.println(msg);
+                }
+            } else {
+                String msg = "'dbReset' operation not allowed!";
+                LOG.info(msg);
+                rsp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                out.println(msg);
+            }
+
+        } else {
+
+            // return an HTML info page
+            rsp.setContentType("text/html");
+
+            out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
+            out.println("   \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+            out.println("<html>");
+            out.println("<head><title>EPCIS Capture Service</title></head>");
+            out.println("<body>");
+            out.println("<p>This service captures EPCIS events sent to it using HTTP POST requests.<br />");
+            out.println("The payload of the HTTP POST request is expected to be an XML document conforming to the EPCISDocument schema.</p>");
+            out.println("<p>For further information refer to the xml schema files or check the Example <br />");
+            out.println("in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.</p>");
+            out.println("</body>");
+            out.println("</html>");
+        }
 
         out.flush();
         out.close();
     }
 
     /**
-     * Invokes the parser (SAX) and catches possible errors. Returns a simple
-     * plaintext error messages via HTTP. Note: Currently there is no validation
-     * against the EPCglobal schema files, however this application takes care
-     * of invalid XML docments.
+     * Implements the EPCIS capture operation. Takes HTTP POST request, extracts
+     * the payload into an XML document, validates the document against the
+     * EPCIS schema, and captures the EPCIS events given in the document. Errors
+     * are caught and returned as simple plaintext messages via HTTP.
      * 
      * @param req
      *            The HttpServletRequest.
@@ -209,101 +250,102 @@ public class CaptureOperationsModule extends HttpServlet {
         rsp.setContentType("text/plain");
         final PrintWriter out = rsp.getWriter();
 
-        try {
-            dbconnection = db.getConnection();
-            LOG.debug("DB connection opened.");
-
-            // get POST data
+        InputStream is = null;
+        // for backwards compatibility: check if we have a POST request with
+        // form parameters
+        if ("application/x-www-form-urlencoded".equalsIgnoreCase(req.getContentType())) {
+            // check if the 'event' form parameter is given
             String event = req.getParameter("event");
-            String dbReset = req.getParameter("dbReset");
-
-            if (event == null || event.equals("")) {
-                // no 'event=' POST parameter
-                if (dbReset != null || !dbReset.equals("")) {
-                    LOG.debug("Found 'dbReset=' POST parameter with value '"
-                            + dbReset + "'.");
-                    if (dbResetAllowed) {
-                        LOG.info("Running db reset script.");
-                        dbReset();
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "'dbReset' operation not allowed.");
-                    }
-                } else {
-                    throw new UnsupportedOperationException(
-                            "Incomplete POST request: Neither 'event=' nor 'dbReset=' parameter found.");
-                }
-            } else {
-                LOG.debug("Found 'event=' POST parameter with "
-                        + event.length() + " bytes payload.");
-
-                // parse the payload into a DOM tree
-                final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setNamespaceAware(true);
-                final DocumentBuilder builder = factory.newDocumentBuilder();
-                document = builder.parse(new ByteArrayInputStream(
-                        event.getBytes()));
-
-                // validate the DOM tree
-                if (validator != null) {
-                    validator.validate(new DOMSource(document), null);
-                    LOG.info("Incoming capture request was successfully validated against the EPCIS schema.");
-                } else {
-                    LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
-                }
-
-                // handle the dpcument
-                handleDocument();
+            if (event != null && !event.equals("")) {
+                LOG.debug("Found 'event=' parameter.");
+                is = new ByteArrayInputStream(event.getBytes());
             }
+        } else {
+            is = req.getInputStream();
+        }
 
-            LOG.info("EPCIS Capture Interface request succeeded.");
-            rsp.setStatus(HttpServletResponse.SC_OK);
-            out.println("Request succeeded.");
-
-        } catch (final SAXException e) {
-            String userMsg = "Unable to read or validate your request, check the data you provided and try again.";
-            String msg = "Unable to parse or validate capture request: "
+        // parse the payload as XML document
+        try {
+            final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            final DocumentBuilder builder = factory.newDocumentBuilder();
+            document = builder.parse(is);
+        } catch (SAXException e) {
+            String msg = "Unable to parse the payload as XML document: "
                     + (e.getException() == null
                             ? e.getMessage()
                             : e.getException().getMessage());
-            LOG.error(msg, e);
+            LOG.info(msg, e);
             rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.println(userMsg);
-
-        } catch (final IOException e) {
-            String userMsg = "An internal error occured. The service might not be available at the moment.";
-            String msg = "I/O error: " + e.getMessage();
+            out.println("We're unable to capture the EPCIS events.");
+            out.println("The data you provided is not a valid XML document.");
+            out.flush();
+            out.close();
+            return;
+        } catch (ParserConfigurationException e) {
+            String msg = "XML document builder not correctly configured.";
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.println(userMsg);
+            out.flush();
+            out.close();
+            return;
+        }
+        LOG.debug("Payload successfully parsed as XML document.");
 
+        // validate the XML document against the EPCISDocument schema
+        if (validator != null) {
+            try {
+                validator.validate(new DOMSource(document), null);
+            } catch (SAXException e) {
+                String msg = "XML document is not a valid EPCISDocument";
+                LOG.info(msg, e);
+                rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.println("We're unable to capture the EPCIS events.");
+                out.println("The XML document you provided is not conform to the EPCISDocument schema.");
+                out.flush();
+                out.close();
+                return;
+            }
+            LOG.info("Incoming capture request was successfully validated against the EPCISDocument schema.");
+        } else {
+            LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
+        }
+
+        // handle the capture operation
+        try {
+            dbconnection = db.getConnection();
+            LOG.debug("DB connection opened.");
+            handleDocument();
+            LOG.debug("DB connection closed.");
+            dbconnection.close();
+
+            // return OK
+            LOG.info("EPCIS Capture Interface request succeeded.");
+            rsp.setStatus(HttpServletResponse.SC_OK);
+            out.println("Capture request succeeded.");
+        } catch (final SAXException e) {
+            String msg = "An error processing the XML document ocurred.";
+            LOG.error(msg, e);
+            rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.println(msg);
         } catch (final SQLException e) {
-            String userMsg = "There is a problem with the database. The service is currently not available.";
-            String msg = "Database error: " + e.getMessage();
+            String msg = "An error involving the database ocurred.";
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.println(userMsg);
-
+            out.println(msg);
         } catch (final UnsupportedOperationException e) {
             String msg = e.getMessage();
-            LOG.error(msg, e);
+            LOG.info(msg, e);
             rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.println(msg);
-
         } catch (final Exception e) {
-            String msg = "Unable to complete the request due to unknown problems. The service might not be available at the moment.";
+            String msg = "An unknown error ocurred.";
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.println(msg);
-
-        } finally {
-            // close the db connection
-            try {
-                dbconnection.close();
-            } catch (SQLException e) {
-                LOG.error("Unable to close DB connection.", e);
-            }
         }
+        out.flush();
+        out.close();
     }
 
     /**
@@ -315,6 +357,7 @@ public class CaptureOperationsModule extends HttpServlet {
      *             If an exception reading from the SQL script occured.
      */
     private void dbReset() throws SQLException, Exception {
+        LOG.info("Running db reset script.");
         Statement stmt = dbconnection.createStatement();
         if (dbResetScript != null) {
             BufferedReader reader = new BufferedReader(new FileReader(
