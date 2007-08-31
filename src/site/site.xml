@@ -47,7 +47,7 @@
       <item name="Project Team" href="team-list.html"/>
       <item name="Mailing Lists" href="mail-lists.html"/>
       <item name="Issue Tracking" href="issue-tracking.html"/>
-      <item name="Source Repository" href="source-repository.html"/>
+<!--      <item name="Source Repository" href="source-repository.html"/> -->
     </menu>
     <menu name="Guides &amp;amp; Documentation" inherit="top">
       <item name="User Guide" href="docs/user-guide.html"/>
