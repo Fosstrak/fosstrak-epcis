@@ -3,11 +3,19 @@
     <title>Changes epcis-captureclient</title>
   </properties>
   <body>
-    <release version="0.2.2" date="">
+    <release version="0.2.2" date="2007-08-31">
       <action dev="steybem" type="update">
-        Changed access method for invoking dbReset operation from HTTP POST
-        form parameter to HTTP GET url parameter. Calling the capture
-        operation URL with ?dbReset=true will now invoke the db-reset-script.
+        Changed access method for invoking EPCIS capture interface in
+        CaptureClient. The capture interface expects an XML document
+        conforming to the EPCISDocument in the payload of the HTTP POST
+        request.
+      </action>
+      <action dev="steybem" type="update">
+        Changed return type of capture method in CaptureClient. It will
+        now return the HTTP response code (received from the EPCIS
+        repository) instead of the message given in payload of the HTTP
+        response. The CaptureClientGui will display an appropriate success
+        or fail message.
       </action>
     </release>
     <release version="0.2.1" date="2007-08-10">
