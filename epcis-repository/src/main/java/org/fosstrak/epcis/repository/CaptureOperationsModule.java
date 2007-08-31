@@ -21,7 +21,6 @@
 package org.accada.epcis.repository;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -119,8 +118,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * The ObjectEvent-query without data.
      */
     private final String objectEventInsert = "INSERT INTO event_ObjectEvent ("
-            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
-            + "disposition, readPoint, bizLocation, action"
+            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action"
             + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
@@ -128,23 +126,20 @@ public class CaptureOperationsModule extends HttpServlet {
      */
     private final String aggregationEventInsert = "INSERT INTO event_AggregationEvent ("
             + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
-            + "disposition, readPoint, bizLocation, action, parentID "
-            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + "disposition, readPoint, bizLocation, action, parentID " + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The QuantityEvent-query without data.
      */
     private final String quantityEventInsert = "INSERT INTO event_QuantityEvent ("
             + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
-            + "disposition, readPoint, bizLocation, epcClass, quantity"
-            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + "disposition, readPoint, bizLocation, epcClass, quantity" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The TransactionEvent-query without data.
      */
     private final String transactionEventInsert = "INSERT INTO event_TransactionEvent ("
-            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
-            + "disposition, readPoint, bizLocation, action"
+            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action"
             + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
@@ -169,63 +164,24 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws IOException
      *             If an error occured while writing the response.
      */
-    public void doGet(final HttpServletRequest req,
-            final HttpServletResponse rsp) throws IOException {
+    public void doGet(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
         final PrintWriter out = rsp.getWriter();
 
-        // check for the dbReset parameter
-        String dbReset = req.getParameter("dbReset");
-        if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
-            LOG.debug("Found 'dbReset' parameter set to 'true'.");
-            rsp.setContentType("text/plain");
-            if (dbResetAllowed) {
-                try {
-                    dbconnection = db.getConnection();
-                    LOG.debug("DB connection opened.");
-                    dbReset();
-                    LOG.debug("DB connection closed.");
-                    dbconnection.close();
+        // return an HTML info page
+        rsp.setContentType("text/html");
 
-                    String msg = "db reset successfull";
-                    LOG.info(msg);
-                    rsp.setStatus(HttpServletResponse.SC_OK);
-                    out.println(msg);
-                } catch (final SQLException e) {
-                    String msg = "An error involving the database ocurred.";
-                    LOG.error(msg, e);
-                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.println(msg);
-                } catch (final Exception e) {
-                    String msg = "An unknown error ocurred.";
-                    LOG.error(msg, e);
-                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.println(msg);
-                }
-            } else {
-                String msg = "'dbReset' operation not allowed!";
-                LOG.info(msg);
-                rsp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-                out.println(msg);
-            }
-
-        } else {
-
-            // return an HTML info page
-            rsp.setContentType("text/html");
-
-            out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
-            out.println("   \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
-            out.println("<html>");
-            out.println("<head><title>EPCIS Capture Service</title></head>");
-            out.println("<body>");
-            out.println("<p>This service captures EPCIS events sent to it using HTTP POST requests.<br />");
-            out.println("The payload of the HTTP POST request is expected to be an XML document conforming to the EPCISDocument schema.</p>");
-            out.println("<p>For further information refer to the xml schema files or check the Example <br />");
-            out.println("in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.</p>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-
+        out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
+        out.println("   \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+        out.println("<html>");
+        out.println("<head><title>EPCIS Capture Service</title></head>");
+        out.println("<body>");
+        out.println("<p>This service captures EPCIS events sent to it using HTTP POST requests.<br />");
+        out
+                .println("The payload of the HTTP POST request is expected to be an XML document conforming to the EPCISDocument schema.</p>");
+        out.println("<p>For further information refer to the xml schema files or check the Example <br />");
+        out.println("in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.</p>");
+        out.println("</body>");
+        out.println("</html>");
         out.flush();
         out.close();
     }
@@ -244,22 +200,58 @@ public class CaptureOperationsModule extends HttpServlet {
      *             If an error occured while validating the request or writing
      *             the response.
      */
-    public void doPost(final HttpServletRequest req,
-            final HttpServletResponse rsp) throws IOException {
+    public void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
         LOG.info("EPCIS Capture Interface invoked.");
         rsp.setContentType("text/plain");
         final PrintWriter out = rsp.getWriter();
 
         InputStream is = null;
-        // for backwards compatibility: check if we have a POST request with
-        // form parameters
+        // check if we have a POST request with form parameters
         if ("application/x-www-form-urlencoded".equalsIgnoreCase(req.getContentType())) {
-            // check if the 'event' form parameter is given
+            // check if the 'event' or 'dbReset' form parameter are given
             String event = req.getParameter("event");
-            if (event != null && !event.equals("")) {
-                LOG.debug("Found 'event=' parameter.");
-                is = new ByteArrayInputStream(event.getBytes());
+            String dbReset = req.getParameter("dbReset");
+            if (event != null) {
+                LOG.info("Found deprecated 'event=' parameter. Refusing to process request.");
+                String msg = "Starting from version 0.2.2, the EPCIS repository does not accept the EPCISDocument in the HTTP POST form parameter 'event' anymore. Please provide the EPCISDocument as HTTP POST payload instead.";
+                rsp.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+                out.println(msg);
+            } else if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
+                LOG.debug("Found 'dbReset' parameter set to 'true'.");
+                rsp.setContentType("text/plain");
+                if (dbResetAllowed) {
+                    try {
+                        dbconnection = db.getConnection();
+                        LOG.debug("DB connection opened.");
+                        dbReset();
+                        LOG.debug("DB connection closed.");
+                        dbconnection.close();
+
+                        String msg = "db reset successfull";
+                        LOG.info(msg);
+                        rsp.setStatus(HttpServletResponse.SC_OK);
+                        out.println(msg);
+                    } catch (final SQLException e) {
+                        String msg = "An error involving the database ocurred.";
+                        LOG.error(msg, e);
+                        rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        out.println(msg);
+                    } catch (final Exception e) {
+                        String msg = "An unknown error ocurred.";
+                        LOG.error(msg, e);
+                        rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        out.println(msg);
+                    }
+                } else {
+                    String msg = "'dbReset' operation not allowed!";
+                    LOG.info(msg);
+                    rsp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    out.println(msg);
+                }
             }
+            out.flush();
+            out.close();
+            return;
         } else {
             is = req.getInputStream();
         }
@@ -272,9 +264,7 @@ public class CaptureOperationsModule extends HttpServlet {
             document = builder.parse(is);
         } catch (SAXException e) {
             String msg = "Unable to parse the payload as XML document: "
-                    + (e.getException() == null
-                            ? e.getMessage()
-                            : e.getException().getMessage());
+                    + (e.getException() == null ? e.getMessage() : e.getException().getMessage());
             LOG.info(msg, e);
             rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.println("We're unable to capture the EPCIS events.");
@@ -360,8 +350,7 @@ public class CaptureOperationsModule extends HttpServlet {
         LOG.info("Running db reset script.");
         Statement stmt = dbconnection.createStatement();
         if (dbResetScript != null) {
-            BufferedReader reader = new BufferedReader(new FileReader(
-                    dbResetScript));
+            BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
             String line;
             while ((line = reader.readLine()) != null) {
                 stmt.addBatch(line);
@@ -389,26 +378,20 @@ public class CaptureOperationsModule extends HttpServlet {
 
         // load properties
         String servletPath = getServletContext().getRealPath("/");
-        String appConfigFile = getServletContext().getInitParameter(
-                "appConfigFile");
+        String appConfigFile = getServletContext().getInitParameter("appConfigFile");
         Properties properties = new Properties();
         try {
             properties.load(new FileInputStream(servletPath + appConfigFile));
         } catch (IOException e) {
-            LOG.error("Unable to load application properties from "
-                    + servletPath + appConfigFile);
+            LOG.error("Unable to load application properties from " + servletPath + appConfigFile);
         }
-        insertMissingVoc = Boolean.parseBoolean(properties.getProperty(
-                "insertMissingVoc", "true"));
-        String dbResetAllowedStr = getServletContext().getInitParameter(
-                "dbResetAllowed");
+        insertMissingVoc = Boolean.parseBoolean(properties.getProperty("insertMissingVoc", "true"));
+        String dbResetAllowedStr = getServletContext().getInitParameter("dbResetAllowed");
         dbResetAllowed = Boolean.parseBoolean(dbResetAllowedStr);
-        dbResetScript = servletPath
-                + getServletContext().getInitParameter("dbResetScript");
+        dbResetScript = servletPath + getServletContext().getInitParameter("dbResetScript");
 
         // load log4j config
-        String log4jConfigFile = getServletContext().getInitParameter(
-                "log4jConfigFile");
+        String log4jConfigFile = getServletContext().getInitParameter("log4jConfigFile");
         if (log4jConfigFile != null) {
             // if no log4j properties file found, then do not try
             // to load it (the application runs without logging)
@@ -417,12 +400,9 @@ public class CaptureOperationsModule extends HttpServlet {
 
         // load the schema validator
         try {
-            String schemaPath = servletPath
-                    + getServletContext().getInitParameter("schemaPath");
-            String schemaFile = getServletContext().getInitParameter(
-                    "schemaFile");
-            File xsd = new File(schemaPath
-                    + System.getProperty("file.separator") + schemaFile);
+            String schemaPath = servletPath + getServletContext().getInitParameter("schemaPath");
+            String schemaFile = getServletContext().getInitParameter("schemaFile");
+            File xsd = new File(schemaPath + System.getProperty("file.separator") + schemaFile);
             LOG.debug("Reading schema from '" + xsd.getAbsolutePath() + "'.");
             if (!xsd.exists()) {
                 LOG.warn("Unable to find the schema file (check "
@@ -461,16 +441,12 @@ public class CaptureOperationsModule extends HttpServlet {
             Node eventNode = events.item(i);
             String nodeName = eventNode.getNodeName();
 
-            if (nodeName.equals("ObjectEvent")
-                    || nodeName.equals("AggregationEvent")
-                    || nodeName.equals("QuantityEvent")
-                    || nodeName.equals("TransactionEvent")) {
+            if (nodeName.equals("ObjectEvent") || nodeName.equals("AggregationEvent")
+                    || nodeName.equals("QuantityEvent") || nodeName.equals("TransactionEvent")) {
                 LOG.debug("processing event " + i + ": '" + nodeName + "'.");
                 handleEvent(eventNode);
-            } else if (!nodeName.equals("#text")
-                    && !nodeName.equals("#comment")) {
-                throw new SAXException("Encountered unknown event '" + nodeName
-                        + "'.");
+            } else if (!nodeName.equals("#text") && !nodeName.equals("#comment")) {
+                throw new SAXException("Encountered unknown event '" + nodeName + "'.");
             }
         }
     }
@@ -488,11 +464,9 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SQLException
      *             If an error connecting to the DB occurs.
      */
-    private void handleEvent(final Node eventNode) throws SAXException,
-            SQLException {
+    private void handleEvent(final Node eventNode) throws SAXException, SQLException {
         if (eventNode != null && eventNode.getChildNodes().getLength() == 0) {
-            throw new SAXException("Event element '" + eventNode.getNodeName()
-                    + "' has no children elements.");
+            throw new SAXException("Event element '" + eventNode.getNodeName() + "' has no children elements.");
         }
         Node curEventNode = null;
 
@@ -523,8 +497,7 @@ public class CaptureOperationsModule extends HttpServlet {
 
                 if (nodeName.equals("#text") || nodeName.equals("#comment")) {
                     // ignore text or comments
-                    LOG.debug("  ignoring text or comment: '"
-                            + curEventNode.getTextContent().trim() + "'");
+                    LOG.debug("  ignoring text or comment: '" + curEventNode.getTextContent().trim() + "'");
                     continue;
                 }
 
@@ -534,28 +507,23 @@ public class CaptureOperationsModule extends HttpServlet {
                     LOG.debug("    eventTime in xml is '" + xmlTime + "'");
                     try {
                         eventTime = TimeParser.parseAsTimestamp(xmlTime);
-                        int offset = TimeZone.getDefault().getRawOffset()
-                                + TimeZone.getDefault().getDSTSavings();
+                        int offset = TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings();
                         eventTime = new Timestamp(eventTime.getTime() - offset);
 
                     } catch (ParseException e) {
-                        throw new SAXException(
-                                "Invalid date/time (must be ISO8601).", e);
+                        throw new SAXException("Invalid date/time (must be ISO8601).", e);
                     }
                     LOG.debug("    eventTime parsed as '" + eventTime + "'");
                 } else if (nodeName.equals("eventTimeZoneOffset")) {
                     eventTimeZoneOffset = curEventNode.getTextContent();
-                } else if (nodeName.equals("epcList")
-                        || nodeName.equals("childEPCs")) {
+                } else if (nodeName.equals("epcList") || nodeName.equals("childEPCs")) {
                     epcs = handleEpcs(curEventNode);
                 } else if (nodeName.equals("bizTransactionList")) {
                     bizTransactionList = handleBizTransactions(curEventNode);
                 } else if (nodeName.equals("action")) {
                     action = curEventNode.getTextContent();
-                    if (!action.equals("ADD") && !action.equals("OBSERVE")
-                            && !action.equals("DELETE")) {
-                        throw new SAXException(
-                                "Encountered illegal 'action' value: " + action);
+                    if (!action.equals("ADD") && !action.equals("OBSERVE") && !action.equals("DELETE")) {
+                        throw new SAXException("Encountered illegal 'action' value: " + action);
                     }
                 } else if (nodeName.equals("bizStep")) {
                     bizStep = new URI(curEventNode.getTextContent());
@@ -581,22 +549,17 @@ public class CaptureOperationsModule extends HttpServlet {
                         LOG.debug("    treating unknown event field as extension.");
                         String prefix = parts[0];
                         String localname = parts[1];
-                        String namespace = document.getDocumentElement().getAttribute(
-                                "xmlns:" + prefix);
+                        String namespace = document.getDocumentElement().getAttribute("xmlns:" + prefix);
                         String value = curEventNode.getTextContent();
-                        fieldNameExtList.add(new EventFieldExtension(prefix,
-                                namespace, localname, value));
+                        fieldNameExtList.add(new EventFieldExtension(prefix, namespace, localname, value));
                     } else {
                         // this is not a valid extension
-                        throw new SAXException(
-                                "    encountered unknown event field: '"
-                                        + nodeName + "'.");
+                        throw new SAXException("    encountered unknown event field: '" + nodeName + "'.");
                     }
                 }
             }
         } catch (MalformedURIException e) {
-            throw new SAXException("  event field '"
-                    + curEventNode.getNodeName() + "' is not of type URI: "
+            throw new SAXException("  event field '" + curEventNode.getNodeName() + "' is not of type URI: "
                     + curEventNode.getTextContent(), e);
         }
 
@@ -612,8 +575,7 @@ public class CaptureOperationsModule extends HttpServlet {
         } else if (nodeName.equals("TransactionEvent")) {
             ps = dbconnection.prepareStatement(transactionEventInsert);
         } else {
-            throw new SAXException("Encountered unknown event element '"
-                    + nodeName + "'.");
+            throw new SAXException("Encountered unknown event element '" + nodeName + "'.");
         }
 
         // parameters 1-7 of the sql query are shared by all events
@@ -675,9 +637,8 @@ public class CaptureOperationsModule extends HttpServlet {
         if (!fieldNameExtList.isEmpty()) {
             for (EventFieldExtension ext : fieldNameExtList) {
 
-                String insert = "INSERT INTO event_" + eventNode.getNodeName()
-                        + "_extensions " + "(event_id, fieldname, prefix, "
-                        + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)";
+                String insert = "INSERT INTO event_" + eventNode.getNodeName() + "_extensions "
+                        + "(event_id, fieldname, prefix, " + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)";
                 LOG.debug("QUERY: " + insert);
                 ps = dbconnection.prepareStatement(insert);
 
@@ -708,8 +669,7 @@ public class CaptureOperationsModule extends HttpServlet {
         // check if the event has any EPCs
         if (epcs != null && !nodeName.equals("QuantityEvent")) {
             // preparing statement for insertion of associated EPCs
-            String insert = "INSERT INTO event_" + nodeName
-                    + "_EPCs (event_id, epc) VALUES (?, ?)";
+            String insert = "INSERT INTO event_" + nodeName + "_EPCs (event_id, epc) VALUES (?, ?)";
             LOG.debug("QUERY: " + insert);
             ps = dbconnection.prepareStatement(insert);
             ps.setLong(1, eventId);
@@ -726,8 +686,7 @@ public class CaptureOperationsModule extends HttpServlet {
         // check if the event has any bizTransactions
         if (bizTransactionList != null) {
             // preparing statement for insertion of associated EPCs
-            String insert = "INSERT INTO event_" + nodeName
-                    + "_bizTrans (event_id, bizTrans_id) VALUES (?, ?)";
+            String insert = "INSERT INTO event_" + nodeName + "_bizTrans (event_id, bizTrans_id) VALUES (?, ?)";
             LOG.debug("QUERY: " + insert);
             ps = dbconnection.prepareStatement(insert);
             ps.setLong(1, eventId);
@@ -755,8 +714,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SQLException
      *             If an SQL problem with the database ocurred.
      */
-    private long getLastAutoIncrementedId(final String tableName)
-            throws SQLException {
+    private long getLastAutoIncrementedId(final String tableName) throws SQLException {
         String stmt = "SELECT LAST_INSERT_ID() as id FROM " + tableName;
         PreparedStatement ps = dbconnection.prepareStatement(stmt);
         final ResultSet rs = ps.executeQuery();
@@ -781,8 +739,7 @@ public class CaptureOperationsModule extends HttpServlet {
      *             If an SQL problem with the database ocurred or if we are not
      *             allowed to insert a missing vocabulary.
      */
-    private long insertVocabulary(final String tableName, final URI uri)
-            throws SQLException {
+    private long insertVocabulary(final String tableName, final URI uri) throws SQLException {
         String stmt = "SELECT id FROM " + tableName + " WHERE uri=?";
         PreparedStatement ps = dbconnection.prepareStatement(stmt);
         ps.setString(1, uri.toString());
@@ -806,9 +763,7 @@ public class CaptureOperationsModule extends HttpServlet {
                 // get last auto_increment value and return it
                 return getLastAutoIncrementedId(tableName);
             } else {
-                throw new SQLException(
-                        "Not allowed to add new vocabulary - use "
-                                + "existing vocabulary");
+                throw new SQLException("Not allowed to add new vocabulary - use " + "existing vocabulary");
             }
         }
     }
@@ -824,8 +779,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private URI[] handleEpcs(final Node epcNode) throws MalformedURIException,
-            SAXParseException {
+    private URI[] handleEpcs(final Node epcNode) throws MalformedURIException, SAXParseException {
         List<URI> epcList = new ArrayList<URI>();
 
         for (int i = 0; i < epcNode.getChildNodes().getLength(); i++) {
@@ -833,10 +787,8 @@ public class CaptureOperationsModule extends HttpServlet {
             if (curNode.getNodeName().equals("epc")) {
                 epcList.add(new URI(curNode.getTextContent()));
             } else {
-                if (curNode.getNodeName() != "#text"
-                        && curNode.getNodeName() != "#comment") {
-                    throw new SAXParseException("Unknown XML tag: "
-                            + curNode.getNodeName(), null);
+                if (curNode.getNodeName() != "#text" && curNode.getNodeName() != "#comment") {
+                    throw new SAXParseException("Unknown XML tag: " + curNode.getNodeName(), null);
                 }
             }
         }
@@ -860,8 +812,8 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SAXParseException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private List<BusinessTransactionType> handleBizTransactions(
-            final Node bizNode) throws MalformedURIException, SAXParseException {
+    private List<BusinessTransactionType> handleBizTransactions(final Node bizNode) throws MalformedURIException,
+            SAXParseException {
         final List<BusinessTransactionType> bizList = new ArrayList<BusinessTransactionType>();
 
         for (int i = 0; i < bizNode.getChildNodes().getLength(); i++) {
@@ -869,15 +821,12 @@ public class CaptureOperationsModule extends HttpServlet {
             if (curNode.getNodeName().equals("bizTransaction")) {
                 String bizTransType = curNode.getAttributes().item(0).getTextContent();
                 String bizTrans = curNode.getTextContent();
-                BusinessTransactionType bt = new BusinessTransactionType(
-                        bizTrans);
+                BusinessTransactionType bt = new BusinessTransactionType(bizTrans);
                 bt.setType(new URI(bizTransType));
                 bizList.add(bt);
             } else {
-                if (!curNode.getNodeName().equals("#text")
-                        && !curNode.getNodeName().equals("#comment")) {
-                    throw new SAXParseException("Unknown XML tag: "
-                            + curNode.getNodeName(), null);
+                if (!curNode.getNodeName().equals("#text") && !curNode.getNodeName().equals("#comment")) {
+                    throw new SAXParseException("Unknown XML tag: " + curNode.getNodeName(), null);
                 }
             }
         }
@@ -894,11 +843,9 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SQLException
      *             If an SQL problem with the database ocurred.
      */
-    private long insertBusinessTransaction(
-            final BusinessTransactionType bizTrans) throws SQLException {
+    private long insertBusinessTransaction(final BusinessTransactionType bizTrans) throws SQLException {
         final long id = insertVocabulary("voc_BizTrans", bizTrans);
-        final long type = insertVocabulary("voc_BizTransType",
-                bizTrans.getType());
+        final long type = insertVocabulary("voc_BizTransType", bizTrans.getType());
 
         String stmt = "SELECT id FROM BizTransaction WHERE bizTrans=? AND type=?";
         PreparedStatement ps = dbconnection.prepareStatement(stmt);
