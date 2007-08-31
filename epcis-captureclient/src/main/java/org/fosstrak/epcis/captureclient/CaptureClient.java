@@ -20,10 +20,9 @@
 
 package org.accada.epcis.captureclient;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -68,14 +67,12 @@ public class CaptureClient implements CaptureInterface {
         // load properties
         InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
         if (is == null) {
-            throw new RuntimeException("Unable to load properties from file "
-                    + PROPERTY_FILE);
+            throw new RuntimeException("Unable to load properties from file " + PROPERTY_FILE);
         }
         try {
             props.load(is);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to load properties from file "
-                    + PROPERTY_FILE);
+            throw new RuntimeException("Unable to load properties from file " + PROPERTY_FILE);
         }
 
         // set the URL
@@ -87,20 +84,12 @@ public class CaptureClient implements CaptureInterface {
     }
 
     /**
-     * Captures an event given as input stream.
+     * {@inheritDoc}
+     * 
+     * @see org.accada.epcis.captureclient.CaptureInterface#capture(java.io.InputStream)
      */
-    public String capture(final InputStream eventXml) throws IOException {
-        byte[] xml = new byte[eventXml.available()];
-        eventXml.read(xml);
-        return capture(xml);
-    }
-
-    /**
-     * Captures an event given as byte array.
-     */
-    public String capture(final byte[] eventXml) throws IOException {
-        String event = new String(eventXml);
-        return capture(event);
+    public int capture(final InputStream xmlStream) throws IOException {
+        return doPost(xmlStream, "text/xml");
     }
 
     /**
@@ -108,8 +97,8 @@ public class CaptureClient implements CaptureInterface {
      * 
      * @see org.accada.epcis.captureclient.CaptureInterface#capture(java.lang.String)
      */
-    public String capture(final String eventXml) throws IOException {
-        return doPost(eventXml);
+    public int capture(final String eventXml) throws IOException {
+        return doPost(eventXml, "text/xml");
     }
 
     /**
@@ -121,50 +110,33 @@ public class CaptureClient implements CaptureInterface {
      * @throws IOException
      *             If a communication error occured.
      */
-    public String dbReset() throws IOException {
-        String queryString = "?dbReset=true";
-        return doGet(queryString);
+    public int dbReset() throws IOException {
+        String formParam = "dbReset=true";
+        return doPost(formParam, "application/x-www-form-urlencoded");
 
     }
 
     /**
-     * Makes a GET request to the capture interface using the given URL query
-     * string.
+     * Opens a connection to the capture module.
      * 
-     * @param queryString
-     *            The queryString to be appended to the URL of the capture
-     *            interface.
-     * @return The response from the server.
+     * @param contentType
+     * @return
      * @throws IOException
-     *             If an I/O error ocurred.
      */
-    private String doGet(String queryString) throws IOException {
-        URL serviceUrl = new URL(captureUrl + queryString);
+    private HttpURLConnection openPostConnection(String contentType) throws IOException {
+        // the url where the capture interface listens
+        URL serviceUrl = new URL(captureUrl);
         HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
-        connection.setRequestMethod("GET");
+        connection.setRequestProperty("content-type", contentType);
+        connection.setRequestMethod("POST");
         connection.setDoInput(true);
-        connection.connect();
-
-        // read response
-        String response = null;
-        InputStream in = null;
-        try {
-            in = connection.getInputStream();
-        } catch (IOException e) {
-            in = connection.getErrorStream();
-        }
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String line;
-        while ((line = br.readLine()) != null) {
-            response = response + line + "\n";
-        }
-
-        br.close();
-        return response.trim();
+        connection.setDoOutput(true);
+        return connection;
     }
 
     /**
-     * Send data to the capture service using HTTP POST.
+     * Send data to the repository's capture operation using HTTP POST. The data
+     * will be sent using the given content-type.
      * 
      * @param data
      *            The data to send.
@@ -172,40 +144,39 @@ public class CaptureClient implements CaptureInterface {
      * @throws IOException
      *             If an error on the HTTP layer occured.
      */
-    private String doPost(final String data) throws IOException {
-        // the url where the capture interface listens
-        URL serviceUrl = new URL(captureUrl);
-
-        // open an http connection
-        HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
-        connection.setRequestProperty("content-type", "text/xml");
-        connection.setRequestMethod("POST");
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-
-        // post the data
-        OutputStreamWriter wr = new OutputStreamWriter(
-                connection.getOutputStream());
+    private int doPost(final String data, final String contentType) throws IOException {
+        HttpURLConnection connection = openPostConnection(contentType);
+        // write the data
+        OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
         wr.write(data);
         wr.flush();
-
-        // read response
-        String response = "";
-        InputStream in = null;
-        try {
-            in = connection.getInputStream();
-        } catch (IOException e) {
-            in = connection.getErrorStream();
-        }
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String line;
-        while ((line = br.readLine()) != null) {
-            response = response + line + "\n";
-        }
-
         wr.close();
-        br.close();
-        return response.trim();
+
+        return connection.getResponseCode();
+    }
+
+    /**
+     * Send data to the repository's capture operation using HTTP POST. The data
+     * will be sent using the given content-type.
+     * 
+     * @param data
+     *            The data to send.
+     * @return The HTTP response message
+     * @throws IOException
+     *             If an error on the HTTP layer occured.
+     */
+    private int doPost(final InputStream data, final String contentType) throws IOException {
+        HttpURLConnection connection = openPostConnection(contentType);
+        // read from input and write to output
+        OutputStream os = connection.getOutputStream();
+        int b;
+        while ((b = data.read()) != -1) {
+            os.write(b);
+        }
+        os.flush();
+        os.close();
+
+        return connection.getResponseCode();
     }
 
     /**

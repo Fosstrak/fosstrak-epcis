@@ -100,25 +100,17 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     /**
      * The possible values for the "actions" parameter.
      */
-    private final String[] actions = {
-            "ADD", "OBSERVE", "DELETE"
-    };
+    private final String[] actions = { "ADD", "OBSERVE", "DELETE" };
 
     /**
      * The four possible event types, in human readable form.
      */
-    private final String[] eventTypes = {
-            "Object event", "Aggregation event", "Quantity event",
-            "Transaction event"
-    };
+    private final String[] eventTypes = { "Object event", "Aggregation event", "Quantity event", "Transaction event" };
 
     /**
      * The four possible event types, used for XML creation.
      */
-    private final String[] xmlEventNode = {
-            "ObjectEvent", "AggregationEvent", "QuantityEvent",
-            "TransactionEvent"
-    };
+    private final String[] xmlEventNode = { "ObjectEvent", "AggregationEvent", "QuantityEvent", "TransactionEvent" };
 
     /**
      * Holds all the examples.
@@ -253,22 +245,18 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         mwEventTypePanel = new JPanel();
         mwMainPanel.add(mwEventTypePanel);
         mwEventDataPanel = new JPanel();
-        mwEventDataPanel.setLayout(new BoxLayout(mwEventDataPanel,
-                BoxLayout.PAGE_AXIS));
+        mwEventDataPanel.setLayout(new BoxLayout(mwEventDataPanel, BoxLayout.PAGE_AXIS));
         mwMainPanel.add(mwEventDataPanel);
         mwButtonPanel = new JPanel();
         mwMainPanel.add(mwButtonPanel);
 
-        mwConfigPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Configuration"),
+        mwConfigPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Configuration"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        mwEventTypePanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Event type"),
+        mwEventTypePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Event type"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        mwEventDataPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Event data"),
+        mwEventDataPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Event data"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwServiceUrlLabel = new JLabel("Capture interface URL: ");
@@ -305,8 +293,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         /* set default to something simple and ISO 8601 compatible */
         Date now = new Date();
-        SimpleDateFormat dateTime = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss.SSS");
+        SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
         mwEventTimeTextField = new JTextField(dateTime.format(now));
 
         mwEventTimeTextField.setToolTipText(toolTipDate);
@@ -744,8 +731,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         ewButtonPanel = new JPanel();
         ewButtonPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
-        ewButtonPanel.setLayout(new BoxLayout(ewButtonPanel,
-                BoxLayout.LINE_AXIS));
+        ewButtonPanel.setLayout(new BoxLayout(ewButtonPanel, BoxLayout.LINE_AXIS));
 
         ewMainPanel.add(ewListPanel);
         ewMainPanel.add(ewButtonPanel);
@@ -809,8 +795,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         // check, if it is a JButton and second, if it's name starts with
         // "removeBizTransNumber<Number>".
         if (((JButton) e.getSource()).getName() != null
-                && ((JButton) e.getSource()).getName().startsWith(
-                        "removeBizTransNumber")) {
+                && ((JButton) e.getSource()).getName().startsWith("removeBizTransNumber")) {
             removeBizTransactionRow((JButton) e.getSource());
         }
     }
@@ -830,12 +815,9 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
                 /* set default to something simple and ISO 8601 compatible */
-                mwEventTimeTextField.setText(cal.get(Calendar.YEAR) + "-"
-                        + cal.get(Calendar.MONTH) + "-"
-                        + cal.get(Calendar.DAY_OF_MONTH) + "T"
-                        + cal.get(Calendar.HOUR_OF_DAY) + ":"
-                        + cal.get(Calendar.MINUTE) + ":"
-                        + cal.get(Calendar.SECOND));
+                mwEventTimeTextField.setText(cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-"
+                        + cal.get(Calendar.DAY_OF_MONTH) + "T" + cal.get(Calendar.HOUR_OF_DAY) + ":"
+                        + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND));
             } else {
                 mwEventTimeTextField.setText(ex.getEventTime());
             }
@@ -856,8 +838,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             int i = 0;
             for (BizTransaction transaction : bizTrans) {
                 addBizTransactionRow();
-                mwBizTransTypeFields.get(i).setText(
-                        transaction.getBizTransType());
+                mwBizTransTypeFields.get(i).setText(transaction.getBizTransType());
                 mwBizTransIDFields.get(i).setText(transaction.getBizTransID());
                 i++;
             }
@@ -921,16 +902,13 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             Element element = null;
 
             /* create empty document and fetch root */
-            document = impl.createDocument("urn:epcglobal:epcis:xsd:1",
-                    "epcis:EPCISDocument", null);
+            document = impl.createDocument("urn:epcglobal:epcis:xsd:1", "epcis:EPCISDocument", null);
             Element root = document.getDocumentElement();
 
             Date now = new Date();
-            SimpleDateFormat dateTime = new SimpleDateFormat(
-                    "yyyy-MM-dd'T'HH:mm:ss.SSS");
+            SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
             root.setAttribute("creationDate", dateTime.format(now));
-            root.setAttribute("xmlns:xsi",
-                    "http://www.w3.org/2001/XMLSchema-instance");
+            root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
             root.setAttribute("xmlns:epcis", "urn:epcglobal:epcis:xsd:1");
             root.setAttribute("schemaVersion", "1.0");
             element = document.createElement("EPCISBody");
@@ -945,10 +923,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
             /* eventTime */
             if (!addEventTime(document, root)) {
-                JOptionPane.showMessageDialog(frame,
-                        "Please specify the event time "
-                                + "(i.e. 2005-07-18T17:33:20.231)", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Please specify the event time "
+                        + "(i.e. 2005-07-18T17:33:20.231)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -956,8 +932,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
             if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("ObjectEvent")) {
                 if (!addEpcList(document, root)) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Please specify at least one EPC", "Error",
+                    JOptionPane.showMessageDialog(frame, "Please specify at least one EPC", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -968,17 +943,13 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
                 addBizLocation(document, root);
                 addBizTransactionList(document, root);
             } else if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("AggregationEvent")) {
-                if (!addParentId(document, root)
-                        && !mwActionComboBox.getSelectedItem().equals("OBSERVE")) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Because action is OBSERVE, it's required to "
-                                    + "specify a ParentID", "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                if (!addParentId(document, root) && !mwActionComboBox.getSelectedItem().equals("OBSERVE")) {
+                    JOptionPane.showMessageDialog(frame, "Because action is OBSERVE, it's required to "
+                            + "specify a ParentID", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (!addChildEpcList(document, root)) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Please specify at least one EPC", "Error",
+                    JOptionPane.showMessageDialog(frame, "Please specify at least one EPC", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -990,15 +961,13 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
                 addBizTransactionList(document, root);
             } else if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("QuantityEvent")) {
                 if (!addEpcClass(document, root)) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Please specify an EPC class (URI)", "Error",
+                    JOptionPane.showMessageDialog(frame, "Please specify an EPC class (URI)", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (!addQuantity(document, root)) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Please specify a quantity value (integer number)",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Please specify a quantity value (integer number)", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 addBizStep(document, root);
@@ -1008,16 +977,13 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
                 addBizTransactionList(document, root);
             } else if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("TransactionEvent")) {
                 if (!addBizTransactionList(document, root)) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Please specify at least one business "
-                                    + "transaction (ID, Type)", "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Please specify at least one business "
+                            + "transaction (ID, Type)", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 addParentId(document, root);
                 if (!addEpcList(document, root)) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Please specify at least one EPC", "Error",
+                    JOptionPane.showMessageDialog(frame, "Please specify at least one EPC", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -1045,47 +1011,42 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             dwOutputTextArea.append(postData);
 
             /* connect the service, write out xml and get response */
-            String response = client.capture(postData);
+            int response = client.capture(postData);
 
-            if (response.contains("200 OK")) {
-                JOptionPane.showMessageDialog(frame, response, "Success",
+            if (response == 200) {
+                JOptionPane.showMessageDialog(frame, "Capture request succeeded.", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(frame, response, "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Capture request failed (HTTP response code " + response + ").",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (MalformedURLException mfue) {
-            JOptionPane.showMessageDialog(frame, mfue.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, mfue.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             StringWriter detailed = new StringWriter();
             PrintWriter pw = new PrintWriter(detailed);
             mfue.printStackTrace(pw);
             dwOutputTextArea.append(detailed.toString());
         } catch (IOException ioe) {
-            JOptionPane.showMessageDialog(frame, ioe.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             StringWriter detailed = new StringWriter();
             PrintWriter pw = new PrintWriter(detailed);
             ioe.printStackTrace(pw);
             dwOutputTextArea.append(detailed.toString());
         } catch (TransformerException te) {
-            JOptionPane.showMessageDialog(frame, te.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, te.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             StringWriter detailed = new StringWriter();
             PrintWriter pw = new PrintWriter(detailed);
             te.printStackTrace(pw);
             dwOutputTextArea.append(detailed.toString());
         } catch (ParserConfigurationException pce) {
-            JOptionPane.showMessageDialog(frame, pce.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, pce.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             StringWriter detailed = new StringWriter();
             PrintWriter pw = new PrintWriter(detailed);
             pce.printStackTrace(pw);
             dwOutputTextArea.append(detailed.toString());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             StringWriter detailed = new StringWriter();
             PrintWriter pw = new PrintWriter(detailed);
             e.printStackTrace(pw);
@@ -1177,8 +1138,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addBizTransactionList(final Document document,
-            final Element root) {
+    private Boolean addBizTransactionList(final Document document, final Element root) {
         if (mwBizTransIDFields != null && mwBizTransIDFields.size() > 0
                 && !mwBizTransIDFields.get(0).getText().equals("")) {
             Element element;
@@ -1186,12 +1146,10 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             Element bizNode = null;
             int i = 0;
             for (JTextField j : mwBizTransIDFields) {
-                if (!j.getText().equals("")
-                        && !mwBizTransTypeFields.get(i).getText().equals("")) {
+                if (!j.getText().equals("") && !mwBizTransTypeFields.get(i).getText().equals("")) {
                     bizNode = document.createElement("bizTransaction");
                     bizNode.appendChild(document.createTextNode(j.getText()));
-                    bizNode.setAttribute("type",
-                            mwBizTransTypeFields.get(i).getText());
+                    bizNode.setAttribute("type", mwBizTransTypeFields.get(i).getText());
                     element.appendChild(bizNode);
                 }
                 i++;
@@ -1322,8 +1280,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             Element element;
             element = document.createElement("epcList");
             Element epcNode = null;
-            StringTokenizer st = new StringTokenizer(
-                    mwEpcListTextField.getText());
+            StringTokenizer st = new StringTokenizer(mwEpcListTextField.getText());
             while (st.hasMoreTokens()) {
                 epcNode = document.createElement("epc");
                 epcNode.appendChild(document.createTextNode(st.nextToken()));
@@ -1427,8 +1384,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            The JButton which generated the event.
      */
     private void removeBizTransactionRow(final JButton button) {
-        int toRemove = Integer.parseInt(button.getName().substring(
-                button.getName().length() - 1, button.getName().length()));
+        int toRemove = Integer.parseInt(button.getName().substring(button.getName().length() - 1,
+                button.getName().length()));
         mwBizTransTypeFields.remove(toRemove);
         mwBizTransIDFields.remove(toRemove);
         mwBizTransButtons.remove(toRemove);
@@ -1580,8 +1537,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("DEMO 4: Reader and other products are "
-                    + "aggregated onto a pallet.");
+            ex.setDescription("DEMO 4: Reader and other products are " + "aggregated onto a pallet.");
             ex.setType(1);
             ex.setAction(0);
             ex.setEventTime("2006-09-20T08:55:04");
@@ -1589,48 +1545,38 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setDisposition("urn:accada:demo:disp:fmcg:readyforpickup");
             ex.setBizLocation("urn:accada:demo:fmcg:ssl:0037000.00729.450");
             ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037000.00729.450,9");
-            ex.setBizTransaction("urn:accada:demo:fmcg:btt:po",
-                    "http://transaction.accada.org/po/12345678");
+            ex.setBizTransaction("urn:accada:demo:fmcg:btt:po", "http://transaction.accada.org/po/12345678");
             ex.setParentID("urn:x:bar:5:036544:007325");
-            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123780.7788 "
-                    + "urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028"
-                    + "urn:epc:id:sgtin:0057000.123430.2029");
+            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123780.7788 " + "urn:epc:id:sgtin:0057000.123430.2027 "
+                    + "urn:epc:id:sgtin:0057000.123430.2028" + "urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("DEMO 5: Tag has been read "
-                    + "at port of Kaohsiung together with other tags");
+            ex.setDescription("DEMO 5: Tag has been read " + "at port of Kaohsiung together with other tags");
             ex.setType(0);
             ex.setEventTime("2006-09-20T10:33:31.116");
             ex.setAction(1);
             ex.setBizStep("urn:accada:demo:bizstep:fmcg:shipment");
             ex.setBizLocation("urn:accada:demo:RepublicOfChina:Kaohsiung");
             ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037200.00729.210,414");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 "
-                    + "urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028"
-                    + "urn:epc:id:sgtin:0057000.123430.2029");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 " + "urn:epc:id:sgtin:0057000.123430.2027 "
+                    + "urn:epc:id:sgtin:0057000.123430.2028" + "urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("DEMO 6: Tag has been read "
-                    + "at port of Rotterdam together with other tags");
+            ex.setDescription("DEMO 6: Tag has been read " + "at port of Rotterdam together with other tags");
             ex.setType(0);
             ex.setEventTime("2006-09-20T12:33:31.116");
             ex.setAction(1);
             ex.setBizStep("urn:accada:demo:bizstep:fmcg:shipment");
             ex.setBizLocation("urn:accada:demo:Netherlands:Rotterdam");
             ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037200.00729.210,234");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 "
-                    + "urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028"
-                    + "urn:epc:id:sgtin:0057000.123430.2029");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 " + "urn:epc:id:sgtin:0057000.123430.2027 "
+                    + "urn:epc:id:sgtin:0057000.123430.2028" + "urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Object has passed a reader "
-                    + "during the manufacturing process");
+            ex.setDescription("Object has passed a reader " + "during the manufacturing process");
             ex.setType(0);
             ex.setEventTime("2006-04-03T20:33:31.116");
             ex.setAction(1);
@@ -1653,8 +1599,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Two pallets (identified by EPCs) have been "
-                    + "loaded onto a truck");
+            ex.setDescription("Two pallets (identified by EPCs) have been " + "loaded onto a truck");
             ex.setType(0);
             ex.setEventTime("2006-05-09T21:01:44");
             ex.setAction(1);
@@ -1662,10 +1607,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setDisposition("urn:epcglobal:epcis:disp:fmcg:transit");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0037000.00729.215");
             ex.setReadPoint("urn:epcglobal:fmcg:ssl:0037000.00729.215,803");
-            ex.setEpcList("urn:epc:id:sgtin:0034000.987650.2686 "
-                    + "urn:epc:id:sgtin:0034000.987650.3542");
-            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po",
-                    "http://transaction.acme.com/po/12345678");
+            ex.setEpcList("urn:epc:id:sgtin:0034000.987650.2686 " + "urn:epc:id:sgtin:0034000.987650.3542");
+            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/po/12345678");
             examples.add(ex);
 
             ex = new CaptureEvent();
@@ -1681,8 +1624,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Three objects have been aggregated onto "
-                    + "a barcode-labeled pallet");
+            ex.setDescription("Three objects have been aggregated onto " + "a barcode-labeled pallet");
             ex.setType(1);
             ex.setAction(0);
             ex.setEventTime("2006-06-01T15:55:04");
@@ -1690,13 +1632,10 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setDisposition("urn:epcglobal:epcis:disp:fmcg:readyforpickup");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0037000.00729.450");
             ex.setReadPoint("urn:epcglobal:fmcg:ssl:0037000.00729.450,9");
-            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po",
-                    "http://transaction.acme.com/po/12345678");
-            ex.setBizTransaction("urn:epcglobal:fmcg:btt:asn",
-                    "http://transaction.acme.com/asn/1152");
+            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/po/12345678");
+            ex.setBizTransaction("urn:epcglobal:fmcg:btt:asn", "http://transaction.acme.com/asn/1152");
             ex.setParentID("urn:x:bar:5:036544:007325");
-            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123430.2025 "
-                    + "urn:epc:id:sgtin:0057000.123430.2027 "
+            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123430.2025 " + "urn:epc:id:sgtin:0057000.123430.2027 "
                     + "urn:epc:id:sgtin:0057000.123430.2028");
             examples.add(ex);
 
@@ -1707,10 +1646,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setEventTime("2006-06-05T09:26:06");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0066000.00101.032");
             ex.setReadPoint("urn:epcglobal:fmcg:ssl:0066000.00101.450,009");
-            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po",
-                    "http://trans.customer.com/po/E58J3Q");
-            ex.setBizTransaction("urn:epcglobal:fmcg:btt:asn",
-                    "http://transaction.acme.com/asn/1152");
+            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://trans.customer.com/po/E58J3Q");
+            ex.setBizTransaction("urn:epcglobal:fmcg:btt:asn", "http://transaction.acme.com/asn/1152");
             ex.setParentID("urn:x:bar:5:036544:007325");
             examples.add(ex);
 
@@ -1727,8 +1664,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("1000 pieces have been produced and can be found "
-                    + "at the production site");
+            ex.setDescription("1000 pieces have been produced and can be found " + "at the production site");
             ex.setType(2);
             ex.setEventTime("2006-08-10T18:14:00");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0037000.00729.450");
@@ -1738,15 +1674,12 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Order changed by customer - two "
-                    + "more objects added to transaction");
+            ex.setDescription("Order changed by customer - two " + "more objects added to transaction");
             ex.setType(3);
             ex.setEventTime("2006-08-18T11:53:01");
             ex.setAction(0);
-            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po",
-                    "http://transaction.acme.com/tracker/6677150");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 "
-                    + "urn:epc:id:sgtin:0057000.678930.5004");
+            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/tracker/6677150");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 " + "urn:epc:id:sgtin:0057000.678930.5004");
             examples.add(ex);
 
             ex = new CaptureEvent();
@@ -1754,10 +1687,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setType(3);
             ex.setEventTime("2006-08-20T07:03:51");
             ex.setAction(2);
-            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po",
-                    "http://transaction.acme.com/tracker/6677150");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 "
-                    + "urn:epc:id:sgtin:0057000.678930.5004");
+            ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/tracker/6677150");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 " + "urn:epc:id:sgtin:0057000.678930.5004");
             examples.add(ex);
         }
     }

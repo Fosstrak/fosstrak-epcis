@@ -21,6 +21,7 @@
 package org.accada.epcis.captureclient;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This is an interface to the EPCIS repository's Capture Operations Module.
@@ -30,15 +31,34 @@ import java.io.IOException;
 public interface CaptureInterface {
 
     /**
-     * Sends an EPCISEvent to the repository's Capture Operations Module.
+     * Sends a capture request to the repository's Capture Interface. The
+     * request must conform to the EPCISDocument schema.
      * 
      * @param event
-     *            An XML String containing the EPCISEvent.
-     * @return The response from the repository's Capture Operations Module.
+     *            An XML String containing the EPCISDocument.
+     * @return The HTTP response code from the repository's Capture Operations
+     *         Module. Code 200 indicates successfull capturing of the given
+     *         events.
      * @throws IOException
      *             If a problem with the given input or an error on the
      *             transport layer occurred.
      */
-    String capture(final String event) throws IOException;
+    int capture(final String event) throws IOException;
+
+    /**
+     * Sends a capture request to the repository's Capture Interface. The
+     * request must conform to the EPCISDocument schema.
+     * 
+     * @param event
+     *            An InputStream to read the XML containing the EPCISDocument
+     *            from.
+     * @return The HTTP response code from the repository's Capture Operations
+     *         Module. Code 200 indicates successfull capturing of the given
+     *         events.
+     * @throws IOException
+     *             If a problem with the given input or an error on the
+     *             transport layer occurred.
+     */
+    int capture(final InputStream event) throws IOException;
 
 }

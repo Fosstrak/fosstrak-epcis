@@ -44,7 +44,6 @@ public class EventFieldExtensionTest extends TestCase {
     private static String event1 = null;
     private static String event2 = null;
     private static String query = null;
-    private static String response = null;
 
     /**
      * Tests event fieldname extensions.
@@ -58,12 +57,12 @@ public class EventFieldExtensionTest extends TestCase {
 
         // send event1
         CaptureClient captureClient = new CaptureClient();
-        String resp = captureClient.capture(event1);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", resp);
+        int resp = captureClient.capture(event1);
+        assertEquals(200, resp);
 
         // send event2
         resp = captureClient.capture(event2);
-        assertEquals("HTTP/1.0 200 OK: Request succeeded.", resp);
+        assertEquals(200, resp);
 
         // send query
         QueryControlClient queryClient = new QueryControlClient();
@@ -77,7 +76,8 @@ public class EventFieldExtensionTest extends TestCase {
      */
     public void setUp() throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
+        sb
+                .append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
         sb.append("<EPCISBody>");
         sb.append("<EventList>");
         sb.append("<ObjectEvent>");
@@ -104,7 +104,8 @@ public class EventFieldExtensionTest extends TestCase {
         event1 = sb.toString();
 
         sb = new StringBuilder();
-        sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
+        sb
+                .append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2006-06-25T00:00:00Z\" schemaVersion=\"1.0\">");
         sb.append("<EPCISBody>");
         sb.append("<EventList>");
         sb.append("<ObjectEvent>");
@@ -157,7 +158,6 @@ public class EventFieldExtensionTest extends TestCase {
         sb.append("  <hls:temperature xmlns:hls=\"http://schema.hls.com/extension\">49</hls:temperature>\n");
         sb.append("  <hls:batchNumber xmlns:hls=\"http://schema.hls.com/extension\">2</hls:batchNumber>\n");
         sb.append("</ObjectEvent>");
-        response = sb.toString();
     }
 
     /**
