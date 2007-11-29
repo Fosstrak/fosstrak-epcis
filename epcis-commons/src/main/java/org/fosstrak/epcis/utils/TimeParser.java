@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * supported format is:
  * 
  * <pre>
- *             &amp;plusmnYYYY-MM-DDThh:mm:ss[.SSS]TZD
+ *             &amp;plusmnYYYY-MM-DDThh:mm:ss[.S]TZD
  * </pre>
  * 
  * where:
@@ -52,7 +52,7 @@ import org.apache.log4j.Logger;
  *             hh    = two digits of hour (00 through 23) (am/pm NOT allowed)
  *             mm    = two digits of minute (00 through 59)
  *             ss    = two digits of second (00 through 59)
- *             SSS   = optional three digits of milliseconds (000 through 999)
+ *             S     = optional one or more digits representing a decimal fraction of a second
  *             TZD   = time zone designator, Z for Zulu (i.e. UTC) or an offset from UTC
  *                     in the form of +hh:mm or -hh:mm
  * </pre>
@@ -127,8 +127,8 @@ public final class TimeParser {
      */
     private static Calendar parse(final String text) throws ParseException {
         String time = text;
-        if (time == null) {
-            throw new IllegalArgumentException("argument may not be null");
+        if (time == null || time.length() == 0) {
+            throw new IllegalArgumentException("Date/Time string may not be null or empty.");
         }
         time = time.trim();
         char sign;
@@ -147,6 +147,8 @@ public final class TimeParser {
         int year, month, day, hour, min, sec, ms;
         String tzID;
         char delimiter;
+
+        // parse year
         try {
             year = Integer.parseInt(time.substring(curPos, curPos + 4));
         } catch (NumberFormatException e) {
@@ -155,11 +157,13 @@ public final class TimeParser {
         }
         curPos += 4;
         delimiter = '-';
-        if (time.charAt(curPos) != delimiter) {
+        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
+
+        // parse month
         try {
             month = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -168,11 +172,13 @@ public final class TimeParser {
         }
         curPos += 2;
         delimiter = '-';
-        if (time.charAt(curPos) != delimiter) {
+        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
+
+        // parse day
         try {
             day = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -181,11 +187,13 @@ public final class TimeParser {
         }
         curPos += 2;
         delimiter = 'T';
-        if (time.charAt(curPos) != delimiter) {
+        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
+
+        // parse hours
         try {
             hour = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -194,11 +202,13 @@ public final class TimeParser {
         }
         curPos += 2;
         delimiter = ':';
-        if (time.charAt(curPos) != delimiter) {
+        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
+
+        // parse minute
         try {
             min = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -207,11 +217,13 @@ public final class TimeParser {
         }
         curPos += 2;
         delimiter = ':';
-        if (time.charAt(curPos) != delimiter) {
+        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
             throw new ParseException("expected delimiter '" + delimiter
                     + "' at position " + curPos, curPos);
         }
         curPos++;
+
+        // parse second
         try {
             sec = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
@@ -219,34 +231,57 @@ public final class TimeParser {
                     + e.getMessage(), curPos);
         }
         curPos += 2;
+
+        // parse millisecond
         delimiter = '.';
-        if (curPos < time.length() && time.charAt(curPos) == '.') {
+        if (curPos < time.length() && time.charAt(curPos) == delimiter) {
             curPos++;
             try {
-                ms = Integer.parseInt(time.substring(curPos, curPos + 3));
+                // read all digits (number of digits unknown)
+                StringBuffer millis = new StringBuffer();
+                while (curPos < time.length() && isNumeric(time.charAt(curPos))) {
+                    millis.append(time.charAt(curPos));
+                    curPos++;
+                }
+                // convert to milliseconds (max 3 digits)
+                if (millis.length() == 1) {
+                    ms = 100 * Integer.parseInt(millis.toString());
+                } else if (millis.length() == 2) {
+                    ms = 10 * Integer.parseInt(millis.toString());
+                } else if (millis.length() >= 3) {
+                    ms = Integer.parseInt(millis.substring(0, 3));
+                    if (millis.length() > 3) {
+                        // round
+                        if (Integer.parseInt(String.valueOf(millis.charAt(3))) >= 5) {
+                            ms++;
+                        }
+                    }
+                } else {
+                    ms = 0;
+                }
             } catch (NumberFormatException e) {
-                throw new ParseException("Millisecond (SSS) has wrong format: "
+                throw new ParseException("Millisecond (S) has wrong format: "
                         + e.getMessage(), curPos);
             }
-            curPos += 3;
         } else {
-            ms = new Integer(0);
+            ms = 0;
         }
-        // time zone designator (Z or +00:00 or -00:00)
+
+        // parse time zone designator (Z or +00:00 or -00:00)
         if (curPos < time.length()
                 && (time.charAt(curPos) == '+' || time.charAt(curPos) == '-')) {
             // offset to UTC specified in the format +00:00/-00:00
             tzID = "GMT" + time.substring(curPos);
         } else if (curPos < time.length() && time.substring(curPos).equals("Z")) {
-            tzID = "GMT";
+            tzID = "UTC";
         } else {
             // throw new ParseException("invalid time zone designator", curPos);
-            LOG.warn("No time zone designator found, using default 'GMT'");
-            tzID = "GMT";
+            LOG.warn("No time zone designator found, using default 'UTC'");
+            tzID = "UTC";
         }
 
         TimeZone tz = TimeZone.getTimeZone(tzID);
-        // verify id of returned time zone (getTimeZone defaults to "GMT")
+        // verify id of returned time zone (getTimeZone defaults to "UTC")
         if (!tz.getID().equals(tzID)) {
             throw new ParseException("invalid time zone '" + tzID + "'", curPos);
         }
@@ -370,4 +405,10 @@ public final class TimeParser {
         }
         return buf.toString();
     }
+
+    private static final boolean isNumeric(final char c) {
+        if ((c >= '0') && (c <= '9')) return true;
+        return false;
+    }
+
 }
