@@ -1085,12 +1085,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
                             + eventType + "_bizTrans`.bizTrans_id");
                     query.append("))");
 
-                } else if (paramName.equals("MATCH_epc")
-                        || paramName.equals("MATCH_parentID")
-                        || paramName.equals("MATCH_anyEPC")
-                        || paramName.equals("MATCH_epcClass")) {
-                    if ((paramName.equals("MATCH_epc") || paramName.equals("MATCH_anyEPC"))
-                            && !eventType.equals("QuantityEvent")) {
+                } else if (paramName.equals("MATCH_epc") || paramName.equals("MATCH_anyEPC")) {
+                    if (eventType.equals("QuantityEvent")) {
+                        // the parameter is not allowed for QuantityEvent,
+                        // exclude event from result set
+                        query.append(" AND 0 ");
+                    } else {
                         String[] epcs = ((ArrayOfString) paramValue).getString();
                         query.append(" AND (`event_");
                         query.append(eventType);
@@ -1103,24 +1103,37 @@ public class QueryOperationsModule implements EPCISServicePortType {
                             query.append("epc LIKE '" + val + "' OR ");
                         }
                         query.append("0))");
+                        if (paramName.equals("MATCH_anyEPC") && (eventType.equals("AggregationEvent")
+                                || eventType.equals("TransactionEvent"))) {
+                            // also look in parentID field
+                            query.append(" OR (parentID IN (");
+                            stringArrayToSQL(epcs, query, queryArgs);
+                            query.append("))");
+                        }
+                    }
 
-                    } else if ((paramName.equals("MATCH_parentID") || paramName.equals("MATCH_anyEPC"))
-                            && (eventType.equals("AggregationEvent") || eventType.equals("TransactionEvent"))) {
+                } else if (paramName.equals("MATCH_parentID")) {
+                    if (eventType.equals("AggregationEvent") || eventType.equals("TransactionEvent")) {
                         query.append(" AND (parentID IN (");
                         String[] epcs = ((ArrayOfString) paramValue).getString();
                         stringArrayToSQL(epcs, query, queryArgs);
                         query.append("))");
+                    } else {
+                        // the parameter is not allowed for other events,
+                        // exclude event from result set
+                        query.append(" AND 0 ");
+                    }
 
-                    } else if (paramName.equals("MATCH_epcClass")
-                            && eventType.equals("QuantityEvent")) {
+                } else if (paramName.equals("MATCH_epcClass")) {
+                    if (eventType.equals("QuantityEvent")) {
                         query.append(" AND (epcClass IN (");
                         query.append("SELECT id FROM `voc_EPCClass` WHERE uri IN (");
                         String[] epcs = ((ArrayOfString) paramValue).getString();
                         stringArrayToSQL(epcs, query, queryArgs);
                         query.append(")))");
-
                     } else {
-                        // the parameter is not allowed for this queryType
+                        // the parameter is not allowed for other events,
+                        // exclude event from result set
                         query.append(" AND 0 ");
                     }
 
@@ -1692,7 +1705,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     storedSubscription = new QuerySubscriptionTriggered(
                             subscrId, params, dest, exportifempty, initrectime,
                             new GregorianCalendar(), queryName,
-                            stringToUri(rs.getString("trigg")), sched);
+                            stringToUri(trigger), sched);
                 }
                 subscribedMap.put(subscrId, storedSubscription);
             } catch (SQLException e) {
