@@ -139,8 +139,9 @@ public class CaptureOperationsModule extends HttpServlet {
      * The TransactionEvent-query without data.
      */
     private final String transactionEventInsert = "INSERT INTO event_TransactionEvent ("
-            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action"
-            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
+            + "disposition, readPoint, bizLocation, action, parentID"
+            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The Connection to the database.
@@ -624,8 +625,8 @@ public class CaptureOperationsModule extends HttpServlet {
             // all other events have action
             ps.setString(8, action);
 
-            // AggregationEvent has additional field parentID
-            if (nodeName.equals("AggregationEvent")) {
+            // AggregationEvent and TransactionEvent have a parentID field
+            if (nodeName.equals("AggregationEvent") || nodeName.equals("TransactionEvent")) {
                 ps.setString(9, parentID);
             }
         }
