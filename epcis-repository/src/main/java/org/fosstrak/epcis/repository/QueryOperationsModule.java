@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import org.accada.epcis.soapapi.ActionType;
@@ -488,11 +487,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
             return null;
         }
 
-        // Calendar needed for converting timestamps
-        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        int offset = TimeZone.getDefault().getRawOffset()
-                + TimeZone.getDefault().getDSTSavings();
-
         // run the query and get all ObjectEvents
         ResultSet rs = executeStatement(objectEventQuery, maxQueryTime);
         checkQueryRows();
@@ -504,11 +498,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            objectEvent.setEventTime((Calendar) cal.clone());
+            objectEvent.setEventTime(TimeParser.convert(time));
             time = rs.getTimestamp("recordTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            objectEvent.setRecordTime((Calendar) cal.clone());
+            objectEvent.setRecordTime(TimeParser.convert(time));
             objectEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set action
@@ -579,11 +571,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
             return null;
         }
 
-        // Calendar needed for converting timestamps
-        Calendar cal = Calendar.getInstance();
-        int offset = TimeZone.getDefault().getRawOffset()
-                + TimeZone.getDefault().getDSTSavings();
-
         // run the query and get all AggregationEvents
         ResultSet rs = executeStatement(aggregationEventQuery, maxQueryTime);
         checkQueryRows();
@@ -595,11 +582,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            aggrEvent.setEventTime((Calendar) cal.clone());
+            aggrEvent.setEventTime(TimeParser.convert(time));
             time = rs.getTimestamp("recordTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            aggrEvent.setRecordTime((Calendar) cal.clone());
+            aggrEvent.setRecordTime(TimeParser.convert(time));
             aggrEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set action
@@ -670,11 +655,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
             return null;
         }
 
-        // Calendar needed for converting timestamps
-        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        int offset = TimeZone.getDefault().getRawOffset()
-                + TimeZone.getDefault().getDSTSavings();
-
         // run the query and get all QuantityEvents
         ResultSet rs = executeStatement(quantityEventQuery, maxQueryTime);
         checkQueryRows();
@@ -686,11 +666,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            quantEvent.setEventTime((Calendar) cal.clone());
+            quantEvent.setEventTime(TimeParser.convert(time));
             time = rs.getTimestamp("recordTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            quantEvent.setRecordTime((Calendar) cal.clone());
+            quantEvent.setRecordTime(TimeParser.convert(time));
             quantEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set EPCClass
@@ -759,11 +737,6 @@ public class QueryOperationsModule implements EPCISServicePortType {
             return null;
         }
 
-        // Calendar needed for converting timestamps
-        Calendar cal = Calendar.getInstance();
-        int offset = TimeZone.getDefault().getRawOffset()
-                + TimeZone.getDefault().getDSTSavings();
-
         // run the query and get all TransactionEvents
         ResultSet rs = executeStatement(transactionEventQuery, maxQueryTime);
         checkQueryRows();
@@ -775,11 +748,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            transEvent.setEventTime((Calendar) cal.clone());
+            transEvent.setEventTime(TimeParser.convert(time));
             time = rs.getTimestamp("recordTime");
-            cal.setTimeInMillis(time.getTime() + offset);
-            transEvent.setRecordTime((Calendar) cal.clone());
+            transEvent.setRecordTime(TimeParser.convert(time));
             transEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set action
@@ -983,10 +954,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     } else if (paramName.equals("LT_recordTime")) {
                         query.append(" AND (recordTime < ?) ");
                     }
-                    Calendar cal = (Calendar) paramValue;
-                    int offset = TimeZone.getDefault().getRawOffset()
-                            + TimeZone.getDefault().getDSTSavings();
-                    Timestamp ts = new Timestamp(cal.getTimeInMillis() - offset);
+                    Timestamp ts = TimeParser.convert((Calendar) paramValue);
                     queryArgs.add(ts.toString());
 
                 } else if (paramName.equals("EQ_action")) {

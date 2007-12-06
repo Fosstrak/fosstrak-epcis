@@ -508,9 +508,6 @@ public class CaptureOperationsModule extends HttpServlet {
                     LOG.debug("    eventTime in xml is '" + xmlTime + "'");
                     try {
                         eventTime = TimeParser.parseAsTimestamp(xmlTime);
-                        int offset = TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings();
-                        eventTime = new Timestamp(eventTime.getTime() - offset);
-
                     } catch (ParseException e) {
                         throw new SAXException("Invalid date/time (must be ISO8601).", e);
                     }
@@ -582,10 +579,9 @@ public class CaptureOperationsModule extends HttpServlet {
         // parameters 1-7 of the sql query are shared by all events
 
         ps.setTimestamp(1, eventTime);
-        // according to specification: if recordTime is ommitted we have to
-        // include the capturing time, i.e. current time
+        // according to the specification: recordTime is the time of capture
         ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-        // note: for the tests it is handy to set recordTime=eventTime
+        // note: for testing it is handy to set recordTime=eventTime
         // ps.setTimestamp(2, eventTime);
         ps.setString(3, eventTimeZoneOffset);
         if (bizStep != null) {
