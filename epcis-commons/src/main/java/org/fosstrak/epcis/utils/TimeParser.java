@@ -113,7 +113,7 @@ public final class TimeParser {
      */
     public static Timestamp parseAsTimestamp(final String text)
             throws ParseException {
-        return new Timestamp(parse(text).getTimeInMillis());
+        return convert(parse(text));
     }
 
     /**
@@ -334,9 +334,7 @@ public final class TimeParser {
      * @return The formatted date/time string.
      */
     public static String format(final Timestamp ts) {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.setTimeInMillis(ts.getTime());
-        return format(cal);
+        return format(convert(ts));
     }
 
     /**
@@ -409,6 +407,30 @@ public final class TimeParser {
     private static final boolean isNumeric(final char c) {
         if ((c >= '0') && (c <= '9')) return true;
         return false;
+    }
+
+    /**
+     * Converts an SQL timestamp value into a Calendar object.
+     * 
+     * @param ts
+     *            The java.sql.Timestamp to convert.
+     * @return The Calendar object representing the given timestamp.
+     */
+    public static Calendar convert(Timestamp ts) {
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        cal.setTimeInMillis(ts.getTime());
+        return cal;
+    }
+
+    /**
+     * Converts a Calendar object into an SQL Timestamp value.
+     * 
+     * @param cal
+     *            The Calendar object to convert.
+     * @return The java.sql.Timestamp representing the given Calendar value.
+     */
+    public static Timestamp convert(Calendar cal) {
+        return new Timestamp(cal.getTimeInMillis());
     }
 
 }
