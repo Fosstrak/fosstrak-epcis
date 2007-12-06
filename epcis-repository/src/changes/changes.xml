@@ -3,6 +3,21 @@
     <title>Changes epcis-repository</title>
   </properties>
   <body>
+    <release version="0.2.3" date="2007-12-10">
+      <action dev="steybem" type="fix" issue="1844046">
+        MATCH_anyEPC query did not match against URIs in the parentID field of
+        Transaction- and AggregationEvents.
+      </action>
+      <action dev="steybem" type="fix" issue="1844041">
+        parentID field of TransactionEvents was ignored in
+        CaptureOperationsModule.
+      </action>
+      <action dev="steybem" type="fix" issue="1789796">
+        Fixed storing and retrieving of time values to/from repository. Time
+        zone offset does not need to be subtracted/added from event time or
+        record time.
+      </action>
+    </release>
     <release version="0.2.2" date="2007-08-31">
       <action dev="steybem" type="fix" issue="1781884">
         HTTP Capture Interface in 0.2.1 was not EPCIS compliant. Fixed 
