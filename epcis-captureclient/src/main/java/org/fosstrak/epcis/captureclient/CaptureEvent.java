@@ -49,6 +49,11 @@ public class CaptureEvent {
     private String eventTime = null;
 
     /**
+     * The event time zone offset.
+     */
+    private String eventTimeZoneOffset = "+00:00";
+
+    /**
      * Action value. Not used for QuantityEvent.<br>
      * 0 = ADD<br>
      * 1 = OBSERVE<br>
@@ -161,6 +166,21 @@ public class CaptureEvent {
      */
     public String getEventTime() {
         return eventTime;
+    }
+
+    /**
+     * @param time
+     *            Sets the event time zone offset.
+     */
+    public void setEventTimeZoneOffset(final String timeZoneOffset) {
+        eventTimeZoneOffset = timeZoneOffset;
+    }
+
+    /**
+     * @return The time zone offset of the event.
+     */
+    public String getEventTimeZoneOffset() {
+        return eventTimeZoneOffset;
     }
 
     /**

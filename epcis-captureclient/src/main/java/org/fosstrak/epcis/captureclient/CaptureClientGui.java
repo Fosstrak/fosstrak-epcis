@@ -33,12 +33,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -77,11 +78,12 @@ import org.w3c.dom.Element;
  * creation of XML from the GUI data.
  * 
  * @author David Gubler
+ * @author Marco Steybe
  */
 public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
     /**
-     * The client thourgh which the EPCISEvents will be sent to the repository's
+     * The client through which the EPCISEvents will be sent to the repository's
      * Capture Operations Module.
      */
     private CaptureClient client;
@@ -89,7 +91,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     /**
      * The various tooltips.
      */
-    private final String toolTipDate = "Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.SSS";
+    private final String toolTipDate = "Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.SSSZ";
     private final String toolTipUri = "URI";
     private final String toolTipUris = "One or multiple URIs, separated by spaces";
     private final String toolTipInteger = "Integer number";
@@ -148,6 +150,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     /* the event time field */
     private JLabel mwEventTimeLabel;
     private JTextField mwEventTimeTextField;
+    private JLabel mwEventTimeZoneOffsetLabel;
+    private JTextField mwEventTimeZoneOffsetTextField;
 
     /* the action type drop-down box */
     private JLabel mwActionLabel;
@@ -288,15 +292,13 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         mwGenerateEventButton.addActionListener(this);
         mwButtonPanel.add(mwGenerateEventButton);
 
-        /* instanciate all event data input fields and descriptions */
-        mwEventTimeLabel = new JLabel("occured");
-
-        /* set default to something simple and ISO 8601 compatible */
-        Date now = new Date();
-        SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        mwEventTimeTextField = new JTextField(dateTime.format(now));
-
+        // instantiate all event data input fields, their default values and descriptions
+        mwEventTimeLabel = new JLabel("event time");
+        mwEventTimeTextField = new JTextField(format(Calendar.getInstance()));
         mwEventTimeTextField.setToolTipText(toolTipDate);
+
+        mwEventTimeZoneOffsetLabel = new JLabel("time zone offset");
+        mwEventTimeZoneOffsetTextField = new JTextField(getTimeZone(Calendar.getInstance()));
 
         mwActionLabel = new JLabel("action");
         mwActionComboBox = new JComboBox(actions);
@@ -392,6 +394,14 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 2;
         mwEventDataInputPanel.add(mwEpcListLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -399,7 +409,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 3;
         mwEventDataInputPanel.add(mwActionLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -407,7 +417,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = 4;
         mwEventDataInputPanel.add(mwBizStepLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -415,7 +425,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 4;
+        c.gridy = 5;
         mwEventDataInputPanel.add(mwDispositionLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -423,7 +433,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 5;
+        c.gridy = 6;
         mwEventDataInputPanel.add(mwReadPointLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -431,7 +441,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 7;
         mwEventDataInputPanel.add(mwBizLocationLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -439,7 +449,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 8;
         mwEventDataInputPanel.add(mwBizTransactionLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -467,6 +477,14 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 2;
         mwEventDataInputPanel.add(mwParentIDLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -474,7 +492,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 3;
         mwEventDataInputPanel.add(mwChildEPCsLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -482,7 +500,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = 4;
         mwEventDataInputPanel.add(mwActionLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -490,7 +508,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 4;
+        c.gridy = 5;
         mwEventDataInputPanel.add(mwBizStepLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -498,7 +516,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 5;
+        c.gridy = 6;
         mwEventDataInputPanel.add(mwDispositionLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -506,7 +524,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 7;
         mwEventDataInputPanel.add(mwReadPointLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -514,7 +532,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 8;
         mwEventDataInputPanel.add(mwBizLocationLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -522,7 +540,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 8;
+        c.gridy = 9;
         mwEventDataInputPanel.add(mwBizTransactionLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -550,6 +568,14 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 2;
         mwEventDataInputPanel.add(mwEpcClassLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -557,94 +583,11 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         c.weightx = 0;
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 3;
         mwEventDataInputPanel.add(mwQuantityLabel, c);
         c.weightx = 1;
         c.gridx = 1;
         mwEventDataInputPanel.add(mwQuantityTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 3;
-        mwEventDataInputPanel.add(mwBizStepLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizStepTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 4;
-        mwEventDataInputPanel.add(mwDispositionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwDispositionTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 5;
-        mwEventDataInputPanel.add(mwReadPointLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwReadPointTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 6;
-        mwEventDataInputPanel.add(mwBizLocationLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizLocationTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 7;
-        mwEventDataInputPanel.add(mwBizTransactionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizTransactionPanel, c);
-    }
-
-    /**
-     * Show user input elements for transaction events.
-     */
-    private void eventDataPanelTransactionEvent() {
-        mwEventDataInputPanel.removeAll();
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10, 5, 5, 0);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 0;
-        mwEventDataInputPanel.add(mwEventTimeLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEventTimeTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 1;
-        mwEventDataInputPanel.add(mwParentIDLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwParentIDTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 2;
-        mwEventDataInputPanel.add(mwEpcListLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEpcListTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 3;
-        mwEventDataInputPanel.add(mwActionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwActionComboBox, c);
 
         c.weightx = 0;
         c.gridx = 0;
@@ -681,6 +624,97 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 8;
+        mwEventDataInputPanel.add(mwBizTransactionLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwBizTransactionPanel, c);
+    }
+
+    /**
+     * Show user input elements for transaction events.
+     */
+    private void eventDataPanelTransactionEvent() {
+        mwEventDataInputPanel.removeAll();
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 5, 5, 0);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 0;
+        mwEventDataInputPanel.add(mwEventTimeLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwEventTimeTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 2;
+        mwEventDataInputPanel.add(mwParentIDLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwParentIDTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 3;
+        mwEventDataInputPanel.add(mwEpcListLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwEpcListTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 4;
+        mwEventDataInputPanel.add(mwActionLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwActionComboBox, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 5;
+        mwEventDataInputPanel.add(mwBizStepLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwBizStepTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 6;
+        mwEventDataInputPanel.add(mwDispositionLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwDispositionTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 7;
+        mwEventDataInputPanel.add(mwReadPointLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwReadPointTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 8;
+        mwEventDataInputPanel.add(mwBizLocationLabel, c);
+        c.weightx = 1;
+        c.gridx = 1;
+        mwEventDataInputPanel.add(mwBizLocationTextField, c);
+
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 9;
         mwEventDataInputPanel.add(mwBizTransactionLabel, c);
         c.weightx = 1;
         c.gridx = 1;
@@ -809,18 +843,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         if (selected >= 0) {
             CaptureEvent ex = (CaptureEvent) exampleEvents.examples.get(selected);
 
-            if (ex.getEventTime() == null) {
-                /* set eventTime to current time */
-                java.util.Date now = new java.util.Date();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(now);
-                /* set default to something simple and ISO 8601 compatible */
-                mwEventTimeTextField.setText(cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-"
-                        + cal.get(Calendar.DAY_OF_MONTH) + "T" + cal.get(Calendar.HOUR_OF_DAY) + ":"
-                        + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND));
-            } else {
-                mwEventTimeTextField.setText(ex.getEventTime());
-            }
+            mwEventTimeTextField.setText(ex.getEventTime());
+            mwEventTimeZoneOffsetTextField.setText(ex.getEventTimeZoneOffset());
             if (ex.getAction() >= 0 && ex.getAction() <= 3) {
                 mwActionComboBox.setSelectedIndex(ex.getAction());
             }
@@ -905,9 +929,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             document = impl.createDocument("urn:epcglobal:epcis:xsd:1", "epcis:EPCISDocument", null);
             Element root = document.getDocumentElement();
 
-            Date now = new Date();
-            SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-            root.setAttribute("creationDate", dateTime.format(now));
+            root.setAttribute("creationDate", format(Calendar.getInstance()));
             root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
             root.setAttribute("xmlns:epcis", "urn:epcglobal:epcis:xsd:1");
             root.setAttribute("schemaVersion", "1.0");
@@ -921,14 +943,21 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             root.appendChild(element);
             root = element;
 
-            /* eventTime */
+            // eventTime
             if (!addEventTime(document, root)) {
                 JOptionPane.showMessageDialog(frame, "Please specify the event time "
-                        + "(i.e. 2005-07-18T17:33:20.231)", "Error", JOptionPane.ERROR_MESSAGE);
+                        + "(e.g. 2005-07-18T17:33:20.231Z)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // record Time is set by the capture-Interface
+            // eventTimeZoneOffset
+            if (!addEventTimeZoneOffset(document, root)) {
+                JOptionPane.showMessageDialog(frame, "Please specify the event timezone offset "
+                        + "(e.g. +00:00 or -06:30)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // recordTime is set by the capture-Interface
 
             if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("ObjectEvent")) {
                 if (!addEpcList(document, root)) {
@@ -1064,7 +1093,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            The element, where it has to be added.
      * @return If the value had been set in the GUI.
      */
-    private Boolean addQuantity(final Document document, final Element root) {
+    private boolean addQuantity(final Document document, final Element root) {
         Element element;
         try {
             Integer n = new Integer(mwQuantityTextField.getText());
@@ -1087,7 +1116,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            The element, where it has to be added.
      * @return If the value had been set in the GUI.
      */
-    private Boolean addEpcClass(final Document document, final Element root) {
+    private boolean addEpcClass(final Document document, final Element root) {
         if (!mwEpcClassTextField.getText().equals("")) {
             Element element;
             element = document.createElement("epcClass");
@@ -1109,7 +1138,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addChildEpcList(final Document document, final Element root) {
+    private boolean addChildEpcList(final Document document, final Element root) {
         if (!mwChildEPCsTextField.getText().equals("")) {
             Element element;
             element = document.createElement("childEPCs");
@@ -1138,7 +1167,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addBizTransactionList(final Document document, final Element root) {
+    private boolean addBizTransactionList(final Document document, final Element root) {
         if (mwBizTransIDFields != null && mwBizTransIDFields.size() > 0
                 && !mwBizTransIDFields.get(0).getText().equals("")) {
             Element element;
@@ -1170,7 +1199,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addBizLocation(final Document document, final Element root) {
+    private boolean addBizLocation(final Document document, final Element root) {
         if (!mwBizLocationTextField.getText().equals("")) {
             Element element;
             element = document.createElement("bizLocation");
@@ -1193,7 +1222,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addReadPoint(final Document document, final Element root) {
+    private boolean addReadPoint(final Document document, final Element root) {
         if (!mwReadPointTextField.getText().equals("")) {
             Element element;
             element = document.createElement("readPoint");
@@ -1216,7 +1245,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addDisposition(final Document document, final Element root) {
+    private boolean addDisposition(final Document document, final Element root) {
         if (!mwDispositionTextField.getText().equals("")) {
             Element element;
             element = document.createElement("disposition");
@@ -1237,7 +1266,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addBizStep(final Document document, final Element root) {
+    private boolean addBizStep(final Document document, final Element root) {
         if (!mwBizStepTextField.getText().equals("")) {
             Element element;
             element = document.createElement("bizStep");
@@ -1275,7 +1304,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addEpcList(final Document document, final Element root) {
+    private boolean addEpcList(final Document document, final Element root) {
         if (!mwEpcListTextField.getText().equals("")) {
             Element element;
             element = document.createElement("epcList");
@@ -1304,7 +1333,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addParentId(final Document document, final Element root) {
+    private boolean addParentId(final Document document, final Element root) {
         if (!mwParentIDTextField.getText().equals("")) {
             Element element;
             element = document.createElement("parentID");
@@ -1325,14 +1354,31 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            the element, where it has to be added
      * @return if the value had been set in the GUI
      */
-    private Boolean addEventTime(final Document document, final Element root) {
+    private boolean addEventTime(final Document document, final Element root) {
         if (!mwEventTimeTextField.getText().equals("")) {
             Element element;
             element = document.createElement("eventTime");
             element.appendChild(document.createTextNode(mwEventTimeTextField.getText()));
             root.appendChild(element);
-            element = document.createElement("eventTimeZoneOffset");
-            element.appendChild(document.createTextNode("+01:00"));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Adds the TimeZone offset of the Event to the XML-File. Required for all Events.
+     * 
+     * @param document
+     *            the DOM-Tree where is has to inserted
+     * @param root
+     *            the element, where it has to be added
+     * @return if the value had been set in the GUI
+     */
+    private boolean addEventTimeZoneOffset(final Document document, final Element root) {
+        if (!mwEventTimeZoneOffsetTextField.getText().equals("")) {
+            Element element = document.createElement("eventTimeZoneOffset");
+            element.appendChild(document.createTextNode(mwEventTimeZoneOffsetTextField.getText()));
             root.appendChild(element);
             return true;
         } else {
@@ -1504,7 +1550,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             CaptureEvent ex = new CaptureEvent();
             ex.setDescription("DEMO 1: Prototype has been assigned a new EPC");
             ex.setType(0);
-            ex.setEventTime("2006-09-20T06:36:17");
+            ex.setEventTime("2006-09-20T06:36:17Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(0);
             ex.setBizStep("urn:accada:demo:bizstep:fmcg:production");
             ex.setDisposition("urn:accada:demo:disp:fmcg:pendingQA");
@@ -1516,7 +1563,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex = new CaptureEvent();
             ex.setDescription("DEMO 2: Prototype passed reader in QA lab");
             ex.setType(0);
-            ex.setEventTime("2006-09-20T07:33:31.116");
+            ex.setEventTime("2006-09-20T07:33:31.116Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
             ex.setBizStep("urn:accada:demo:bizstep:fmcg:production");
             ex.setBizLocation("urn:accada:demo:fmcg:ssl:0037000.00729.210");
@@ -1527,7 +1575,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex = new CaptureEvent();
             ex.setDescription("DEMO 3: Prototype finished QA process.");
             ex.setType(3);
-            ex.setEventTime("2006-09-20T07:53:01");
+            ex.setEventTime("2006-09-20T07:53:01Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(0);
             ex.setBizTransaction("urn:accada:demo:biztrans:fmcg:QApassed",
                     "http://demo.accada.org/QAtracker/q3432q4324");
@@ -1537,48 +1586,52 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("DEMO 4: Reader and other products are " + "aggregated onto a pallet.");
+            ex.setDescription("DEMO 4: Reader and other products are aggregated onto a pallet.");
             ex.setType(1);
             ex.setAction(0);
-            ex.setEventTime("2006-09-20T08:55:04");
+            ex.setEventTime("2006-09-20T08:55:04Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setBizStep("urn:accada:demo:bizstep:fmcg:pickandpack");
             ex.setDisposition("urn:accada:demo:disp:fmcg:readyforpickup");
             ex.setBizLocation("urn:accada:demo:fmcg:ssl:0037000.00729.450");
             ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037000.00729.450,9");
             ex.setBizTransaction("urn:accada:demo:fmcg:btt:po", "http://transaction.accada.org/po/12345678");
             ex.setParentID("urn:x:bar:5:036544:007325");
-            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123780.7788 " + "urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028" + "urn:epc:id:sgtin:0057000.123430.2029");
+            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123780.7788 urn:epc:id:sgtin:0057000.123430.2027 "
+                    + "urn:epc:id:sgtin:0057000.123430.2028 urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("DEMO 5: Tag has been read " + "at port of Kaohsiung together with other tags");
+            ex.setDescription("DEMO 5: Tag has been read at port of Kaohsiung together with other tags");
             ex.setType(0);
-            ex.setEventTime("2006-09-20T10:33:31.116");
+            ex.setEventTime("2006-09-20T10:33:31.116Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
             ex.setBizStep("urn:accada:demo:bizstep:fmcg:shipment");
             ex.setBizLocation("urn:accada:demo:RepublicOfChina:Kaohsiung");
             ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037200.00729.210,414");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 " + "urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028" + "urn:epc:id:sgtin:0057000.123430.2029");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 urn:epc:id:sgtin:0057000.123430.2027 "
+                    + "urn:epc:id:sgtin:0057000.123430.2028 urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("DEMO 6: Tag has been read " + "at port of Rotterdam together with other tags");
+            ex.setDescription("DEMO 6: Tag has been read at port of Rotterdam together with other tags");
             ex.setType(0);
-            ex.setEventTime("2006-09-20T12:33:31.116");
+            ex.setEventTime("2006-09-20T12:33:31.116Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
             ex.setBizStep("urn:accada:demo:bizstep:fmcg:shipment");
             ex.setBizLocation("urn:accada:demo:Netherlands:Rotterdam");
             ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037200.00729.210,234");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 " + "urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028" + "urn:epc:id:sgtin:0057000.123430.2029");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 urn:epc:id:sgtin:0057000.123430.2027 "
+                    + "urn:epc:id:sgtin:0057000.123430.2028 urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Object has passed a reader " + "during the manufacturing process");
+            ex.setDescription("Object has passed a reader during the manufacturing process");
             ex.setType(0);
-            ex.setEventTime("2006-04-03T20:33:31.116");
+            ex.setEventTime("2006-04-03T20:33:31.116Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
             ex.setBizStep("urn:epcglobal:epcis:bizstep:fmcg:production");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0037000.00729.210");
@@ -1589,7 +1642,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex = new CaptureEvent();
             ex.setDescription("An object has been assigned a new EPC");
             ex.setType(0);
-            ex.setEventTime("2006-04-03T22:36:17");
+            ex.setEventTime("2006-04-03T22:36:17Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(0);
             ex.setBizStep("urn:epcglobal:epcis:bizstep:fmcg:production");
             ex.setDisposition("urn:epcglobal:epcis:disp:fmcg:readyforuse");
@@ -1599,22 +1653,24 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Two pallets (identified by EPCs) have been " + "loaded onto a truck");
+            ex.setDescription("Two pallets (identified by EPCs) have been loaded onto a truck");
             ex.setType(0);
-            ex.setEventTime("2006-05-09T21:01:44");
+            ex.setEventTime("2006-05-09T21:01:44Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
             ex.setBizStep("urn:epcglobal:epcis:bizstep:fmcg:loading");
             ex.setDisposition("urn:epcglobal:epcis:disp:fmcg:transit");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0037000.00729.215");
             ex.setReadPoint("urn:epcglobal:fmcg:ssl:0037000.00729.215,803");
-            ex.setEpcList("urn:epc:id:sgtin:0034000.987650.2686 " + "urn:epc:id:sgtin:0034000.987650.3542");
+            ex.setEpcList("urn:epc:id:sgtin:0034000.987650.2686 urn:epc:id:sgtin:0034000.987650.3542");
             ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/po/12345678");
             examples.add(ex);
 
             ex = new CaptureEvent();
             ex.setDescription("An object has arrived for repair");
             ex.setType(0);
-            ex.setEventTime("2006-05-10T04:50:35");
+            ex.setEventTime("2006-05-10T04:50:35Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
             ex.setBizStep("urn:epcglobal:epcis:bizstep:fmcg:received");
             ex.setDisposition("urn:epcglobal:epcis:disp:fmcg:inrepair");
@@ -1624,10 +1680,11 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Three objects have been aggregated onto " + "a barcode-labeled pallet");
+            ex.setDescription("Three objects have been aggregated onto a barcode-labeled pallet");
             ex.setType(1);
             ex.setAction(0);
-            ex.setEventTime("2006-06-01T15:55:04");
+            ex.setEventTime("2006-06-01T15:55:04Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setBizStep("urn:epcglobal:epcis:bizstep:fmcg:pickandpack");
             ex.setDisposition("urn:epcglobal:epcis:disp:fmcg:readyforpickup");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0037000.00729.450");
@@ -1635,7 +1692,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/po/12345678");
             ex.setBizTransaction("urn:epcglobal:fmcg:btt:asn", "http://transaction.acme.com/asn/1152");
             ex.setParentID("urn:x:bar:5:036544:007325");
-            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123430.2025 " + "urn:epc:id:sgtin:0057000.123430.2027 "
+            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123430.2025 urn:epc:id:sgtin:0057000.123430.2027 "
                     + "urn:epc:id:sgtin:0057000.123430.2028");
             examples.add(ex);
 
@@ -1643,7 +1700,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setDescription("Aggregation ended at customer's site");
             ex.setType(1);
             ex.setAction(2);
-            ex.setEventTime("2006-06-05T09:26:06");
+            ex.setEventTime("2006-06-05T09:26:06Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0066000.00101.032");
             ex.setReadPoint("urn:epcglobal:fmcg:ssl:0066000.00101.450,009");
             ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://trans.customer.com/po/E58J3Q");
@@ -1654,7 +1712,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex = new CaptureEvent();
             ex.setDescription("Physical inventory count: 67 parts counted");
             ex.setType(2);
-            ex.setEventTime("2006-01-15T16:15:31");
+            ex.setEventTime("2006-01-15T16:15:31Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setBizStep("urn:epcglobal:epcis:bizstep:fmcg:physinv");
             ex.setDisposition("urn:epcglobal:epcis:disp:fmcg:readyforuse");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0066000.00102.007");
@@ -1664,9 +1723,10 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("1000 pieces have been produced and can be found " + "at the production site");
+            ex.setDescription("1000 pieces have been produced and can be found at the production site");
             ex.setType(2);
-            ex.setEventTime("2006-08-10T18:14:00");
+            ex.setEventTime("2006-08-10T18:14:00Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setBizLocation("urn:epcglobal:fmcg:ssl:0037000.00729.450");
             ex.setReadPoint("urn:epcglobal:fmcg:ssl:0037000.00729.451,2");
             ex.setEpcClass("urn:epc:id:sgtin:0069000.919923");
@@ -1674,23 +1734,109 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             examples.add(ex);
 
             ex = new CaptureEvent();
-            ex.setDescription("Order changed by customer - two " + "more objects added to transaction");
+            ex.setDescription("Order changed by customer - two more objects added to transaction");
             ex.setType(3);
-            ex.setEventTime("2006-08-18T11:53:01");
+            ex.setEventTime("2006-08-18T11:53:01Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(0);
             ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/tracker/6677150");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 " + "urn:epc:id:sgtin:0057000.678930.5004");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 urn:epc:id:sgtin:0057000.678930.5004");
             examples.add(ex);
 
             ex = new CaptureEvent();
             ex.setDescription("Transaction is finished");
             ex.setType(3);
-            ex.setEventTime("2006-08-20T07:03:51");
+            ex.setEventTime("2006-08-20T07:03:51Z");
+            ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(2);
             ex.setBizTransaction("urn:epcglobal:fmcg:btt:po", "http://transaction.acme.com/tracker/6677150");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 " + "urn:epc:id:sgtin:0057000.678930.5004");
+            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 urn:epc:id:sgtin:0057000.678930.5004");
             examples.add(ex);
         }
+    }
+
+    /**
+     * Miscellaneous numeric formats used in formatting.
+     */
+    private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
+    private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
+    private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
+
+    /**
+     * Formats a <code>Calendar</code> value into an ISO8601-compliant
+     * date/time string.
+     * 
+     * @param cal
+     *            The time value to be formatted into a date/time string.
+     * @return The formatted date/time string.
+     */
+    private static String format(final Calendar cal) {
+        if (cal == null) {
+            throw new IllegalArgumentException("argument can not be null");
+        }
+
+        // determine era and adjust year if necessary
+        int year = cal.get(Calendar.YEAR);
+        if (cal.isSet(Calendar.ERA)
+                && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
+            /**
+             * calculate year using astronomical system: year n BCE =>
+             * astronomical year -n + 1
+             */
+            year = 0 - year + 1;
+        }
+
+        /**
+         * the format of the date/time string is: YYYY-MM-DDThh:mm:ss.SSSTZD
+         * note that we cannot use java.text.SimpleDateFormat for formatting
+         * because it can't handle years <= 0 and TZD's
+         */
+        StringBuffer buf = new StringBuffer();
+        // year ([-]YYYY)
+        buf.append(XXXX_FORMAT.format(year));
+        buf.append('-');
+        // month (MM)
+        buf.append(XX_FORMAT.format(cal.get(Calendar.MONTH) + 1));
+        buf.append('-');
+        // day (DD)
+        buf.append(XX_FORMAT.format(cal.get(Calendar.DAY_OF_MONTH)));
+        buf.append('T');
+        // hour (hh)
+        buf.append(XX_FORMAT.format(cal.get(Calendar.HOUR_OF_DAY)));
+        buf.append(':');
+        // minute (mm)
+        buf.append(XX_FORMAT.format(cal.get(Calendar.MINUTE)));
+        buf.append(':');
+        // second (ss)
+        buf.append(XX_FORMAT.format(cal.get(Calendar.SECOND)));
+        buf.append('.');
+        // millisecond (SSS)
+        buf.append(XXX_FORMAT.format(cal.get(Calendar.MILLISECOND)));
+        // time zone designator (+/-hh:mm)
+        buf.append(getTimeZone(cal));
+        return buf.toString();
+    }
+
+    /**
+     * Returns the time zone designator in a ISO6601-compliant format from the
+     * given <code>Calendar</code> value.
+     * 
+     * @param cal
+     *            The Calendar to be formatted.
+     * @return The time zone designator from the given Calendar.
+     */
+    private static String getTimeZone(final Calendar cal) {
+        StringBuffer buf = new StringBuffer();
+        TimeZone tz = cal.getTimeZone();
+        // determine offset of timezone from UTC (incl. daylight saving)
+        int offset = tz.getOffset(cal.getTimeInMillis());
+        int hours = Math.abs((offset / (60 * 1000)) / 60);
+        int minutes = Math.abs((offset / (60 * 1000)) % 60);
+        buf.append(offset < 0 ? '-' : '+');
+        buf.append(XX_FORMAT.format(hours));
+        buf.append(':');
+        buf.append(XX_FORMAT.format(minutes));
+        return buf.toString();
     }
 
     /**
