@@ -58,7 +58,7 @@ package org.accada.epcis.queryclient;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -76,6 +76,7 @@ import org.accada.epcis.soapapi.QueryParam;
 import org.accada.epcis.soapapi.QueryResults;
 import org.accada.epcis.soapapi.Subscribe;
 import org.accada.epcis.soapapi.Unsubscribe;
+import org.accada.epcis.utils.TimeParser;
 
 /**
  * Implements a Class to interface with the axis stubs for the EPCIS Query
@@ -129,15 +130,16 @@ public class QueryClientGuiHelper {
      * Converts the values in a calendar object into a nicely formatted string.
      * 
      * @param cal
-     *            with the Calender-Date
+     *            with the Calendar-Date
      * @return String
      */
     private String prettyStringCalendar(final Calendar cal) {
         if (cal == null) {
             return null;
         }
-        Date date = cal.getTime();
-        return date.toString();
+        // set to current timezone
+        cal.setTimeZone(TimeZone.getDefault());
+        return TimeParser.format(cal);
     }
 
     /**

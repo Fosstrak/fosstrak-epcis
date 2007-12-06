@@ -35,10 +35,8 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -69,6 +67,7 @@ import org.accada.epcis.soapapi.QueryParam;
 import org.accada.epcis.soapapi.QuerySchedule;
 import org.accada.epcis.soapapi.Subscribe;
 import org.accada.epcis.soapapi.SubscriptionControls;
+import org.accada.epcis.utils.TimeParser;
 import org.apache.axis.AxisFault;
 import org.apache.axis.types.URI;
 
@@ -112,7 +111,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     };
 
     /**
-     * Contains the various choices for the query parameterers in a human
+     * Contains the various choices for the query parameters in a human
      * readable form.
      */
     private String[] queryParameterUsertext;
@@ -121,13 +120,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * Contains the data for the result table.
      */
     private Object[][] data = {};
-
-    /**
-     * ISO 8601 SimpleDateFormat. Use it like this for current time:
-     * isoDateFormat.format(now)
-     */
-    private final SimpleDateFormat isoDateFormat = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /**
      * The endpoint URL for the query service.
@@ -344,7 +336,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sss");
+        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sssZ");
         newEntry.setParamType(ParameterType.Time);
         newEntry.setQueryText("GE_eventTime");
         newEntry.setRequired(false);
@@ -353,7 +345,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sss");
+        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sssZ");
         newEntry.setParamType(ParameterType.Time);
         newEntry.setQueryText("LT_eventTime");
         newEntry.setRequired(false);
@@ -362,7 +354,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sss");
+        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sssZ");
         newEntry.setParamType(ParameterType.Time);
         newEntry.setQueryText("GE_recordTime");
         newEntry.setRequired(false);
@@ -371,7 +363,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sss");
+        newEntry.setDescription("Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.sssZ");
         newEntry.setParamType(ParameterType.Time);
         newEntry.setQueryText("LT_recordTime");
         newEntry.setRequired(false);
@@ -593,7 +585,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
 
         queryParameterUsertext = new String[queryParamsUserText.size()];
         int i = 0;
-        for (Iterator it = queryParamsUserText.keySet().iterator(); it.hasNext();) {
+        for (Iterator<String> it = queryParamsUserText.keySet().iterator(); it.hasNext();) {
             queryParameterUsertext[i] = (String) it.next();
             i++;
         }
@@ -831,10 +823,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         c.gridx = 1;
         c.gridy = 2;
         c.gridwidth = 6;
-        Date now = new Date();
-        SimpleDateFormat dateTime = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss.SSS");
-        mwInitRecTimeField = new JTextField(dateTime.format(now), 40);
+        Calendar cal = Calendar.getInstance();
+        mwInitRecTimeField = new JTextField(TimeParser.format(cal), 40);
         mwSubscriptionPanel.add(mwInitRecTimeField, c);
 
         c.weightx = 0;
@@ -1114,6 +1104,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             if (mwTransactionEventsCheckBox.isSelected()) {
                 eventVector.add("TransactionEvent");
             }
+            // print error if no event type is selected
+            if (eventVector.isEmpty()) {
+                JFrame frame = new JFrame();
+                JOptionPane.showMessageDialog(frame,
+                        "Please select at least one of the event types to be returned.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             String[] eventArray = new String[eventVector.size()];
             eventVector.toArray(eventArray);
 
@@ -1134,17 +1132,10 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                     client.addParameter(new QueryParam(name, valueInteger));
                     break;
                 case Time:
-                    Calendar valueCalendar = Calendar.getInstance();
-                    Date dateTemp;
-                    try {
-                        dateTemp = isoDateFormat.parse(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
-                    } catch (ParseException e) {
-                        SimpleDateFormat isoDateFormatTemp = new SimpleDateFormat(
-                                "yyyy-MM-dd'T'HH:mm:ss");
-                        dateTemp = isoDateFormatTemp.parse(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
-                    }
-                    valueCalendar.setTime(dateTemp);
-                    client.addParameter(new QueryParam(name, valueCalendar));
+                    // parse given ISO8601 date string into a calendar
+                    String dateStr = ((JTextField) mwQueryArgumentTextFields.get(i)).getText();
+                    Calendar cal = TimeParser.parseAsCalendar(dateStr);
+                    client.addParameter(new QueryParam(name, cal));
                     break;
                 default:
                     String value = ((JTextField) mwQueryArgumentTextFields.get(i)).getText();
@@ -1166,17 +1157,9 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 subcr.setQueryName("SimpleEventQuery");
                 subcr.setSubscriptionID(mwSubIdField.getText());
                 SubscriptionControls controls = new SubscriptionControls();
-                Calendar valueCalendar = Calendar.getInstance();
-                Date dateTemp;
-                try {
-                    dateTemp = isoDateFormat.parse(mwInitRecTimeField.getText());
-                } catch (ParseException e) {
-                    SimpleDateFormat isoDateFormatTemp = new SimpleDateFormat(
-                            "yyyy-MM-dd'T'HH:mm:ss");
-                    dateTemp = isoDateFormatTemp.parse(mwInitRecTimeField.getText());
-                }
-                valueCalendar.setTime(dateTemp);
-                controls.setInitialRecordTime(valueCalendar);
+                String dateStr = mwInitRecTimeField.getText();
+                Calendar cal = TimeParser.parseAsCalendar(dateStr);
+                controls.setInitialRecordTime(cal);
                 controls.setReportIfEmpty(reportIf.isSelected());
                 QuerySchedule sched = new QuerySchedule();
 
@@ -1194,8 +1177,9 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 subcr.setControls(controls);
                 client.subscribeQuery(subcr);
                 JFrame frame = new JFrame();
-                JOptionPane.showMessageDialog(frame, "You have sucessfully "
-                        + "subscribed to that Query", "Service is responding",
+                JOptionPane.showMessageDialog(frame,
+                        "You have sucessfully subscribed to that Query",
+                        "Service is responding",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
                 data = client.runQuery();
@@ -1224,6 +1208,15 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             JOptionPane.showMessageDialog(frame, msg,
                     "EPCIS Query Interface service error",
                     JOptionPane.ERROR_MESSAGE);
+        } catch (ParseException e) {
+            String msg = "Unable to parse a Time value.";
+            dwOutputTextArea.append("\n" + msg + "\n");
+            PrintWriter pw = new PrintWriter(new StringWriter());
+            e.printStackTrace(pw);
+            dwOutputTextArea.append(pw.toString());
+            JFrame frame = new JFrame();
+            JOptionPane.showMessageDialog(frame, msg + "\n" + e.getMessage(),
+                    msg, JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             dwOutputTextArea.append("\nCould not execute query:\n");
             StringWriter detailed = new StringWriter();
@@ -1268,7 +1261,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     /**
      * Handles the event of a pressed "info" button. Queries the server for
      * information about it's version and the implemented standard. If this
-     * succeedes, one can assume that the connection to the service works fine;
+     * succeeds, one can assume that the connection to the service works fine;
      * if this fails, an error message will be shown to the user with the cause
      * and a stack trace will be printed to the console
      */
@@ -1374,8 +1367,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         }
         /* update graphics */
         mainWindow.pack();
-        // mainWindow.setSize(mainWindow.getSize().width,
-        // mainWindow.getSize().height - mw_heightdiff);
     }
 
     /**
@@ -1411,8 +1402,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
 
         /* update graphics */
         mainWindow.pack();
-        // mainWindow.setSize(mainWindow.getSize().width,
-        // mainWindow.getSize().height + mw_heightdiff);
     }
 
     /**
@@ -1608,7 +1597,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                     + "certain date");
             ex.setReturnObjectEvents(true);
             ex.getQueryParameters().add(
-                    new QueryParam("GE_eventTime", "2006-01-01T05:20:31"));
+                    new QueryParam("GE_eventTime", "2006-01-01T05:20:31Z"));
             ex.getQueryParameters().add(
                     new QueryParam("MATCH_epc",
                             "urn:epc:id:sgtin:0034000.987650.2686"));
@@ -1620,26 +1609,10 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             ex.setReturnAggregationEvents(true);
             ex.setReturnQuantityEvents(true);
             ex.setReturnTransactionEvents(true);
-            /*
-             * ex.getQueryParametersVector() .add(new QueryParam("GE_eventTime",
-             * "2006-02-14T00:00:00")); ex.getQueryParametersVector() .add(new
-             * QueryParam("LT_eventTime", "2006-02-15T00:00:00"));
-             */
             ex.getQueryParameters().add(
                     new QueryParam("EQ_readPoint",
                             "urn:epcglobal:fmcg:ssl:0037000.00729.210,414"));
             examples.add(ex);
-
-            /*
-             * Example disabled - not supported by GUI see
-             * QueryInterfaceClientSwingGui.generateParamHashMap() ex = new
-             * QueryInterfaceQueryExample(); ex.setDescription("Get status
-             * information about shipment"); ex.setReturnObjectEvents(true);
-             * ex.setReturnTransactionEvents(true);
-             * ex.getQueryParametersVector().add(new
-             * QueryParam("EQ_bizTransaction",
-             * "http://transaction.acme.com/po/12345678")); examples.add(ex);
-             */
 
             ex = new Query();
             ex.setDescription("Find out when a certain EPC was shipped");
@@ -1653,29 +1626,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                             "urn:epc:id:sgtin:0057000.123430.2028"));
             examples.add(ex);
 
-            /*
-             * ex = new QueryInterfaceQueryExample(); ex.setDescription("Find
-             * all events caused by two EPCs (only " + "ObjectEvent and
-             * AggragationEvent may be queried this way)");
-             * ex.setReturnObjectEvents(true);
-             * ex.setReturnAggregationEvents(true);
-             * ex.getQueryParametersVector().add(new QueryParam("MATCH_epc",
-             * "urn:epc:id:sgtin:0057000.123430.2028 " +
-             * "urn:epc:id:sgtin:0034000.987650.3542"));
-             * ex.getQueryParametersVector().add(new
-             * QueryParam("MATCH_childEPC",
-             * "urn:epc:id:sgtin:0057000.123430.2028 " +
-             * "urn:epc:id:sgtin:0034000.987650.3542")); examples.add(ex);
-             */
-
             ex = new Query();
             ex.setDescription("Find all EPCs that have been in repair during 2006");
             ex.setReturnObjectEvents(true);
             ex.getQueryParameters().add(new QueryParam("EQ_action", "OBSERVE"));
             ex.getQueryParameters().add(
-                    new QueryParam("GE_eventTime", "2006-01-01T00:00:00"));
+                    new QueryParam("GE_eventTime", "2006-01-01T00:00:00Z"));
             ex.getQueryParameters().add(
-                    new QueryParam("LT_eventTime", "2007-01-01T00:00:00"));
+                    new QueryParam("LT_eventTime", "2007-01-01T00:00:00Z"));
             ex.getQueryParameters().add(
                     new QueryParam("EQ_disposition",
                             "urn:epcglobal:epcis:disp:fmcg:inrepair"));
