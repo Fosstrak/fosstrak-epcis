@@ -3,6 +3,18 @@
     <title>Changes epcis-captureclient</title>
   </properties>
   <body>
+    <release version="0.2.3" date="2007-12-10">
+      <action dev="steybem" type="fix" issue="1845531">
+        Corrected serialization of time values into XML.
+      </action>
+      <action dev="steybem" type="update">
+        Display time values in ISO8601 format.
+      </action>
+      <action dev="steybem" type="add">
+        Added field for setting eventTimeZoneOffset in capture client GUI and
+        adjusted event examples.
+      </action>
+    </release>
     <release version="0.2.2" date="2007-08-31">
       <action dev="steybem" type="update">
         Changed access method for invoking EPCIS capture interface in
