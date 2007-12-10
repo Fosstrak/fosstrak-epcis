@@ -40,9 +40,9 @@ public class ScheduleTest extends TestCase {
      * Test for next scheduled year.
      * 
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      * @throws SubscriptionControlsException
-     *             If an error in the scheudle occured.
+     *             If an error in the schedule occurred.
      */
     public void testNextScheduledYear() throws ImplementationException,
             SubscriptionControlsException {
@@ -70,9 +70,9 @@ public class ScheduleTest extends TestCase {
      * Test for next scheduled half hour.
      * 
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      * @throws SubscriptionControlsException
-     *             If an error in the scheudle occured.
+     *             If an error in the schedule occurred.
      */
     public void testNextScheduledHalfHour() throws ImplementationException,
             SubscriptionControlsException {
@@ -109,9 +109,9 @@ public class ScheduleTest extends TestCase {
      * Test for next scheduled day of the week.
      * 
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      * @throws SubscriptionControlsException
-     *             If an error in the scheudle occured.
+     *             If an error in the schedule occurred.
      */
     public void testNextScheduledDayOfWeek() throws ImplementationException,
             SubscriptionControlsException {
@@ -140,9 +140,9 @@ public class ScheduleTest extends TestCase {
      * Test for next scheduled leap year (Schaltjahr).
      * 
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      * @throws SubscriptionControlsException
-     *             If an error in the scheudle occured.
+     *             If an error in the schedule occurred.
      */
     public void testNextScheduledLeapYear() throws ImplementationException,
             SubscriptionControlsException {
@@ -163,9 +163,6 @@ public class ScheduleTest extends TestCase {
 
         // expected time is 29.2.2004 23:00.00
         GregorianCalendar exp = new GregorianCalendar(2004, 1, 29, 23, 0, 0);
-
-        printDateTime(act);
-        printDateTime(exp);
         assertEquals(exp, act);
     }
 
@@ -173,9 +170,9 @@ public class ScheduleTest extends TestCase {
      * Test for next scheduled minute (used in the query tests!).
      * 
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      * @throws SubscriptionControlsException
-     *             If an error in the scheudle occured.
+     *             If an error in the schedule occurred.
      */
     public void testNextScheduledMinute() throws ImplementationException,
             SubscriptionControlsException {
@@ -199,9 +196,9 @@ public class ScheduleTest extends TestCase {
      * Test for a complex next scheduled time.
      * 
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      * @throws SubscriptionControlsException
-     *             If an error in the scheudle occured.
+     *             If an error in the schedule occurred.
      */
     public void testComplexNextScheduledTime() throws ImplementationException,
             SubscriptionControlsException {
@@ -263,9 +260,9 @@ public class ScheduleTest extends TestCase {
      * Test for another complex next scheduled time.
      * 
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      * @throws SubscriptionControlsException
-     *             If an error in the scheudle occured.
+     *             If an error in the schedule occurred.
      */
     public void testLeapYearDayOfWeekNextScheduledTime()
             throws ImplementationException, SubscriptionControlsException {
@@ -305,24 +302,5 @@ public class ScheduleTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // success
         }
-    }
-
-    /**
-     * Prints the date and time of the given Calendar.
-     * 
-     * @param cal
-     *            The calendar to print.
-     */
-    private void printDateTime(final GregorianCalendar cal) {
-        System.out.println("Year: "
-                + cal.get(Calendar.YEAR)
-                // Calendar starts months with 0
-                + ", Month: " + (cal.get(Calendar.MONTH) + 1) + ", Day: "
-                + cal.get(Calendar.DAY_OF_MONTH) + ", Hour: "
-                + cal.get(Calendar.HOUR_OF_DAY) + ", Minute: "
-                + cal.get(Calendar.MINUTE) + ", Second: "
-                + cal.get(Calendar.SECOND)
-                // Calendar week days start on sunday
-                + ", Weekday: " + (cal.get(Calendar.DAY_OF_WEEK) - 1));
     }
 }
