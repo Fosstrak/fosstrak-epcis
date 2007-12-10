@@ -17,6 +17,9 @@
         zone offset does not need to be subtracted/added from event time or
         record time.
       </action>
+      <action dev="steybem" type="fix">
+        Fixed QuerySchedule to correctly handle leap years.
+      </action>
     </release>
     <release version="0.2.2" date="2007-08-31">
       <action dev="steybem" type="fix" issue="1781884">
