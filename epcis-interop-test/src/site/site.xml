@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Accada">
   <body>
-  
-    <menu name="Modules">
+
+    <menu name="EPCIS Project Modules">
       <item name="EPCIS Repository" href="../epcis-repository/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
-      <item name="EPCIS Query Client" href="../epcis-interop-test/project-reports.html" collapse="true">
+      <item name="EPCIS Query Client" href="../epcis-queryclient/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
       <item name="EPCIS Capture Client" href="../epcis-captureclient/project-reports.html" collapse="true">
@@ -15,12 +15,12 @@
       <item name="EPCIS Commons" href="../epcis-commons/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
-      <item name="EPCIS Interop Test" href="project-reports.html">
+      <item name="EPCIS Interop Test" href="project-reports.html" collapse="false">
         <item name="Changes Report" href="changes-report.html"/>
         <item name="Dependencies" href="dependencies.html"/>
-        <item name="Surefire" href="surefire-report.html"/>
+        <item name="Surefire Report" href="surefire-report.html"/>
       </item>
     </menu>
-    
+
   </body>
 </project>
