@@ -47,7 +47,7 @@
       parameter name is "event", the data is an XML representation of an
       ObjectEvent, AggregationEvent, QuantityEvent or TransactionEvent.
     </description>
-    <servlet-class>org.accada.epcis.repository.CaptureOperationsModule</servlet-class>
+    <servlet-class>org.accada.epcis.repository.CaptureOperationsServlet</servlet-class>
   </servlet>
 
 

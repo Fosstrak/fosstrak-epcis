@@ -21,8 +21,6 @@
 package org.accada.epcis.repository;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,26 +34,15 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.TimeZone;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.accada.epcis.soapapi.BusinessTransactionType;
@@ -63,7 +50,6 @@ import org.accada.epcis.utils.TimeParser;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -79,9 +65,7 @@ import org.xml.sax.SAXParseException;
  * @author Alain Remund
  * @author Marco Steybe
  */
-public class CaptureOperationsModule extends HttpServlet {
-
-    private static final long serialVersionUID = 8987594429634294827L;
+public class CaptureOperationsModule {
 
     /**
      * The log to write to.
@@ -89,17 +73,12 @@ public class CaptureOperationsModule extends HttpServlet {
     private static final Logger LOG = Logger.getLogger(CaptureOperationsModule.class);
 
     /**
-     * The XML-Validator which validates the incoming messages.
+     * The XSD schema which validates the incoming messages.
      */
-    private static Validator validator = null;
+    private Schema schema;
 
     /**
-     * SAX needs a static document variable.
-     */
-    private static Document document = null;
-
-    /**
-     * Wheter we should insert new vocabulary or throw an error message.
+     * Whether we should insert new vocabulary or throw an error message.
      */
     private boolean insertMissingVoc = true;
 
@@ -117,36 +96,22 @@ public class CaptureOperationsModule extends HttpServlet {
     /**
      * The ObjectEvent-query without data.
      */
-    private final String objectEventInsert = "INSERT INTO event_ObjectEvent ("
-            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action"
-            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String objectEventInsert = "INSERT INTO event_ObjectEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The AggregationEvent-query without data.
      */
-    private final String aggregationEventInsert = "INSERT INTO event_AggregationEvent ("
-            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
-            + "disposition, readPoint, bizLocation, action, parentID " + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String aggregationEventInsert = "INSERT INTO event_AggregationEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action, parentID " + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The QuantityEvent-query without data.
      */
-    private final String quantityEventInsert = "INSERT INTO event_QuantityEvent ("
-            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
-            + "disposition, readPoint, bizLocation, epcClass, quantity" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String quantityEventInsert = "INSERT INTO event_QuantityEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, epcClass, quantity" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The TransactionEvent-query without data.
      */
-    private final String transactionEventInsert = "INSERT INTO event_TransactionEvent ("
-            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
-            + "disposition, readPoint, bizLocation, action, parentID"
-            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    /**
-     * The Connection to the database.
-     */
-    private Connection dbconnection = null;
+    private final String transactionEventInsert = "INSERT INTO event_TransactionEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action, parentID" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The DataSource holding the database.
@@ -163,7 +128,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * @param rsp
      *            The HttpServletResponse.
      * @throws IOException
-     *             If an error occured while writing the response.
+     *             If an error occurred while writing the response.
      */
     public void doGet(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
         final PrintWriter out = rsp.getWriter();
@@ -177,8 +142,7 @@ public class CaptureOperationsModule extends HttpServlet {
         out.println("<head><title>EPCIS Capture Service</title></head>");
         out.println("<body>");
         out.println("<p>This service captures EPCIS events sent to it using HTTP POST requests.<br />");
-        out
-                .println("The payload of the HTTP POST request is expected to be an XML document conforming to the EPCISDocument schema.</p>");
+        out.println("The payload of the HTTP POST request is expected to be an XML document conforming to the EPCISDocument schema.</p>");
         out.println("<p>For further information refer to the xml schema files or check the Example <br />");
         out.println("in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.</p>");
         out.println("</body>");
@@ -198,7 +162,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * @param rsp
      *            The HttpServletResponse.
      * @throws IOException
-     *             If an error occured while validating the request or writing
+     *             If an error occurred while validating the request or writing
      *             the response.
      */
     public void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
@@ -222,23 +186,28 @@ public class CaptureOperationsModule extends HttpServlet {
                 rsp.setContentType("text/plain");
                 if (dbResetAllowed) {
                     try {
-                        dbconnection = db.getConnection();
-                        LOG.debug("DB connection opened.");
-                        dbReset();
-                        LOG.debug("DB connection closed.");
-                        dbconnection.close();
-
+                        Connection dbconnection = null;
+                        try {
+                            dbconnection = db.getConnection();
+                            LOG.debug("DB connection opened.");
+                            dbReset(dbconnection);
+                        } finally {
+                            if (dbconnection != null) {
+                                dbconnection.close();
+                                LOG.debug("DB connection closed.");
+                            }
+                        }
                         String msg = "db reset successfull";
                         LOG.info(msg);
                         rsp.setStatus(HttpServletResponse.SC_OK);
                         out.println(msg);
                     } catch (final SQLException e) {
-                        String msg = "An error involving the database ocurred.";
+                        String msg = "An error involving the database occurred.";
                         LOG.error(msg, e);
                         rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         out.println(msg);
                     } catch (final Exception e) {
-                        String msg = "An unknown error ocurred.";
+                        String msg = "An unknown error occurred.";
                         LOG.error(msg, e);
                         rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         out.println(msg);
@@ -258,14 +227,14 @@ public class CaptureOperationsModule extends HttpServlet {
         }
 
         // parse the payload as XML document
+        Document document;
         try {
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             final DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(is);
         } catch (SAXException e) {
-            String msg = "Unable to parse the payload as XML document: "
-                    + (e.getException() == null ? e.getMessage() : e.getException().getMessage());
+            String msg = "Unable to parse the payload as XML document: " + (e.getException() == null ? e.getMessage() : e.getException().getMessage());
             LOG.info(msg, e);
             rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.println("We're unable to capture the EPCIS events.");
@@ -284,7 +253,8 @@ public class CaptureOperationsModule extends HttpServlet {
         LOG.debug("Payload successfully parsed as XML document.");
 
         // validate the XML document against the EPCISDocument schema
-        if (validator != null) {
+        if (schema != null) {
+            Validator validator = schema.newValidator();
             try {
                 validator.validate(new DOMSource(document), null);
             } catch (SAXException e) {
@@ -303,24 +273,29 @@ public class CaptureOperationsModule extends HttpServlet {
         }
 
         // handle the capture operation
+        Connection dbconnection = null;
         try {
-            dbconnection = db.getConnection();
-            LOG.debug("DB connection opened.");
-            handleDocument();
-            LOG.debug("DB connection closed.");
-            dbconnection.close();
-
+            try {
+                dbconnection = db.getConnection();
+                LOG.debug("DB connection opened.");
+                handleDocument(dbconnection, document);
+            } finally {
+                if (dbconnection != null) {
+                    dbconnection.close();
+                }
+                LOG.debug("DB connection closed.");
+            }
             // return OK
             LOG.info("EPCIS Capture Interface request succeeded.");
             rsp.setStatus(HttpServletResponse.SC_OK);
             out.println("Capture request succeeded.");
         } catch (final SAXException e) {
-            String msg = "An error processing the XML document ocurred.";
+            String msg = "An error processing the XML document occurred.";
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.println(msg);
         } catch (final SQLException e) {
-            String msg = "An error involving the database ocurred.";
+            String msg = "An error involving the database occurred.";
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.println(msg);
@@ -330,7 +305,7 @@ public class CaptureOperationsModule extends HttpServlet {
             rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.println(msg);
         } catch (final Exception e) {
-            String msg = "An unknown error ocurred.";
+            String msg = "An unknown error occurred.";
             LOG.error(msg, e);
             rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.println(msg);
@@ -343,85 +318,27 @@ public class CaptureOperationsModule extends HttpServlet {
      * Cleans all event data from the epcis repository database.
      * 
      * @throws SQLException
-     *             If an error with the database occured.
+     *             If an error with the database occurred.
      * @throws Exception
-     *             If an exception reading from the SQL script occured.
+     *             If an exception reading from the SQL script occurred.
      */
-    private void dbReset() throws SQLException, Exception {
+    private void dbReset(Connection dbconnection) throws SQLException, Exception {
         LOG.info("Running db reset script.");
-        Statement stmt = dbconnection.createStatement();
-        if (dbResetScript != null) {
-            BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stmt.addBatch(line);
+        Statement stmt = null;
+        try {
+            stmt = dbconnection.createStatement();
+            if (dbResetScript != null) {
+                BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stmt.addBatch(line);
+                }
             }
-        }
-        stmt.executeBatch();
-    }
-
-    /**
-     * @see javax.servlet.GenericServlet#init()
-     * @throws ServletException
-     *             If the context could not be loaded.
-     */
-    public void init() throws ServletException {
-        // read configuration and set up database source
-        try {
-            Context initContext = new InitialContext();
-            Context env = (Context) initContext.lookup("java:comp/env");
-            db = (DataSource) env.lookup("jdbc/EPCISDB");
-        } catch (NamingException e) {
-            String msg = "Unable to read configuration, check META-INF/context.xml for Resource 'jdbc/EPCISDB'.";
-            LOG.error(msg, e);
-            throw new ServletException(msg, e);
-        }
-
-        // load properties
-        String servletPath = getServletContext().getRealPath("/");
-        String appConfigFile = getServletContext().getInitParameter("appConfigFile");
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(servletPath + appConfigFile));
-        } catch (IOException e) {
-            LOG.error("Unable to load application properties from " + servletPath + appConfigFile);
-        }
-        insertMissingVoc = Boolean.parseBoolean(properties.getProperty("insertMissingVoc", "true"));
-        String dbResetAllowedStr = getServletContext().getInitParameter("dbResetAllowed");
-        dbResetAllowed = Boolean.parseBoolean(dbResetAllowedStr);
-        dbResetScript = servletPath + getServletContext().getInitParameter("dbResetScript");
-
-        // load log4j config
-        String log4jConfigFile = getServletContext().getInitParameter("log4jConfigFile");
-        if (log4jConfigFile != null) {
-            // if no log4j properties file found, then do not try
-            // to load it (the application runs without logging)
-            PropertyConfigurator.configure(servletPath + log4jConfigFile);
-        }
-
-        // load the schema validator
-        try {
-            String schemaPath = servletPath + getServletContext().getInitParameter("schemaPath");
-            String schemaFile = getServletContext().getInitParameter("schemaFile");
-            File xsd = new File(schemaPath + System.getProperty("file.separator") + schemaFile);
-            LOG.debug("Reading schema from '" + xsd.getAbsolutePath() + "'.");
-            if (!xsd.exists()) {
-                LOG.warn("Unable to find the schema file (check "
-                        + "'pathToSchemaFiles' parameter in META-INF/context.xml)");
-                LOG.warn("Schema validation will not be available!");
-                validator = null;
-            } else {
-                // load the schema to validate against
-                SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Source schemaSrc = new StreamSource(xsd);
-                Schema schema = schemaFact.newSchema(schemaSrc);
-
-                validator = schema.newValidator();
+            stmt.executeBatch();
+        } finally {
+            if (stmt != null) {
+                stmt.close();
             }
-        } catch (Exception e) {
-            LOG.warn("Unable to load the schema validator.", e);
-            LOG.warn("Schema validation will not be available!");
-            validator = null;
         }
     }
 
@@ -429,11 +346,11 @@ public class CaptureOperationsModule extends HttpServlet {
      * Parses the entire document and handles the supplied events.
      * 
      * @throws SQLException
-     *             If an error with the database occured.
+     *             If an error with the database occurred.
      * @throws SAXException
-     *             If an error parsing the document occured.
+     *             If an error parsing the document occurred.
      */
-    private void handleDocument() throws SQLException, SAXException {
+    private void handleDocument(Connection dbconnection, Document document) throws SQLException, SAXException {
         NodeList eventList = document.getElementsByTagName("EventList");
         NodeList events = eventList.item(0).getChildNodes();
 
@@ -442,10 +359,9 @@ public class CaptureOperationsModule extends HttpServlet {
             Node eventNode = events.item(i);
             String nodeName = eventNode.getNodeName();
 
-            if (nodeName.equals("ObjectEvent") || nodeName.equals("AggregationEvent")
-                    || nodeName.equals("QuantityEvent") || nodeName.equals("TransactionEvent")) {
+            if (nodeName.equals("ObjectEvent") || nodeName.equals("AggregationEvent") || nodeName.equals("QuantityEvent") || nodeName.equals("TransactionEvent")) {
                 LOG.debug("processing event " + i + ": '" + nodeName + "'.");
-                handleEvent(eventNode);
+                handleEvent(dbconnection, eventNode);
             } else if (!nodeName.equals("#text") && !nodeName.equals("#comment")) {
                 throw new SAXException("Encountered unknown event '" + nodeName + "'.");
             }
@@ -465,7 +381,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * @throws SQLException
      *             If an error connecting to the DB occurs.
      */
-    private void handleEvent(final Node eventNode) throws SAXException, SQLException {
+    private void handleEvent(Connection dbconnection, final Node eventNode) throws SAXException, SQLException {
         if (eventNode != null && eventNode.getChildNodes().getLength() == 0) {
             throw new SAXException("Event element '" + eventNode.getNodeName() + "' has no children elements.");
         }
@@ -547,7 +463,8 @@ public class CaptureOperationsModule extends HttpServlet {
                         LOG.debug("    treating unknown event field as extension.");
                         String prefix = parts[0];
                         String localname = parts[1];
-                        String namespace = document.getDocumentElement().getAttribute("xmlns:" + prefix);
+                        // String namespace = document.getDocumentElement().getAttribute("xmlns:" + prefix);
+                        String namespace = curEventNode.lookupNamespaceURI(prefix);
                         String value = curEventNode.getTextContent();
                         fieldNameExtList.add(new EventFieldExtension(prefix, namespace, localname, value));
                     } else {
@@ -557,109 +474,121 @@ public class CaptureOperationsModule extends HttpServlet {
                 }
             }
         } catch (MalformedURIException e) {
-            throw new SAXException("  event field '" + curEventNode.getNodeName() + "' is not of type URI: "
-                    + curEventNode.getTextContent(), e);
+            throw new SAXException(
+                    "  event field '" + curEventNode.getNodeName() + "' is not of type URI: " + curEventNode.getTextContent(),
+                    e);
         }
 
         // preparing query
-        PreparedStatement ps;
         String nodeName = eventNode.getNodeName();
-        if (nodeName.equals("AggregationEvent")) {
-            ps = dbconnection.prepareStatement(aggregationEventInsert);
-        } else if (nodeName.equals("ObjectEvent")) {
-            ps = dbconnection.prepareStatement(objectEventInsert);
-        } else if (nodeName.equals("QuantityEvent")) {
-            ps = dbconnection.prepareStatement(quantityEventInsert);
-        } else if (nodeName.equals("TransactionEvent")) {
-            ps = dbconnection.prepareStatement(transactionEventInsert);
-        } else {
-            throw new SAXException("Encountered unknown event element '" + nodeName + "'.");
-        }
-
-        // parameters 1-7 of the sql query are shared by all events
-
-        ps.setTimestamp(1, eventTime);
-        // according to the specification: recordTime is the time of capture
-        ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-        // note: for testing it is handy to set recordTime=eventTime
-        // ps.setTimestamp(2, eventTime);
-        ps.setString(3, eventTimeZoneOffset);
-        if (bizStep != null) {
-            ps.setLong(4, insertVocabulary("voc_BizStep", bizStep));
-        } else {
-            ps.setNull(4, java.sql.Types.BIGINT);
-        }
-        if (disposition != null) {
-            ps.setLong(5, insertVocabulary("voc_Disposition", disposition));
-        } else {
-            ps.setNull(5, java.sql.Types.BIGINT);
-        }
-        if (readPoint != null) {
-            ps.setLong(6, insertVocabulary("voc_ReadPoint", readPoint));
-        } else {
-            ps.setNull(6, java.sql.Types.BIGINT);
-        }
-        if (bizLocation != null) {
-            ps.setLong(7, insertVocabulary("voc_BizLoc", bizLocation));
-        } else {
-            ps.setNull(7, java.sql.Types.BIGINT);
-        }
-
-        // special handling for QuantityEvent
-        if (nodeName.equals("QuantityEvent")) {
-            if (epcClass != null) {
-                ps.setLong(8, insertVocabulary("voc_EPCClass", epcClass));
+        PreparedStatement ps = null;
+        try {
+            if (nodeName.equals("AggregationEvent")) {
+                ps = dbconnection.prepareStatement(aggregationEventInsert);
+            } else if (nodeName.equals("ObjectEvent")) {
+                ps = dbconnection.prepareStatement(objectEventInsert);
+            } else if (nodeName.equals("QuantityEvent")) {
+                ps = dbconnection.prepareStatement(quantityEventInsert);
+            } else if (nodeName.equals("TransactionEvent")) {
+                ps = dbconnection.prepareStatement(transactionEventInsert);
             } else {
-                ps.setNull(8, java.sql.Types.BIGINT);
+                throw new SAXException("Encountered unknown event element '" + nodeName + "'.");
             }
-            if (quantity != null) {
-                ps.setLong(9, quantity.longValue());
-            } else {
-                ps.setNull(9, java.sql.Types.BIGINT);
-            }
-        } else {
-            // all other events have action
-            ps.setString(8, action);
 
-            // AggregationEvent and TransactionEvent have a parentID field
-            if (nodeName.equals("AggregationEvent") || nodeName.equals("TransactionEvent")) {
-                ps.setString(9, parentID);
+            // parameters 1-7 of the sql query are shared by all events
+
+            ps.setTimestamp(1, eventTime);
+            // according to the specification: recordTime is the time of capture
+            ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            // note: for testing it is handy to set recordTime=eventTime
+            // ps.setTimestamp(2, eventTime);
+            ps.setString(3, eventTimeZoneOffset);
+            if (bizStep != null) {
+                ps.setLong(4, insertVocabulary(dbconnection, "voc_BizStep", bizStep));
+            } else {
+                ps.setNull(4, java.sql.Types.BIGINT);
+            }
+            if (disposition != null) {
+                ps.setLong(5, insertVocabulary(dbconnection, "voc_Disposition", disposition));
+            } else {
+                ps.setNull(5, java.sql.Types.BIGINT);
+            }
+            if (readPoint != null) {
+                ps.setLong(6, insertVocabulary(dbconnection, "voc_ReadPoint", readPoint));
+            } else {
+                ps.setNull(6, java.sql.Types.BIGINT);
+            }
+            if (bizLocation != null) {
+                ps.setLong(7, insertVocabulary(dbconnection, "voc_BizLoc", bizLocation));
+            } else {
+                ps.setNull(7, java.sql.Types.BIGINT);
+            }
+
+            // special handling for QuantityEvent
+            if (nodeName.equals("QuantityEvent")) {
+                if (epcClass != null) {
+                    ps.setLong(8, insertVocabulary(dbconnection, "voc_EPCClass", epcClass));
+                } else {
+                    ps.setNull(8, java.sql.Types.BIGINT);
+                }
+                if (quantity != null) {
+                    ps.setLong(9, quantity.longValue());
+                } else {
+                    ps.setNull(9, java.sql.Types.BIGINT);
+                }
+            } else {
+                // all other events have action
+                ps.setString(8, action);
+
+                // AggregationEvent and TransactionEvent have a parentID field
+                if (nodeName.equals("AggregationEvent") || nodeName.equals("TransactionEvent")) {
+                    ps.setString(9, parentID);
+                }
+            }
+
+            // insert event into database
+            ps.executeUpdate();
+        } finally {
+            if (ps != null) {
+                ps.close();
             }
         }
 
-        // insert event into database
-        ps.executeUpdate();
+        long eventId = getLastAutoIncrementedId(dbconnection, "event_" + nodeName);
 
-        long eventId = getLastAutoIncrementedId("event_" + nodeName);
         if (!fieldNameExtList.isEmpty()) {
             for (EventFieldExtension ext : fieldNameExtList) {
 
-                String insert = "INSERT INTO event_" + eventNode.getNodeName() + "_extensions "
-                        + "(event_id, fieldname, prefix, " + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)";
+                String insert = "INSERT INTO event_" + eventNode.getNodeName() + "_extensions " + "(event_id, fieldname, prefix, " + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)";
                 LOG.debug("QUERY: " + insert);
-                ps = dbconnection.prepareStatement(insert);
+                ps = null;
 
-                ps.setLong(1, eventId);
-                LOG.debug("       query param 1: " + eventId);
-                ps.setString(2, ext.getFieldname());
-                LOG.debug("       query param 2: " + ext.getFieldname());
-                ps.setString(3, ext.getPrefix());
-                LOG.debug("       query param 3: " + ext.getPrefix());
-                if (ext.getIntValue() != null) {
-                    ps.setInt(4, ext.getIntValue());
-                    LOG.debug("       query param 4: " + ext.getIntValue());
-                } else if (ext.getFloatValue() != null) {
-                    ps.setFloat(4, ext.getFloatValue());
-                    LOG.debug("       query param 4: " + ext.getFloatValue());
-                } else if (ext.getDateValue() != null) {
-                    ps.setTimestamp(4, ext.getDateValue());
-                    LOG.debug("       query param 4: " + ext.getDateValue());
-                } else {
-                    ps.setString(4, ext.getStrValue());
-                    LOG.debug("       query param 4: " + ext.getStrValue());
+                try {
+                    ps = dbconnection.prepareStatement(insert);
+                    ps.setLong(1, eventId);
+                    LOG.debug("       query param 1: " + eventId);
+                    ps.setString(2, ext.getFieldname());
+                    LOG.debug("       query param 2: " + ext.getFieldname());
+                    ps.setString(3, ext.getPrefix());
+                    LOG.debug("       query param 3: " + ext.getPrefix());
+                    if (ext.getIntValue() != null) {
+                        ps.setInt(4, ext.getIntValue());
+                        LOG.debug("       query param 4: " + ext.getIntValue());
+                    } else if (ext.getFloatValue() != null) {
+                        ps.setFloat(4, ext.getFloatValue());
+                        LOG.debug("       query param 4: " + ext.getFloatValue());
+                    } else if (ext.getDateValue() != null) {
+                        ps.setTimestamp(4, ext.getDateValue());
+                        LOG.debug("       query param 4: " + ext.getDateValue());
+                    } else {
+                        ps.setString(4, ext.getStrValue());
+                        LOG.debug("       query param 4: " + ext.getStrValue());
+                    }
+                } finally {
+                    if (ps != null) {
+                        ps.executeUpdate();
+                    }
                 }
-
-                ps.executeUpdate();
             }
         }
 
@@ -668,15 +597,24 @@ public class CaptureOperationsModule extends HttpServlet {
             // preparing statement for insertion of associated EPCs
             String insert = "INSERT INTO event_" + nodeName + "_EPCs (event_id, epc) VALUES (?, ?)";
             LOG.debug("QUERY: " + insert);
-            ps = dbconnection.prepareStatement(insert);
-            ps.setLong(1, eventId);
-            LOG.debug("       query param 1: " + eventId);
+            ps = null;
+            try {
+                ps = dbconnection.prepareStatement(insert);
 
-            // insert all EPCs in the EPCs array
-            for (int i = 0; i < epcs.length; i++) {
-                ps.setString(2, epcs[i].toString());
-                LOG.debug("       query param 2: " + epcs[i].toString());
-                ps.executeUpdate();
+                // insert all EPCs in the EPCs array
+                for (int i = 0; i < epcs.length; i++) {
+                    ps.setLong(1, eventId);
+                    LOG.debug("       query param 1: " + eventId);
+                    ps.setString(2, epcs[i].toString());
+                    LOG.debug("       query param 2: " + epcs[i].toString());
+                    ps.addBatch();
+                }
+
+                ps.executeBatch();
+            } finally {
+                if (ps != null) {
+                    ps.close();
+                }
             }
         }
 
@@ -685,17 +623,24 @@ public class CaptureOperationsModule extends HttpServlet {
             // preparing statement for insertion of associated EPCs
             String insert = "INSERT INTO event_" + nodeName + "_bizTrans (event_id, bizTrans_id) VALUES (?, ?)";
             LOG.debug("QUERY: " + insert);
-            ps = dbconnection.prepareStatement(insert);
-            ps.setLong(1, eventId);
-            LOG.debug("       query param 1: " + eventId);
-
-            // insert all BizTransactions into the BusinessTransaction-Table
-            // and connect it with the "event_<event-name>_bizTrans"-Table
-            for (final BusinessTransactionType bizTrans : bizTransactionList) {
-                long bTrans = insertBusinessTransaction(bizTrans);
-                ps.setLong(2, bTrans);
-                LOG.debug("       query param 2: " + bTrans);
-                ps.executeUpdate();
+            ps = null;
+            try {
+                ps = dbconnection.prepareStatement(insert);
+                // insert all BizTransactions into the BusinessTransaction-Table
+                // and connect it with the "event_<event-name>_bizTrans"-Table
+                for (final BusinessTransactionType bizTrans : bizTransactionList) {
+                    ps.setLong(1, eventId);
+                    LOG.debug("       query param 1: " + eventId);
+                    long bTrans = insertBusinessTransaction(dbconnection, bizTrans);
+                    ps.setLong(2, bTrans);
+                    LOG.debug("       query param 2: " + bTrans);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            } finally {
+                if (ps != null) {
+                    ps.close();
+                }
             }
         }
     }
@@ -709,14 +654,28 @@ public class CaptureOperationsModule extends HttpServlet {
      *            retrieved.
      * @return The last auto incremented ID.
      * @throws SQLException
-     *             If an SQL problem with the database ocurred.
+     *             If an SQL problem with the database occurred.
      */
-    private long getLastAutoIncrementedId(final String tableName) throws SQLException {
+    private long getLastAutoIncrementedId(Connection dbconnection, final String tableName) throws SQLException {
         String stmt = "SELECT LAST_INSERT_ID() as id FROM " + tableName;
-        PreparedStatement ps = dbconnection.prepareStatement(stmt);
-        final ResultSet rs = ps.executeQuery();
-        rs.next();
-        return rs.getLong("id");
+        PreparedStatement ps = null;
+        try {
+            ps = dbconnection.prepareStatement(stmt);
+            ResultSet rs = null;
+            try {
+                rs = ps.executeQuery();
+                rs.next();
+                return rs.getLong("id");
+            } finally {
+                if (rs != null) {
+                    rs.close();
+                }
+            }
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+        }
     }
 
     /**
@@ -728,41 +687,61 @@ public class CaptureOperationsModule extends HttpServlet {
      * @param tableName
      *            The name of the vocabulary table.
      * @param uri
-     *            The Voci adapting the URI to be inserted into the vocabulary
+     *            The vocabulary adapting the URI to be inserted into the vocabulary
      *            table.
      * @return The ID of an already existing vocabulary table with the given
      *         uri.
      * @throws SQLException
-     *             If an SQL problem with the database ocurred or if we are not
+     *             If an SQL problem with the database occurred or if we are not
      *             allowed to insert a missing vocabulary.
      */
-    private long insertVocabulary(final String tableName, final URI uri) throws SQLException {
+    private long insertVocabulary(Connection dbconnection, final String tableName, final URI uri) throws SQLException {
         String stmt = "SELECT id FROM " + tableName + " WHERE uri=?";
-        PreparedStatement ps = dbconnection.prepareStatement(stmt);
-        ps.setString(1, uri.toString());
-        ResultSet rs = ps.executeQuery();
+        PreparedStatement ps = null;
+        try {
+            ps = dbconnection.prepareStatement(stmt);
+            ps.setString(1, uri.toString());
+            ResultSet rs = null;
+            try {
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    // the uri already exists
+                    return rs.getLong("id");
+                }
+            } finally {
+                if (rs != null) {
+                    rs.close();
+                }
+            }
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+        }
 
-        if (rs.next()) {
-            // the uri already exists
-            return rs.getLong("id");
+        // the uri does not yet exist: insert it if allowed. According to
+        // the specs, some vocabulary is not allowed to be extended; this is
+        // currently ignored here
+        if (!insertMissingVoc) {
+            throw new SQLException("Not allowed to add new vocabulary - use " + "existing vocabulary");
         } else {
-            // the uri does not yet exist: insert it if allowed. According to
-            // the specs, some vocabulary is not allowed to be extended; this is
-            // currently ignored here
-            if (insertMissingVoc) {
+            ps = null;
+            try {
                 stmt = "INSERT INTO " + tableName + " (uri) VALUES (?)";
                 LOG.debug("QUERY: " + stmt);
                 LOG.debug("       query param 1: " + uri.toString());
                 ps = dbconnection.prepareStatement(stmt);
                 ps.setString(1, uri.toString());
                 ps.executeUpdate();
-
-                // get last auto_increment value and return it
-                return getLastAutoIncrementedId(tableName);
-            } else {
-                throw new SQLException("Not allowed to add new vocabulary - use " + "existing vocabulary");
+            } finally {
+                if (ps != null) {
+                    ps.close();
+                }
             }
         }
+
+        // get last auto_increment value and return it
+        return getLastAutoIncrementedId(dbconnection, tableName);
     }
 
     /**
@@ -770,7 +749,7 @@ public class CaptureOperationsModule extends HttpServlet {
      * 
      * @param epcNode
      *            The parent Node from which EPC URIs should be extracted.
-     * @return An array of Voci containing all the URIs found in the given node.
+     * @return An array of vocabularies containing all the URIs found in the given node.
      * @throws MalformedURIException
      *             If a string is not parsable as URI.
      * @throws SAXParseException
@@ -798,7 +777,7 @@ public class CaptureOperationsModule extends HttpServlet {
 
     /**
      * Parses the xml tree for epc nodes and returns a List of BizTransaction
-     * URIs with their corresponing type.
+     * URIs with their corresponding type.
      * 
      * @param bizNode
      *            The parent Node from which BizTransaction URIs should be
@@ -838,22 +817,40 @@ public class CaptureOperationsModule extends HttpServlet {
      *            The BusinessTransaction to be inserted.
      * @return The ID from the BusinessTransaction-table.
      * @throws SQLException
-     *             If an SQL problem with the database ocurred.
+     *             If an SQL problem with the database occurred.
      */
-    private long insertBusinessTransaction(final BusinessTransactionType bizTrans) throws SQLException {
-        final long id = insertVocabulary("voc_BizTrans", bizTrans);
-        final long type = insertVocabulary("voc_BizTransType", bizTrans.getType());
+    private long insertBusinessTransaction(Connection dbconnection, final BusinessTransactionType bizTrans)
+            throws SQLException {
+        final long id = insertVocabulary(dbconnection, "voc_BizTrans", bizTrans);
+        final long type = insertVocabulary(dbconnection, "voc_BizTransType", bizTrans.getType());
 
         String stmt = "SELECT id FROM BizTransaction WHERE bizTrans=? AND type=?";
-        PreparedStatement ps = dbconnection.prepareStatement(stmt);
-        ps.setLong(1, id);
-        ps.setLong(2, type);
+        PreparedStatement ps = null;
+        try {
+            ps = dbconnection.prepareStatement(stmt);
+            ps.setLong(1, id);
+            ps.setLong(2, type);
 
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            // the BusinessTransaction already exists
-            return rs.getLong("id");
-        } else {
+            ResultSet rs = null;
+            try {
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    // the BusinessTransaction already exists
+                    return rs.getLong("id");
+                }
+            } finally {
+                if (rs != null) {
+                    rs.close();
+                }
+            }
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+        }
+
+        ps = null;
+        try {
             // insert the BusinessTransaction
             stmt = "INSERT INTO BizTransaction (bizTrans, type) VALUES (?, ?)";
             LOG.debug("QUERY: " + stmt);
@@ -863,8 +860,52 @@ public class CaptureOperationsModule extends HttpServlet {
             ps.setLong(1, id);
             ps.setLong(2, type);
             ps.executeUpdate();
-
-            return getLastAutoIncrementedId("BizTransaction");
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
         }
+        return getLastAutoIncrementedId(dbconnection, "BizTransaction");
     }
+
+    public DataSource getDb() {
+        return db;
+    }
+
+    public void setDb(DataSource db) {
+        this.db = db;
+    }
+
+    public boolean isDbResetAllowed() {
+        return dbResetAllowed;
+    }
+
+    public void setDbResetAllowed(boolean dbResetAllowed) {
+        this.dbResetAllowed = dbResetAllowed;
+    }
+
+    public String getDbResetScript() {
+        return dbResetScript;
+    }
+
+    public void setDbResetScript(String dbResetScript) {
+        this.dbResetScript = dbResetScript;
+    }
+
+    public boolean isInsertMissingVoc() {
+        return insertMissingVoc;
+    }
+
+    public void setInsertMissingVoc(boolean insertMissingVoc) {
+        this.insertMissingVoc = insertMissingVoc;
+    }
+
+    public Schema getSchema() {
+        return schema;
+    }
+
+    public void setSchema(Schema schema) {
+        this.schema = schema;
+    }
+
 }
