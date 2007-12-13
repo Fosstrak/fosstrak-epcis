@@ -15,5 +15,6 @@
         prior to running the interop tests.
       </action>    
     </release>
+    <release version="0.2.0" date="2007-04-27" description="first release" />
   </body>
 </document>
