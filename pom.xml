@@ -170,6 +170,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
+          <!-- Lock to this version in order to prevent generating corrupted
+               menu structures for sub-modules when running site:site from the
+               parent module. See http://jira.codehaus.org/browse/MSITE-279 for
+               details on this issue. -->
+          <version>2.0-beta-5</version>
           <configuration>
             <locales>en</locales>
             <publishDate position="left" format="yyyy-MM-dd hh:mm:ss" />
@@ -178,7 +183,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.3</version>
           <!--
             By default, the surefire plugin automatically includes all test classes
             with following wildcard patterns:
@@ -276,7 +280,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>2.1</version>
         <configuration>
           <linkXref>true</linkXref>
           <sourceEncoding>utf-8</sourceEncoding>
@@ -301,7 +304,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javancss-maven-plugin</artifactId>
-        <version>2.0-beta-2</version>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
