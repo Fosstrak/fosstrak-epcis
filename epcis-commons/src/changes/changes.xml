@@ -3,7 +3,6 @@
     <title>Changes epcis-commons</title>
   </properties>
   <body>
-    <release version="0.2.1" date="2007-08-10">
-    </release>
+    <release version="0.2.0" date="2007-04-27" description="first release" />
   </body>
 </document>
