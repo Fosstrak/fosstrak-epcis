@@ -3,7 +3,7 @@
     <title>Changes epcis-queryclient</title>
   </properties>
   <body>
-    <release version="0.2.3" date="2007-12-10">
+    <release version="0.2.3" date="2007-12-13">
       <action dev="steybem" type="fix" issue="1845531">
         Corrected parsing of time values from repository response.
       </action>
@@ -14,11 +14,11 @@
         Display error message when no event type is selected in GUI.
       </action>
     </release>
-    <release version="0.2.2" date="2007-08-31" />
     <release version="0.2.1" date="2007-08-10">
       <action dev="rodunerc" type="fix">
         axis-wsdl4j was not properly included in Webstart application.
       </action>
     </release>
+    <release version="0.2.0" date="2007-04-27" description="first release" />
   </body>
 </document>
