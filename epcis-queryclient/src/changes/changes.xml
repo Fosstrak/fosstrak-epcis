@@ -3,7 +3,7 @@
     <title>Changes epcis-queryclient</title>
   </properties>
   <body>
-    <release version="0.2.3" date="2007-12-13">
+    <release version="0.2.3" date="2007-12-14">
       <action dev="steybem" type="fix" issue="1845531">
         Corrected parsing of time values from repository response.
       </action>
