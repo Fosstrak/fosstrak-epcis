@@ -7,7 +7,7 @@
 
   <groupId>org.accada.epcis</groupId>
   <artifactId>epcis</artifactId>
-  <version>0.2.3-SNAPSHOT</version>
+  <version>0.2.3</version>
   <packaging>pom</packaging> <!-- aggregator projects require 'pom' as packaging -->
   <modelVersion>4.0.0</modelVersion>
 
@@ -210,9 +210,9 @@
   
   <scm>
     <!-- keep empty tags here to avoid release:prepare crashes -->
-    <connection></connection>
-    <developerConnection>scm:svn:https://svn.accada.org/repos/epcis</developerConnection>
-    <url>https://svn.accada.org/repos/epcis/</url>
+    <connection>scm:svn:https://svn.accada.org/repos/epcis/tags/epcis-0.2.3</connection>
+    <developerConnection>scm:svn:https://svn.accada.org/repos/epcis/tags/epcis-0.2.3</developerConnection>
+    <url>https://svn.accada.org/repos/epcis/tags/epcis-0.2.3</url>
   </scm>
   <distributionManagement>
     <repository>
