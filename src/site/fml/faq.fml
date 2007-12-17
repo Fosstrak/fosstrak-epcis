@@ -19,7 +19,7 @@
 </faq>
 
 <faq>
-<question>Why do see so many failing tests during Maven's "test" phase?</question>
+<question>Why do I see so many failing tests during Maven's "test" phase?</question>
 <answer>Most probably, you don't have a proper test environment on your machine. The interoperability tests need access to an EPCIS repository running on your local machine that contains the test data set found in <i>epcis-repository/src/main/sql/epcis_test_data.sql</i>. Also, this repository must have the configuration parameter <i>dbResetAllowed</i> in the webapp's <i>context.xml</i> set to <i>true</i> (default value is <i>false</i>).</answer>
 </faq>
 
