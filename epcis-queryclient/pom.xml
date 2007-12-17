@@ -112,6 +112,7 @@
               <include>axis:axis-wsdl4j</include>
               <include>commons-discovery:commons-discovery</include>
               <include>commons-logging:commons-logging</include>
+              <include>log4j:log4j</include>
             </includes>
           </dependencies>
           <jnlp>
