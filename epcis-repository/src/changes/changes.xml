@@ -3,6 +3,18 @@
     <title>Changes epcis-repository</title>
   </properties>
   <body>
+    <release version="0.2.4" date="2007-12-21">
+      <action dev="steybem" type="update">
+        Added indexes to several database tables for improved performance.
+      </action>
+      <action dev="steybem" type="update">
+        Replaced JDBC Statements with PreparedStatements for improved performance.
+      </action>
+      <action dev="steybem" type="add">
+        Added LoggableStatement which can be used to provide cleaner log entries
+        for SQL queries.
+      </action>
+    </release>
     <release version="0.2.3" date="2007-12-14">
       <action dev="steybem" type="fix" issue="1789785" due-to="Sean Wellington">
         Made CaptureOperationsModule more thread-safe and made sure that database
