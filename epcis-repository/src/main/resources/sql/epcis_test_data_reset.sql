@@ -50,6 +50,8 @@ DELETE FROM `voc_epcClass_attr`;
 DELETE FROM `voc_readPoint`;
 DELETE FROM `voc_readPoint_attr`;
 DELETE FROM `vocabularies`;
+-- The times given in the events are in UTC
+SET time_zone = '+00:00';
 -- ----------------------------------------------------
 -- Fill the test event data into the database
 -- ----------------------------------------------------
@@ -77,3 +79,5 @@ INSERT INTO `voc_disposition` (`id`,`uri`) VALUES (9, 'urn:epcglobal:hls:disp:ac
 INSERT INTO `voc_epcclass` (`id`,`uri`) VALUES (41, 'urn:epc:idpat:sgtin:0614141.107340.*'), (42, 'urn:epc:idpat:sgtin:0614141.107341.*'), (43, 'urn:epc:idpat:sgtin:0614141.107342.*'), (44, 'urn:epc:idpat:sgtin:0614141.107343.*'), (45, 'urn:epc:idpat:sgtin:0614141.107344.*'), (46, 'urn:epc:idpat:sgtin:0614142.107345.*'), (47, 'urn:epc:idpat:sgtin:0614142.107346.*'), (48, 'urn:epc:idpat:sgtin:0614142.107347.*'), (49, 'urn:epc:idpat:sgtin:0614142.107348.*'), (50, 'urn:epc:idpat:sgtin:0614142.107349.*'); 
 INSERT INTO `voc_readpoint` (`id`,`uri`) VALUES (21, 'urn:epcglobal:fmcg:loc:0614141073467.RP-1'), (22, 'urn:epcglobal:fmcg:loc:0614141073468.RP-1'), (23, 'urn:epcglobal:fmcg:loc:0614141073468.RP-2'), (24, 'urn:epcglobal:fmcg:loc:0614141073468.RP-3'), (25, 'urn:epcglobal:fmcg:loc:0614141073469.RP-1');
 INSERT INTO `voc_readpoint_attr` (`id`,`attribute`,`value`) VALUES (21, 'urn:epcglobal:fmcg:mda:gln', '0614141073467'), (22, 'urn:epcglobal:fmcg:mda:gln', '0614141073468'), (23, 'urn:epcglobal:fmcg:mda:gln', '0614141073468'), (24, 'urn:epcglobal:fmcg:mda:gln', '0614141073468'), (25, 'urn:epcglobal:fmcg:mda:gln', '0614141073469'), (21, 'urn:epcglobal:fmcg:mda:sslt', '208'), (22, 'urn:epcglobal:fmcg:mda:sslt', '209'), (23, 'urn:epcglobal:fmcg:mda:sslt', '299'), (24, 'urn:epcglobal:fmcg:mda:sslt', '210'), (25, 'urn:epcglobal:fmcg:mda:sslt', '209'), (21, 'urn:epcglobal:fmcg:mda:sslta', '422'), (22, 'urn:epcglobal:fmcg:mda:sslta', '414'), (23, 'urn:epcglobal:fmcg:mda:sslta', '422'), (24, 'urn:epcglobal:fmcg:mda:sslta', '414'), (25, 'urn:epcglobal:fmcg:mda:sslta', '414'), (21, 'urn:epcglobal:fmcg:mda:sle', 'PackagingLineX'), (22, 'urn:epcglobal:fmcg:mda:sle', 'DockDoor3'), (23, 'urn:epcglobal:fmcg:mda:sle', 'PickArea5'), (24, 'urn:epcglobal:fmcg:mda:sle', 'DockDoor6'), (25, 'urn:epcglobal:fmcg:mda:sle', 'DockDoor1');
+-- Reset the time zone
+SET time_zone = 'SYSTEM';
