@@ -274,7 +274,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @return <code>true</code> if subscriptionID already exists in DB,
      *         <code>false</code> otherwise.
      * @throws SQLException
-     *             If a problem with the database occured.
+     *             If a problem with the database occurred.
      */
     private boolean fetchExistsSubscriptionId(final String subscrId)
             throws SQLException {
@@ -294,59 +294,44 @@ public class QueryOperationsModule implements EPCISServicePortType {
     }
 
     /**
-     * Returns all EPCs associated to a certain event_id.
+     * Executes the SQL query given in the PreparedStatement and retrieves all
+     * EPC objects from the result set.
      * 
-     * @param tableName
-     *            The SQL name of the table to be searched
-     * @param eventId
-     *            is typically an 64bit integer. We use string here to avoid
-     *            java vs. SQL type problems.
-     * @return EPCs beloning to event_id
+     * @param stmt
+     *            The PreparedStatement to be executed.
+     * @return an array of EPC objects.
      * @throws SQLException
-     *             If an error with the database occured.
+     *             If a database access error occurred.
      */
-    private EPC[] fetchEPCs(final String tableName, final int eventId)
+    private EPC[] fetchEPCs(PreparedStatement stmt)
             throws SQLException {
-        String query = "SELECT DISTINCT epc FROM " + delimiter + tableName
-                + delimiter + " WHERE " + delimiter + "event_id" + delimiter
-                + " = " + eventId;
-        LOG.debug("QUERY: " + query);
-        Statement stmt = dbconnection.createStatement();
-
-        ResultSet rs = stmt.executeQuery(query);
+        ResultSet rs = stmt.executeQuery();
         List<EPC> epcList = new ArrayList<EPC>();
         while (rs.next()) {
             EPC epc = new EPC(rs.getString("epc"));
             epcList.add(epc);
         }
-
         EPC[] epcs = new EPC[epcList.size()];
         epcs = epcList.toArray(epcs);
         return epcs;
     }
 
     /**
-     * Retreives all MessageElement, i.e. all fieldname extensions for the given
-     * event.
+     * Executes the SQL query in the given PreparedStatement and retrieves all
+     * MessageElement objects, i.e. all fieldname extensions, from the result
+     * set.
      * 
+     * @param stmt
+     *            The PreparedStatement to be executed.
      * @param tableName
      *            The name of the table with the field extensions of the event.
-     * @param eventId
-     *            The ID of the event
-     * @return All MessageElement (fieldname extensions) associated with the
-     *         given eventId.
+     * @return an array of MessageElement objects.
      * @throws SQLException
-     *             If an error with the database occured.
+     *             If a database access error occurred.
      */
     private MessageElement[] fetchMessageElements(final String tableName,
-            final int eventId) throws SQLException {
-        String query = "SELECT * FROM " + delimiter + tableName + delimiter
-                + " WHERE " + delimiter + "event_id" + delimiter + " = "
-                + eventId;
-        LOG.debug("QUERY: " + query);
-        Statement stmt = dbconnection.createStatement();
-
-        ResultSet rs = stmt.executeQuery(query);
+            PreparedStatement stmt) throws SQLException {
+        ResultSet rs = stmt.executeQuery();
         List<MessageElement> meList = new ArrayList<MessageElement>();
         while (rs.next()) {
             String fieldname = rs.getString("fieldname");
@@ -383,49 +368,29 @@ public class QueryOperationsModule implements EPCISServicePortType {
     }
 
     /**
-     * Returns all bizTransactions associated to a certain event_id.
+     * Executes the SQL query in the given PreparedStatement and retrieves all
+     * BusinessTransactionType objects from the result set.
      * 
-     * @param tableName
-     *            The SQL name of the table to be searched.
-     * @param eventId
-     *            Typically an 64bit integer to identify the event.
-     * @return bizTransactions associated to event_id
+     * @param stmt
+     *            The PreparedStatement to be executed.
+     * @return an array of BusinessTransactionType objects.
      * @throws SQLException
-     *             DB problem.
+     *             If a database access error occurred.
      * @throws ImplementationException
-     *             Several problems get matched to this exception.
+     *             If an error retrieving or transforming data from the query
+     *             result occurred.
      */
     private BusinessTransactionType[] fetchBizTransactions(
-            final String tableName, final int eventId) throws SQLException,
+            PreparedStatement stmt) throws SQLException,
             ImplementationException {
-        String query = "SELECT DISTINCT "
-                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri"
-                + " FROM ((`BizTransaction` JOIN `"
-                + tableName
-                + "` ON `BizTransaction`.id = `"
-                + tableName
-                + "`.bizTrans_id)"
-                + "JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
-                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
-                + " WHERE `" + tableName + "`.event_id = " + eventId;
-        LOG.debug("QUERY: " + query);
-        Statement stmt = dbconnection.createStatement();
-
-        ResultSet rs = stmt.executeQuery(query.replaceAll("`", delimiter));
+        ResultSet rs = stmt.executeQuery();
         List<BusinessTransactionType> bizTransList = new ArrayList<BusinessTransactionType>();
         while (rs.next()) {
-            String uriString = null;
-            uriString = rs.getString("uri");
-            URI uri = stringToUri(uriString);
+            URI uri = stringToUri(rs.getString("uri"));
             BusinessTransactionType btrans = new BusinessTransactionType(uri);
-            uriString = rs.getString("typeuri");
-            if (uriString != null) {
-                uri = stringToUri(uriString);
-                btrans.setType(uri);
-            }
+            btrans.setType(stringToUri(rs.getString("typeuri")));
             bizTransList.add(btrans);
         }
-
         BusinessTransactionType[] bizTrans = new BusinessTransactionType[bizTransList.size()];
         bizTrans = bizTransList.toArray(bizTrans);
         return bizTrans;
@@ -491,6 +456,26 @@ public class QueryOperationsModule implements EPCISServicePortType {
         ResultSet rs = executeStatement(objectEventQuery, maxQueryTime);
         checkQueryRows();
 
+        // prepare some queries
+        String bizTransQuery = "SELECT "
+            + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
+            + "`BizTransaction` JOIN `event_ObjectEvent_bizTrans` ON `BizTransaction`.id = `event_ObjectEvent_bizTrans`.bizTrans_id"
+            + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
+            + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
+            + " WHERE `event_ObjectEvent_bizTrans`.event_id = ?";
+        String epcQuery = "SELECT epc FROM `event_ObjectEvent_EPCs` WHERE event_id = ?";
+        String extQuery = "SELECT * FROM `event_ObjectEvent_extensions` WHERE event_id = ?";
+        PreparedStatement bizTransStmt, epcStmt, extStmt;
+        if (LOG.isDebugEnabled()) {
+            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
+            epcStmt = new LoggableStatement(dbconnection, epcQuery);
+            extStmt = new LoggableStatement(dbconnection, extQuery);
+        } else {
+            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
+            epcStmt = dbconnection.prepareStatement(epcQuery);
+            extStmt = dbconnection.prepareStatement(extQuery);
+        }
+
         List<ObjectEventType> objectEventList = new ArrayList<ObjectEventType>();
         while (rs.next()) {
             ObjectEventType objectEvent = new ObjectEventType();
@@ -522,17 +507,28 @@ public class QueryOperationsModule implements EPCISServicePortType {
             }
 
             // set business transactions
-            BusinessTransactionType[] btt = fetchBizTransactions(
-                    "event_ObjectEvent_bizTrans", eventId);
+            bizTransStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + bizTransStmt.toString());
+            }
+            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
             objectEvent.setBizTransactionList(btt);
 
             // set EPCs
-            EPC[] epcs = fetchEPCs("event_ObjectEvent_EPCs", eventId);
+            epcStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + epcStmt.toString());
+            }
+            EPC[] epcs = fetchEPCs(epcStmt);
             objectEvent.setEpcList(epcs);
 
             // set field extensions
+            extStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + extStmt.toString());
+            }
             MessageElement[] any = fetchMessageElements(
-                    "event_ObjectEvent_extensions", eventId);
+                    "event_ObjectEvent_extensions", extStmt);
             objectEvent.set_any(any);
 
             objectEventList.add(objectEvent);
@@ -575,6 +571,26 @@ public class QueryOperationsModule implements EPCISServicePortType {
         ResultSet rs = executeStatement(aggregationEventQuery, maxQueryTime);
         checkQueryRows();
 
+        // prepare some queries
+        String bizTransQuery = "SELECT "
+            + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
+            + "`BizTransaction` JOIN `event_AggregationEvent_bizTrans` ON `BizTransaction`.id = `event_AggregationEvent_bizTrans`.bizTrans_id"
+            + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
+            + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
+            + " WHERE `event_AggregationEvent_bizTrans`.event_id = ?";
+        String epcQuery = "SELECT epc FROM `event_AggregationEvent_EPCs` WHERE event_id = ?";
+        String extQuery = "SELECT * FROM `event_AggregationEvent_extensions` WHERE event_id = ?";
+        PreparedStatement bizTransStmt, epcStmt, extStmt;
+        if (LOG.isDebugEnabled()) {
+            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
+            epcStmt = new LoggableStatement(dbconnection, epcQuery);
+            extStmt = new LoggableStatement(dbconnection, extQuery);
+        } else {
+            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
+            epcStmt = dbconnection.prepareStatement(epcQuery);
+            extStmt = dbconnection.prepareStatement(extQuery);
+        }
+
         List<AggregationEventType> aggrEventList = new ArrayList<AggregationEventType>();
         while (rs.next()) {
             AggregationEventType aggrEvent = new AggregationEventType();
@@ -607,17 +623,28 @@ public class QueryOperationsModule implements EPCISServicePortType {
             }
 
             // set business transactions
-            BusinessTransactionType[] bizTrans = fetchBizTransactions(
-                    "event_AggregationEvent_bizTrans", eventId);
-            aggrEvent.setBizTransactionList(bizTrans);
+            bizTransStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + bizTransStmt.toString());
+            }
+            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
+            aggrEvent.setBizTransactionList(btt);
 
-            // set associated EPCs
-            EPC[] epcs = fetchEPCs("event_AggregationEvent_EPCs", eventId);
+            // set EPCs
+            epcStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + epcStmt.toString());
+            }
+            EPC[] epcs = fetchEPCs(epcStmt);
             aggrEvent.setChildEPCs(epcs);
 
             // set field extensions
+            extStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + extStmt.toString());
+            }
             MessageElement[] any = fetchMessageElements(
-                    "event_AggregationEvent_extensions", eventId);
+                    "event_AggregationEvent_extensions", extStmt);
             aggrEvent.set_any(any);
 
             aggrEventList.add(aggrEvent);
@@ -659,6 +686,23 @@ public class QueryOperationsModule implements EPCISServicePortType {
         ResultSet rs = executeStatement(quantityEventQuery, maxQueryTime);
         checkQueryRows();
 
+        // prepare some queries
+        String bizTransQuery = "SELECT "
+            + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
+            + "`BizTransaction` JOIN `event_QuantityEvent_bizTrans` ON `BizTransaction`.id = `event_QuantityEvent_bizTrans`.bizTrans_id"
+            + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
+            + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
+            + " WHERE `event_QuantityEvent_bizTrans`.event_id = ?";
+        String extQuery = "SELECT * FROM `event_QuantityEvent_extensions` WHERE event_id = ?";
+        PreparedStatement bizTransStmt, extStmt;
+        if (LOG.isDebugEnabled()) {
+            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
+            extStmt = new LoggableStatement(dbconnection, extQuery);
+        } else {
+            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
+            extStmt = dbconnection.prepareStatement(extQuery);
+        }
+
         List<QuantityEventType> quantEventList = new ArrayList<QuantityEventType>();
         while (rs.next()) {
             QuantityEventType quantEvent = new QuantityEventType();
@@ -692,13 +736,20 @@ public class QueryOperationsModule implements EPCISServicePortType {
             }
 
             // set business transactions
-            BusinessTransactionType[] bizTrans = fetchBizTransactions(
-                    "event_QuantityEvent_bizTrans", eventId);
-            quantEvent.setBizTransactionList(bizTrans);
+            bizTransStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + bizTransStmt.toString());
+            }
+            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
+            quantEvent.setBizTransactionList(btt);
 
             // set field extensions
+            extStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + extStmt.toString());
+            }
             MessageElement[] any = fetchMessageElements(
-                    "event_QuantityEvent_extensions", eventId);
+                    "event_QuantityEvent_extensions", extStmt);
             quantEvent.set_any(any);
 
             quantEventList.add(quantEvent);
@@ -741,6 +792,26 @@ public class QueryOperationsModule implements EPCISServicePortType {
         ResultSet rs = executeStatement(transactionEventQuery, maxQueryTime);
         checkQueryRows();
 
+        // prepare some queries
+        String bizTransQuery = "SELECT "
+            + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
+            + "`BizTransaction` JOIN `event_TransactionEvent_bizTrans` ON `BizTransaction`.id = `event_TransactionEvent_bizTrans`.bizTrans_id"
+            + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
+            + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
+            + " WHERE `event_TransactionEvent_bizTrans`.event_id = ?";
+        String epcQuery = "SELECT epc FROM `event_TransactionEvent_EPCs` WHERE event_id = ?";
+        String extQuery = "SELECT * FROM `event_TransactionEvent_extensions` WHERE event_id = ?";
+        PreparedStatement bizTransStmt, epcStmt, extStmt;
+        if (LOG.isDebugEnabled()) {
+            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
+            epcStmt = new LoggableStatement(dbconnection, epcQuery);
+            extStmt = new LoggableStatement(dbconnection, extQuery);
+        } else {
+            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
+            epcStmt = dbconnection.prepareStatement(epcQuery);
+            extStmt = dbconnection.prepareStatement(extQuery);
+        }
+
         List<TransactionEventType> transEventList = new ArrayList<TransactionEventType>();
         while (rs.next()) {
             TransactionEventType transEvent = new TransactionEventType();
@@ -773,17 +844,28 @@ public class QueryOperationsModule implements EPCISServicePortType {
             }
 
             // set business transactions
-            BusinessTransactionType[] bizTrans = fetchBizTransactions(
-                    "event_TransactionEvent_bizTrans", eventId);
-            transEvent.setBizTransactionList(bizTrans);
+            bizTransStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + bizTransStmt.toString());
+            }
+            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
+            transEvent.setBizTransactionList(btt);
 
-            // set associated EPCs
-            EPC[] epcs = fetchEPCs("event_TransactionEvent_EPCs", eventId);
+            // set EPCs
+            epcStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + epcStmt.toString());
+            }
+            EPC[] epcs = fetchEPCs(epcStmt);
             transEvent.setEpcList(epcs);
 
             // set field extensions
+            extStmt.setInt(1, eventId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("QUERY: " + extStmt.toString());
+            }
             MessageElement[] any = fetchMessageElements(
-                    "event_TransactionEvent_extensions", eventId);
+                    "event_TransactionEvent_extensions", extStmt);
             transEvent.set_any(any);
 
             transEventList.add(transEvent);
@@ -802,7 +884,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * global 'maxNrOfRows' parameter.
      * 
      * @throws SQLException
-     *             If a problem accessing the database occured.
+     *             If a problem accessing the database occurred.
      * @throws QueryTooLargeException
      *             If the rows returned by the query is larger than specified or
      *             larger than this implementation is willing to accept.
@@ -875,7 +957,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryParameterException
      *             If one of the given QueryParam is invalid.
      * @throws ImplementationException
-     *             If an error in the implementation occured.
+     *             If an error in the implementation occurred.
      */
     private PreparedStatement createEventQuery(final QueryParam[] queryParams,
             final String eventType) throws SQLException,
@@ -1422,7 +1504,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            A Subscribe object containing the query to be subscribed..
      * @return Nothing.
      * @throws ImplementationException
-     *             If a problem with the EPCIS implementation occured.
+     *             If a problem with the EPCIS implementation occurred.
      * @throws InvalidURIException
      *             If an invalid URI where the query results should be posted is
      *             provided.
@@ -1631,9 +1713,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * 
      * @return A Map mapping query names to scheduled query subscriptions.
      * @throws SQLException
-     *             If a problem with the database occured.
+     *             If a problem with the database occurred.
      * @throws ImplementationException
-     *             If a problem with the EPCIS implementation occured.
+     *             If a problem with the EPCIS implementation occurred.
      */
     private Map<String, QuerySubscriptionScheduled> fetchSubscriptions()
             throws SQLException, ImplementationException {
@@ -1703,7 +1785,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            unsubscribed.
      * @return Nothing.
      * @throws ImplementationException
-     *             If a problem with the EPCIS implementation occured.
+     *             If a problem with the EPCIS implementation occurred.
      * @throws NoSuchSubscriptionException
      *             If the suscription id is not subscribed.
      */
@@ -1766,7 +1848,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             If the map could not be reloaded.
      * @throws SQLException
-     *             If a database error occured.
+     *             If a database error occurred.
      */
     private Map<String, QuerySubscriptionScheduled> loadSubscriptions()
             throws ImplementationException, SQLException {
@@ -1786,7 +1868,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            An empty parameter.
      * @return An ArrayOfString containing IDs of all subscribed queries.
      * @throws ImplementationException
-     *             If a problem with the EPCIS implementation occured.
+     *             If a problem with the EPCIS implementation occurred.
      */
     public ArrayOfString getSubscriptionIDs(final GetSubscriptionIDs parms)
             throws ImplementationException {
@@ -1816,7 +1898,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            The query to poll.
      * @return A QueryResults object containing the result of the query.
      * @throws ImplementationException
-     *             If a problem with the EPCIS implementation occured.
+     *             If a problem with the EPCIS implementation occurred.
      * @throws QueryTooLargeException
      *             If the query is too large.
      * @throws QueryParameterException
@@ -1915,11 +1997,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            The parameters for running the MasterDataQuery.
      * @return The QueryResults.
      * @throws SQLException
-     *             If an error accessing the database occured.
+     *             If an error accessing the database occurred.
      * @throws QueryParameterException
      *             If one of the provided QueryParam is invalid.
      * @throws ImplementationException
-     *             If a service implementation error occured.
+     *             If a service implementation error occurred.
      * @throws QueryTooLargeException
      *             If the query is too large to be executed.
      */
@@ -2117,9 +2199,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            QueryTooLargeException is raised.
      * @return A List of vocabularies (URI) filtered by the given arguments.
      * @throws SQLException
-     *             If an error accessing the database occured.
+     *             If an error accessing the database occurred.
      * @throws ImplementationException
-     *             If an error converting a String to an URI occured.
+     *             If an error converting a String to an URI occurred.
      * @throws QueryTooLargeException
      *             If the actual number of returned vocabularies would exceed
      *             the given maxElementCount.
@@ -2214,9 +2296,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            A possibly empty array of vocabulary names.
      * @return A mapping from the table name to the vocabulary name.
      * @throws SQLException
-     *             If an error accessing the databse occured.
+     *             If an error accessing the databse occurred.
      * @throws ImplementationException
-     *             If an error converting a String to an URI occured.
+     *             If an error converting a String to an URI occurred.
      */
     private Map<String, URI> fetchVocabularyTableNames(final String[] uris)
             throws SQLException, ImplementationException {
@@ -2264,7 +2346,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            the retrieved attributes.
      * @return The attributes, a mapping from attribute name to attribute value.
      * @throws SQLException
-     *             If an error accessing the database occured.
+     *             If an error accessing the database occurred.
      */
     private Map<String, String> fetchAttributes(final String vocTableName,
             final String vocName, final String[] filterAttrNames)
@@ -2319,7 +2401,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            retrieved.
      * @return A List of URI containing the children.
      * @throws SQLException
-     *             If a DB access error occured.
+     *             If a DB access error occurred.
      * @throws ImplementationException
      *             If a String could not be converted into an URI.
      */
@@ -2408,7 +2490,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *            The time to wait for the query to finish.
      * @return The ResultSet from query execution.
      * @throws QueryTooComplexException
-     *             If the query takes longer than the gven timeout.
+     *             If the query takes longer than the given timeout.
      * @throws SQLException
      *             If the execution of the query threw an exception.
      */
