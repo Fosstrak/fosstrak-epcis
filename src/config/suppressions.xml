@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This is a custom suppressions XML documents that goes along with the
+  Checkstyle SuppressionFilter module.
+-->
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.0//EN" "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+<suppressions>
+    <!-- exclude all checks from the generated Axis code in the soapapi package -->
+    <suppress checks=".*" files="soapapi/.*"/>
+</suppressions>

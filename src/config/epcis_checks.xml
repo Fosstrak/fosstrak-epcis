@@ -8,15 +8,11 @@
 <module name="Checker">
     <property name="severity" value="warning"/>
     <module name="TreeWalker">
-        <module name="AbstractClassName"/>
         <module name="ArrayTypeStyle"/>
         <module name="AvoidNestedBlocks"/>
         <module name="AvoidStarImport"/>
         <module name="ConstantName"/>
         <module name="DefaultComesLast"/>
-        <module name="DesignForExtension">
-            <property name="severity" value="ignore"/>
-        </module>
         <module name="DoubleCheckedLocking"/>
         <module name="EmptyBlock">
             <property name="option" value="text"/>
@@ -70,9 +66,6 @@
         </module>
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
-        <module name="MagicNumber">
-            <property name="severity" value="ignore"/>
-        </module>
         <module name="MissingSwitchDefault"/>
         <module name="RedundantThrows"/>
         <module name="SimplifyBooleanExpression"/>
@@ -91,13 +84,10 @@
             <property name="severity" value="info"/>
         </module>
         <module name="UpperEll"/>
-        <module name="Indentation">
-            <property name="severity" value="ignore"/>
-        </module>
         <module name="DefaultComesLast"/>
         <module name="DeclarationOrder"/>
         <module name="Header">
-            <property name="headerFile" value="${checkstyle.header.file}"/>
+            <property name="headerFile" value="${samedir}/HEADER.txt"/>
         </module>
     </module>
     <module name="PackageHtml"/>
@@ -105,5 +95,7 @@
         <property name="lineSeparator" value="lf"/>
     </module>
     <module name="Translation"/>
-    <module name="StrictDuplicateCode"/>
+    <module name="SuppressionFilter">
+        <property name="file" value="${samedir}/suppressions.xml"/>
+    </module>
 </module>
