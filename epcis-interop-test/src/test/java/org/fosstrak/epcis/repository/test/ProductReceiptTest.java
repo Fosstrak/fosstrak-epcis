@@ -53,9 +53,9 @@ public class ProductReceiptTest extends TestCase {
      * Test SE4.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE4() throws IOException, ServiceException {
         int testNr = 4;
@@ -75,9 +75,9 @@ public class ProductReceiptTest extends TestCase {
      * Test SE5.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE5() throws IOException, ServiceException {
         fail("Authentication not supported!");
@@ -87,9 +87,9 @@ public class ProductReceiptTest extends TestCase {
      * Test SE6.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE6() throws IOException, ServiceException {
         int testNr = 6;
@@ -109,9 +109,9 @@ public class ProductReceiptTest extends TestCase {
      * Test SE7.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE7() throws IOException, ServiceException {
         int testNr = 7;

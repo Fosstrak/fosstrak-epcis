@@ -49,9 +49,9 @@ public class EventFieldExtensionTest extends TestCase {
      * Tests event fieldname extensions.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testExtension() throws IOException, ServiceException {
 

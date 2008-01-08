@@ -50,9 +50,9 @@ public class AuthenticationTest extends TestCase {
      * Test SE1.
      * 
      * @throws IOException
-     *             IF an I/O error occured.
+     *             IF an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE1() throws IOException, ServiceException {
         int testNr = 1;
@@ -72,9 +72,9 @@ public class AuthenticationTest extends TestCase {
      * Test SE2.
      * 
      * @throws IOException
-     *             IF an I/O error occured.
+     *             IF an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE2() throws IOException, ServiceException {
         fail("Authentication not supported!");
@@ -84,9 +84,9 @@ public class AuthenticationTest extends TestCase {
      * Test SE3.
      * 
      * @throws IOException
-     *             IF an I/O error occured.
+     *             IF an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE3() throws IOException, ServiceException {
         int testNr = 3;

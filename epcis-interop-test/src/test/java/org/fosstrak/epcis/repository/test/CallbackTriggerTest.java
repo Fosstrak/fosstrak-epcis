@@ -40,7 +40,7 @@ public class CallbackTriggerTest extends TestCase {
      * Tests if setting the initialRecordTime parameter has effect.
      * 
      * @throws Exception
-     *             If an error executing the test occured.
+     *             If an error executing the test occurred.
      */
     public void testSE75() throws Exception {
 

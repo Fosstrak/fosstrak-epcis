@@ -87,9 +87,9 @@ public class QueryTooLargeTest extends TestCase {
      * Tests if QueryTooLargeException is raised.
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE50() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE50-Request-1-Poll.xml";
@@ -108,9 +108,9 @@ public class QueryTooLargeTest extends TestCase {
      * Tests if QueryTooLargeException is raised (callback).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE68() throws IOException, ServiceException {
         // subscribe query

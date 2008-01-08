@@ -54,9 +54,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD1.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD1() throws IOException, ServiceException {
         int testNr = 1;
@@ -76,9 +76,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD2.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD2() throws IOException, ServiceException {
         int testNr = 2;
@@ -98,9 +98,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD3.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD3() throws IOException, ServiceException {
         int testNr = 3;
@@ -120,9 +120,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD4.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD4() throws IOException, ServiceException {
         int testNr = 4;
@@ -142,9 +142,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD5.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD5() throws IOException, ServiceException {
         int testNr = 5;
@@ -164,9 +164,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD6.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD6() throws IOException, ServiceException {
         int testNr = 6;
@@ -186,9 +186,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD7.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD7() throws IOException, ServiceException {
         int testNr = 7;
@@ -208,9 +208,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD8.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD8() throws IOException, ServiceException {
         int testNr = 8;
@@ -232,9 +232,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD9.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD9() throws IOException, ServiceException {
         int testNr = 9;
@@ -254,9 +254,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD10.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD10() throws IOException, ServiceException {
         int testNr = 10;
@@ -276,9 +276,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD11.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD11() throws IOException, ServiceException {
         int testNr = 11;
@@ -298,9 +298,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD12.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD12() throws IOException, ServiceException {
         int testNr = 12;
@@ -320,9 +320,9 @@ public class MasterDataQueryTest extends TestCase {
      * TEST MD13.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testMD13() throws IOException, ServiceException {
         int testNr = 13;
@@ -334,8 +334,7 @@ public class MasterDataQueryTest extends TestCase {
 
             fail("SubscribeNotPermittedException expected");
         } catch (SubscribeNotPermittedException e) {
-            assertEquals("Subscription not allowed for SimpleMasterDataQuery.",
-                    e.getReason());
+            assertEquals("Subscription not allowed for SimpleMasterDataQuery.", e.getReason());
         }
     }
 }

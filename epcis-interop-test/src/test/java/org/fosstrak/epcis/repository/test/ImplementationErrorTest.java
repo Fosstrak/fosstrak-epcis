@@ -61,9 +61,9 @@ public class ImplementationErrorTest extends TestCase {
      * Tests if ImplementationException is raised.
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE51() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE51-Request-1-Poll.xml";
@@ -84,9 +84,9 @@ public class ImplementationErrorTest extends TestCase {
      * Tests if ImplementationException is raised (callback).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE69() throws IOException, ServiceException {
         // subscribe query

@@ -48,9 +48,9 @@ public class QueryTooComplexTest extends TestCase {
      * Tests if QueryTooComplexException is raised.
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE49() throws IOException, ServiceException {
         System.out.println("SETUP: 'maxQueryExecutionTime' property must be set to 0!");

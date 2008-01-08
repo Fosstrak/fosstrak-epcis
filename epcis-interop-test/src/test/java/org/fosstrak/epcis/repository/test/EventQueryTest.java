@@ -816,8 +816,7 @@ public class EventQueryTest extends TestCase {
         QueryResults actResults = client.poll(fis);
         fis.close();
 
-        String resp = RESP_PATH + RESP_PREFIX + testNr
-                + "-Response-1-QueryResults.xml";
+        String resp = RESP_PATH + RESP_PREFIX + testNr + "-Response-1-QueryResults.xml";
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
         fis.close();

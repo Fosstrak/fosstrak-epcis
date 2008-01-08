@@ -50,9 +50,9 @@ public class SubscriptionIdsTest extends TestCase {
      * two subscribed queries.
      * 
      * @throws IOException
-     *             If a problem reading the query xml occured.
+     *             If a problem reading the query xml occurred.
      * @throws ServiceException
-     *             If an EPCIS query service error occured.
+     *             If an EPCIS query service error occurred.
      */
     public void testSE46() throws IOException, ServiceException {
 

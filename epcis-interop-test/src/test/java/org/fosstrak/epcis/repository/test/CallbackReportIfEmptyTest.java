@@ -128,9 +128,9 @@ public class CallbackReportIfEmptyTest extends TestCase {
      * @throws ParserConfigurationException
      *             If the parser could not be configured.
      * @throws SAXException
-     *             If a parse error occured.
+     *             If a parse error occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     private Document parseResponse(final String resp)
             throws ParserConfigurationException, SAXException, IOException {

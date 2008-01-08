@@ -56,7 +56,7 @@ public class CallbackUnsubscribeTest extends TestCase {
      * no further notification after the query is unsubscribed.
      * 
      * @throws IOException
-     *             If an I/O excpetion occured.
+     *             If an I/O excpetion occurred.
      * @throws ServiceException
      *             If the EPCIS query service encountered a problem.
      * @throws ParserConfigurationException
@@ -119,9 +119,9 @@ public class CallbackUnsubscribeTest extends TestCase {
      * @throws ParserConfigurationException
      *             If the parser could not be configured.
      * @throws SAXException
-     *             If a parse error occured.
+     *             If a parse error occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     private Document parseResponse(final String resp)
             throws ParserConfigurationException, SAXException, IOException {

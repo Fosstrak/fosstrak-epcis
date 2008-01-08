@@ -51,9 +51,9 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if InvalidURIException is raised.
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE52() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE52-Request-1-Subscribe.xml";
@@ -65,8 +65,7 @@ public class ErrorMessagesTest extends TestCase {
             fail("InvalidURIException expected");
         } catch (InvalidURIException e) {
             fis.close();
-            assertEquals("Destination URI is invalid: unknown protocol: htto",
-                    e.getReason());
+            assertEquals("Destination URI is invalid: unknown protocol: htto", e.getReason());
         }
     }
 
@@ -74,9 +73,9 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if DuplicateSubscriptionException is raised.
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE53() throws IOException, ServiceException {
         // subscribe first query
@@ -97,9 +96,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (DuplicateSubscriptionException e) {
             fis.close();
             client.unsubscribe("QuerySE53"); // clean up
-            assertEquals(
-                    "SubscriptionID 'QuerySE53' already exists. Choose a different subscriptionID.",
-                    e.getReason());
+            assertEquals("SubscriptionID 'QuerySE53' already exists. Choose a different subscriptionID.", e.getReason());
         }
     }
 
@@ -107,9 +104,9 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if NoSuchSubscriptionException is raised.
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE54() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE54-Request-1-Subscribe.xml";
@@ -126,8 +123,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (NoSuchSubscriptionException e) {
             // ok
             client.unsubscribe("QuerySE54-1");
-            assertEquals("There is no subscription with ID 'QuerySE54-2'.",
-                    e.getReason());
+            assertEquals("There is no subscription with ID 'QuerySE54-2'.", e.getReason());
         }
     }
 
@@ -136,9 +132,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE55() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE55-Request-1-Subscribe.xml";
@@ -152,9 +148,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value '61' for parameter 'second' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value '61' for parameter 'second' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -163,9 +157,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE56() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE56-Request-1-Subscribe.xml";
@@ -179,9 +173,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value '-1' for parameter 'second' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value '-1' for parameter 'second' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -189,9 +181,9 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (second value invalid).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE57() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE57-Request-1-Subscribe.xml";
@@ -205,9 +197,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value 'a' for parameter 'second' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value 'a' for parameter 'second' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -216,9 +206,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE58() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE58-Request-1-Subscribe.xml";
@@ -232,9 +222,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value '[1-8]' for parameter 'dayOfWeek' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value '[1-8]' for parameter 'dayOfWeek' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -243,9 +231,9 @@ public class ErrorMessagesTest extends TestCase {
      * invalid).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE59() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE59-Request-1-Subscribe.xml";
@@ -259,9 +247,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value 'x' for parameter 'dayOfWeek' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value 'x' for parameter 'dayOfWeek' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -270,9 +256,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE60() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE60-Request-1-Subscribe.xml";
@@ -286,9 +272,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value '-1' for parameter 'minute' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value '-1' for parameter 'minute' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -297,9 +281,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE61() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE61-Request-1-Subscribe.xml";
@@ -313,9 +297,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value '61' for parameter 'minute' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value '61' for parameter 'minute' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -323,9 +305,9 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (minute value invalid).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE62() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE62-Request-1-Subscribe.xml";
@@ -339,9 +321,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value 'a' for parameter 'minute' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value 'a' for parameter 'minute' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -350,9 +330,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE63() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE63-Request-1-Subscribe.xml";
@@ -366,9 +346,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value '24' for parameter 'hour' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value '24' for parameter 'hour' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -377,9 +355,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE64() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE64-Request-1-Subscribe.xml";
@@ -393,9 +371,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value '-1' for parameter 'hour' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value '-1' for parameter 'hour' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -404,9 +380,9 @@ public class ErrorMessagesTest extends TestCase {
      * range).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE65() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE65-Request-1-Subscribe.xml";
@@ -420,9 +396,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (SubscriptionControlsException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The value 'a' for parameter 'hour' is invalid in the query schedule.",
-                    e.getReason());
+            assertEquals("The value 'a' for parameter 'hour' is invalid in the query schedule.", e.getReason());
         }
     }
 
@@ -430,9 +404,9 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if QueryParameterException is raised (parameter name not defined).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE70() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE70-Request-1-Poll.xml";
@@ -445,8 +419,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (QueryParameterException e) {
             // ok
             fis.close();
-            assertEquals("The parameter EQ_abcd cannot be recognised.",
-                    e.getReason());
+            assertEquals("The parameter EQ_abcd cannot be recognised.", e.getReason());
         }
     }
 
@@ -454,9 +427,9 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if QueryParameterException is raised (invalid parameter value).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE71() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE71-Request-1-Poll.xml";
@@ -469,9 +442,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (QueryParameterException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "The type of the value for query parameter 'GE_quantity': 3.1459 is invalid.",
-                    e.getReason());
+            assertEquals("The type of the value for query parameter 'GE_quantity': 3.1459 is invalid.", e.getReason());
         }
     }
 
@@ -480,9 +451,9 @@ public class ErrorMessagesTest extends TestCase {
      * parameter).
      * 
      * @throws ServiceException
-     *             If an error in the EPCIS query service occured.
+     *             If an error in the EPCIS query service occurred.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     public void testSE72() throws IOException, ServiceException {
         final String query = "Test-EPCIS10-SE72-Request-1-Poll.xml";
@@ -495,9 +466,7 @@ public class ErrorMessagesTest extends TestCase {
         } catch (QueryParameterException e) {
             // ok
             fis.close();
-            assertEquals(
-                    "Two or more inputs are provided for the same parameter 'EQ_bizStep'.",
-                    e.getReason());
+            assertEquals("Two or more inputs are provided for the same parameter 'EQ_bizStep'.", e.getReason());
         }
     }
 }

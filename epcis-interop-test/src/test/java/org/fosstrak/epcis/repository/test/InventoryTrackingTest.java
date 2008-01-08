@@ -52,9 +52,9 @@ public class InventoryTrackingTest extends TestCase {
      * TEST SE8.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE8() throws IOException, ServiceException {
         int testNr = 8;
@@ -73,9 +73,9 @@ public class InventoryTrackingTest extends TestCase {
      * TEST SE9.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an error in the service occured.
+     *             If an error in the service occurred.
      */
     public void testSE9() throws IOException, ServiceException {
         int testNr = 9;

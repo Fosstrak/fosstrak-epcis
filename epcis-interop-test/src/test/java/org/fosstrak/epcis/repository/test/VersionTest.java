@@ -41,9 +41,9 @@ public class VersionTest extends TestCase {
      * Tests if the supported Standard Version is "1.0".
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an EPCIS query service error occured.
+     *             If an EPCIS query service error occurred.
      */
     public void testSE47() throws IOException, ServiceException {
         String stdVersion = client.getStandardVersion();
@@ -54,9 +54,9 @@ public class VersionTest extends TestCase {
      * Tests if the vendor version is defined.
      * 
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      * @throws ServiceException
-     *             If an EPCIS query service error occured.
+     *             If an EPCIS query service error occurred.
      */
     public void testSE67() throws IOException, ServiceException {
         String version = client.getVendorVersion();
