@@ -83,6 +83,13 @@ import org.w3c.dom.Element;
 public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
     /**
+     * Miscellaneous numeric formats used in formatting.
+     */
+    private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
+    private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
+    private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
+
+    /**
      * The client through which the EPCISEvents will be sent to the repository's
      * Capture Operations Module.
      */
@@ -292,7 +299,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         mwGenerateEventButton.addActionListener(this);
         mwButtonPanel.add(mwGenerateEventButton);
 
-        // instantiate all event data input fields, their default values and descriptions
+        // instantiate all event data input fields, their default values and
+        // descriptions
         mwEventTimeLabel = new JLabel("event time");
         mwEventTimeTextField = new JTextField(format(Calendar.getInstance()));
         mwEventTimeTextField.setToolTipText(toolTipDate);
@@ -1367,7 +1375,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     }
 
     /**
-     * Adds the TimeZone offset of the Event to the XML-File. Required for all Events.
+     * Adds the TimeZone offset of the Event to the XML-File. Required for all
+     * Events.
      * 
      * @param document
      *            the DOM-Tree where is has to inserted
@@ -1756,13 +1765,6 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     }
 
     /**
-     * Miscellaneous numeric formats used in formatting.
-     */
-    private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
-    private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
-    private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
-
-    /**
      * Formats a <code>Calendar</code> value into an ISO8601-compliant
      * date/time string.
      * 
@@ -1777,8 +1779,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
 
         // determine era and adjust year if necessary
         int year = cal.get(Calendar.YEAR);
-        if (cal.isSet(Calendar.ERA)
-                && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
+        if (cal.isSet(Calendar.ERA) && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
             /**
              * calculate year using astronomical system: year n BCE =>
              * astronomical year -n + 1

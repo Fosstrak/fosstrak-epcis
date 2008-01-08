@@ -108,7 +108,7 @@ public class CaptureClient implements CaptureInterface {
      * 
      * @return The response from the capture module.
      * @throws IOException
-     *             If a communication error occured.
+     *             If a communication error occurred.
      */
     public int dbReset() throws IOException {
         String formParam = "dbReset=true";
@@ -123,7 +123,7 @@ public class CaptureClient implements CaptureInterface {
      * @return
      * @throws IOException
      */
-    private HttpURLConnection openPostConnection(String contentType) throws IOException {
+    private HttpURLConnection openPostConnection(final String contentType) throws IOException {
         // the url where the capture interface listens
         URL serviceUrl = new URL(captureUrl);
         HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
@@ -142,7 +142,7 @@ public class CaptureClient implements CaptureInterface {
      *            The data to send.
      * @return The HTTP response message
      * @throws IOException
-     *             If an error on the HTTP layer occured.
+     *             If an error on the HTTP layer occurred.
      */
     private int doPost(final String data, final String contentType) throws IOException {
         HttpURLConnection connection = openPostConnection(contentType);
@@ -163,7 +163,7 @@ public class CaptureClient implements CaptureInterface {
      *            The data to send.
      * @return The HTTP response message
      * @throws IOException
-     *             If an error on the HTTP layer occured.
+     *             If an error on the HTTP layer occurred.
      */
     private int doPost(final InputStream data, final String contentType) throws IOException {
         HttpURLConnection connection = openPostConnection(contentType);
@@ -190,7 +190,7 @@ public class CaptureClient implements CaptureInterface {
      * @param url
      *            The new URL String to which this client should connect.
      */
-    public void setCaptureUrl(String url) {
+    public void setCaptureUrl(final String url) {
         this.captureUrl = url;
     }
 }

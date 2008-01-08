@@ -43,7 +43,7 @@ public class CaptureEvent {
     private int type = 0;
 
     /**
-     * The time at which the event occured. Null will insert the time when the
+     * The time at which the event occurred. Null will insert the time when the
      * example is selected. Used by all events.
      */
     private String eventTime = null;
