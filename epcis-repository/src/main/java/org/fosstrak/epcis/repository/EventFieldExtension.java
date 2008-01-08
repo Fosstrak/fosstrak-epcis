@@ -58,8 +58,7 @@ public class EventFieldExtension {
      * @param value
      *            The value of the event field.
      */
-    public EventFieldExtension(final String prefix, final String namespace,
-            final String localname, final String value) {
+    public EventFieldExtension(final String prefix, final String namespace, final String localname, final String value) {
         this.localname = localname;
         this.prefix = prefix;
         this.namespace = namespace;

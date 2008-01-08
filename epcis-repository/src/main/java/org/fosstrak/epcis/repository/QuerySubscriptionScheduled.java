@@ -39,8 +39,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Alain Remund, Arthur van Dorp
  */
-public class QuerySubscriptionScheduled extends QuerySubscription implements
-        NotificationListener, Serializable {
+public class QuerySubscriptionScheduled extends QuerySubscription implements NotificationListener, Serializable {
 
     private static final Logger LOG = Logger.getLogger(QuerySubscriptionScheduled.class);
 
@@ -81,19 +80,15 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements
      * @throws ImplementationException
      *             If the Scheduler could not be started.
      */
-    public QuerySubscriptionScheduled(final String subscriptionID,
-            final QueryParam[] queryParams, final URI dest,
-            final Boolean reportIfEmpty,
-            final GregorianCalendar initialRecordTime,
-            final GregorianCalendar lastTimeExecuted, final Schedule schedule,
-            final String queryName) throws ImplementationException {
-        super(subscriptionID, queryParams, dest, reportIfEmpty,
-              initialRecordTime, lastTimeExecuted, queryName);
+    public QuerySubscriptionScheduled(final String subscriptionID, final QueryParam[] queryParams, final URI dest,
+            final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
+            final GregorianCalendar lastTimeExecuted, final Schedule schedule, final String queryName)
+            throws ImplementationException {
+        super(subscriptionID, queryParams, dest, reportIfEmpty, initialRecordTime, lastTimeExecuted, queryName);
         this.schedule = schedule;
         if (LOG.isDebugEnabled()) {
             Date nextSchedule = schedule.nextScheduledTime().getTime();
-            LOG.debug("Next scheduled time for the subscribed query is '"
-                    + nextSchedule + "'.");
+            LOG.debug("Next scheduled time for the subscribed query is '" + nextSchedule + "'.");
             LOG.debug("URI to which to send results for the subscribed query is " + dest.toString());
         }
         startThread();
@@ -110,8 +105,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements
         nextAction.addNotificationListener(this, null, nextAction);
 
         Date nextSchedule = schedule.nextScheduledTime().getTime();
-        nextAction.addNotification("SubscriptionSchedule",
-                "Please do the query", null, nextSchedule);
+        nextAction.addNotification("SubscriptionSchedule", "Please do the query", null, nextSchedule);
         nextAction.start();
     }
 
@@ -142,8 +136,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements
      *            A Timer stating the time when the Notification should be
      *            invoked.
      */
-    public void handleNotification(final Notification pNotification,
-            final Object pHandback) {
+    public void handleNotification(final Notification pNotification, final Object pHandback) {
         if (pHandback == null) {
             LOG.error("The timer stating the next scheduled query execution time is null!");
             return;
@@ -158,16 +151,13 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements
 
                 // determine next scheduled execution time
                 Date nextSchedule = schedule.nextScheduledTime().getTime();
-                LOG.debug("Next scheduled time for the subscribed query is '"
-                        + nextSchedule + "'.");
-                ((Timer) pHandback).addNotification("SubscriptionSchedule",
-                        "Please do the query", (Timer) pHandback, nextSchedule);
+                LOG.debug("Next scheduled time for the subscribed query is '" + nextSchedule + "'.");
+                ((Timer) pHandback).addNotification("SubscriptionSchedule", "Please do the query", (Timer) pHandback,
+                        nextSchedule);
 
             } catch (ImplementationException e) {
-                String msg = "The next scheduled date for the subscribed query with ID '"
-                        + getSubscriptionID()
-                        + "' cannot be evaluated: "
-                        + e.getReason();
+                String msg = "The next scheduled date for the subscribed query with ID '" + getSubscriptionID()
+                        + "' cannot be evaluated: " + e.getReason();
                 LOG.error(msg, e);
             }
         }

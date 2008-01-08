@@ -83,8 +83,7 @@ public class Schedule implements Serializable {
      * @throws SubscriptionControlsException
      *             If invalid data is part of the Schedule.
      */
-    public Schedule(final QuerySchedule schedule)
-            throws SubscriptionControlsException {
+    public Schedule(final QuerySchedule schedule) throws SubscriptionControlsException {
 
         // ease handling of null values in the query schedule
         if (schedule.getSecond() == null) {
@@ -130,11 +129,9 @@ public class Schedule implements Serializable {
             throw new SubscriptionControlsException(
                     "Invalid query schedule: impossible month/dayOfMonth combination, e.g. February 30.");
         }
-        if (!months.isEmpty()
-                && daysOfMonth.first() == 31
+        if (!months.isEmpty() && daysOfMonth.first() == 31
                 && !months.contains(0) // months w. 31 days are always ok
-                && !months.contains(2) && !months.contains(4)
-                && !months.contains(6) && !months.contains(7)
+                && !months.contains(2) && !months.contains(4) && !months.contains(6) && !months.contains(7)
                 && !months.contains(9) && !months.contains(11)) {
             throw new SubscriptionControlsException(
                     "Invalid query schedule: impossible month/dayOfMonth combination, e.g. April 31.");
@@ -170,14 +167,13 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any kind of error.
      */
-    public GregorianCalendar nextScheduledTime(final GregorianCalendar time)
-            throws ImplementationException {
+    public GregorianCalendar nextScheduledTime(final GregorianCalendar time) throws ImplementationException {
         GregorianCalendar nextSchedule = (GregorianCalendar) time.clone();
         // look at year
         while (!monthMadeValid(nextSchedule)) {
             nextSchedule.roll(YEAR, true);
             setFieldsToMinimum(nextSchedule, MONTH);
-            
+
         }
         return nextSchedule;
     }
@@ -192,8 +188,7 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any kind of error.
      */
-    private boolean monthMadeValid(final GregorianCalendar nextSchedule)
-            throws ImplementationException {
+    private boolean monthMadeValid(final GregorianCalendar nextSchedule) throws ImplementationException {
         // check if the month of the current time is valid, i.e. there is a
         // month value in the schedule equal to the month value of the current
         // time
@@ -229,21 +224,16 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any kind of error.
      */
-    private boolean dayMadeValid(final GregorianCalendar nextSchedule)
-            throws ImplementationException {
-        if (!daysOfMonth.contains(nextSchedule.get(DAY_OF_MONTH))
-                && !daysOfMonth.isEmpty()) {
-            if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH,
-                    HOUR_OF_DAY)) {
+    private boolean dayMadeValid(final GregorianCalendar nextSchedule) throws ImplementationException {
+        if (!daysOfMonth.contains(nextSchedule.get(DAY_OF_MONTH)) && !daysOfMonth.isEmpty()) {
+            if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH, HOUR_OF_DAY)) {
                 return false;
             }
         }
 
         // Check and make this also a valid day of week.
-        while (!daysOfWeek.contains(nextSchedule.get(DAY_OF_WEEK))
-                && !daysOfWeek.isEmpty()) {
-            if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH,
-                    HOUR_OF_DAY)) {
+        while (!daysOfWeek.contains(nextSchedule.get(DAY_OF_WEEK)) && !daysOfWeek.isEmpty()) {
+            if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH, HOUR_OF_DAY)) {
                 return false;
             } else if (!daysOfWeek.contains(nextSchedule.get(DAY_OF_WEEK))) {
                 dayMadeValid(nextSchedule);
@@ -254,8 +244,7 @@ public class Schedule implements Serializable {
         // valid as well or go to next day.
         while (!hourMadeValid(nextSchedule)) {
             // No valid hour for this day, try next day.
-            if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH,
-                    HOUR_OF_DAY)) {
+            if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH, HOUR_OF_DAY)) {
                 return false;
             }
             // Reset all smaller units to min.
@@ -276,8 +265,7 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean hourMadeValid(final GregorianCalendar nextSchedule)
-            throws ImplementationException {
+    private boolean hourMadeValid(final GregorianCalendar nextSchedule) throws ImplementationException {
         if (!hours.contains(nextSchedule.get(HOUR_OF_DAY)) && !hours.isEmpty()) {
             if (!setFieldToNextValidRoll(nextSchedule, HOUR_OF_DAY, MINUTE)) {
                 return false;
@@ -305,12 +293,12 @@ public class Schedule implements Serializable {
      * 
      * @param nextSchedule
      *            The current candidate for the result.
-     * @return True if minute and smaller units successfully set to valid values.
+     * @return True if minute and smaller units successfully set to valid
+     *         values.
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean minuteMadeValid(final GregorianCalendar nextSchedule)
-            throws ImplementationException {
+    private boolean minuteMadeValid(final GregorianCalendar nextSchedule) throws ImplementationException {
         if (!minutes.contains(nextSchedule.get(MINUTE)) && !minutes.isEmpty()) {
 
             if (!setFieldToNextValidRoll(nextSchedule, MINUTE, SECOND)) {
@@ -344,8 +332,7 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean secondMadeValid(final GregorianCalendar nextSchedule)
-            throws ImplementationException {
+    private boolean secondMadeValid(final GregorianCalendar nextSchedule) throws ImplementationException {
         // check whether the second value of the current time is a valid
         // scheduled second
         if (!seconds.isEmpty() && !seconds.contains(nextSchedule.get(SECOND))) {
@@ -368,8 +355,8 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean setToNextScheduledValue(final GregorianCalendar cal,
-            final int field) throws ImplementationException {
+    private boolean setToNextScheduledValue(final GregorianCalendar cal, final int field)
+            throws ImplementationException {
         int next;
         TreeSet<Integer> vals = getValues(field);
         if (vals.isEmpty()) {
@@ -384,8 +371,7 @@ public class Schedule implements Serializable {
                 return false;
             }
         }
-        if (next > cal.getActualMaximum(field)
-                || next < cal.getActualMinimum(field)) {
+        if (next > cal.getActualMaximum(field) || next < cal.getActualMinimum(field)) {
             return false;
         }
         // all is well, set it to next
@@ -410,8 +396,7 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean setFieldToNextValidRoll(final GregorianCalendar cal,
-            final int field, final int smallerField)
+    private boolean setFieldToNextValidRoll(final GregorianCalendar cal, final int field, final int smallerField)
             throws ImplementationException {
         setFieldsToMinimum(cal, smallerField);
         return setToNextScheduledValue(cal, field);
@@ -431,19 +416,16 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean setFieldToMinimum(final GregorianCalendar cal,
-            final int field) throws ImplementationException {
+    private boolean setFieldToMinimum(final GregorianCalendar cal, final int field) throws ImplementationException {
         int min;
         TreeSet<Integer> values = getValues(field);
         if (values.isEmpty()) {
             min = cal.getActualMinimum(field);
         } else {
-            min = Math.max(values.first().intValue(),
-                    cal.getActualMinimum(field));
+            min = Math.max(values.first().intValue(), cal.getActualMinimum(field));
             if (min > cal.getActualMaximum(field)) {
                 min = cal.getActualMaximum(field);
-                if (!values.contains(min) || min < cal.getActualMinimum(field)
-                        || min > cal.getActualMaximum(field)) {
+                if (!values.contains(min) || min < cal.getActualMinimum(field) || min > cal.getActualMaximum(field)) {
                     return false;
                 }
             }
@@ -467,8 +449,8 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Various errors.
      */
-    private boolean setFieldsToMinimum(final GregorianCalendar cal,
-            final int largestField) throws ImplementationException {
+    private boolean setFieldsToMinimum(final GregorianCalendar cal, final int largestField)
+            throws ImplementationException {
         boolean result = true;
         switch (largestField) {
         case (MONTH):
@@ -504,8 +486,7 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             In case of a access to an unknown field.
      */
-    private TreeSet<Integer> getValues(final int field)
-            throws ImplementationException {
+    private TreeSet<Integer> getValues(final int field) throws ImplementationException {
         switch (field) {
         case (DAY_OF_WEEK):
             return daysOfWeek;
@@ -546,8 +527,8 @@ public class Schedule implements Serializable {
      *             If one of the given values is invalid, i.e. does not lie
      *             between the <code>min</code> and <code>max</code> value.
      */
-    private void handleValues(final String[] values, final String type,
-            final int min, final int max) throws SubscriptionControlsException {
+    private void handleValues(final String[] values, final String type, final int min, final int max)
+            throws SubscriptionControlsException {
         // we put values into this sorted set
         TreeSet<Integer> vals = new TreeSet<Integer>();
         for (String v : values) {
@@ -559,10 +540,8 @@ public class Schedule implements Serializable {
                     int end = Integer.parseInt(range[1]);
                     // check range
                     if (start < min || end > max || start > end) {
-                        throw new SubscriptionControlsException(
-                                "The value for '"
-                                        + type
-                                        + "' is out of range in the query schedule.");
+                        throw new SubscriptionControlsException("The value for '" + type
+                                + "' is out of range in the query schedule.");
                     }
                     // add all values in the range
                     for (int value = start; value <= end; value++) {
@@ -573,17 +552,14 @@ public class Schedule implements Serializable {
                     int value = Integer.parseInt(v);
                     // check value
                     if (value < min || value > max) {
-                        throw new SubscriptionControlsException(
-                                "The value for '"
-                                        + type
-                                        + "' is out of range in the query schedule.");
+                        throw new SubscriptionControlsException("The value for '" + type
+                                + "' is out of range in the query schedule.");
                     }
                     // add value
                     vals = addValue(value, type, vals);
                 }
             } catch (Exception e) {
-                String msg = "The value '" + v + "' for parameter '" + type
-                        + "' is invalid in the query schedule.";
+                String msg = "The value '" + v + "' for parameter '" + type + "' is invalid in the query schedule.";
                 LOG.info("USER ERROR: " + msg + e.getMessage());
                 throw new SubscriptionControlsException(msg);
             }
@@ -616,8 +592,7 @@ public class Schedule implements Serializable {
      *            The set of values to which the value should be added.
      * @return The modified set of values.
      */
-    private TreeSet<Integer> addValue(final int value, final String type,
-            final TreeSet<Integer> vals) {
+    private TreeSet<Integer> addValue(final int value, final String type, final TreeSet<Integer> vals) {
         if (type.equals("dayOfWeek")) {
             vals.add(new Integer((value % 7) + 1));
         } else if (type.equals("month")) {

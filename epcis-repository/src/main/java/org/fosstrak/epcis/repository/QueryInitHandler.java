@@ -73,10 +73,9 @@ public class QueryInitHandler extends BasicHandler {
      *            The MessageContext to process with this handler.
      * @throws ImplementationException
      *             If an error reading the configuration or setting up the
-     *             database occured.
+     *             database occurred.
      */
-    public void invoke(final MessageContext msgContext)
-            throws ImplementationException {
+    public void invoke(final MessageContext msgContext) throws ImplementationException {
         try {
             ServletContext ctx = ((HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext();
             String servletPath = ctx.getRealPath("/");
@@ -92,13 +91,11 @@ public class QueryInitHandler extends BasicHandler {
             String appConfigFile = ctx.getInitParameter("appConfigFile");
             Properties properties = new Properties();
             try {
-                InputStream is = new FileInputStream(servletPath
-                        + appConfigFile);
+                InputStream is = new FileInputStream(servletPath + appConfigFile);
                 properties.load(is);
                 is.close();
             } catch (IOException e) {
-                log.error("Unable to load application properties from "
-                        + servletPath + appConfigFile);
+                log.error("Unable to load application properties from " + servletPath + appConfigFile);
             }
 
             // read db connection parameters
@@ -109,8 +106,7 @@ public class QueryInitHandler extends BasicHandler {
             log.info("Connection to database successfully established.");
 
             String delimiter = dbconnection.getMetaData().getIdentifierQuoteString();
-            log.debug("Resolved string delimiter used to quote SQL identifiers as '"
-                    + delimiter + "'.");
+            log.debug("Resolved string delimiter used to quote SQL identifiers as '" + delimiter + "'.");
 
             Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) ctx.getAttribute("subscribedMap");
             if (subscribedMap != null && log.isDebugEnabled()) {
@@ -152,8 +148,7 @@ public class QueryInitHandler extends BasicHandler {
             dbconnection.close();
             log.info("Database connection successfully closed.");
         } catch (SQLException e) {
-            String msg = "Unable to close the database connection: "
-                    + e.getMessage();
+            String msg = "Unable to close the database connection: " + e.getMessage();
             log.error(msg, e);
         }
 

@@ -132,9 +132,12 @@ public class CaptureOperationsServlet extends HttpServlet {
      *            The HttpServletResponse.
      * @throws IOException
      *             If an error occurred while writing the response.
+     * @throws ServletException
+     *             If a servlet error occurred.
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse rsp) throws ServletException,
+            IOException {
         captureOperationsModule.doGet(req, rsp);
     }
 
@@ -151,9 +154,12 @@ public class CaptureOperationsServlet extends HttpServlet {
      * @throws IOException
      *             If an error occurred while validating the request or writing
      *             the response.
+     * @throws ServletException
+     *             If a servlet error occurred.
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws ServletException,
+            IOException {
         captureOperationsModule.doPost(req, rsp);
     }
 

@@ -96,22 +96,30 @@ public class CaptureOperationsModule {
     /**
      * The ObjectEvent-query without data.
      */
-    private final String objectEventInsert = "INSERT INTO event_ObjectEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String objectEventInsert = "INSERT INTO event_ObjectEvent ("
+            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action"
+            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The AggregationEvent-query without data.
      */
-    private final String aggregationEventInsert = "INSERT INTO event_AggregationEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action, parentID " + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String aggregationEventInsert = "INSERT INTO event_AggregationEvent ("
+            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
+            + "disposition, readPoint, bizLocation, action, parentID " + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The QuantityEvent-query without data.
      */
-    private final String quantityEventInsert = "INSERT INTO event_QuantityEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, epcClass, quantity" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String quantityEventInsert = "INSERT INTO event_QuantityEvent ("
+            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
+            + "disposition, readPoint, bizLocation, epcClass, quantity" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The TransactionEvent-query without data.
      */
-    private final String transactionEventInsert = "INSERT INTO event_TransactionEvent (" + "eventTime, recordTime, eventTimeZoneOffset, bizStep, " + "disposition, readPoint, bizLocation, action, parentID" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String transactionEventInsert = "INSERT INTO event_TransactionEvent ("
+            + "eventTime, recordTime, eventTimeZoneOffset, bizStep, "
+            + "disposition, readPoint, bizLocation, action, parentID" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The DataSource holding the database.
@@ -234,7 +242,8 @@ public class CaptureOperationsModule {
             final DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(is);
         } catch (SAXException e) {
-            String msg = "Unable to parse the payload as XML document: " + (e.getException() == null ? e.getMessage() : e.getException().getMessage());
+            String msg = "Unable to parse the payload as XML document: "
+                    + (e.getException() == null ? e.getMessage() : e.getException().getMessage());
             LOG.info(msg, e);
             rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.println("We're unable to capture the EPCIS events.");
@@ -317,12 +326,14 @@ public class CaptureOperationsModule {
     /**
      * Cleans all event data from the epcis repository database.
      * 
+     * @param dbconnection
+     *            The database connection.
      * @throws SQLException
      *             If an error with the database occurred.
-     * @throws Exception
+     * @throws IOException
      *             If an exception reading from the SQL script occurred.
      */
-    private void dbReset(Connection dbconnection) throws SQLException, Exception {
+    private void dbReset(final Connection dbconnection) throws SQLException, IOException {
         LOG.info("Running db reset script.");
         Statement stmt = null;
         try {
@@ -345,12 +356,17 @@ public class CaptureOperationsModule {
     /**
      * Parses the entire document and handles the supplied events.
      * 
+     * @param dbconnection
+     *            The database connection.
+     * @param document
+     *            The XML Document to parse and handle.
      * @throws SQLException
      *             If an error with the database occurred.
      * @throws SAXException
      *             If an error parsing the document occurred.
      */
-    private void handleDocument(Connection dbconnection, Document document) throws SQLException, SAXException {
+    private void handleDocument(final Connection dbconnection, final Document document) throws SQLException,
+            SAXException {
         NodeList eventList = document.getElementsByTagName("EventList");
         NodeList events = eventList.item(0).getChildNodes();
 
@@ -359,7 +375,8 @@ public class CaptureOperationsModule {
             Node eventNode = events.item(i);
             String nodeName = eventNode.getNodeName();
 
-            if (nodeName.equals("ObjectEvent") || nodeName.equals("AggregationEvent") || nodeName.equals("QuantityEvent") || nodeName.equals("TransactionEvent")) {
+            if (nodeName.equals("ObjectEvent") || nodeName.equals("AggregationEvent")
+                    || nodeName.equals("QuantityEvent") || nodeName.equals("TransactionEvent")) {
                 LOG.debug("processing event " + i + ": '" + nodeName + "'.");
                 handleEvent(dbconnection, eventNode);
             } else if (!nodeName.equals("#text") && !nodeName.equals("#comment")) {
@@ -374,6 +391,8 @@ public class CaptureOperationsModule {
      * query generation part has some if/elses to take care of different event
      * parameters.
      * 
+     * @param dbconnection
+     *            The database connection.
      * @param eventNode
      *            The current event node.
      * @throws SAXException
@@ -381,7 +400,7 @@ public class CaptureOperationsModule {
      * @throws SQLException
      *             If an error connecting to the DB occurs.
      */
-    private void handleEvent(Connection dbconnection, final Node eventNode) throws SAXException, SQLException {
+    private void handleEvent(final Connection dbconnection, final Node eventNode) throws SAXException, SQLException {
         if (eventNode != null && eventNode.getChildNodes().getLength() == 0) {
             throw new SAXException("Event element '" + eventNode.getNodeName() + "' has no children elements.");
         }
@@ -463,7 +482,9 @@ public class CaptureOperationsModule {
                         LOG.debug("    treating unknown event field as extension.");
                         String prefix = parts[0];
                         String localname = parts[1];
-                        // String namespace = document.getDocumentElement().getAttribute("xmlns:" + prefix);
+                        // String namespace =
+                        // document.getDocumentElement().getAttribute("xmlns:" +
+                        // prefix);
                         String namespace = curEventNode.lookupNamespaceURI(prefix);
                         String value = curEventNode.getTextContent();
                         fieldNameExtList.add(new EventFieldExtension(prefix, namespace, localname, value));
@@ -474,9 +495,8 @@ public class CaptureOperationsModule {
                 }
             }
         } catch (MalformedURIException e) {
-            throw new SAXException(
-                    "  event field '" + curEventNode.getNodeName() + "' is not of type URI: " + curEventNode.getTextContent(),
-                    e);
+            throw new SAXException("  event field '" + curEventNode.getNodeName() + "' is not of type URI: "
+                    + curEventNode.getTextContent(), e);
         }
 
         // preparing query
@@ -559,7 +579,8 @@ public class CaptureOperationsModule {
         if (!fieldNameExtList.isEmpty()) {
             for (EventFieldExtension ext : fieldNameExtList) {
 
-                String insert = "INSERT INTO event_" + eventNode.getNodeName() + "_extensions " + "(event_id, fieldname, prefix, " + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)";
+                String insert = "INSERT INTO event_" + eventNode.getNodeName() + "_extensions "
+                        + "(event_id, fieldname, prefix, " + ext.getValueColumnName() + ") VALUES (?, ? ,?, ?)";
                 LOG.debug("QUERY: " + insert);
                 ps = null;
 
@@ -649,6 +670,8 @@ public class CaptureOperationsModule {
      * Retrieves the last inserted ID chosen by the autoIncrement functionality
      * in the table with the given name.
      * 
+     * @param dbconnection
+     *            The database connection.
      * @param tableName
      *            The name of the table for which the last inserted ID should be
      *            retrieved.
@@ -656,7 +679,7 @@ public class CaptureOperationsModule {
      * @throws SQLException
      *             If an SQL problem with the database occurred.
      */
-    private long getLastAutoIncrementedId(Connection dbconnection, final String tableName) throws SQLException {
+    private long getLastAutoIncrementedId(final Connection dbconnection, final String tableName) throws SQLException {
         String stmt = "SELECT LAST_INSERT_ID() as id FROM " + tableName;
         PreparedStatement ps = null;
         try {
@@ -684,18 +707,21 @@ public class CaptureOperationsModule {
      * vocabulary is extended if "insertmissingvoc" is true; otherwise an
      * SQLException is thrown
      * 
+     * @param dbconnection
+     *            The database connection.
      * @param tableName
      *            The name of the vocabulary table.
      * @param uri
-     *            The vocabulary adapting the URI to be inserted into the vocabulary
-     *            table.
+     *            The vocabulary adapting the URI to be inserted into the
+     *            vocabulary table.
      * @return The ID of an already existing vocabulary table with the given
      *         uri.
      * @throws SQLException
      *             If an SQL problem with the database occurred or if we are not
      *             allowed to insert a missing vocabulary.
      */
-    private long insertVocabulary(Connection dbconnection, final String tableName, final URI uri) throws SQLException {
+    private long insertVocabulary(final Connection dbconnection, final String tableName, final URI uri)
+            throws SQLException {
         String stmt = "SELECT id FROM " + tableName + " WHERE uri=?";
         PreparedStatement ps = null;
         try {
@@ -749,7 +775,8 @@ public class CaptureOperationsModule {
      * 
      * @param epcNode
      *            The parent Node from which EPC URIs should be extracted.
-     * @return An array of vocabularies containing all the URIs found in the given node.
+     * @return An array of vocabularies containing all the URIs found in the
+     *         given node.
      * @throws MalformedURIException
      *             If a string is not parsable as URI.
      * @throws SAXParseException
@@ -813,13 +840,15 @@ public class CaptureOperationsModule {
      * Inserts the BusinessTransactionType and the BusinessTransactionID into
      * the BusinessTransaction-Table if necessary.
      * 
+     * @param dbconnection
+     *            The database connection.
      * @param bizTrans
      *            The BusinessTransaction to be inserted.
      * @return The ID from the BusinessTransaction-table.
      * @throws SQLException
      *             If an SQL problem with the database occurred.
      */
-    private long insertBusinessTransaction(Connection dbconnection, final BusinessTransactionType bizTrans)
+    private long insertBusinessTransaction(final Connection dbconnection, final BusinessTransactionType bizTrans)
             throws SQLException {
         final long id = insertVocabulary(dbconnection, "voc_BizTrans", bizTrans);
         final long type = insertVocabulary(dbconnection, "voc_BizTransType", bizTrans.getType());

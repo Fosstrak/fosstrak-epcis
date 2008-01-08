@@ -56,10 +56,9 @@ public class QueryPostHandler extends BasicHandler {
      *            the MessageContext to process with this InitHandler.
      * @throws ImplementationException
      *             If an error reading the configuration or setting up the
-     *             database occured.
+     *             database occurred.
      */
-    public void invoke(final MessageContext msgContext)
-            throws ImplementationException {
+    public void invoke(final MessageContext msgContext) throws ImplementationException {
         try {
             Connection dbconnection = (Connection) msgContext.getProperty("dbconnection");
             dbconnection.close();
@@ -67,15 +66,13 @@ public class QueryPostHandler extends BasicHandler {
 
             Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) msgContext.getProperty("subscribedMap");
             HttpServlet servlet = (HttpServlet) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLET);
-            servlet.getServletContext().setAttribute("subscribedMap",
-                    subscribedMap);
+            servlet.getServletContext().setAttribute("subscribedMap", subscribedMap);
             if (subscribedMap != null && LOG.isDebugEnabled()) {
                 LOG.debug("Stored " + subscribedMap.size() + " subscriptions to servlet context.");
             }
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
-            String msg = "Unable to close the database connection: "
-                    + e.getMessage();
+            String msg = "Unable to close the database connection: " + e.getMessage();
             iex.setReason(msg);
             iex.setStackTrace(e.getStackTrace());
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);

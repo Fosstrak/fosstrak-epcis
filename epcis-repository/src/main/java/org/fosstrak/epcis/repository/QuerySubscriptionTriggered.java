@@ -52,14 +52,13 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
 
     private URI trigger;
 
-    public QuerySubscriptionTriggered(String subscriptionID,
-            QueryParam[] queryParams, URI dest, Boolean reportIfEmpty,
-            GregorianCalendar initialRecordTime,
-            GregorianCalendar lastTimeExecuted, String queryName, URI aTrigger,
-            Schedule every10min) throws ImplementationException {
-        super(subscriptionID, queryParams, dest, reportIfEmpty,
-              initialRecordTime, lastTimeExecuted, every10min, queryName);
-        this.trigger = aTrigger;
+    public QuerySubscriptionTriggered(final String subscriptionID, final QueryParam[] queryParams, final URI dest,
+            final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
+            final GregorianCalendar lastTimeExecuted, final String queryName, final URI trigger,
+            final Schedule every10min) throws ImplementationException {
+        super(subscriptionID, queryParams, dest, reportIfEmpty, initialRecordTime, lastTimeExecuted, every10min,
+              queryName);
+        this.trigger = trigger;
     }
 
     /**
@@ -70,7 +69,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
      *      java.lang.Object)
      */
     @Override
-    public void handleNotification(Notification pNotification, Object pHandback) {
+    public void handleNotification(final Notification pNotification, final Object pHandback) {
         if (pHandback == null) {
             LOG.error("The timer stating the next scheduled query execution time is null!");
             return;
@@ -81,14 +80,10 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
             try {
                 LOG.debug("Checking trigger condition ...");
                 String queryName = "SimpleEventQuery";
-                String[] epcs = {
-                    trigger.toString()
-                };
+                String[] epcs = { trigger.toString() };
                 QueryParam[] queryParam = {
-                        new QueryParam("MATCH_anyEPC", new ArrayOfString(epcs,
-                                null)),
-                        new QueryParam("GE_recordTime", initialRecordTime)
-                };
+                        new QueryParam("MATCH_anyEPC", new ArrayOfString(epcs, null)),
+                        new QueryParam("GE_recordTime", initialRecordTime) };
 
                 // initialize the query service
                 EPCglobalEPCISServiceLocator queryLocator = new EPCglobalEPCISServiceLocator();
@@ -96,8 +91,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
                 EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) queryLocator.getEPCglobalEPCISServicePort();
 
                 // send the query
-                QueryResults results = epcisQueryService.poll(new Poll(
-                        queryName, queryParam));
+                QueryResults results = epcisQueryService.poll(new Poll(queryName, queryParam));
                 if (results.getResultsBody().getEventList() != null) {
                     LOG.debug("Trigger condition fulfilled!");
                     LOG.debug("Executing subscribed query associated with trigger event ...");
@@ -105,7 +99,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
                     LOG.debug("Triggered query successfully executed!");
                 }
             } catch (Exception e) {
-                String msg = "An error occured while checking trigger condition for query with subscriptionID '"
+                String msg = "An error occurred while checking trigger condition for query with subscriptionID '"
                         + subscriptionID + "': " + e.getMessage();
                 LOG.error(msg, e);
             }
@@ -114,15 +108,13 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
             Date nextSchedule;
             try {
                 nextSchedule = schedule.nextScheduledTime().getTime();
-                LOG.debug("Next scheduled time for the subscribed query with subscriptionID '"
-                        + subscriptionID + "' is '" + nextSchedule + "'.");
-                ((Timer) pHandback).addNotification("SubscriptionSchedule",
-                        "Please do the query", (Timer) pHandback, nextSchedule);
+                LOG.debug("Next scheduled time for the subscribed query with subscriptionID '" + subscriptionID
+                        + "' is '" + nextSchedule + "'.");
+                ((Timer) pHandback).addNotification("SubscriptionSchedule", "Please do the query", (Timer) pHandback,
+                        nextSchedule);
             } catch (ImplementationException e) {
-                String msg = "Next scheduled time for the subscribed query with ID '"
-                        + getSubscriptionID()
-                        + "' cannot be evaluated: "
-                        + e.getReason();
+                String msg = "Next scheduled time for the subscribed query with ID '" + getSubscriptionID()
+                        + "' cannot be evaluated: " + e.getReason();
                 LOG.error(msg, e);
             }
         }
