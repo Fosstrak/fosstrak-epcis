@@ -58,18 +58,17 @@ public final class QueryCallbackListener extends Thread {
      * port.
      * 
      * @throws IOException
-     *             If an error setting up the communication socket occured.
+     *             If an error setting up the communication socket occurred.
      */
     private QueryCallbackListener() throws IOException {
-        System.out.println("listening for query callbacks on port " + PORT
-                + " ...");
+        System.out.println("listening for query callbacks on port " + PORT + " ...");
         server = new ServerSocket(PORT);
     }
 
     /**
      * @return The only instance of this class (singleton).
      * @throws IOException
-     *             If an error setting up the communication socket occured.
+     *             If an error setting up the communication socket occurred.
      */
     public static QueryCallbackListener getInstance() throws IOException {
         if (instance == null) {
@@ -113,7 +112,7 @@ public final class QueryCallbackListener extends Thread {
      * @param client
      *            The client Socket.
      * @throws IOException
-     *             If an I/O error occured.
+     *             If an I/O error occurred.
      */
     private void handleConnection(final Socket client) throws IOException {
         PrintWriter out = new PrintWriter(client.getOutputStream(), true);

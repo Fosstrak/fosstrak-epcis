@@ -48,6 +48,7 @@ public class TimeParserTest extends TestCase {
      * {@link org.accada.epcis.utils.TimeParser#parseAsCalendar(java.lang.String)}.
      * 
      * @throws ParseException
+     *             If an error parsing a date occurred.
      */
     public void testParse() throws ParseException {
         Calendar calAct = null;

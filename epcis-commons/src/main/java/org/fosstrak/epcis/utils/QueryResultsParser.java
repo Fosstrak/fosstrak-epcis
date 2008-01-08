@@ -98,8 +98,7 @@ public final class QueryResultsParser {
      *            QueryResults object.
      * @return The parsed QueryResults object.
      */
-    public static QueryResults parseQueryResults(
-            final InputStream xmlQueryResults) {
+    public static QueryResults parseQueryResults(final InputStream xmlQueryResults) {
         QueryResults queryResults = null;
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -110,12 +109,10 @@ public final class QueryResultsParser {
         } catch (Exception e) {
             throw new RuntimeException("Unable to parse the XML query.", e);
         }
-        Element queryName = (Element) epcisq.getElementsByTagName("queryName").item(
-                0);
+        Element queryName = (Element) epcisq.getElementsByTagName("queryName").item(0);
 
         if (!queryName.getTextContent().equals("SimpleEventQuery")) {
-            Element vocList = (Element) epcisq.getElementsByTagName(
-                    "VocabularyList").item(0);
+            Element vocList = (Element) epcisq.getElementsByTagName("VocabularyList").item(0);
             VocabularyType[] vocs = null;
             if (vocList != null) {
                 NodeList vocsList = vocList.getElementsByTagName("Vocabulary");
@@ -125,8 +122,7 @@ public final class QueryResultsParser {
             }
 
             EventListType eventList = null;
-            QueryResultsBody queryResultsBody = new QueryResultsBody(eventList,
-                    vocs);
+            QueryResultsBody queryResultsBody = new QueryResultsBody(eventList, vocs);
 
             // no extensions implemented!
             QueryResultsExtensionType queryResultsExtension = null;
@@ -134,58 +130,49 @@ public final class QueryResultsParser {
             String queryNam = queryName.getTextContent();
             String subscriptionId = null;
             MessageElement[] message = null;
-            queryResults = new QueryResults(queryNam, subscriptionId,
-                    queryResultsBody, queryResultsExtension, message);
+            queryResults = new QueryResults(queryNam, subscriptionId, queryResultsBody, queryResultsExtension, message);
         } else {
-            Element eventList = (Element) epcisq.getElementsByTagName(
-                    "EventList").item(0);
+            Element eventList = (Element) epcisq.getElementsByTagName("EventList").item(0);
             ObjectEventType[] objectEvents = null;
             AggregationEventType[] aggrEvents = null;
             QuantityEventType[] quantEvents = null;
             TransactionEventType[] transEvents = null;
             if (eventList != null) {
                 NodeList objectEventsList = eventList.getElementsByTagName("ObjectEvent");
-                if (objectEventsList != null
-                        && objectEventsList.getLength() != 0) {
+                if (objectEventsList != null && objectEventsList.getLength() != 0) {
                     objectEvents = handleObjectEvents(objectEventsList);
                 }
 
                 NodeList aggregationEventsList = eventList.getElementsByTagName("AggregationEvent");
-                if (aggregationEventsList != null
-                        && aggregationEventsList.getLength() != 0) {
+                if (aggregationEventsList != null && aggregationEventsList.getLength() != 0) {
                     aggrEvents = handleAggregationEvents(aggregationEventsList);
                 }
 
                 NodeList quantityEventsList = eventList.getElementsByTagName("QuantityEvent");
-                if (quantityEventsList != null
-                        && quantityEventsList.getLength() != 0) {
+                if (quantityEventsList != null && quantityEventsList.getLength() != 0) {
                     quantEvents = handleQuantityEvents(quantityEventsList);
                 }
 
                 NodeList transactionEventsList = eventList.getElementsByTagName("TransactionEvent");
-                if (transactionEventsList != null
-                        && transactionEventsList.getLength() != 0) {
+                if (transactionEventsList != null && transactionEventsList.getLength() != 0) {
                     transEvents = handleTransactionEvents(transactionEventsList);
                 }
             }
 
             EPCISEventListExtensionType epcisEventList = null;
             MessageElement[] message = null;
-            EventListType eventListType = new EventListType(objectEvents,
-                    aggrEvents, quantEvents, transEvents, epcisEventList,
-                    message);
+            EventListType eventListType = new EventListType(objectEvents, aggrEvents, quantEvents, transEvents,
+                    epcisEventList, message);
 
             VocabularyType[] vocabulary = null;
-            QueryResultsBody queryResultsBody = new QueryResultsBody(
-                    eventListType, vocabulary);
+            QueryResultsBody queryResultsBody = new QueryResultsBody(eventListType, vocabulary);
 
             // no extensions implemented!
             QueryResultsExtensionType queryResultsExtension = null;
 
             String queryNam = queryName.getTextContent();
             String subscriptionId = null;
-            queryResults = new QueryResults(queryNam, subscriptionId,
-                    queryResultsBody, queryResultsExtension, message);
+            queryResults = new QueryResults(queryNam, subscriptionId, queryResultsBody, queryResultsExtension, message);
         }
         return queryResults;
     }
@@ -197,26 +184,22 @@ public final class QueryResultsParser {
      *            The NodeList parsed from the XML containing the object events.
      * @return An array of ObjectEventType.
      */
-    private static ObjectEventType[] handleObjectEvents(
-            final NodeList objectEventList) {
+    private static ObjectEventType[] handleObjectEvents(final NodeList objectEventList) {
         Vector<ObjectEventType> list = new Vector<ObjectEventType>();
 
         for (int i = 0; i < objectEventList.getLength(); i++) {
             Element objectEvent = (Element) objectEventList.item(i);
 
             // parse <eventTime>
-            Node eventTimeNode = objectEvent.getElementsByTagName("eventTime").item(
-                    0);
+            Node eventTimeNode = objectEvent.getElementsByTagName("eventTime").item(0);
             Calendar eventTime = handleTime(eventTimeNode);
 
             // parse <recordTime>
-            Node recordTimeNode = objectEvent.getElementsByTagName("recordTime").item(
-                    0);
+            Node recordTimeNode = objectEvent.getElementsByTagName("recordTime").item(0);
             Calendar recordTime = handleTime(recordTimeNode);
 
             // parse <eventTimeZoneOffset>
-            Node eventTimeZoneOffsetNode = objectEvent.getElementsByTagName(
-                    "eventTimeZoneOffset").item(0);
+            Node eventTimeZoneOffsetNode = objectEvent.getElementsByTagName("eventTimeZoneOffset").item(0);
             String eventTimeZoneOffset = eventTimeZoneOffsetNode.getTextContent();
 
             // TODO parse extension
@@ -224,19 +207,15 @@ public final class QueryResultsParser {
 
             // TODO parse message element
             List<MessageElement> messages = new ArrayList<MessageElement>();
-            Node temperature = objectEvent.getElementsByTagName(
-                    "hls:temperature").item(0);
+            Node temperature = objectEvent.getElementsByTagName("hls:temperature").item(0);
             if (temperature != null) {
-                MessageElement me = new MessageElement("temperature", "hls",
-                        "http://schema.hls.com/extension");
+                MessageElement me = new MessageElement("temperature", "hls", "http://schema.hls.com/extension");
                 me.setValue(temperature.getTextContent());
                 messages.add(me);
             }
-            Node batchNumber = objectEvent.getElementsByTagName(
-                    "hls:batchNumber").item(0);
+            Node batchNumber = objectEvent.getElementsByTagName("hls:batchNumber").item(0);
             if (batchNumber != null) {
-                MessageElement me = new MessageElement("batchNumber", "hls",
-                        "http://schema.hls.com/extension");
+                MessageElement me = new MessageElement("batchNumber", "hls", "http://schema.hls.com/extension");
                 me.setValue(batchNumber.getTextContent());
                 messages.add(me);
             }
@@ -244,8 +223,7 @@ public final class QueryResultsParser {
             message = messages.toArray(message);
 
             // parse <epcList>
-            Node epcListNode = objectEvent.getElementsByTagName("epcList").item(
-                    0);
+            Node epcListNode = objectEvent.getElementsByTagName("epcList").item(0);
             EPC[] epcList = handleEpcList(epcListNode);
 
             // parse <action>
@@ -253,30 +231,25 @@ public final class QueryResultsParser {
             ActionType action = handleAction(actionNode);
 
             // parse <bizStep>
-            Node bizStepNode = objectEvent.getElementsByTagName("bizStep").item(
-                    0);
+            Node bizStepNode = objectEvent.getElementsByTagName("bizStep").item(0);
             URI bizStep = handleUri(bizStepNode);
 
             // parse <disposition>
-            Node dispNode = objectEvent.getElementsByTagName("disposition").item(
-                    0);
+            Node dispNode = objectEvent.getElementsByTagName("disposition").item(0);
             URI disposition = handleUri(dispNode);
 
             // parse <readPoint>
-            Node readPointNode = objectEvent.getElementsByTagName("readPoint").item(
-                    0);
+            Node readPointNode = objectEvent.getElementsByTagName("readPoint").item(0);
             ReadPointType readPoint = null;
             if (readPointNode != null) {
                 Element readPointElement = (Element) readPointNode;
-                Node idNode = readPointElement.getElementsByTagName("id").item(
-                        0);
+                Node idNode = readPointElement.getElementsByTagName("id").item(0);
                 URI id = handleUri(idNode);
                 readPoint = new ReadPointType(id, null, null);
             }
 
             // parse <bizLocation>
-            Node bizLocNode = objectEvent.getElementsByTagName("bizLocation").item(
-                    0);
+            Node bizLocNode = objectEvent.getElementsByTagName("bizLocation").item(0);
             BusinessLocationType bizLocation = null;
             if (bizLocNode != null) {
                 Element bizLocElement = (Element) bizLocNode;
@@ -286,17 +259,15 @@ public final class QueryResultsParser {
             }
 
             // parse <bizTransactionList>
-            Node bizTransListNode = objectEvent.getElementsByTagName(
-                    "bizTransactionList").item(0);
+            Node bizTransListNode = objectEvent.getElementsByTagName("bizTransactionList").item(0);
             BusinessTransactionType[] bizTransList = handleBizTransList(bizTransListNode);
 
             // TODO parse extension
             ObjectEventExtensionType extension = null;
 
-            ObjectEventType objectEventType = new ObjectEventType(eventTime,
-                    recordTime, eventTimeZoneOffset, baseExtension, epcList,
-                    action, bizStep, disposition, readPoint, bizLocation,
-                    bizTransList, extension, message);
+            ObjectEventType objectEventType = new ObjectEventType(eventTime, recordTime, eventTimeZoneOffset,
+                    baseExtension, epcList, action, bizStep, disposition, readPoint, bizLocation, bizTransList,
+                    extension, message);
             list.add(objectEventType);
         }
         ObjectEventType[] objectEvent = new ObjectEventType[list.size()];
@@ -311,8 +282,7 @@ public final class QueryResultsParser {
      *            events.
      * @return An array of TransactionEventType.
      */
-    private static TransactionEventType[] handleTransactionEvents(
-            final NodeList transEventList) {
+    private static TransactionEventType[] handleTransactionEvents(final NodeList transEventList) {
         Vector<TransactionEventType> list = new Vector<TransactionEventType>();
 
         for (int i = 0; i < transEventList.getLength(); i++) {
@@ -320,18 +290,15 @@ public final class QueryResultsParser {
 
             try {
                 // parse <eventTime>
-                Node eventTimeNode = transEvent.getElementsByTagName(
-                        "eventTime").item(0);
+                Node eventTimeNode = transEvent.getElementsByTagName("eventTime").item(0);
                 Calendar eventTime = handleTime(eventTimeNode);
 
                 // parse <recordTime>
-                Node recordTimeNode = transEvent.getElementsByTagName(
-                        "recordTime").item(0);
+                Node recordTimeNode = transEvent.getElementsByTagName("recordTime").item(0);
                 Calendar recordTime = handleTime(recordTimeNode);
 
                 // parse <eventTimeZoneOffset>
-                Node eventTimeZoneOffsetNode = transEvent.getElementsByTagName(
-                        "eventTimeZoneOffset").item(0);
+                Node eventTimeZoneOffsetNode = transEvent.getElementsByTagName("eventTimeZoneOffset").item(0);
                 String eventTimeZoneOffset = eventTimeZoneOffsetNode.getTextContent();
 
                 // TODO parse extension
@@ -341,55 +308,45 @@ public final class QueryResultsParser {
                 MessageElement[] message = null;
 
                 // parse <bizTransactionList>
-                Node bizTransListNode = transEvent.getElementsByTagName(
-                        "bizTransactionList").item(0);
+                Node bizTransListNode = transEvent.getElementsByTagName("bizTransactionList").item(0);
                 BusinessTransactionType[] bizTransList = handleBizTransList(bizTransListNode);
 
                 // parse <parentID>
-                Node parentIdNode = transEvent.getElementsByTagName("parentID").item(
-                        0);
+                Node parentIdNode = transEvent.getElementsByTagName("parentID").item(0);
                 URI parentID = handleUri(parentIdNode);
 
                 // parse <epcList>
-                Node epcListNode = transEvent.getElementsByTagName("epcList").item(
-                        0);
+                Node epcListNode = transEvent.getElementsByTagName("epcList").item(0);
                 EPC[] epcList = handleEpcList(epcListNode);
 
                 // parse <action>
-                Node actionNode = transEvent.getElementsByTagName("action").item(
-                        0);
+                Node actionNode = transEvent.getElementsByTagName("action").item(0);
                 ActionType action = handleAction(actionNode);
 
                 // parse <bizStep>
-                Node bizStepNode = transEvent.getElementsByTagName("bizStep").item(
-                        0);
+                Node bizStepNode = transEvent.getElementsByTagName("bizStep").item(0);
                 URI bizStep = handleUri(bizStepNode);
 
                 // parse <disposition>
-                Node dispNode = transEvent.getElementsByTagName("disposition").item(
-                        0);
+                Node dispNode = transEvent.getElementsByTagName("disposition").item(0);
                 URI disposition = handleUri(dispNode);
 
                 // parse <readPoint>
-                Node readPointNode = transEvent.getElementsByTagName(
-                        "readPoint").item(0);
+                Node readPointNode = transEvent.getElementsByTagName("readPoint").item(0);
                 ReadPointType readPoint = null;
                 if (readPointNode != null) {
                     Element readPointElement = (Element) readPointNode;
-                    Node idNode = readPointElement.getElementsByTagName("id").item(
-                            0);
+                    Node idNode = readPointElement.getElementsByTagName("id").item(0);
                     URI id = handleUri(idNode);
                     readPoint = new ReadPointType(id, null, null);
                 }
 
                 // parse <bizLocation>
-                Node bizLocNode = transEvent.getElementsByTagName("bizLocation").item(
-                        0);
+                Node bizLocNode = transEvent.getElementsByTagName("bizLocation").item(0);
                 BusinessLocationType bizLocation = null;
                 if (bizLocNode != null) {
                     Element bizLocElement = (Element) bizLocNode;
-                    Node idNode = bizLocElement.getElementsByTagName("id").item(
-                            0);
+                    Node idNode = bizLocElement.getElementsByTagName("id").item(0);
                     URI id = handleUri(idNode);
                     bizLocation = new BusinessLocationType(id, null, null);
                 }
@@ -397,11 +354,9 @@ public final class QueryResultsParser {
                 // TODO parse extension
                 TransactionEventExtensionType extension = null;
 
-                TransactionEventType event = new TransactionEventType(
-                        eventTime, recordTime, eventTimeZoneOffset,
-                        baseExtension, bizTransList, parentID, epcList, action,
-                        bizStep, disposition, readPoint, bizLocation,
-                        extension, message);
+                TransactionEventType event = new TransactionEventType(eventTime, recordTime, eventTimeZoneOffset,
+                        baseExtension, bizTransList, parentID, epcList, action, bizStep, disposition, readPoint,
+                        bizLocation, extension, message);
 
                 list.add(event);
 
@@ -421,26 +376,22 @@ public final class QueryResultsParser {
      *            events.
      * @return An array of AggregationEventType.
      */
-    private static AggregationEventType[] handleAggregationEvents(
-            final NodeList aggrEventList) {
+    private static AggregationEventType[] handleAggregationEvents(final NodeList aggrEventList) {
         Vector<AggregationEventType> list = new Vector<AggregationEventType>();
 
         for (int i = 0; i < aggrEventList.getLength(); i++) {
             Element aggrEvent = (Element) aggrEventList.item(i);
 
             // parse <eventTime>
-            Node eventTimeNode = aggrEvent.getElementsByTagName("eventTime").item(
-                    0);
+            Node eventTimeNode = aggrEvent.getElementsByTagName("eventTime").item(0);
             Calendar eventTime = handleTime(eventTimeNode);
 
             // parse <recordTime>
-            Node recordTimeNode = aggrEvent.getElementsByTagName("recordTime").item(
-                    0);
+            Node recordTimeNode = aggrEvent.getElementsByTagName("recordTime").item(0);
             Calendar recordTime = handleTime(recordTimeNode);
 
             // parse <eventTimeZoneOffset>
-            Node eventTimeZoneOffsetNode = aggrEvent.getElementsByTagName(
-                    "eventTimeZoneOffset").item(0);
+            Node eventTimeZoneOffsetNode = aggrEvent.getElementsByTagName("eventTimeZoneOffset").item(0);
             String eventTimeZoneOffset = eventTimeZoneOffsetNode.getTextContent();
 
             // TODO parse extension
@@ -450,13 +401,11 @@ public final class QueryResultsParser {
             MessageElement[] message = null;
 
             // parse <parentID>
-            Node parentIdNode = aggrEvent.getElementsByTagName("parentID").item(
-                    0);
+            Node parentIdNode = aggrEvent.getElementsByTagName("parentID").item(0);
             URI parentID = handleUri(parentIdNode);
 
             // parse <childEPCs>
-            Node childEpcList = aggrEvent.getElementsByTagName("childEPCs").item(
-                    0);
+            Node childEpcList = aggrEvent.getElementsByTagName("childEPCs").item(0);
             EPC[] childEpcs = handleEpcList(childEpcList);
 
             // parse <action>
@@ -468,25 +417,21 @@ public final class QueryResultsParser {
             URI bizStep = handleUri(bizStepNode);
 
             // parse <disposition>
-            Node dispNode = aggrEvent.getElementsByTagName("disposition").item(
-                    0);
+            Node dispNode = aggrEvent.getElementsByTagName("disposition").item(0);
             URI disposition = handleUri(dispNode);
 
             // parse <readPoint>
-            Node readPointNode = aggrEvent.getElementsByTagName("readPoint").item(
-                    0);
+            Node readPointNode = aggrEvent.getElementsByTagName("readPoint").item(0);
             ReadPointType readPoint = null;
             if (readPointNode != null) {
                 Element readPointElement = (Element) readPointNode;
-                Node idNode = readPointElement.getElementsByTagName("id").item(
-                        0);
+                Node idNode = readPointElement.getElementsByTagName("id").item(0);
                 URI id = handleUri(idNode);
                 readPoint = new ReadPointType(id, null, null);
             }
 
             // parse <bizLocation>
-            Node bizLocNode = aggrEvent.getElementsByTagName("bizLocation").item(
-                    0);
+            Node bizLocNode = aggrEvent.getElementsByTagName("bizLocation").item(0);
             BusinessLocationType bizLocation = null;
             if (bizLocNode != null) {
                 Element bizLocElement = (Element) bizLocNode;
@@ -496,17 +441,15 @@ public final class QueryResultsParser {
             }
 
             // parse <bizTransactionList>
-            Node bizTransListNode = aggrEvent.getElementsByTagName(
-                    "bizTransactionList").item(0);
+            Node bizTransListNode = aggrEvent.getElementsByTagName("bizTransactionList").item(0);
             BusinessTransactionType[] bizTransList = handleBizTransList(bizTransListNode);
 
             // TODO parse extension
             AggregationEventExtensionType extension = null;
 
-            AggregationEventType aggrEventType = new AggregationEventType(
-                    eventTime, recordTime, eventTimeZoneOffset, baseExtension,
-                    parentID, childEpcs, action, bizStep, disposition,
-                    readPoint, bizLocation, bizTransList, extension, message);
+            AggregationEventType aggrEventType = new AggregationEventType(eventTime, recordTime, eventTimeZoneOffset,
+                    baseExtension, parentID, childEpcs, action, bizStep, disposition, readPoint, bizLocation,
+                    bizTransList, extension, message);
             list.add(aggrEventType);
         }
         AggregationEventType[] aggrEvent = new AggregationEventType[list.size()];
@@ -521,26 +464,22 @@ public final class QueryResultsParser {
      *            events.
      * @return An array of QuantityEventType.
      */
-    private static QuantityEventType[] handleQuantityEvents(
-            final NodeList quantityEventList) {
+    private static QuantityEventType[] handleQuantityEvents(final NodeList quantityEventList) {
         Vector<QuantityEventType> list = new Vector<QuantityEventType>();
 
         for (int i = 0; i < quantityEventList.getLength(); i++) {
             Element quantityEvent = (Element) quantityEventList.item(i);
 
             // parse <eventTime>
-            Node eventTimeNode = quantityEvent.getElementsByTagName("eventTime").item(
-                    0);
+            Node eventTimeNode = quantityEvent.getElementsByTagName("eventTime").item(0);
             Calendar eventTime = handleTime(eventTimeNode);
 
             // parse <recordTime>
-            Node recordTimeNode = quantityEvent.getElementsByTagName(
-                    "recordTime").item(0);
+            Node recordTimeNode = quantityEvent.getElementsByTagName("recordTime").item(0);
             Calendar recordTime = handleTime(recordTimeNode);
 
             // parse <eventTimeZoneOffset>
-            Node eventTimeZoneOffsetNode = quantityEvent.getElementsByTagName(
-                    "eventTimeZoneOffset").item(0);
+            Node eventTimeZoneOffsetNode = quantityEvent.getElementsByTagName("eventTimeZoneOffset").item(0);
             String eventTimeZoneOffset = eventTimeZoneOffsetNode.getTextContent();
 
             // TODO parse extension
@@ -550,40 +489,33 @@ public final class QueryResultsParser {
             MessageElement[] message = null;
 
             // parse <epcClass>
-            Node epcClassNode = quantityEvent.getElementsByTagName("epcClass").item(
-                    0);
+            Node epcClassNode = quantityEvent.getElementsByTagName("epcClass").item(0);
             URI epcClass = handleUri(epcClassNode);
 
             // parse <quantity>
-            Node quantityNode = quantityEvent.getElementsByTagName("quantity").item(
-                    0);
+            Node quantityNode = quantityEvent.getElementsByTagName("quantity").item(0);
             int quantity = Integer.parseInt(quantityNode.getTextContent());
 
             // parse <bizStep>
-            Node bizStepNode = quantityEvent.getElementsByTagName("bizStep").item(
-                    0);
+            Node bizStepNode = quantityEvent.getElementsByTagName("bizStep").item(0);
             URI bizStep = handleUri(bizStepNode);
 
             // parse <disposition>
-            Node dispNode = quantityEvent.getElementsByTagName("disposition").item(
-                    0);
+            Node dispNode = quantityEvent.getElementsByTagName("disposition").item(0);
             URI disposition = handleUri(dispNode);
 
             // parse <readPoint>
-            Node readPointNode = quantityEvent.getElementsByTagName("readPoint").item(
-                    0);
+            Node readPointNode = quantityEvent.getElementsByTagName("readPoint").item(0);
             ReadPointType readPoint = null;
             if (readPointNode != null) {
                 Element readPointElement = (Element) readPointNode;
-                Node idNode = readPointElement.getElementsByTagName("id").item(
-                        0);
+                Node idNode = readPointElement.getElementsByTagName("id").item(0);
                 URI id = handleUri(idNode);
                 readPoint = new ReadPointType(id, null, null);
             }
 
             // parse <bizLocation>
-            Node bizLocNode = quantityEvent.getElementsByTagName("bizLocation").item(
-                    0);
+            Node bizLocNode = quantityEvent.getElementsByTagName("bizLocation").item(0);
             BusinessLocationType bizLocation = null;
             if (bizLocNode != null) {
                 Element bizLocElement = (Element) bizLocNode;
@@ -593,17 +525,15 @@ public final class QueryResultsParser {
             }
 
             // parse <bizTransactionList>
-            Node bizTransListNode = quantityEvent.getElementsByTagName(
-                    "bizTransactionList").item(0);
+            Node bizTransListNode = quantityEvent.getElementsByTagName("bizTransactionList").item(0);
             BusinessTransactionType[] bizTransList = handleBizTransList(bizTransListNode);
 
             // TODO parse extension
             QuantityEventExtensionType extension = null;
 
-            QuantityEventType quantityEventType = new QuantityEventType(
-                    eventTime, recordTime, eventTimeZoneOffset, baseExtension,
-                    epcClass, quantity, bizStep, disposition, readPoint,
-                    bizLocation, bizTransList, extension, message);
+            QuantityEventType quantityEventType = new QuantityEventType(eventTime, recordTime, eventTimeZoneOffset,
+                    baseExtension, epcClass, quantity, bizStep, disposition, readPoint, bizLocation, bizTransList,
+                    extension, message);
             list.add(quantityEventType);
         }
         QuantityEventType[] quantityEvent = new QuantityEventType[list.size()];
@@ -646,9 +576,7 @@ public final class QueryResultsParser {
                     URI attrId = handleUri(attrIdNode);
 
                     String attrStringVal = attrElem.getTextContent();
-                    MessageElement[] attrVal = new MessageElement[] {
-                        new MessageElement(new Text(attrStringVal))
-                    };
+                    MessageElement[] attrVal = new MessageElement[] { new MessageElement(new Text(attrStringVal)) };
 
                     AttributeType attr = new AttributeType();
                     attr.setId(attrId);
@@ -766,8 +694,7 @@ public final class QueryResultsParser {
      *            The XML Node containing the list of business transactions.
      * @return An array of BusinessTransactionType.
      */
-    private static BusinessTransactionType[] handleBizTransList(
-            final Node bizTransListNode) {
+    private static BusinessTransactionType[] handleBizTransList(final Node bizTransListNode) {
         BusinessTransactionType[] bizTransList = null;
         if (bizTransListNode != null) {
             List<BusinessTransactionType> bizList = new Vector<BusinessTransactionType>();
@@ -775,10 +702,8 @@ public final class QueryResultsParser {
             NodeList bizTransNodeList = bizTransElement.getElementsByTagName("bizTransaction");
             for (int i = 0; i < bizTransNodeList.getLength(); i++) {
                 URI value = handleUri(bizTransNodeList.item(i));
-                BusinessTransactionType bizTrans = new BusinessTransactionType(
-                        value);
-                Node type = bizTransNodeList.item(i).getAttributes().getNamedItem(
-                        "type");
+                BusinessTransactionType bizTrans = new BusinessTransactionType(value);
+                Node type = bizTransNodeList.item(i).getAttributes().getNamedItem("type");
                 bizTrans.setType(handleUri(type));
                 bizList.add(bizTrans);
             }
@@ -803,8 +728,7 @@ public final class QueryResultsParser {
             try {
                 uri = new URI(node.getTextContent().trim());
             } catch (MalformedURIException e) {
-                throw new RuntimeException("URI '" + node.getTextContent()
-                        + "' is not valid.", e);
+                throw new RuntimeException("URI '" + node.getTextContent() + "' is not valid.", e);
             }
         }
         return uri;
@@ -820,14 +744,12 @@ public final class QueryResultsParser {
      * @param actResults
      *            The actual QueryResults object.
      */
-    public static void compareResults(final QueryResults expResults,
-            final QueryResults actResults) {
+    public static void compareResults(final QueryResults expResults, final QueryResults actResults) {
         assertEquals(expResults == null, actResults == null);
         assertEquals(expResults.get_any(), actResults.get_any());
         assertEquals(expResults.getExtension(), actResults.getExtension());
         assertEquals(expResults.getQueryName(), actResults.getQueryName());
-        assertEquals(expResults.getSubscriptionID(),
-                actResults.getSubscriptionID());
+        assertEquals(expResults.getSubscriptionID(), actResults.getSubscriptionID());
 
         VocabularyType[] expVocabularies = expResults.getResultsBody().getVocabularyList();
         VocabularyType[] actVocabularies = actResults.getResultsBody().getVocabularyList();
@@ -852,8 +774,7 @@ public final class QueryResultsParser {
      * @param actVocs
      *            The actual VocabularyType array.
      */
-    private static void compareVocabularies(final VocabularyType[] expVocs,
-            final VocabularyType[] actVocs) {
+    private static void compareVocabularies(final VocabularyType[] expVocs, final VocabularyType[] actVocs) {
         assertEquals(expVocs.length, actVocs.length);
         for (int i = 0; i < expVocs.length; i++) {
             assertEquals(expVocs[i].getType(), actVocs[i].getType());
@@ -895,8 +816,7 @@ public final class QueryResultsParser {
                         if (expME != null) {
                             assertEquals(expME.length, actME.length);
                             for (int l = 0; l < expME.length; l++) {
-                                assertEquals(expME[l].getNodeValue().trim(),
-                                        actME[l].getNodeValue().trim());
+                                assertEquals(expME[l].getNodeValue().trim(), actME[l].getNodeValue().trim());
                             }
                         }
                     }
@@ -924,8 +844,7 @@ public final class QueryResultsParser {
      * @param expEvents
      *            The actual EventListType.
      */
-    private static void compareEvents(final EventListType actEvents,
-            final EventListType expEvents) {
+    private static void compareEvents(final EventListType actEvents, final EventListType expEvents) {
         // compare ObjectEvent
         ObjectEventType[] actObjectEvent = actEvents.getObjectEvent();
         ObjectEventType[] expObjectEvent = expEvents.getObjectEvent();
@@ -934,22 +853,14 @@ public final class QueryResultsParser {
         if (actObjectEvent != null) {
             assertEquals(expObjectEvent.length, actObjectEvent.length);
             for (int i = 0; i < actObjectEvent.length; i++) {
-                assertEquals(expObjectEvent[i].getAction(),
-                        actObjectEvent[i].getAction());
-                assertEquals(expObjectEvent[i].getBaseExtension(),
-                        actObjectEvent[i].getBaseExtension());
-                assertEquals(expObjectEvent[i].getBizLocation(),
-                        actObjectEvent[i].getBizLocation());
-                assertEquals(expObjectEvent[i].getBizStep(),
-                        actObjectEvent[i].getBizStep());
-                assertEquals(expObjectEvent[i].getDisposition(),
-                        actObjectEvent[i].getDisposition());
-                assertEquals(expObjectEvent[i].getEventTime().compareTo(
-                        actObjectEvent[i].getEventTime()), 0);
-                assertEquals(expObjectEvent[i].getExtension(),
-                        actObjectEvent[i].getExtension());
-                assertEquals(expObjectEvent[i].getReadPoint(),
-                        actObjectEvent[i].getReadPoint());
+                assertEquals(expObjectEvent[i].getAction(), actObjectEvent[i].getAction());
+                assertEquals(expObjectEvent[i].getBaseExtension(), actObjectEvent[i].getBaseExtension());
+                assertEquals(expObjectEvent[i].getBizLocation(), actObjectEvent[i].getBizLocation());
+                assertEquals(expObjectEvent[i].getBizStep(), actObjectEvent[i].getBizStep());
+                assertEquals(expObjectEvent[i].getDisposition(), actObjectEvent[i].getDisposition());
+                assertEquals(expObjectEvent[i].getEventTime().compareTo(actObjectEvent[i].getEventTime()), 0);
+                assertEquals(expObjectEvent[i].getExtension(), actObjectEvent[i].getExtension());
+                assertEquals(expObjectEvent[i].getReadPoint(), actObjectEvent[i].getReadPoint());
                 // assertEquals(expObjectEvent[i].getRecordTime(),
                 // actObjectEvent[i].getRecordTime());
 
@@ -958,11 +869,9 @@ public final class QueryResultsParser {
                 assertEquals(expME.length, actME.length);
                 for (int j = 0; j < actME.length; j++) {
                     assertEquals(expME[j].getValue(), actME[j].getValue());
-                    assertEquals(expME[j].getNamespaceURI(),
-                            actME[j].getNamespaceURI());
+                    assertEquals(expME[j].getNamespaceURI(), actME[j].getNamespaceURI());
                     assertEquals(expME[j].getPrefix(), actME[j].getPrefix());
-                    assertEquals(expME[j].getLocalName(),
-                            actME[j].getLocalName());
+                    assertEquals(expME[j].getLocalName(), actME[j].getLocalName());
                 }
 
                 EPC[] actEpcs = actObjectEvent[i].getEpcList();
@@ -976,8 +885,7 @@ public final class QueryResultsParser {
                 BusinessTransactionType[] expBizTrans = expObjectEvent[i].getBizTransactionList();
                 assertEquals(expBizTrans.length, actBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
+                    assertEquals(expBizTrans[j].getType(), actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }
@@ -992,26 +900,16 @@ public final class QueryResultsParser {
         if (actAggrEvent != null) {
             assertEquals(expAggrEvent.length, actAggrEvent.length);
             for (int i = 0; i < actAggrEvent.length; i++) {
-                assertEquals(expAggrEvent[i].get_any(),
-                        actAggrEvent[i].get_any());
-                assertEquals(expAggrEvent[i].getAction(),
-                        actAggrEvent[i].getAction());
-                assertEquals(expAggrEvent[i].getBaseExtension(),
-                        actAggrEvent[i].getBaseExtension());
-                assertEquals(expAggrEvent[i].getBizLocation(),
-                        actAggrEvent[i].getBizLocation());
-                assertEquals(expAggrEvent[i].getBizStep(),
-                        actAggrEvent[i].getBizStep());
-                assertEquals(expAggrEvent[i].getDisposition(),
-                        actAggrEvent[i].getDisposition());
-                assertEquals(expAggrEvent[i].getEventTime().compareTo(
-                        actAggrEvent[i].getEventTime()), 0);
-                assertEquals(expAggrEvent[i].getExtension(),
-                        actAggrEvent[i].getExtension());
-                assertEquals(expAggrEvent[i].getParentID(),
-                        actAggrEvent[i].getParentID());
-                assertEquals(expAggrEvent[i].getReadPoint(),
-                        actAggrEvent[i].getReadPoint());
+                assertEquals(expAggrEvent[i].get_any(), actAggrEvent[i].get_any());
+                assertEquals(expAggrEvent[i].getAction(), actAggrEvent[i].getAction());
+                assertEquals(expAggrEvent[i].getBaseExtension(), actAggrEvent[i].getBaseExtension());
+                assertEquals(expAggrEvent[i].getBizLocation(), actAggrEvent[i].getBizLocation());
+                assertEquals(expAggrEvent[i].getBizStep(), actAggrEvent[i].getBizStep());
+                assertEquals(expAggrEvent[i].getDisposition(), actAggrEvent[i].getDisposition());
+                assertEquals(expAggrEvent[i].getEventTime().compareTo(actAggrEvent[i].getEventTime()), 0);
+                assertEquals(expAggrEvent[i].getExtension(), actAggrEvent[i].getExtension());
+                assertEquals(expAggrEvent[i].getParentID(), actAggrEvent[i].getParentID());
+                assertEquals(expAggrEvent[i].getReadPoint(), actAggrEvent[i].getReadPoint());
                 // assertEquals(expObjectEvent[i].getRecordTime(),
                 // actObjectEvent[i].getRecordTime());
 
@@ -1026,8 +924,7 @@ public final class QueryResultsParser {
                 BusinessTransactionType[] expBizTrans = expAggrEvent[i].getBizTransactionList();
                 assertEquals(actBizTrans.length, expBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
+                    assertEquals(expBizTrans[j].getType(), actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }
@@ -1042,26 +939,16 @@ public final class QueryResultsParser {
         if (actTransEvent != null) {
             assertEquals(expTransEvent.length, actTransEvent.length);
             for (int i = 0; i < actTransEvent.length; i++) {
-                assertEquals(expTransEvent[i].get_any(),
-                        actTransEvent[i].get_any());
-                assertEquals(expTransEvent[i].getAction(),
-                        actTransEvent[i].getAction());
-                assertEquals(expTransEvent[i].getBaseExtension(),
-                        actTransEvent[i].getBaseExtension());
-                assertEquals(expTransEvent[i].getBizLocation(),
-                        actTransEvent[i].getBizLocation());
-                assertEquals(expTransEvent[i].getBizStep(),
-                        actTransEvent[i].getBizStep());
-                assertEquals(expTransEvent[i].getDisposition(),
-                        actTransEvent[i].getDisposition());
-                assertEquals(expTransEvent[i].getEventTime().compareTo(
-                        actTransEvent[i].getEventTime()), 0);
-                assertEquals(expTransEvent[i].getExtension(),
-                        actTransEvent[i].getExtension());
-                assertEquals(expTransEvent[i].getParentID(),
-                        actTransEvent[i].getParentID());
-                assertEquals(expTransEvent[i].getReadPoint(),
-                        actTransEvent[i].getReadPoint());
+                assertEquals(expTransEvent[i].get_any(), actTransEvent[i].get_any());
+                assertEquals(expTransEvent[i].getAction(), actTransEvent[i].getAction());
+                assertEquals(expTransEvent[i].getBaseExtension(), actTransEvent[i].getBaseExtension());
+                assertEquals(expTransEvent[i].getBizLocation(), actTransEvent[i].getBizLocation());
+                assertEquals(expTransEvent[i].getBizStep(), actTransEvent[i].getBizStep());
+                assertEquals(expTransEvent[i].getDisposition(), actTransEvent[i].getDisposition());
+                assertEquals(expTransEvent[i].getEventTime().compareTo(actTransEvent[i].getEventTime()), 0);
+                assertEquals(expTransEvent[i].getExtension(), actTransEvent[i].getExtension());
+                assertEquals(expTransEvent[i].getParentID(), actTransEvent[i].getParentID());
+                assertEquals(expTransEvent[i].getReadPoint(), actTransEvent[i].getReadPoint());
                 // assertEquals(expTransEvent[i].getRecordTime(),
                 // actTransEvent[i].getRecordTime());
 
@@ -1076,8 +963,7 @@ public final class QueryResultsParser {
                 BusinessTransactionType[] expBizTrans = expTransEvent[i].getBizTransactionList();
                 assertEquals(actBizTrans.length, expBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
+                    assertEquals(expBizTrans[j].getType(), actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }
@@ -1092,26 +978,16 @@ public final class QueryResultsParser {
         if (actQuantEvent != null) {
             assertEquals(expQuantEvent.length, actQuantEvent.length);
             for (int i = 0; i < actQuantEvent.length; i++) {
-                assertEquals(expQuantEvent[i].get_any(),
-                        actQuantEvent[i].get_any());
-                assertEquals(expQuantEvent[i].getBaseExtension(),
-                        actQuantEvent[i].getBaseExtension());
-                assertEquals(expQuantEvent[i].getBizLocation(),
-                        actQuantEvent[i].getBizLocation());
-                assertEquals(expQuantEvent[i].getBizStep(),
-                        actQuantEvent[i].getBizStep());
-                assertEquals(expQuantEvent[i].getDisposition(),
-                        actQuantEvent[i].getDisposition());
-                assertEquals(expQuantEvent[i].getEventTime().compareTo(
-                        actQuantEvent[i].getEventTime()), 0);
-                assertEquals(expQuantEvent[i].getEpcClass(),
-                        actQuantEvent[i].getEpcClass());
-                assertEquals(expQuantEvent[i].getExtension(),
-                        actQuantEvent[i].getExtension());
-                assertEquals(expQuantEvent[i].getQuantity(),
-                        actQuantEvent[i].getQuantity());
-                assertEquals(expQuantEvent[i].getReadPoint(),
-                        actQuantEvent[i].getReadPoint());
+                assertEquals(expQuantEvent[i].get_any(), actQuantEvent[i].get_any());
+                assertEquals(expQuantEvent[i].getBaseExtension(), actQuantEvent[i].getBaseExtension());
+                assertEquals(expQuantEvent[i].getBizLocation(), actQuantEvent[i].getBizLocation());
+                assertEquals(expQuantEvent[i].getBizStep(), actQuantEvent[i].getBizStep());
+                assertEquals(expQuantEvent[i].getDisposition(), actQuantEvent[i].getDisposition());
+                assertEquals(expQuantEvent[i].getEventTime().compareTo(actQuantEvent[i].getEventTime()), 0);
+                assertEquals(expQuantEvent[i].getEpcClass(), actQuantEvent[i].getEpcClass());
+                assertEquals(expQuantEvent[i].getExtension(), actQuantEvent[i].getExtension());
+                assertEquals(expQuantEvent[i].getQuantity(), actQuantEvent[i].getQuantity());
+                assertEquals(expQuantEvent[i].getReadPoint(), actQuantEvent[i].getReadPoint());
                 // assertEquals(expQuantEvent[i].getRecordTime(),
                 // actQuantEvent[i].getRecordTime());
 
@@ -1119,8 +995,7 @@ public final class QueryResultsParser {
                 BusinessTransactionType[] expBizTrans = expQuantEvent[i].getBizTransactionList();
                 assertEquals(actBizTrans.length, expBizTrans.length);
                 for (int j = 0; j < actBizTrans.length; j++) {
-                    assertEquals(expBizTrans[j].getType(),
-                            actBizTrans[j].getType());
+                    assertEquals(expBizTrans[j].getType(), actBizTrans[j].getType());
                     // assertEquals(expBizTrans[j].getValue(),
                     // actBizTrans[j].getValue());
                 }
@@ -1144,8 +1019,7 @@ public final class QueryResultsParser {
         if (expected != null && expected.equals(actual)) {
             return;
         }
-        throw new AssertionError("expected:<" + expected + "> but was:<"
-                + actual + ">");
+        throw new AssertionError("expected:<" + expected + "> but was:<" + actual + ">");
     }
 
     /**
@@ -1168,18 +1042,16 @@ public final class QueryResultsParser {
      *            The QueryResults object to be converted.
      * @return The XML representation of the QueryResults.
      * @throws IOException
-     *             If an error serializing the QueryResults object occured.
+     *             If an error serializing the QueryResults object occurred.
      */
-    public static String queryResultsToXML(final QueryResults results)
-            throws IOException {
+    public static String queryResultsToXML(final QueryResults results) throws IOException {
         // serialize the response
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStreamWriter writer = new OutputStreamWriter(baos);
         SerializationContext serContext = new SerializationContext(writer);
         QName xmlType = QueryResults.getTypeDesc().getXmlType();
         serContext.setWriteXMLType(xmlType);
-        serContext.serialize(xmlType, new NullAttributes(), results, xmlType,
-                QueryResults.class, false, true);
+        serContext.serialize(xmlType, new NullAttributes(), results, xmlType, QueryResults.class, false, true);
         writer.flush();
         return baos.toString();
     }

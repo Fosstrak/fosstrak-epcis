@@ -83,8 +83,7 @@ public final class TimeParser {
      * @throws ParseException
      *             If the date/time could not be parsed.
      */
-    public static Calendar parseAsCalendar(final String text)
-            throws ParseException {
+    public static Calendar parseAsCalendar(final String text) throws ParseException {
         return parse(text);
     }
 
@@ -111,8 +110,7 @@ public final class TimeParser {
      * @throws ParseException
      *             If the date/time could not be parsed.
      */
-    public static Timestamp parseAsTimestamp(final String text)
-            throws ParseException {
+    public static Timestamp parseAsTimestamp(final String text) throws ParseException {
         return convert(parse(text));
     }
 
@@ -152,14 +150,12 @@ public final class TimeParser {
         try {
             year = Integer.parseInt(time.substring(curPos, curPos + 4));
         } catch (NumberFormatException e) {
-            throw new ParseException("Year (YYYY) has wrong format: "
-                    + e.getMessage(), curPos);
+            throw new ParseException("Year (YYYY) has wrong format: " + e.getMessage(), curPos);
         }
         curPos += 4;
         delimiter = '-';
         if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter
-                    + "' at position " + curPos, curPos);
+            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
         }
         curPos++;
 
@@ -167,14 +163,12 @@ public final class TimeParser {
         try {
             month = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
-            throw new ParseException("Month (MM) has wrong format: "
-                    + e.getMessage(), curPos);
+            throw new ParseException("Month (MM) has wrong format: " + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = '-';
         if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter
-                    + "' at position " + curPos, curPos);
+            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
         }
         curPos++;
 
@@ -182,14 +176,12 @@ public final class TimeParser {
         try {
             day = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
-            throw new ParseException("Day (DD) has wrong format: "
-                    + e.getMessage(), curPos);
+            throw new ParseException("Day (DD) has wrong format: " + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = 'T';
         if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter
-                    + "' at position " + curPos, curPos);
+            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
         }
         curPos++;
 
@@ -197,14 +189,12 @@ public final class TimeParser {
         try {
             hour = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
-            throw new ParseException("Hour (hh) has wrong format: "
-                    + e.getMessage(), curPos);
+            throw new ParseException("Hour (hh) has wrong format: " + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = ':';
         if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter
-                    + "' at position " + curPos, curPos);
+            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
         }
         curPos++;
 
@@ -212,14 +202,12 @@ public final class TimeParser {
         try {
             min = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
-            throw new ParseException("Minute (mm) has wrong format: "
-                    + e.getMessage(), curPos);
+            throw new ParseException("Minute (mm) has wrong format: " + e.getMessage(), curPos);
         }
         curPos += 2;
         delimiter = ':';
         if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter
-                    + "' at position " + curPos, curPos);
+            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
         }
         curPos++;
 
@@ -227,8 +215,7 @@ public final class TimeParser {
         try {
             sec = Integer.parseInt(time.substring(curPos, curPos + 2));
         } catch (NumberFormatException e) {
-            throw new ParseException("Second (ss) has wrong format: "
-                    + e.getMessage(), curPos);
+            throw new ParseException("Second (ss) has wrong format: " + e.getMessage(), curPos);
         }
         curPos += 2;
 
@@ -260,16 +247,14 @@ public final class TimeParser {
                     ms = 0;
                 }
             } catch (NumberFormatException e) {
-                throw new ParseException("Millisecond (S) has wrong format: "
-                        + e.getMessage(), curPos);
+                throw new ParseException("Millisecond (S) has wrong format: " + e.getMessage(), curPos);
             }
         } else {
             ms = 0;
         }
 
         // parse time zone designator (Z or +00:00 or -00:00)
-        if (curPos < time.length()
-                && (time.charAt(curPos) == '+' || time.charAt(curPos) == '-')) {
+        if (curPos < time.length() && (time.charAt(curPos) == '+' || time.charAt(curPos) == '-')) {
             // offset to UTC specified in the format +00:00/-00:00
             tzID = "GMT" + time.substring(curPos);
         } else if (curPos < time.length() && time.substring(curPos).equals("Z")) {
@@ -352,8 +337,7 @@ public final class TimeParser {
 
         // determine era and adjust year if necessary
         int year = cal.get(Calendar.YEAR);
-        if (cal.isSet(Calendar.ERA)
-                && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
+        if (cal.isSet(Calendar.ERA) && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
             /**
              * calculate year using astronomical system: year n BCE =>
              * astronomical year -n + 1
@@ -404,9 +388,16 @@ public final class TimeParser {
         return buf.toString();
     }
 
-    private static final boolean isNumeric(final char c) {
-        if ((c >= '0') && (c <= '9')) return true;
-        return false;
+    /**
+     * Checks whether the given character is Numeric.
+     * 
+     * @param c
+     *            The character to check.
+     * @return <code>true</code> if the given character is numeric,
+     *         <code>false</code> otherwise.
+     */
+    private static boolean isNumeric(final char c) {
+        return (((c >= '0') && (c <= '9')) ? true : false);
     }
 
     /**
@@ -416,7 +407,7 @@ public final class TimeParser {
      *            The java.sql.Timestamp to convert.
      * @return The Calendar object representing the given timestamp.
      */
-    public static Calendar convert(Timestamp ts) {
+    public static Calendar convert(final Timestamp ts) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTimeInMillis(ts.getTime());
         return cal;
@@ -429,7 +420,7 @@ public final class TimeParser {
      *            The Calendar object to convert.
      * @return The java.sql.Timestamp representing the given Calendar value.
      */
-    public static Timestamp convert(Calendar cal) {
+    public static Timestamp convert(final Calendar cal) {
         return new Timestamp(cal.getTimeInMillis());
     }
 
