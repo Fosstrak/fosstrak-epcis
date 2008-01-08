@@ -23,6 +23,9 @@ package org.accada.epcis.repository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -41,6 +44,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.xml.sax.SAXException;
 
 /**
  * CaptureOperationsModule implements the core capture operations. Converts XML
@@ -119,6 +123,8 @@ public class CaptureOperationsServlet extends HttpServlet {
             LOG.warn("Unable to load the schema validator.", e);
             LOG.warn("Schema validation will not be available!");
         }
+
+        captureOperationsModule.setCaptureOperationsBackend(new CaptureOperationsBackend());
     }
 
     /**
@@ -132,13 +138,26 @@ public class CaptureOperationsServlet extends HttpServlet {
      *            The HttpServletResponse.
      * @throws IOException
      *             If an error occurred while writing the response.
-     * @throws ServletException
-     *             If a servlet error occurred.
      */
-    @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse rsp) throws ServletException,
-            IOException {
-        captureOperationsModule.doGet(req, rsp);
+    public void doGet(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
+        final PrintWriter out = rsp.getWriter();
+
+        // return an HTML info page
+        rsp.setContentType("text/html");
+
+        out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
+        out.println("   \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+        out.println("<html>");
+        out.println("<head><title>EPCIS Capture Service</title></head>");
+        out.println("<body>");
+        out.println("<p>This service captures EPCIS events sent to it using HTTP POST requests.<br />");
+        out.println("The payload of the HTTP POST request is expected to be an XML document conforming to the EPCISDocument schema.</p>");
+        out.println("<p>For further information refer to the xml schema files or check the Example <br />");
+        out.println("in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.</p>");
+        out.println("</body>");
+        out.println("</html>");
+        out.flush();
+        out.close();
     }
 
     /**
@@ -154,13 +173,80 @@ public class CaptureOperationsServlet extends HttpServlet {
      * @throws IOException
      *             If an error occurred while validating the request or writing
      *             the response.
-     * @throws ServletException
-     *             If a servlet error occurred.
      */
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws ServletException,
-            IOException {
-        captureOperationsModule.doPost(req, rsp);
+    public void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
+        LOG.info("EPCIS Capture Interface invoked.");
+        rsp.setContentType("text/plain");
+        final PrintWriter out = rsp.getWriter();
+
+        InputStream is = null;
+        // check if we have a POST request with form parameters
+        if ("application/x-www-form-urlencoded".equalsIgnoreCase(req.getContentType())) {
+            // check if the 'event' or 'dbReset' form parameter are given
+            String event = req.getParameter("event");
+            String dbReset = req.getParameter("dbReset");
+            if (event != null) {
+                LOG.info("Found deprecated 'event=' parameter. Refusing to process request.");
+                String msg = "Starting from version 0.2.2, the EPCIS repository does not accept the EPCISDocument in the HTTP POST form parameter 'event' anymore. Please provide the EPCISDocument as HTTP POST payload instead.";
+                rsp.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+                out.println(msg);
+            } else if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
+                LOG.debug("Found 'dbReset' parameter set to 'true'.");
+                rsp.setContentType("text/plain");
+                try {
+                    captureOperationsModule.doDbReset();
+                    String msg = "db reset successfull";
+                    LOG.info(msg);
+                    rsp.setStatus(HttpServletResponse.SC_OK);
+                    out.println(msg);
+                } catch (SQLException e) {
+                    String msg = "An error involving the database occurred.";
+                    LOG.error(msg, e);
+                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.println(msg);
+                } catch (IOException e) {
+                    String msg = "An unknown error occurred.";
+                    LOG.error(msg, e);
+                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.println(msg);
+                } catch (UnsupportedOperationException e) {
+                    String msg = "'dbReset' operation not allowed!";
+                    LOG.info(msg);
+                    rsp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    out.println(msg);
+                }
+            }
+            out.flush();
+            out.close();
+            return;
+        } else {
+            is = req.getInputStream();
+            try {
+                captureOperationsModule.doCapture(is);
+                rsp.setStatus(HttpServletResponse.SC_OK);
+                out.println("Capture request succeeded.");
+            } catch (SAXException e) {
+                String msg = "An error processing the XML document occurred.";
+                LOG.error(msg, e);
+                rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.println(msg);
+            } catch (SQLException e) {
+                String msg = "An error involving the database occurred.";
+                LOG.error(msg, e);
+                rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.println(msg);
+            } catch (final Exception e) {
+                String msg = "An unknown error occurred.";
+                LOG.error(msg, e);
+                rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.println(msg);
+            }
+
+            out.flush();
+            out.close();
+
+        }
     }
 
 }
