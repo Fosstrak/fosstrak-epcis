@@ -29,6 +29,7 @@
     username="${db.username}"
     password="${db.password}"
     driverClassName="com.mysql.jdbc.Driver"
+    defaultAutoCommit="false"
     url="jdbc:mysql://localhost:3306/${db.database}?autoReconnect=true">
   </Resource>
 
