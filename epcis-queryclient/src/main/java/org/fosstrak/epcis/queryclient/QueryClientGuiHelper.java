@@ -158,44 +158,33 @@ public class QueryClientGuiHelper {
             debugTextArea.append("-------------\n");
             for (i = 0; i < eventList.getObjectEvent().length; i++) {
                 debugTextArea.append("eventTime:\t"
-                        + prettyStringCalendar(eventList.getObjectEvent()[i].getEventTime())
-                        + "\n");
+                        + prettyStringCalendar(eventList.getObjectEvent()[i].getEventTime()) + "\n");
                 debugTextArea.append("recordTime:\t"
-                        + prettyStringCalendar(eventList.getObjectEvent()[i].getRecordTime())
-                        + "\n");
+                        + prettyStringCalendar(eventList.getObjectEvent()[i].getRecordTime()) + "\n");
                 debugTextArea.append("EPCList:\t");
                 for (j = 0; j < eventList.getObjectEvent()[i].getEpcList().length; j++) {
-                    debugTextArea.append(" '"
-                            + eventList.getObjectEvent()[i].getEpcList()[j]
-                            + "'");
+                    debugTextArea.append(" '" + eventList.getObjectEvent()[i].getEpcList()[j] + "'");
                 }
                 debugTextArea.append("\n");
-                debugTextArea.append("ActionType:\t"
-                        + eventList.getObjectEvent()[i].getAction() + "\n");
-                debugTextArea.append("bizStep:\t"
-                        + eventList.getObjectEvent()[i].getBizStep() + "\n");
-                debugTextArea.append("disposition:\t"
-                        + eventList.getObjectEvent()[i].getDisposition() + "\n");
+                debugTextArea.append("ActionType:\t" + eventList.getObjectEvent()[i].getAction() + "\n");
+                debugTextArea.append("bizStep:\t" + eventList.getObjectEvent()[i].getBizStep() + "\n");
+                debugTextArea.append("disposition:\t" + eventList.getObjectEvent()[i].getDisposition() + "\n");
                 if (eventList.getObjectEvent()[i].getReadPoint() != null) {
                     debugTextArea.append("readPoint:\t"
-                            + eventList.getObjectEvent()[i].getReadPoint().getId().toString()
-                            + "\n");
+                            + eventList.getObjectEvent()[i].getReadPoint().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("readPoint:\tnull\n");
                 }
                 if (eventList.getObjectEvent()[i].getBizLocation() != null) {
                     debugTextArea.append("bizLocation:\t"
-                            + eventList.getObjectEvent()[i].getBizLocation().getId().toString()
-                            + "\n");
+                            + eventList.getObjectEvent()[i].getBizLocation().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("bizLocation:\tnull\n");
                 }
                 debugTextArea.append("bizTransactions: Type, ID\n");
                 for (j = 0; j < eventList.getObjectEvent()[i].getBizTransactionList().length; j++) {
-                    debugTextArea.append("\t'"
-                            + eventList.getObjectEvent()[i].getBizTransactionList()[j].getType()
-                            + "', '"
-                            + eventList.getObjectEvent()[i].getBizTransactionList()[j].getValue().toString()
+                    debugTextArea.append("\t'" + eventList.getObjectEvent()[i].getBizTransactionList()[j].getType()
+                            + "', '" + eventList.getObjectEvent()[i].getBizTransactionList()[j].getValue().toString()
                             + "'\n");
                 }
                 debugTextArea.append("\n");
@@ -208,49 +197,35 @@ public class QueryClientGuiHelper {
             debugTextArea.append("------------------\n");
             for (i = 0; i < eventList.getAggregationEvent().length; i++) {
                 debugTextArea.append("eventTime:\t"
-                        + prettyStringCalendar(eventList.getAggregationEvent()[i].getEventTime())
-                        + "\n");
+                        + prettyStringCalendar(eventList.getAggregationEvent()[i].getEventTime()) + "\n");
                 debugTextArea.append("recordTime:\t"
-                        + prettyStringCalendar(eventList.getAggregationEvent()[i].getRecordTime())
-                        + "\n");
-                debugTextArea.append("ParentID:\t"
-                        + eventList.getAggregationEvent()[i].getParentID()
-                        + "\n");
+                        + prettyStringCalendar(eventList.getAggregationEvent()[i].getRecordTime()) + "\n");
+                debugTextArea.append("ParentID:\t" + eventList.getAggregationEvent()[i].getParentID() + "\n");
                 debugTextArea.append("ChildEPCs:\t");
                 for (j = 0; j < eventList.getAggregationEvent()[i].getChildEPCs().length; j++) {
-                    debugTextArea.append(" '"
-                            + eventList.getAggregationEvent()[i].getChildEPCs()[j]
-                            + "'");
+                    debugTextArea.append(" '" + eventList.getAggregationEvent()[i].getChildEPCs()[j] + "'");
                 }
                 debugTextArea.append("\n");
-                debugTextArea.append("ActionType:\t"
-                        + eventList.getAggregationEvent()[i].getAction() + "\n");
-                debugTextArea.append("bizStep:\t"
-                        + eventList.getAggregationEvent()[i].getBizStep()
-                        + "\n");
-                debugTextArea.append("disposition:\t"
-                        + eventList.getAggregationEvent()[i].getDisposition()
-                        + "\n");
+                debugTextArea.append("ActionType:\t" + eventList.getAggregationEvent()[i].getAction() + "\n");
+                debugTextArea.append("bizStep:\t" + eventList.getAggregationEvent()[i].getBizStep() + "\n");
+                debugTextArea.append("disposition:\t" + eventList.getAggregationEvent()[i].getDisposition() + "\n");
 
                 if (eventList.getAggregationEvent()[i].getReadPoint() != null) {
                     debugTextArea.append("readPoint:\t"
-                            + eventList.getAggregationEvent()[i].getReadPoint().getId().toString()
-                            + "\n");
+                            + eventList.getAggregationEvent()[i].getReadPoint().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("readPoint:\tnull\n");
                 }
                 if (eventList.getAggregationEvent()[i].getBizLocation() != null) {
                     debugTextArea.append("bizLocation:\t"
-                            + eventList.getAggregationEvent()[i].getBizLocation().getId().toString()
-                            + "\n");
+                            + eventList.getAggregationEvent()[i].getBizLocation().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("bizLocation:\tnull\n");
                 }
                 debugTextArea.append("bizTransactions: Type, ID\n");
                 for (j = 0; j < eventList.getAggregationEvent()[i].getBizTransactionList().length; j++) {
                     debugTextArea.append("\t'"
-                            + eventList.getAggregationEvent()[i].getBizTransactionList()[j].getType()
-                            + "', '"
+                            + eventList.getAggregationEvent()[i].getBizTransactionList()[j].getType() + "', '"
                             + eventList.getAggregationEvent()[i].getBizTransactionList()[j].getValue().toString()
                             + "'\n");
                 }
@@ -264,40 +239,29 @@ public class QueryClientGuiHelper {
             debugTextArea.append("---------------\n");
             for (i = 0; i < eventList.getQuantityEvent().length; i++) {
                 debugTextArea.append("eventTime:\t"
-                        + prettyStringCalendar(eventList.getQuantityEvent()[i].getEventTime())
-                        + "\n");
+                        + prettyStringCalendar(eventList.getQuantityEvent()[i].getEventTime()) + "\n");
                 debugTextArea.append("recordTime:\t"
-                        + prettyStringCalendar(eventList.getQuantityEvent()[i].getRecordTime())
-                        + "\n");
-                debugTextArea.append("ecpClass:\t"
-                        + eventList.getQuantityEvent()[i].getEpcClass() + "\n");
-                debugTextArea.append("Quantity:\t"
-                        + eventList.getQuantityEvent()[i].getQuantity() + "\n");
-                debugTextArea.append("bizStep:\t"
-                        + eventList.getQuantityEvent()[i].getBizStep() + "\n");
-                debugTextArea.append("disposition:\t"
-                        + eventList.getQuantityEvent()[i].getDisposition()
-                        + "\n");
+                        + prettyStringCalendar(eventList.getQuantityEvent()[i].getRecordTime()) + "\n");
+                debugTextArea.append("ecpClass:\t" + eventList.getQuantityEvent()[i].getEpcClass() + "\n");
+                debugTextArea.append("Quantity:\t" + eventList.getQuantityEvent()[i].getQuantity() + "\n");
+                debugTextArea.append("bizStep:\t" + eventList.getQuantityEvent()[i].getBizStep() + "\n");
+                debugTextArea.append("disposition:\t" + eventList.getQuantityEvent()[i].getDisposition() + "\n");
                 if (eventList.getQuantityEvent()[i].getReadPoint() != null) {
                     debugTextArea.append("readPoint:\t"
-                            + eventList.getQuantityEvent()[i].getReadPoint().getId().toString()
-                            + "\n");
+                            + eventList.getQuantityEvent()[i].getReadPoint().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("readPoint:\tnull\n");
                 }
                 if (eventList.getQuantityEvent()[i].getBizLocation() != null) {
                     debugTextArea.append("bizLocation:\t"
-                            + eventList.getQuantityEvent()[i].getBizLocation().getId().toString()
-                            + "\n");
+                            + eventList.getQuantityEvent()[i].getBizLocation().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("bizLocation:\tnull\n");
                 }
                 debugTextArea.append("bizTransactions: Type, ID:\n");
                 for (j = 0; j < eventList.getQuantityEvent()[i].getBizTransactionList().length; j++) {
-                    debugTextArea.append("\t'"
-                            + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getType()
-                            + "', '"
-                            + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getValue().toString()
+                    debugTextArea.append("\t'" + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getType()
+                            + "', '" + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getValue().toString()
                             + "'\n");
                 }
                 debugTextArea.append("\n");
@@ -310,48 +274,34 @@ public class QueryClientGuiHelper {
             debugTextArea.append("------------------\n");
             for (i = 0; i < eventList.getTransactionEvent().length; i++) {
                 debugTextArea.append("eventTime:\t"
-                        + prettyStringCalendar(eventList.getTransactionEvent()[i].getEventTime())
-                        + "\n");
+                        + prettyStringCalendar(eventList.getTransactionEvent()[i].getEventTime()) + "\n");
                 debugTextArea.append("recordTime:\t"
-                        + prettyStringCalendar(eventList.getTransactionEvent()[i].getRecordTime())
-                        + "\n");
-                debugTextArea.append("parentID:\t"
-                        + eventList.getTransactionEvent()[i].getParentID()
-                        + "\n");
+                        + prettyStringCalendar(eventList.getTransactionEvent()[i].getRecordTime()) + "\n");
+                debugTextArea.append("parentID:\t" + eventList.getTransactionEvent()[i].getParentID() + "\n");
                 debugTextArea.append("epcList:\t");
                 for (j = 0; j < eventList.getTransactionEvent()[i].getEpcList().length; j++) {
-                    debugTextArea.append(" '"
-                            + eventList.getTransactionEvent()[i].getEpcList()[j]
-                            + "'");
+                    debugTextArea.append(" '" + eventList.getTransactionEvent()[i].getEpcList()[j] + "'");
                 }
                 debugTextArea.append("\n");
-                debugTextArea.append("ActionType:\t"
-                        + eventList.getTransactionEvent()[i].getAction() + "\n");
-                debugTextArea.append("bizStep:\t"
-                        + eventList.getTransactionEvent()[i].getBizStep()
-                        + "\n");
-                debugTextArea.append("disposition:\t"
-                        + eventList.getTransactionEvent()[i].getDisposition()
-                        + "\n");
+                debugTextArea.append("ActionType:\t" + eventList.getTransactionEvent()[i].getAction() + "\n");
+                debugTextArea.append("bizStep:\t" + eventList.getTransactionEvent()[i].getBizStep() + "\n");
+                debugTextArea.append("disposition:\t" + eventList.getTransactionEvent()[i].getDisposition() + "\n");
                 if (eventList.getTransactionEvent()[i].getReadPoint() != null) {
                     debugTextArea.append("readPoint:\t"
-                            + eventList.getTransactionEvent()[i].getReadPoint().getId().toString()
-                            + "\n");
+                            + eventList.getTransactionEvent()[i].getReadPoint().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("readPoint:\tnull\n");
                 }
                 if (eventList.getTransactionEvent()[i].getBizLocation() != null) {
                     debugTextArea.append("bizLocation:\t"
-                            + eventList.getTransactionEvent()[i].getBizLocation().getId().toString()
-                            + "\n");
+                            + eventList.getTransactionEvent()[i].getBizLocation().getId().toString() + "\n");
                 } else {
                     debugTextArea.append("bizLocation:\tnull\n");
                 }
                 debugTextArea.append("bizTransactions: Type, ID\n");
                 for (j = 0; j < eventList.getTransactionEvent()[i].getBizTransactionList().length; j++) {
                     debugTextArea.append("\t'"
-                            + eventList.getTransactionEvent()[i].getBizTransactionList()[j].getType()
-                            + "', '"
+                            + eventList.getTransactionEvent()[i].getBizTransactionList()[j].getType() + "', '"
                             + eventList.getTransactionEvent()[i].getBizTransactionList()[j].getValue().toString()
                             + "'\n");
                 }
@@ -399,9 +349,7 @@ public class QueryClientGuiHelper {
                 table[row][2] = prettyStringCalendar(eventList.getObjectEvent()[i].getRecordTime());
                 table[row][5] = "";
                 for (j = 0; j < eventList.getObjectEvent()[i].getEpcList().length; j++) {
-                    table[row][5] = table[row][5] + "'"
-                            + eventList.getObjectEvent()[i].getEpcList()[j]
-                            + "' ";
+                    table[row][5] = table[row][5] + "'" + eventList.getObjectEvent()[i].getEpcList()[j] + "' ";
                 }
                 table[row][6] = eventList.getObjectEvent()[i].getAction();
                 table[row][7] = eventList.getObjectEvent()[i].getBizStep();
@@ -414,12 +362,9 @@ public class QueryClientGuiHelper {
                 }
                 table[row][11] = "";
                 for (j = 0; j < eventList.getObjectEvent()[i].getBizTransactionList().length; j++) {
-                    table[row][11] = table[row][11]
-                            + "'"
-                            + eventList.getObjectEvent()[i].getBizTransactionList()[j].getType()
-                            + ", "
-                            + eventList.getObjectEvent()[i].getBizTransactionList()[j].getValue().toString()
-                            + "'";
+                    table[row][11] = table[row][11] + "'"
+                            + eventList.getObjectEvent()[i].getBizTransactionList()[j].getType() + ", "
+                            + eventList.getObjectEvent()[i].getBizTransactionList()[j].getValue().toString() + "'";
                     if (eventList.getObjectEvent()[i].getBizTransactionList().length > j + 1) {
                         table[row][11] = table[row][11] + "  ;  ";
                     }
@@ -437,10 +382,7 @@ public class QueryClientGuiHelper {
                 table[row][3] = eventList.getAggregationEvent()[i].getParentID();
                 table[row][5] = "";
                 for (j = 0; j < eventList.getAggregationEvent()[i].getChildEPCs().length; j++) {
-                    table[row][5] = table[row][5]
-                            + "'"
-                            + eventList.getAggregationEvent()[i].getChildEPCs()[j]
-                            + "' ";
+                    table[row][5] = table[row][5] + "'" + eventList.getAggregationEvent()[i].getChildEPCs()[j] + "' ";
                 }
                 table[row][6] = eventList.getAggregationEvent()[i].getAction();
                 table[row][7] = eventList.getAggregationEvent()[i].getBizStep();
@@ -453,12 +395,9 @@ public class QueryClientGuiHelper {
                 }
                 table[row][11] = "";
                 for (j = 0; j < eventList.getAggregationEvent()[i].getBizTransactionList().length; j++) {
-                    table[row][11] = table[row][11]
-                            + "'"
-                            + eventList.getAggregationEvent()[i].getBizTransactionList()[j].getType()
-                            + ", "
-                            + eventList.getAggregationEvent()[i].getBizTransactionList()[j].getValue().toString()
-                            + "'";
+                    table[row][11] = table[row][11] + "'"
+                            + eventList.getAggregationEvent()[i].getBizTransactionList()[j].getType() + ", "
+                            + eventList.getAggregationEvent()[i].getBizTransactionList()[j].getValue().toString() + "'";
                     if (eventList.getAggregationEvent()[i].getBizTransactionList().length > j + 1) {
                         table[row][11] = table[row][11] + "  ;  ";
                     }
@@ -473,10 +412,8 @@ public class QueryClientGuiHelper {
                 table[row][0] = "Quantity";
                 table[row][1] = prettyStringCalendar(eventList.getQuantityEvent()[i].getEventTime());
                 table[row][2] = prettyStringCalendar(eventList.getQuantityEvent()[i].getRecordTime());
-                table[row][4] = ""
-                        + eventList.getQuantityEvent()[i].getQuantity();
-                table[row][5] = "EPC class "
-                        + eventList.getQuantityEvent()[i].getEpcClass();
+                table[row][4] = "" + eventList.getQuantityEvent()[i].getQuantity();
+                table[row][5] = "EPC class " + eventList.getQuantityEvent()[i].getEpcClass();
                 table[row][7] = eventList.getQuantityEvent()[i].getBizStep();
                 table[row][8] = eventList.getQuantityEvent()[i].getDisposition();
                 if (eventList.getQuantityEvent()[i].getReadPoint() != null) {
@@ -487,12 +424,9 @@ public class QueryClientGuiHelper {
                 }
                 table[row][11] = "";
                 for (j = 0; j < eventList.getQuantityEvent()[i].getBizTransactionList().length; j++) {
-                    table[row][11] = table[row][11]
-                            + "'"
-                            + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getType()
-                            + ", "
-                            + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getValue().toString()
-                            + "'";
+                    table[row][11] = table[row][11] + "'"
+                            + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getType() + ", "
+                            + eventList.getQuantityEvent()[i].getBizTransactionList()[j].getValue().toString() + "'";
                     if (eventList.getQuantityEvent()[i].getBizTransactionList().length > j + 1) {
                         table[row][11] = table[row][11] + "  ;  ";
                     }
@@ -510,10 +444,7 @@ public class QueryClientGuiHelper {
                 table[row][3] = eventList.getTransactionEvent()[i].getParentID();
                 table[row][5] = "";
                 for (j = 0; j < eventList.getTransactionEvent()[i].getEpcList().length; j++) {
-                    table[row][5] = table[row][5]
-                            + "'"
-                            + eventList.getTransactionEvent()[i].getEpcList()[j]
-                            + "' ";
+                    table[row][5] = table[row][5] + "'" + eventList.getTransactionEvent()[i].getEpcList()[j] + "' ";
                 }
                 table[row][6] = eventList.getTransactionEvent()[i].getAction();
                 table[row][7] = eventList.getTransactionEvent()[i].getBizStep();
@@ -526,12 +457,9 @@ public class QueryClientGuiHelper {
                 }
                 table[row][11] = "";
                 for (j = 0; j < eventList.getTransactionEvent()[i].getBizTransactionList().length; j++) {
-                    table[row][11] = table[row][11]
-                            + "'"
-                            + eventList.getTransactionEvent()[i].getBizTransactionList()[j].getType()
-                            + ", "
-                            + eventList.getTransactionEvent()[i].getBizTransactionList()[j].getValue().toString()
-                            + "'";
+                    table[row][11] = table[row][11] + "'"
+                            + eventList.getTransactionEvent()[i].getBizTransactionList()[j].getType() + ", "
+                            + eventList.getTransactionEvent()[i].getBizTransactionList()[j].getValue().toString() + "'";
                     if (eventList.getTransactionEvent()[i].getBizTransactionList().length > j + 1) {
                         table[row][11] = table[row][11] + "  ;  ";
                     }
@@ -573,11 +501,9 @@ public class QueryClientGuiHelper {
 
         QueryParam[] queryParams = new QueryParam[queryParamsVector.size()];
         queryParamsVector.toArray(queryParams);
-        debugTextArea.append("Number of query parameters: "
-                + queryParams.length + "\n");
+        debugTextArea.append("Number of query parameters: " + queryParams.length + "\n");
         for (int i = 0; i < queryParams.length; i++) {
-            debugTextArea.append(queryParams[i].getName() + " "
-                    + queryParams[i].getValue() + "\n");
+            debugTextArea.append(queryParams[i].getName() + " " + queryParams[i].getValue() + "\n");
         }
 
         Poll pollparams = new Poll();
@@ -607,11 +533,9 @@ public class QueryClientGuiHelper {
 
         QueryParam[] queryParams = new QueryParam[queryParamsVector.size()];
         queryParamsVector.toArray(queryParams);
-        debugTextArea.append("Number of query parameters: "
-                + queryParams.length + "\n");
+        debugTextArea.append("Number of query parameters: " + queryParams.length + "\n");
         for (int i = 0; i < queryParams.length; i++) {
-            debugTextArea.append(queryParams[i].getName() + " "
-                    + queryParams[i].getValue() + "\n");
+            debugTextArea.append(queryParams[i].getName() + " " + queryParams[i].getValue() + "\n");
         }
 
         subcr.setParams(queryParams);
@@ -628,9 +552,8 @@ public class QueryClientGuiHelper {
         try {
             JFrame frame = new JFrame();
             if (subscriptionID.equals("")) {
-                JOptionPane.showMessageDialog(frame,
-                        "Please specify a SubscriptionID",
-                        "Service is responding", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Please specify a SubscriptionID", "Service is responding",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             EPCISServiceBindingStub stub;
@@ -638,16 +561,15 @@ public class QueryClientGuiHelper {
             Unsubscribe parms = new Unsubscribe();
             parms.setSubscriptionID(subscriptionID);
             stub.unsubscribe(parms);
-            JOptionPane.showMessageDialog(frame, "Successfully unsubscribed.",
-                    "Service is responding", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Successfully unsubscribed.", "Service is responding",
+                    JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             JFrame frame = new JFrame();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             String stacktrace = sw.toString();
-            JOptionPane.showMessageDialog(frame, "Sorry, the Service returned "
-                    + "an Error:\n" + stacktrace, "Service is not responding",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Sorry, the Service returned " + "an Error:\n" + stacktrace,
+                    "Service is not responding", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
 
@@ -674,28 +596,23 @@ public class QueryClientGuiHelper {
             GetSubscriptionIDs parms = new GetSubscriptionIDs();
             parms.setQueryName("simpleQuery");
             ArrayOfString res = stub.getSubscriptionIDs(parms);
-            String text = "The Service found the following "
-                    + "SubscriptionID(s):\n";
+            String text = "The Service found the following " + "SubscriptionID(s):\n";
             String[] resArray = res.getString();
             if (resArray != null) {
                 for (String item : resArray) {
                     text += "- " + item + "\n";
                 }
                 JFrame frame = new JFrame();
-                JOptionPane.showMessageDialog(frame, text,
-                        "Service is responding",
-                        JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(frame, text, "Service is responding", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JFrame frame = new JFrame();
-                JOptionPane.showMessageDialog(frame, "There are no "
-                        + "Subscribed Queries.", "Service is responding",
+                JOptionPane.showMessageDialog(frame, "There are no " + "Subscribed Queries.", "Service is responding",
                         JOptionPane.INFORMATION_MESSAGE);
             }
 
         } catch (Exception e) {
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, "Sorry, the Service doesn't "
-                    + "work", "Service is not responding",
+            JOptionPane.showMessageDialog(frame, "Sorry, the Service doesn't " + "work", "Service is not responding",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
@@ -737,8 +654,7 @@ public class QueryClientGuiHelper {
         Vector<String> parsed = new Vector<String>();
         String temp = "";
         for (int i = 0; i < text.length(); i++) {
-            if (((Character) (text.charAt(i))).toString().equals(" ")
-                    && temp != "") {
+            if (((Character) (text.charAt(i))).toString().equals(" ") && temp != "") {
                 parsed.add(temp);
                 temp = "";
             } else if (!((Character) (text.charAt(i))).toString().equals(" ")) {

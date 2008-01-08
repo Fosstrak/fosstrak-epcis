@@ -46,13 +46,12 @@ public interface QueryControlInterface {
      * @return The QueryResults.
      * @throws ServiceException
      *             If an exception whithin the repository's Query Controls
-     *             Module occured.
+     *             Module occurred.
      * @throws RemoteException
      *             If an exception communicating with the repository's Query
-     *             Controls Module occured.
+     *             Controls Module occurred.
      */
-    QueryResults poll(final String queryName, final QueryParam[] params)
-            throws ServiceException, RemoteException;
+    QueryResults poll(final String queryName, final QueryParam[] params) throws ServiceException, RemoteException;
 
     /**
      * Performs a subscribe operation at the repository's Query Controls Module,
@@ -71,15 +70,13 @@ public interface QueryControlInterface {
      *            The ID of the subscription.
      * @throws ServiceException
      *             If an exception whithin the repository's Query Controls
-     *             Module occured.
+     *             Module occurred.
      * @throws RemoteException
      *             If an exception communicating with the repository's Query
-     *             Controls Module occured.
+     *             Controls Module occurred.
      */
-    void subscribe(final String queryName, final QueryParam[] params,
-            final URI dest, final SubscriptionControls controls,
-            final String subscriptionId) throws ServiceException,
-            RemoteException;
+    void subscribe(final String queryName, final QueryParam[] params, final URI dest,
+            final SubscriptionControls controls, final String subscriptionId) throws ServiceException, RemoteException;
 
     /**
      * Perform an unsubscribe operation at the repository's Query Controls
@@ -89,13 +86,12 @@ public interface QueryControlInterface {
      *            The ID of the query to be unsubscribed.
      * @throws ServiceException
      *             If an exception whithin the repository's Query Controls
-     *             Module occured.
+     *             Module occurred.
      * @throws RemoteException
      *             If an exception communicating with the repository's Query
-     *             Controls Module occured.
+     *             Controls Module occurred.
      */
-    void unsubscribe(final String subscriptionId) throws ServiceException,
-            RemoteException;
+    void unsubscribe(final String subscriptionId) throws ServiceException, RemoteException;
 
     /**
      * Retrieves the names of queries that can be coped with.
@@ -103,10 +99,10 @@ public interface QueryControlInterface {
      * @return A List of query names.
      * @throws ServiceException
      *             If an exception whithin the repository's Query Controls
-     *             Module occured.
+     *             Module occurred.
      * @throws RemoteException
      *             If an exception communicating with the repository's Query
-     *             Controls Module occured.
+     *             Controls Module occurred.
      */
     List<String> getQueryNames() throws ServiceException, RemoteException;
 
@@ -118,13 +114,12 @@ public interface QueryControlInterface {
      * @return A List of IDs.
      * @throws ServiceException
      *             If an exception whithin the repository's Query Controls
-     *             Module occured.
+     *             Module occurred.
      * @throws RemoteException
      *             If an exception communicating with the repository's Query
-     *             Controls Module occured.
+     *             Controls Module occurred.
      */
-    List<String> getSubscriptionIds(final String queryName)
-            throws ServiceException, RemoteException;
+    List<String> getSubscriptionIds(final String queryName) throws ServiceException, RemoteException;
 
     /**
      * Retrieves the standard version implemented by this implementation.
@@ -132,10 +127,10 @@ public interface QueryControlInterface {
      * @return The implemented standard version.
      * @throws ServiceException
      *             If an exception whithin the repository's Query Controls
-     *             Module occured.
+     *             Module occurred.
      * @throws RemoteException
      *             If an exception communicating with the repository's Query
-     *             Controls Module occured.
+     *             Controls Module occurred.
      */
     String getStandardVersion() throws ServiceException, RemoteException;
 
@@ -145,10 +140,10 @@ public interface QueryControlInterface {
      * @return The vendor version.
      * @throws ServiceException
      *             If an exception whithin the repository's Query Controls
-     *             Module occured.
+     *             Module occurred.
      * @throws RemoteException
      *             If an exception communicating with the repository's Query
-     *             Controls Module occured.
+     *             Controls Module occurred.
      */
     String getVendorVersion() throws ServiceException, RemoteException;
 }

@@ -105,14 +105,12 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * Contains the column names for the result table.
      */
     private final String[] columnNames = {
-            "Event", "occured", "recorded", "Parent ID", "Quantity", "EPCs",
-            "Action", "Business step", "Disposition", "Readpoint ID",
-            "Business location", "Business transaction"
-    };
+            "Event", "occurred", "recorded", "Parent ID", "Quantity", "EPCs", "Action", "Business step", "Disposition",
+            "Readpoint ID", "Business location", "Business transaction" };
 
     /**
-     * Contains the various choices for the query parameters in a human
-     * readable form.
+     * Contains the various choices for the query parameters in a human readable
+     * form.
      */
     private String[] queryParameterUsertext;
 
@@ -138,47 +136,27 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
 
     /* main window */
     private JFrame mainWindow;
-
     private JPanel mwMainPanel;
-
     private JPanel mwConfigPanel;
-
     private JPanel mwSubscribeManagementPanel;
-
     private JPanel mwEventTypeSelectPanel;
-
     private JPanel mwQueryPanel;
-
     private JPanel mwSubscriptionPanel;
-
     private JPanel mwQueryArgsPanel;
-
     private JPanel mwQueryExamplesPanel;
-
     private JPanel mwButtonPanel;
-
     private JLabel mwServiceUrlLabel;
 
     private JTextField mwServiceUrlTextField;
-
     private JButton mwServiceInfoButton;
-
     private JLabel mwUnsubscribeQueryLabel;
-
     private JTextField mwUnsubscribeQueryTextField;
-
     private JButton mwUnsubscribeQueryButton;
-
     private JButton mwSubscriptionIdButton;
-
     private JCheckBox mwShowDebugWindowCheckBox;
-
     private JCheckBox mwObjectEventsCheckBox;
-
     private JCheckBox mwAggregationEventsCheckBox;
-
     private JCheckBox mwQuantityEventsCheckBox;
-
     private JCheckBox mwTransactionEventsCheckBox;
 
     /*
@@ -188,75 +166,48 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * drop-down box
      */
     private LinkedList<JComboBox> mwQuerySelectComboBoxes;
-
     private LinkedList<JTextFieldEnhanced> mwQueryArgumentTextFields;
 
     private int mwQueryArgumentTextFieldsExtraWidth = 550;
-
     private int mwHeightDifference;
 
     private JButton mwRunQueryButton;
-
     private JButton mwFillInExampleButton;
 
     /* subscribe Query */
     private JCheckBox isSubscribed;
-
     private JTextField mwScheduleMinuteField;
-
     private JTextField mwScheduleSecField;
-
     private JTextField mwScheduleHourField;
-
     private JTextField mwScheduleWeekField;
-
     private JTextField mwScheduleMonthField;
-
     private JTextField mwScheduleDayField;
-
     private JTextField mwSubIdField;
-
     private JTextField mwInitRecTimeField;
-
     private JTextField mwDestUriTextField;
-
     private JCheckBox reportIf;
-
     private JCheckBox triggerIf;
 
     /* results window */
     private JFrame resultsWindow;
-
     private JPanel rwResultsPanel;
-
     private JTable rwResultsTable;
-
     private JScrollPane rwResultsScrollPane;
 
     /* example selection window */
     private JFrame exampleWindow;
-
     private JPanel ewMainPanel;
-
     private JPanel ewListPanel;
-
     private JPanel ewButtonPanel;
-
     private JList ewExampleList;
-
     private JScrollPane ewExampleScrollPane;
-
     private JButton ewOkButton;
 
     /* debug window */
     private JFrame debugWindow;
-
     private JTextArea dwOutputTextArea;
-
     private JScrollPane dwOutputScrollPane;
-
     private JPanel dwButtonPanel;
-
     private JButton dwClearButton;
 
     /**
@@ -326,8 +277,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsUserText = new LinkedHashMap<String, QueryItem>();
         queryParamsQueryText = new LinkedHashMap<String, QueryItem>();
 
-        newEntry.setDescription("Choose a query parameter "
-                + "from the drop-down menu");
+        newEntry.setDescription("Choose a query parameter " + "from the drop-down menu");
         newEntry.setParamType(ParameterType.noType);
         newEntry.setQueryText("");
         newEntry.setRequired(false);
@@ -381,8 +331,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("EQ_bizStep");
         newEntry.setRequired(false);
@@ -391,8 +340,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("EQ_disposition");
         newEntry.setRequired(false);
@@ -401,8 +349,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("EQ_readPoint");
         newEntry.setRequired(false);
@@ -411,8 +358,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("WD_readPoint");
         newEntry.setRequired(false);
@@ -421,8 +367,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("EQ_bizLocation");
         newEntry.setRequired(false);
@@ -431,8 +376,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("WD_bizLocation");
         newEntry.setRequired(false);
@@ -444,8 +388,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         // we do not support this in the GUI (List of String)
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("MATCH_epc");
         newEntry.setRequired(false);
@@ -454,8 +397,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("MATCH_parentID");
         newEntry.setRequired(false);
@@ -464,8 +406,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("MATCH_childEPC");
         newEntry.setRequired(false);
@@ -474,8 +415,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         queryParamsQueryText.put(newEntry.getQueryText(), newEntry);
 
         newEntry = new QueryItem();
-        newEntry.setDescription("Space-separated list "
-                + "of URIs with OR semantics");
+        newEntry.setDescription("Space-separated list " + "of URIs with OR semantics");
         newEntry.setParamType(ParameterType.ListOfString);
         newEntry.setQueryText("MATCH_epcClass");
         newEntry.setRequired(false);
@@ -651,25 +591,20 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mwButtonPanel = new JPanel();
         mwMainPanel.add(mwButtonPanel);
 
-        mwConfigPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Configuration"),
+        mwConfigPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Configuration"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwSubscribeManagementPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Subscribe Management"),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+                BorderFactory.createTitledBorder("Subscribe Management"), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwEventTypeSelectPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Events to be returned"),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+                BorderFactory.createTitledBorder("Events to be returned"), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        mwQueryPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Query arguments"),
+        mwQueryPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Query arguments"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwSubscriptionPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Subscription Arguments"),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+                BorderFactory.createTitledBorder("Subscription Arguments"), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwServiceUrlLabel = new JLabel("Query interface URL: ");
         mwServiceUrlTextField = new JTextField(queryUrl, 40);
@@ -741,8 +676,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mwQuerySelectComboBoxes.add(new JComboBox(queryParameterUsertext));
         ((JComboBox) mwQuerySelectComboBoxes.getFirst()).addActionListener(this);
         queryParamsUserText.get("ignore");
-        mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15,
-                queryParamsUserText.get("ignore")));
+        mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15, queryParamsUserText.get("ignore")));
 
         mwQueryArgsPanel = new JPanel(new GridBagLayout());
         mwQueryExamplesPanel = new JPanel(new BorderLayout());
@@ -759,8 +693,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 1;
         c.gridx = 1;
         c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
-        mwQueryArgsPanel.add((JTextField) mwQueryArgumentTextFields.getFirst(),
-                c);
+        mwQueryArgsPanel.add((JTextField) mwQueryArgumentTextFields.getFirst(), c);
 
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -983,8 +916,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
 
         ewButtonPanel = new JPanel();
         ewButtonPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
-        ewButtonPanel.setLayout(new BoxLayout(ewButtonPanel,
-                BoxLayout.LINE_AXIS));
+        ewButtonPanel.setLayout(new BoxLayout(ewButtonPanel, BoxLayout.LINE_AXIS));
 
         ewMainPanel.add(ewListPanel);
         ewMainPanel.add(ewButtonPanel);
@@ -1107,8 +1039,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             // print error if no event type is selected
             if (eventVector.isEmpty()) {
                 JFrame frame = new JFrame();
-                JOptionPane.showMessageDialog(frame,
-                        "Please select at least one of the event types to be returned.",
+                JOptionPane.showMessageDialog(frame, "Please select at least one of the event types to be returned.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -1147,9 +1078,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             if (isSubscribed.isSelected()) {
                 if (mwSubIdField.getText().equals("")) {
                     JFrame frame = new JFrame();
-                    JOptionPane.showMessageDialog(frame,
-                            "Please specify a SubscriptionID",
-                            "Service is responding", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Please specify a SubscriptionID", "Service is responding",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 Subscribe subcr = new Subscribe();
@@ -1177,10 +1107,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 subcr.setControls(controls);
                 client.subscribeQuery(subcr);
                 JFrame frame = new JFrame();
-                JOptionPane.showMessageDialog(frame,
-                        "You have sucessfully subscribed to that Query",
-                        "Service is responding",
-                        JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "You have sucessfully subscribed to that Query",
+                        "Service is responding", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 data = client.runQuery();
                 createResultsWindow();
@@ -1188,13 +1116,9 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         } catch (AxisFault af) {
             String msg = new String("EPCIS Query Interface service error.\n");
             if (af.getFaultDetails().length >= 2
-                    && af.getFaultDetails()[1].getTextContent().endsWith(
-                            "ImplementationException")) {
-                msg += "Reason: "
-                        + af.getFaultDetails()[0].getChildNodes().item(0).getTextContent()
-                        + "\n";
-                msg += "Severity: "
-                        + af.getFaultDetails()[0].getChildNodes().item(1).getTextContent();
+                    && af.getFaultDetails()[1].getTextContent().endsWith("ImplementationException")) {
+                msg += "Reason: " + af.getFaultDetails()[0].getChildNodes().item(0).getTextContent() + "\n";
+                msg += "Severity: " + af.getFaultDetails()[0].getChildNodes().item(1).getTextContent();
             } else {
                 msg += af.getFaultDetails()[0].getTextContent();
             }
@@ -1205,9 +1129,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             dwOutputTextArea.append(detailed.toString());
 
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, msg,
-                    "EPCIS Query Interface service error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, msg, "EPCIS Query Interface service error", JOptionPane.ERROR_MESSAGE);
         } catch (ParseException e) {
             String msg = "Unable to parse a Time value.";
             dwOutputTextArea.append("\n" + msg + "\n");
@@ -1215,8 +1137,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             e.printStackTrace(pw);
             dwOutputTextArea.append(pw.toString());
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, msg + "\n" + e.getMessage(),
-                    msg, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, msg + "\n" + e.getMessage(), msg, JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             dwOutputTextArea.append("\nCould not execute query:\n");
             StringWriter detailed = new StringWriter();
@@ -1225,9 +1146,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             dwOutputTextArea.append(detailed.toString());
 
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, "Could not execute query:\n"
-                    + e.getMessage(), "Could not execute query",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Could not execute query:\n" + e.getMessage(),
+                    "Could not execute query", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1241,15 +1161,13 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private void mwQuerySelectComboBoxesChanged(final int i) {
         JComboBox cb = (JComboBox) mwQuerySelectComboBoxes.get(i);
 
-        if ((cb.getSelectedIndex() == 0)
-                && (cb != mwQuerySelectComboBoxes.getLast())) {
+        if ((cb.getSelectedIndex() == 0) && (cb != mwQuerySelectComboBoxes.getLast())) {
             /*
              * the user selected "ignore" and this is not the last row, so
              * remove it
              */
             removeArgumentRow(i);
-        } else if ((cb.getSelectedIndex() != 0)
-                && (cb == mwQuerySelectComboBoxes.getLast())) {
+        } else if ((cb.getSelectedIndex() != 0) && (cb == mwQuerySelectComboBoxes.getLast())) {
             /* the user changed the value of the last row, so add a new row */
             addArgumentRow(i);
         } else {
@@ -1272,15 +1190,13 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             String standardVersion = client.queryStandardVersion();
             String vendorVersion = client.queryVendorVersion();
             String[] queryNames = client.queryNames();
-            String text = "Service is responding:\n" + "Implemented standard: "
-                    + standardVersion + "\n" + "Service version: "
-                    + vendorVersion + "\n" + "Supports the following queries: ";
+            String text = "Service is responding:\n" + "Implemented standard: " + standardVersion + "\n"
+                    + "Service version: " + vendorVersion + "\n" + "Supports the following queries: ";
             for (String elem : queryNames) {
                 text += elem + "\n";
             }
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, text, "Service is responding",
-                    JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, text, "Service is responding", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
 
@@ -1291,8 +1207,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             dwOutputTextArea.append(detailed.toString());
 
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, "Error:\n" + e.getMessage(),
-                    "Service not responding", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Error:\n" + e.getMessage(), "Service not responding",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1315,8 +1231,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 toAddItem = null;
                 toAddItem = queryParamsQueryText.get(item.getName());
                 if (toAddItem == null) {
-                    dwOutputTextArea.append("bugbug: Query example "
-                            + "uses unknown queryParam");
+                    dwOutputTextArea.append("bugbug: Query example " + "uses unknown queryParam");
                 } else {
                     ((JComboBox) mwQuerySelectComboBoxes.get(i)).setSelectedItem(toAddItem.getUserText());
                     ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).setText((String) item.getValue());
@@ -1362,8 +1277,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             c.weightx = 1;
             c.gridx = 1;
             c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
-            layout.setConstraints(
-                    (JTextField) mwQueryArgumentTextFields.get(j), c);
+            layout.setConstraints((JTextField) mwQueryArgumentTextFields.get(j), c);
         }
         /* update graphics */
         mainWindow.pack();
@@ -1380,8 +1294,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
 
         mwQuerySelectComboBoxes.add(new JComboBox(queryParameterUsertext));
         ((JComboBox) mwQuerySelectComboBoxes.getLast()).addActionListener(this);
-        mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15,
-                queryParamsUserText.get("ignore")));
+        mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15, queryParamsUserText.get("ignore")));
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -1393,8 +1306,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 1;
         c.gridx = 1;
         c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
-        mwQueryArgsPanel.add(
-                (JTextFieldEnhanced) mwQueryArgumentTextFields.getLast(), c);
+        mwQueryArgsPanel.add((JTextFieldEnhanced) mwQueryArgumentTextFields.getLast(), c);
 
         /* update tooltip of TextField */
         JComboBox cb = (JComboBox) mwQuerySelectComboBoxes.get(i);
@@ -1587,20 +1499,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             ex.setDescription("Search for an aggregation onto a certain pallet");
             ex.setReturnAggregationEvents(true);
             ex.getQueryParameters().add(new QueryParam("EQ_action", "ADD"));
-            ex.getQueryParameters().add(
-                    new QueryParam("MATCH_parentID",
-                            "urn:x:bar:5:036544:007325"));
+            ex.getQueryParameters().add(new QueryParam("MATCH_parentID", "urn:x:bar:5:036544:007325"));
             examples.add(ex);
 
             ex = new Query();
-            ex.setDescription("Find out what happened to a certain EPC after a "
-                    + "certain date");
+            ex.setDescription("Find out what happened to a certain EPC after a " + "certain date");
             ex.setReturnObjectEvents(true);
-            ex.getQueryParameters().add(
-                    new QueryParam("GE_eventTime", "2006-01-01T05:20:31Z"));
-            ex.getQueryParameters().add(
-                    new QueryParam("MATCH_epc",
-                            "urn:epc:id:sgtin:0034000.987650.2686"));
+            ex.getQueryParameters().add(new QueryParam("GE_eventTime", "2006-01-01T05:20:31Z"));
+            ex.getQueryParameters().add(new QueryParam("MATCH_epc", "urn:epc:id:sgtin:0034000.987650.2686"));
             examples.add(ex);
 
             ex = new Query();
@@ -1609,34 +1515,24 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             ex.setReturnAggregationEvents(true);
             ex.setReturnQuantityEvents(true);
             ex.setReturnTransactionEvents(true);
-            ex.getQueryParameters().add(
-                    new QueryParam("EQ_readPoint",
-                            "urn:epcglobal:fmcg:ssl:0037000.00729.210,414"));
+            ex.getQueryParameters().add(new QueryParam("EQ_readPoint", "urn:epcglobal:fmcg:ssl:0037000.00729.210,414"));
             examples.add(ex);
 
             ex = new Query();
             ex.setDescription("Find out when a certain EPC was shipped");
             ex.setReturnObjectEvents(true);
             ex.getQueryParameters().add(new QueryParam("EQ_action", "OBSERVE"));
-            ex.getQueryParameters().add(
-                    new QueryParam("EQ_bizStep",
-                            "urn:epcglobal:epcis:bizstep:fmcg:shipping"));
-            ex.getQueryParameters().add(
-                    new QueryParam("MATCH_epc",
-                            "urn:epc:id:sgtin:0057000.123430.2028"));
+            ex.getQueryParameters().add(new QueryParam("EQ_bizStep", "urn:epcglobal:epcis:bizstep:fmcg:shipping"));
+            ex.getQueryParameters().add(new QueryParam("MATCH_epc", "urn:epc:id:sgtin:0057000.123430.2028"));
             examples.add(ex);
 
             ex = new Query();
             ex.setDescription("Find all EPCs that have been in repair during 2006");
             ex.setReturnObjectEvents(true);
             ex.getQueryParameters().add(new QueryParam("EQ_action", "OBSERVE"));
-            ex.getQueryParameters().add(
-                    new QueryParam("GE_eventTime", "2006-01-01T00:00:00Z"));
-            ex.getQueryParameters().add(
-                    new QueryParam("LT_eventTime", "2007-01-01T00:00:00Z"));
-            ex.getQueryParameters().add(
-                    new QueryParam("EQ_disposition",
-                            "urn:epcglobal:epcis:disp:fmcg:inrepair"));
+            ex.getQueryParameters().add(new QueryParam("GE_eventTime", "2006-01-01T00:00:00Z"));
+            ex.getQueryParameters().add(new QueryParam("LT_eventTime", "2007-01-01T00:00:00Z"));
+            ex.getQueryParameters().add(new QueryParam("EQ_disposition", "urn:epcglobal:epcis:disp:fmcg:inrepair"));
             examples.add(ex);
         }
 

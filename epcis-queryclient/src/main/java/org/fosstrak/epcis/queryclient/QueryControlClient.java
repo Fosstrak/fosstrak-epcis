@@ -105,14 +105,12 @@ public class QueryControlClient implements QueryControlInterface {
         Properties props = new Properties();
         InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
         if (is == null) {
-            throw new RuntimeException("Unable to load properties from file "
-                    + PROPERTY_FILE);
+            throw new RuntimeException("Unable to load properties from file " + PROPERTY_FILE);
         }
         try {
             props.load(is);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to load properties from file "
-                    + PROPERTY_FILE);
+            throw new RuntimeException("Unable to load properties from file " + PROPERTY_FILE);
         }
 
         // set query address
@@ -131,8 +129,7 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#getQueryNames()
      */
-    public List<String> getQueryNames() throws ServiceException,
-            RemoteException {
+    public List<String> getQueryNames() throws ServiceException, RemoteException {
         EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
         ArrayOfString temp = stub.getQueryNames(new EmptyParms());
         List<String> names = Arrays.asList(temp.getString());
@@ -155,8 +152,7 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#getSubscriptionIds(java.lang.String)
      */
-    public List<String> getSubscriptionIds(final String queryName)
-            throws ServiceException, RemoteException {
+    public List<String> getSubscriptionIds(final String queryName) throws ServiceException, RemoteException {
         EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
         GetSubscriptionIDs parms = new GetSubscriptionIDs(queryName);
         ArrayOfString res = stub.getSubscriptionIDs(parms);
@@ -181,8 +177,8 @@ public class QueryControlClient implements QueryControlInterface {
      * @see org.accada.epcis.queryclient.QueryControlInterface#poll(java.lang.String,
      *      org.accada.epcis.soapapi.QueryParam[])
      */
-    public QueryResults poll(final String queryName, final QueryParam[] params)
-            throws ServiceException, RemoteException {
+    public QueryResults poll(final String queryName, final QueryParam[] params) throws ServiceException,
+            RemoteException {
         EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
         Poll poll = new Poll(queryName, params);
         QueryResults results = stub.poll(poll);
@@ -200,7 +196,7 @@ public class QueryControlClient implements QueryControlInterface {
      * @return The query results in its XML form (unwrapped from a SOAP response
      *         message).
      * @throws IOException
-     *             If an error on the transport layer (HTTP) occured.
+     *             If an error on the transport layer (HTTP) occurred.
      */
     public String pollDirect(final String query) throws IOException {
         String soapReq = wrapIntoSoapMessage(query);
@@ -220,12 +216,11 @@ public class QueryControlClient implements QueryControlInterface {
      *         Operations Module.
      * @throws RemoteException
      *             If an error communicating with the Query Operations Module
-     *             occured.
+     *             occurred.
      * @throws ServiceException
-     *             If an error within the Query Operations Module occured.
+     *             If an error within the Query Operations Module occurred.
      */
-    public QueryResults poll(final String query) throws RemoteException,
-            ServiceException {
+    public QueryResults poll(final String query) throws RemoteException, ServiceException {
         InputStream is = new ByteArrayInputStream(query.getBytes());
         return poll(is);
     }
@@ -240,16 +235,14 @@ public class QueryControlClient implements QueryControlInterface {
      *         Operations Module.
      * @throws RemoteException
      *             If an error communicating with the Query Operations Module
-     *             occured.
+     *             occurred.
      * @throws ServiceException
-     *             If an error within the Query Operations Module occured.
+     *             If an error within the Query Operations Module occurred.
      */
-    public QueryResults poll(final InputStream query) throws RemoteException,
-            ServiceException {
+    public QueryResults poll(final InputStream query) throws RemoteException, ServiceException {
         Document epcisq = parseAsDocument(query);
         String queryName = epcisq.getElementsByTagName("queryName").item(0).getTextContent();
-        Element paramElems = (Element) epcisq.getElementsByTagName("params").item(
-                0);
+        Element paramElems = (Element) epcisq.getElementsByTagName("params").item(0);
         QueryParam[] params = parseQueryParams(paramElems);
 
         QueryResults response = this.poll(queryName, params);
@@ -263,13 +256,10 @@ public class QueryControlClient implements QueryControlInterface {
      *      org.accada.epcis.soapapi.QueryParam[], org.apache.axis.types.URI,
      *      org.accada.epcis.soapapi.SubscriptionControls, java.lang.String)
      */
-    public void subscribe(final String queryName, final QueryParam[] params,
-            final URI dest, final SubscriptionControls controls,
-            final String subscriptionId) throws ServiceException,
-            RemoteException {
+    public void subscribe(final String queryName, final QueryParam[] params, final URI dest,
+            final SubscriptionControls controls, final String subscriptionId) throws ServiceException, RemoteException {
         EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        Subscribe subscribe = new Subscribe(queryName, params, dest, controls,
-                subscriptionId);
+        Subscribe subscribe = new Subscribe(queryName, params, dest, controls, subscriptionId);
         stub.subscribe(subscribe);
     }
 
@@ -282,12 +272,11 @@ public class QueryControlClient implements QueryControlInterface {
      *            The query in its XML form.
      * @throws RemoteException
      *             If an error communicating with the Query Operations Module
-     *             occured.
+     *             occurred.
      * @throws ServiceException
-     *             If an error within the Query Operations Module occured.
+     *             If an error within the Query Operations Module occurred.
      */
-    public void subscribe(final String query) throws RemoteException,
-            ServiceException {
+    public void subscribe(final String query) throws RemoteException, ServiceException {
         InputStream is = new ByteArrayInputStream(query.getBytes());
         subscribe(is);
     }
@@ -300,24 +289,21 @@ public class QueryControlClient implements QueryControlInterface {
      *            The query in its XML form.
      * @throws RemoteException
      *             If an error communicating with the Query Operations Module
-     *             occured.
+     *             occurred.
      * @throws ServiceException
-     *             If an error within the Query Operations Module occured.
+     *             If an error within the Query Operations Module occurred.
      */
-    public void subscribe(final InputStream query) throws RemoteException,
-            ServiceException {
+    public void subscribe(final InputStream query) throws RemoteException, ServiceException {
         Document epcisq = parseAsDocument(query);
         String queryName = epcisq.getElementsByTagName("queryName").item(0).getTextContent();
         Element params = (Element) epcisq.getElementsByTagName("params").item(0);
         QueryParam[] queryParams = parseQueryParams(params);
 
         URI dest = parseURI(epcisq.getElementsByTagName("dest").item(0));
-        Element controlsElement = (Element) epcisq.getElementsByTagName(
-                "controls").item(0);
+        Element controlsElement = (Element) epcisq.getElementsByTagName("controls").item(0);
         SubscriptionControls controls = parseSubscriptionControls(controlsElement);
         String subscrId = null;
-        Node subscribeIdNode = epcisq.getElementsByTagName("subscriptionID").item(
-                0);
+        Node subscribeIdNode = epcisq.getElementsByTagName("subscriptionID").item(0);
         if (subscribeIdNode != null) {
             subscrId = subscribeIdNode.getTextContent();
         }
@@ -330,8 +316,7 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#unsubscribe(java.lang.String)
      */
-    public void unsubscribe(final String subscriptionId)
-            throws ServiceException, RemoteException {
+    public void unsubscribe(final String subscriptionId) throws ServiceException, RemoteException {
         EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
         Unsubscribe parms = new Unsubscribe(subscriptionId);
         stub.unsubscribe(parms);
@@ -373,8 +358,7 @@ public class QueryControlClient implements QueryControlInterface {
      * @return The contents of the body of the SOAP envelope.
      */
     private String unwrapFromSoapMessage(final String soapMsg) {
-        int beginIndex = soapMsg.indexOf("<soapenv:Body>")
-                + "<soapenv:Body>".length();
+        int beginIndex = soapMsg.indexOf("<soapenv:Body>") + "<soapenv:Body>".length();
         int endIndex = soapMsg.lastIndexOf("</soapenv:Body>");
         return soapMsg.substring(beginIndex, endIndex);
     }
@@ -387,7 +371,7 @@ public class QueryControlClient implements QueryControlInterface {
      *            The data to be sent.
      * @return The response from the repository's Query Operations Module.
      * @throws IOException
-     *             If an error on the transport layer (HTTP) occured.
+     *             If an error on the transport layer (HTTP) occurred.
      */
     private String doPost(final byte[] data) throws IOException {
         // the url where the query interface listens
@@ -405,8 +389,7 @@ public class QueryControlClient implements QueryControlInterface {
         out.close();
 
         // get response
-        String response = "HTTP/1.0 " + connection.getResponseCode() + " "
-                + connection.getResponseMessage() + ": ";
+        String response = "HTTP/1.0 " + connection.getResponseCode() + " " + connection.getResponseMessage() + ": ";
 
         // read and return response
         InputStream in = null;
@@ -456,8 +439,7 @@ public class QueryControlClient implements QueryControlInterface {
         for (int i = 0; i < nofParams; i++) {
             Element param = (Element) paramList.item(i);
             Element name = (Element) param.getElementsByTagName("name").item(0);
-            Element value = (Element) param.getElementsByTagName("value").item(
-                    0);
+            Element value = (Element) param.getElementsByTagName("value").item(0);
             String paramName = name.getTextContent();
             Object paramValue = parseParamValue(value);
             QueryParam queryParam = new QueryParam(paramName, paramValue);
@@ -517,10 +499,8 @@ public class QueryControlClient implements QueryControlInterface {
      *            The subscription controls Element.
      * @return The parsed SubscriptionControls.
      */
-    private SubscriptionControls parseSubscriptionControls(
-            final Element controlsNode) {
-        Element scheduleNode = (Element) controlsNode.getElementsByTagName(
-                "schedule").item(0);
+    private SubscriptionControls parseSubscriptionControls(final Element controlsNode) {
+        Element scheduleNode = (Element) controlsNode.getElementsByTagName("schedule").item(0);
         QuerySchedule schedule = parseQuerySchedule(scheduleNode);
 
         URI trigger = null;
@@ -529,19 +509,16 @@ public class QueryControlClient implements QueryControlInterface {
             trigger = parseURI(triggerNode);
         }
 
-        Node timeNode = controlsNode.getElementsByTagName("initialRecordTime").item(
-                0);
+        Node timeNode = controlsNode.getElementsByTagName("initialRecordTime").item(0);
         Calendar initialRecordTime = null;
         try {
             initialRecordTime = parseTime(timeNode);
         } catch (ParseException e) {
-            String msg = "Unable to parse time value for 'initialRecordTime': "
-                    + e.getMessage();
+            String msg = "Unable to parse time value for 'initialRecordTime': " + e.getMessage();
             throw new RuntimeException(msg, e);
         }
 
-        String boolStr = controlsNode.getElementsByTagName("reportIfEmpty").item(
-                0).getTextContent();
+        String boolStr = controlsNode.getElementsByTagName("reportIfEmpty").item(0).getTextContent();
         boolean reportIfEmpty = Boolean.parseBoolean(boolStr);
 
         // TODO handle extension
@@ -550,8 +527,8 @@ public class QueryControlClient implements QueryControlInterface {
         // TODO handle message
         MessageElement[] msg = null;
 
-        SubscriptionControls controls = new SubscriptionControls(schedule,
-                trigger, initialRecordTime, reportIfEmpty, ext, msg);
+        SubscriptionControls controls = new SubscriptionControls(schedule, trigger, initialRecordTime, reportIfEmpty,
+                ext, msg);
         return controls;
     }
 
@@ -581,8 +558,7 @@ public class QueryControlClient implements QueryControlInterface {
                 hr = hrNode.getTextContent();
             }
             String dom = null;
-            Node domNode = scheduleNode.getElementsByTagName("dayOfMonth").item(
-                    0);
+            Node domNode = scheduleNode.getElementsByTagName("dayOfMonth").item(0);
             if (domNode != null) {
                 dom = domNode.getTextContent();
             }
@@ -592,8 +568,7 @@ public class QueryControlClient implements QueryControlInterface {
                 m = mNode.getTextContent();
             }
             String dow = null;
-            Node dowNode = scheduleNode.getElementsByTagName("dayOfWeek").item(
-                    0);
+            Node dowNode = scheduleNode.getElementsByTagName("dayOfWeek").item(0);
             if (dowNode != null) {
                 dow = dowNode.getTextContent();
             }
@@ -604,8 +579,7 @@ public class QueryControlClient implements QueryControlInterface {
             // TODO handle message
             MessageElement[] msg = null;
 
-            schedule = new QuerySchedule(sec, min, hr, dom, m, dow, extension,
-                    msg);
+            schedule = new QuerySchedule(sec, min, hr, dom, m, dow, extension, msg);
         }
         return schedule;
     }
@@ -623,8 +597,7 @@ public class QueryControlClient implements QueryControlInterface {
             try {
                 uri = new URI(node.getTextContent());
             } catch (MalformedURIException e) {
-                throw new RuntimeException("URI '" + node.getTextContent()
-                        + "' is not valid.", e);
+                throw new RuntimeException("URI '" + node.getTextContent() + "' is not valid.", e);
             }
         }
         return uri;
