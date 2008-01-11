@@ -160,6 +160,7 @@ CREATE TABLE `event_AggregationEvent_EPCs` (
 -- for uniform access `child` has been ommitted from the table name.
 `event_id` bigint NOT NULL REFERENCES `event_AggregationEvent`,
 `epc` varchar(1023) NOT NULL,
+`idx` int NOT NULL,
 INDEX (event_id)
 );
 
@@ -167,6 +168,7 @@ CREATE TABLE `event_AggregationEvent_bizTrans` (
 -- bizTrans 0..* associated with event
 `event_id` bigint NOT NULL REFERENCES `event_AggregationEvent` (`id`),
 `bizTrans_id` bigint NOT NULL REFERENCES `BizTransaction` (`id`),
+`idx` int NOT NULL,
 INDEX (event_id)
 );
 
@@ -203,6 +205,7 @@ CREATE TABLE `event_ObjectEvent` (
 CREATE TABLE `event_ObjectEvent_EPCs` (
 `event_id` bigint NOT NULL REFERENCES `event_ObjectEvent`,
 `epc` varchar(1023) NOT NULL,
+`idx` int NOT NULL,
 INDEX (event_id)
 );
 
@@ -210,6 +213,7 @@ CREATE TABLE `event_ObjectEvent_bizTrans` (
 -- bizTrans 0..* associated with event
 `event_id` bigint NOT NULL REFERENCES `event_ObjectEvent` (`id`),
 `bizTrans_id` bigint NOT NULL REFERENCES `BizTransaction` (`id`),
+`idx` int NOT NULL,
 INDEX (event_id)
 );
 
@@ -247,6 +251,7 @@ CREATE TABLE `event_QuantityEvent_bizTrans` (
 -- bizTrans 0..* associated with event
 `event_id` bigint NOT NULL REFERENCES `event_QuantityEvent` (`id`),
 `bizTrans_id` bigint NOT NULL REFERENCES `BizTransaction` (`id`),
+`idx` int NOT NULL,
 INDEX (event_id)
 );
 
@@ -284,6 +289,7 @@ CREATE TABLE `event_TransactionEvent` (
 CREATE TABLE `event_TransactionEvent_EPCs` (
 `event_id` bigint NOT NULL REFERENCES `event_TransactionEvent`,
 `epc` varchar(1023) NOT NULL,
+`idx` int NOT NULL,
 INDEX (event_id)
 );
 
@@ -291,6 +297,7 @@ CREATE TABLE `event_TransactionEvent_bizTrans` (
 -- bizTrans 1..* associated with event, at least one not yet enforced in DB
 `event_id` bigint NOT NULL REFERENCES `event_TransactionEvent` (`id`),
 `bizTrans_id` bigint NOT NULL REFERENCES `BizTransaction` (`id`),
+`idx` int NOT NULL,
 INDEX (event_id)
 );
 

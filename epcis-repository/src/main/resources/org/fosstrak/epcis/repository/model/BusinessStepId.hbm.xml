@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.accada.epcis.repository.model">
+
+	<class name="BusinessStepId" lazy="true" 
+		proxy="org.accada.epcis.repository.model.BusinessStepId"
+		dynamic-update="false" dynamic-insert="false"
+		select-before-update="false" table="voc_BizStep">
+
+		<id name="id">
+			<generator class="native" />
+		</id>
+		
+		<natural-id>
+			<property name="uri" type="java.lang.String" not-null="true" 
+				insert="true" update="false" index="voc_BizStep_uri_ix"/>
+		</natural-id>
+
+	</class>
+
+</hibernate-mapping>

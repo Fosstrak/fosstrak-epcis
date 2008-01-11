@@ -261,7 +261,7 @@ public final class TimeParser {
             tzID = "UTC";
         } else {
             // throw new ParseException("invalid time zone designator", curPos);
-            LOG.warn("No time zone designator found, using default 'UTC'");
+            LOG.debug("No time zone designator found, using default 'UTC'");
             tzID = "UTC";
         }
 

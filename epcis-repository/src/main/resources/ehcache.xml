@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<ehcache>
+
+	<diskStore path="java.io.tmpdir" />
+
+	<defaultCache maxElementsInMemory="500" eternal="false"
+		overflowToDisk="true" timeToLiveSeconds="600"
+		memoryStoreEvictionPolicy="LRU" />
+
+	<cache name="org.hibernate.cache.StandardQueryCache"
+		maxElementsInMemory="500" eternal="false" timeToLiveSeconds="600"
+		overflowToDisk="true" />
+
+</ehcache>

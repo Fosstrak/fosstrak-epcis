@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.accada.epcis.repository.model">
+
+	<class name="BusinessTransaction" lazy="true" 
+		proxy="org.accada.epcis.repository.model.BusinessTransaction"
+		dynamic-update="false" dynamic-insert="false"
+		select-before-update="false" table="BizTransaction">
+
+		<id name="id">
+			<generator class="native" />
+		</id>
+		
+		<natural-id>
+			<many-to-one name="bizTransaction" class="org.accada.epcis.repository.model.BusinessTransactionId"
+				index="BizTransaction_bizTransaction_ix" update="false" insert="true"
+				access="property" not-null="true" column="bizTrans"/>
+			<many-to-one name="type" class="org.accada.epcis.repository.model.BusinessTransactionTypeId"
+				index="BizTransaction_type_ix" update="false" insert="true"
+				access="property" not-null="true" column="type" />
+		</natural-id>
+
+	</class>
+
+</hibernate-mapping>

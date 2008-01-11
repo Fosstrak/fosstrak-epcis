@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.accada.epcis.repository.model">
+
+	<class name="ObjectEvent" lazy="true" 
+		proxy="org.accada.epcis.repository.model.ObjectEvent"
+		dynamic-update="false" dynamic-insert="false"
+		select-before-update="false" table="event_ObjectEvent">
+
+		<id name="id">
+			<generator class="native" />
+		</id>
+	
+		<property name="eventTime" type="timestamp" not-null="false" 
+			insert="true" update="false"/>
+		
+		<property name="recordTime" type="timestamp" not-null="false"
+			insert="true" update="false"/>
+			
+		<property name="eventTimeZoneOffset" type="java.lang.String" not-null="true"
+			insert="true" update="false"/>
+
+		<property name="action">
+			<column name="action" not-null="true" />
+			<type name="org.accada.epcis.repository.model.EnumUserType">
+				<param name="enumClassName">org.accada.epcis.repository.model.Action</param>
+			</type>
+		</property>
+
+		<many-to-one name="bizStep" class="org.accada.epcis.repository.model.BusinessStepId"
+			index="event_ObjectEvent_bizStep_ix" update="false" insert="true"
+			access="property" not-null="false" />
+
+		<many-to-one name="disposition" class="org.accada.epcis.repository.model.DispositionId"
+			index="event_ObjectEvent_disposition_ix" update="false" insert="true"
+			access="property" not-null="false" />
+
+		<many-to-one name="bizLocation" class="org.accada.epcis.repository.model.BusinessLocationId"
+			index="event_ObjectEvent_bizLocation_ix" update="false" insert="true"
+			access="property" not-null="false" />
+
+		<many-to-one name="readPoint" class="org.accada.epcis.repository.model.ReadPointId"
+			index="event_ObjectEvent_readPoint_ix" update="false" insert="true"
+			access="property" not-null="false" />
+
+		<list name="epcList" table="event_ObjectEvent_EPCs" lazy="true">
+			<key>
+				<column name="event_id" index="event_ObjectEvent_EPCs_ix"/>
+			</key>
+			<index column="idx"/>
+			<element type="java.lang.String">
+				<column name="epc" not-null="true" index="event_ObjectEvent_EPCs_ix"/>
+			</element>
+		</list>
+		
+		<list name="bizTransList" table="event_ObjectEvent_bizTrans" lazy="true">
+			<key>
+				<column name="event_id" index="event_ObjectEvent_bizTrans_ix"/>
+			</key>
+			<index column="idx"/>
+			<many-to-many column="bizTrans_id" class="org.accada.epcis.repository.model.BusinessTransaction"/>
+		</list>
+		
+		<bag name="extensions" table="event_ObjectEvent_extensions" lazy="true">
+			<key>
+				<column name="event_id" index="event_ObjectEvent_extensions_ix"/>
+			</key>
+			<composite-element class="org.accada.epcis.repository.model.EventFieldExtension">
+				<property name="fieldname" type="java.lang.String"/>
+				<property name="prefix" type="java.lang.String"/>
+				<property name="strValue" type="java.lang.String"/>
+				<property name="intValue" type="int"/>
+				<property name="floatValue" type="float"/>
+				<property name="dateValue" type="timestamp"/>
+			</composite-element>
+		</bag>
+
+	</class>
+	
+</hibernate-mapping>
