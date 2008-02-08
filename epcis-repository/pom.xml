@@ -26,39 +26,30 @@
       <groupId>org.accada.epcis</groupId>
       <artifactId>epcis-commons</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.axis</groupId>
-          <artifactId>axis-ant</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate</artifactId>
       <version>3.2.5.ga</version>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>[3.8,4)</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
-
-  <!-- =========================================================== -->
-  <!-- Repositories                                                -->
-  <!-- =========================================================== -->
-
-  <repositories>
-    <repository>
-      <id>sun</id>
-      <name>Sun Maven Repository</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
-  </repositories>
 
 
   <!-- =========================================================== -->
@@ -86,9 +77,15 @@
       </plugin>
       <plugin>
         <!--
-          the tomcat-maven-plugin used to deploy the application to tomcat.
-          this requires a corresponding server block in your settings.xml
-          stating username and password for the tomcat-manager application.
+          The tomcat-maven-plugin is used to deploy the application to Tomcat
+          using the Tomcat Manager. The login credentials for the Manager
+          application must be specified in a corresponding server block in your
+          settings.xml (http://maven.apache.org/settings.html#Servers), e.g.
+            <server>
+              <id>tomcat-manager</id>
+              <username>admin</username>
+              <password></password>
+            </server>
         -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>tomcat-maven-plugin</artifactId>
@@ -129,14 +126,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.0</version>
         <configuration>
           <includes>**/*.java</includes>
           <excludes>org/accada/epcis/soapapi/*.*</excludes>
           <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
-          <headerLocation>${basedir}/../src/config/HEADER.txt</headerLocation>
           <enableRulesSummary>false</enableRulesSummary>
           <xrefLocation>xref</xrefLocation>
+          <propertyExpansion>samedir=${basedir}/../src/config</propertyExpansion>
         </configuration>
       </plugin>
       <plugin>
@@ -148,17 +144,28 @@
 
 
   <!-- =========================================================== -->
-  <!-- Plugin Repositories                                         -->
+  <!-- Repositories                                                -->
   <!-- =========================================================== -->
 
-  <!--
-    the tomcat-maven-plugin is not in maven's core set of plugins.
-    therefore we need to tell maven to look into the mojo sandbox
-    repository where the plugin resides
-  -->
+  <repositories>
+    <!--
+      JARs provided by Sun fall under Sun's Binary License which disallows
+      them from being distributed from Maven's central repository. Therefore
+      we need to specify where such libraries (e.g. JTA) can be downloaded.
+    -->
+    <repository>
+      <id>sun</id>
+      <name>Sun Maven 2 Repository</name>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+  </repositories>
   <pluginRepositories>
+    <!--
+      For Maven plugins provided by Codehaus which are not yet in Maven's core
+      set of plugins, e.g. tomcat-maven-plugin
+    -->
     <pluginRepository>
-      <id>Maven Snapshots</id>
+      <id>Codehaus Maven Repository</id>
       <url>http://maven.codehaus.org/maven2/</url>
       <snapshots>
         <enabled>false</enabled>
