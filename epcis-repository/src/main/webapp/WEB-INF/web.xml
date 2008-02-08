@@ -5,128 +5,94 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-
-
   <display-name>EPCIS Repository</display-name>
+
+  <!--
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>META-INF/applicationContext.xml</param-value>
+  </context-param>
+  -->
+  <!--
+  <context-param>
+    <param-name>log4jConfigLocation</param-name>
+    <param-value>META-INF/log4j.properties</param-value>
+  </context-param>
+  -->
+  <context-param>
+    <param-name>appConfigLocation</param-name>
+    <param-value>META-INF/application.properties</param-value>
+  </context-param>
+
+  <!--
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+  </listener>
+  -->
+  <listener>
+    <listener-class>org.accada.epcis.repository.RepositoryContextListener</listener-class>
+  </listener>
+
+  <!--
+  <servlet>
+    <servlet-name>epcisRepository</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  -->
+  <servlet>
+    <!-- CXFServlet providing the Query Interface Endpoint -->
+    <servlet-name>EpcisQueryInterface</servlet-name>
+    <description>
+      This servlet dispatches EPCIS query requests to the Web service framework
+      for processing of the query according to the SOAP/HTTP Binding for the
+      Query Control Interface (EPCglobal EPCIS Specification Section 11.2).
+    </description>
+    <servlet-class>org.accada.epcis.repository.QueryInitServlet</servlet-class>
+    <!--<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>-->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <!-- CaptureOperationsModule servlet providing the Capture Interface -->
+    <servlet-name>EpcisCaptureInterface</servlet-name>
+    <description>
+      This servlet captures EPCIS events sent in HTTP POST requests. The POST
+      data payload must contain an XML formatted EPCISDocument according to the
+      schema for core event types (EPCglobal EPCIS Specification Section 9.5).
+    </description>
+    <servlet-class>org.accada.epcis.repository.CaptureOperationsServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <!-- The capture servlet will be available at http://{url:port}/{context-path}/capture -->
+    <servlet-name>EpcisCaptureInterface</servlet-name>
+    <url-pattern>/capture</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <!-- The query Web service will be available at http://{url:port}/{context-path}/query -->
+    <servlet-name>EpcisQueryInterface</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
 
   <session-config>
     <session-timeout>5</session-timeout>
   </session-config>
 
-  <!--
-    currently the W3C hasn't settled on a media type for WSDL:
-    http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft
-    for now we go with the basic 'it's XML' response
-  -->
   <mime-mapping>
     <extension>wsdl</extension>
     <mime-type>text/xml</mime-type>
   </mime-mapping>
-
   <mime-mapping>
     <extension>xsd</extension>
     <mime-type>text/xml</mime-type>
   </mime-mapping>
 
   <welcome-file-list id="WelcomeFileList">
-    <welcome-file>index.jsp</welcome-file>
     <welcome-file>index.html</welcome-file>
-    <welcome-file>index.jws</welcome-file>
   </welcome-file-list>
-
-
-
-  <!-- ====================================================================== -->
-  <!--                     Core Capture Operations Module                     -->
-  <!-- ====================================================================== -->
-
-  <servlet>
-    <servlet-name>CaptureOperationsModule</servlet-name>
-    <description>
-      This servlet captures EPCIS events sent in HTTP POST requests. The POST
-      parameter name is "event", the data is an XML representation of an
-      ObjectEvent, AggregationEvent, QuantityEvent or TransactionEvent.
-    </description>
-    <servlet-class>org.accada.epcis.repository.CaptureOperationsServlet</servlet-class>
-  </servlet>
-
-
-  <!--
-    the servlet will be available at the following URL:
-    http://{url:port}/{context-path}/capture, e.g.
-    http://localhost:8080/epcis-repository-0.2.0-SNAPSHOT/capture
-  -->
-  <servlet-mapping>
-    <servlet-name>CaptureOperationsModule</servlet-name>
-    <url-pattern>/capture</url-pattern>
-  </servlet-mapping>
-
-
-  <!-- ====================================================================== -->
-  <!--                     Axis Service (EPCIS Query Interface)               -->
-  <!-- ====================================================================== -->
-
-  <listener>
-    <listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
-  </listener>
-
-  <servlet>
-    <servlet-name>AxisServlet</servlet-name>
-    <display-name>Apache-Axis Servlet</display-name>
-    <servlet-class>
-      org.apache.axis.transport.http.AxisServlet
-    </servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>AdminServlet</servlet-name>
-    <display-name>Axis Admin Servlet</display-name>
-    <servlet-class>
-      org.apache.axis.transport.http.AdminServlet
-    </servlet-class>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
-
-  <servlet>
-    <servlet-name>SOAPMonitorService</servlet-name>
-    <display-name>SOAPMonitorService</display-name>
-    <servlet-class>
-      org.apache.axis.monitor.SOAPMonitorService
-    </servlet-class>
-    <init-param>
-      <param-name>SOAPMonitorPort</param-name>
-      <param-value>5001</param-value>
-    </init-param>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/servlet/AxisServlet</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>*.jws</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/services/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>SOAPMonitorService</servlet-name>
-    <url-pattern>/SOAPMonitor</url-pattern>
-  </servlet-mapping>
-
-  <!-- uncomment this if you want the admin servlet -->
-  <!--
-  <servlet-mapping>
-    <servlet-name>AdminServlet</servlet-name>
-    <url-pattern>/servlet/AdminServlet</url-pattern>
-  </servlet-mapping>
-  -->
-
 
 </web-app>

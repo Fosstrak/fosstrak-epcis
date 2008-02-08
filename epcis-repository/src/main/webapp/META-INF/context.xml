@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Context docBase="" reloadable="true">
+<Context reloadable="true">
 
   <!--
      Parameters defined here are 'initial parameters' which are loaded at
