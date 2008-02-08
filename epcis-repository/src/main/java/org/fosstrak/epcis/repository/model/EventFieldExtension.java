@@ -23,7 +23,8 @@ package org.accada.epcis.repository.model;
 import java.sql.Timestamp;
 
 import org.accada.epcis.utils.TimeParser;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A simple representation for an event field extension.
@@ -32,7 +33,7 @@ import org.apache.log4j.Logger;
  */
 public class EventFieldExtension {
 
-    private static final Logger LOG = Logger.getLogger(EventFieldExtension.class);
+    private static final Log LOG = LogFactory.getLog(EventFieldExtension.class);
 
     private Long id;
     private String prefix = null;
