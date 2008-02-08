@@ -1,4 +1,4 @@
-<epcisq:poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+<epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
 	<queryName>SimpleEventQuery</queryName>
 	<params>
 		<param>
@@ -13,4 +13,4 @@
 			<value>19</value>
 		</param>
 	</params>
-</epcisq:poll>
+</epcisq:Poll>
