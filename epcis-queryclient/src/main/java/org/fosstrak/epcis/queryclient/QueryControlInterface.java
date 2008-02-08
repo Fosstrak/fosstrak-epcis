@@ -20,15 +20,24 @@
 
 package org.accada.epcis.queryclient;
 
-import java.rmi.RemoteException;
 import java.util.List;
 
-import javax.xml.rpc.ServiceException;
-
-import org.accada.epcis.soapapi.QueryParam;
-import org.accada.epcis.soapapi.QueryResults;
-import org.accada.epcis.soapapi.SubscriptionControls;
-import org.apache.axis.types.URI;
+import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
+import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.InvalidURIExceptionResponse;
+import org.accada.epcis.soap.NoSuchNameExceptionResponse;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
+import org.accada.epcis.soap.QueryParameterExceptionResponse;
+import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
+import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.SecurityExceptionResponse;
+import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
+import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
+import org.accada.epcis.soap.ValidationExceptionResponse;
+import org.accada.epcis.soap.model.Poll;
+import org.accada.epcis.soap.model.QueryParams;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.soap.model.SubscriptionControls;
 
 /**
  * @author Marco Steybe
@@ -36,22 +45,23 @@ import org.apache.axis.types.URI;
 public interface QueryControlInterface {
 
     /**
-     * Performs a poll operation at the repository's Query Controls Module, i.e.
-     * runs a query with the given name and parameters.
+     * Performs a poll operation at the repository's Query Controls Module.
      * 
-     * @param queryName
-     *            The name of the query to be executed.
-     * @param params
-     *            The parameters of the query to be executed.
+     * @param poll
+     *            The Poll object including the query name and parameters to be
+     *            executed.
      * @return The QueryResults.
-     * @throws ServiceException
-     *             If an exception whithin the repository's Query Controls
-     *             Module occurred.
-     * @throws RemoteException
-     *             If an exception communicating with the repository's Query
-     *             Controls Module occurred.
+     * @throws QueryParameterExceptionResponse
+     * @throws NoSuchNameExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws QueryTooLargeExceptionResponse
+     * @throws QueryTooComplexExceptionResponse
+     * @throws ImplementationExceptionResponse
      */
-    QueryResults poll(final String queryName, final QueryParam[] params) throws ServiceException, RemoteException;
+    QueryResults poll(final Poll poll) throws ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
+            QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
+            NoSuchNameExceptionResponse, QueryParameterExceptionResponse;
 
     /**
      * Performs a subscribe operation at the repository's Query Controls Module,
@@ -68,15 +78,23 @@ public interface QueryControlInterface {
      *            The SubscriptionControls.
      * @param subscriptionId
      *            The ID of the subscription.
-     * @throws ServiceException
-     *             If an exception whithin the repository's Query Controls
-     *             Module occurred.
-     * @throws RemoteException
-     *             If an exception communicating with the repository's Query
-     *             Controls Module occurred.
+     * @throws QueryParameterExceptionResponse
+     * @throws SubscriptionControlsExceptionResponse
+     * @throws NoSuchNameExceptionResponse
+     * @throws SubscribeNotPermittedExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws InvalidURIExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws QueryTooComplexExceptionResponse
+     * @throws ImplementationExceptionResponse
+     * @throws DuplicateSubscriptionExceptionResponse
      */
-    void subscribe(final String queryName, final QueryParam[] params, final URI dest,
-            final SubscriptionControls controls, final String subscriptionId) throws ServiceException, RemoteException;
+    void subscribe(final String queryName, final QueryParams params, final String dest,
+            final SubscriptionControls controls, final String subscriptionId)
+            throws DuplicateSubscriptionExceptionResponse, ImplementationExceptionResponse,
+            QueryTooComplexExceptionResponse, SecurityExceptionResponse, InvalidURIExceptionResponse,
+            ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse, NoSuchNameExceptionResponse,
+            SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse;
 
     /**
      * Perform an unsubscribe operation at the repository's Query Controls
@@ -84,27 +102,24 @@ public interface QueryControlInterface {
      * 
      * @param subscriptionId
      *            The ID of the query to be unsubscribed.
-     * @throws ServiceException
-     *             If an exception whithin the repository's Query Controls
-     *             Module occurred.
-     * @throws RemoteException
-     *             If an exception communicating with the repository's Query
-     *             Controls Module occurred.
+     * @throws NoSuchSubscriptionExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws ImplementationExceptionResponse
      */
-    void unsubscribe(final String subscriptionId) throws ServiceException, RemoteException;
+    void unsubscribe(final String subscriptionId) throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse;
 
     /**
      * Retrieves the names of queries that can be coped with.
      * 
      * @return A List of query names.
-     * @throws ServiceException
-     *             If an exception whithin the repository's Query Controls
-     *             Module occurred.
-     * @throws RemoteException
-     *             If an exception communicating with the repository's Query
-     *             Controls Module occurred.
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws ImplementationExceptionResponse
      */
-    List<String> getQueryNames() throws ServiceException, RemoteException;
+    List<String> getQueryNames() throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse;
 
     /**
      * Retrieves the ID of a subscribed query.
@@ -112,38 +127,33 @@ public interface QueryControlInterface {
      * @param queryName
      *            The name of the query.
      * @return A List of IDs.
-     * @throws ServiceException
-     *             If an exception whithin the repository's Query Controls
-     *             Module occurred.
-     * @throws RemoteException
-     *             If an exception communicating with the repository's Query
-     *             Controls Module occurred.
+     * @throws NoSuchNameExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws ImplementationExceptionResponse
      */
-    List<String> getSubscriptionIds(final String queryName) throws ServiceException, RemoteException;
+    List<String> getSubscriptionIds(final String queryName) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse;
 
     /**
      * Retrieves the standard version implemented by this implementation.
      * 
      * @return The implemented standard version.
-     * @throws ServiceException
-     *             If an exception whithin the repository's Query Controls
-     *             Module occurred.
-     * @throws RemoteException
-     *             If an exception communicating with the repository's Query
-     *             Controls Module occurred.
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws ImplementationExceptionResponse
      */
-    String getStandardVersion() throws ServiceException, RemoteException;
+    String getStandardVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse;
 
     /**
      * Retrieves the vendor version.
      * 
      * @return The vendor version.
-     * @throws ServiceException
-     *             If an exception whithin the repository's Query Controls
-     *             Module occurred.
-     * @throws RemoteException
-     *             If an exception communicating with the repository's Query
-     *             Controls Module occurred.
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws ImplementationExceptionResponse
      */
-    String getVendorVersion() throws ServiceException, RemoteException;
+    String getVendorVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse;
 }

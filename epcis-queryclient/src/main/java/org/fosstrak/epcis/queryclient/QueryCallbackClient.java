@@ -30,9 +30,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.accada.epcis.soapapi.ImplementationException;
-import org.accada.epcis.soapapi.QueryResults;
-import org.accada.epcis.soapapi.QueryTooLargeException;
+import org.accada.epcis.soap.model.ImplementationException;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.soap.model.QueryTooLargeException;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**
@@ -50,7 +50,12 @@ public class QueryCallbackClient extends HttpServlet implements QueryCallbackInt
      */
     public void callbackResults(QueryResults result) {
         InputStream is = new ByteArrayInputStream(callbackResults.getBytes());
-        result = QueryResultsParser.parseQueryResults(is);
+        try {
+            result = QueryResultsParser.parseResults(is);
+        } catch (IOException e) {
+            // TODO auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**

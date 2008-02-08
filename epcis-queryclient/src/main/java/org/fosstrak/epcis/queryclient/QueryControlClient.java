@@ -27,40 +27,41 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Properties;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.rpc.ServiceException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
-import org.accada.epcis.soapapi.ArrayOfString;
-import org.accada.epcis.soapapi.EPCISServiceBindingStub;
-import org.accada.epcis.soapapi.EPCglobalEPCISServiceLocator;
-import org.accada.epcis.soapapi.EmptyParms;
-import org.accada.epcis.soapapi.GetSubscriptionIDs;
-import org.accada.epcis.soapapi.Poll;
-import org.accada.epcis.soapapi.QueryParam;
-import org.accada.epcis.soapapi.QueryResults;
-import org.accada.epcis.soapapi.QuerySchedule;
-import org.accada.epcis.soapapi.QueryScheduleExtensionType;
-import org.accada.epcis.soapapi.Subscribe;
-import org.accada.epcis.soapapi.SubscriptionControls;
-import org.accada.epcis.soapapi.SubscriptionControlsExtensionType;
-import org.accada.epcis.soapapi.Unsubscribe;
-import org.accada.epcis.utils.TimeParser;
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.URI;
-import org.apache.axis.types.URI.MalformedURIException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
+import org.accada.epcis.soap.EPCISServicePortType;
+import org.accada.epcis.soap.EPCglobalEPCISService;
+import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.InvalidURIExceptionResponse;
+import org.accada.epcis.soap.NoSuchNameExceptionResponse;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
+import org.accada.epcis.soap.QueryParameterExceptionResponse;
+import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
+import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.SecurityExceptionResponse;
+import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
+import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
+import org.accada.epcis.soap.ValidationExceptionResponse;
+import org.accada.epcis.soap.model.EmptyParms;
+import org.accada.epcis.soap.model.GetSubscriptionIDs;
+import org.accada.epcis.soap.model.Poll;
+import org.accada.epcis.soap.model.QueryParams;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.soap.model.Subscribe;
+import org.accada.epcis.soap.model.SubscriptionControls;
+import org.accada.epcis.soap.model.Unsubscribe;
+import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 
 /**
  * This query client is a wrapper for EPCISServiceBindingStub which performs the
@@ -75,6 +76,17 @@ public class QueryControlClient implements QueryControlInterface {
 
     private static final String PROPERTY_QUERY_URL = "default.url";
 
+    private static final QName SERVICE = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISService");
+    private static final QName PORT = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePort");
+
+    private static URL WSDL_LOCATION;
+
+    static {
+        // TODO: do not hard code the wsdl location here! better to read it
+        // from properties
+        WSDL_LOCATION = ClassLoader.getSystemResource("wsdl/EPCglobal-epcis-query-1_0.wsdl");
+    }
+
     /**
      * The URL String at which the Query Operations Module listens.
      */
@@ -83,45 +95,28 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * The locator for the service.
      */
-    private EPCglobalEPCISServiceLocator service;
+    private EPCISServicePortType servicePort;
 
     /**
      * Constructs a new QueryClient which connects to the repository's Query
      * Operations Module listening at a default url address.
      */
     public QueryControlClient() {
-        this(null);
+        this(WSDL_LOCATION);
     }
 
     /**
      * Constructs a new QueryClient which connects to the repository's Query
      * Operations Module listening at the given url address.
      * 
-     * @param address
+     * @param wsdlLocation
      *            The URL String the query module is listening at.
      */
-    public QueryControlClient(final String address) {
-        // read properties
-        Properties props = new Properties();
-        InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
-        if (is == null) {
-            throw new RuntimeException("Unable to load properties from file " + PROPERTY_FILE);
-        }
-        try {
-            props.load(is);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load properties from file " + PROPERTY_FILE);
-        }
-
-        // set query address
-        if (address != null) {
-            this.queryUrl = address;
-        } else {
-            this.queryUrl = props.getProperty(PROPERTY_QUERY_URL);
-        }
-
-        this.service = new EPCglobalEPCISServiceLocator();
-        this.service.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
+    public QueryControlClient(final URL wsdlLocation) {
+        // Service service = new Service(wsdlLocation, SERVICE);
+        // servicePort = service.getPort(PORT, EPCISServicePortType.class);
+        EPCglobalEPCISService service = new EPCglobalEPCISService(wsdlLocation, SERVICE);
+        servicePort = service.getEPCglobalEPCISServicePort();
     }
 
     /**
@@ -129,11 +124,9 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#getQueryNames()
      */
-    public List<String> getQueryNames() throws ServiceException, RemoteException {
-        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        ArrayOfString temp = stub.getQueryNames(new EmptyParms());
-        List<String> names = Arrays.asList(temp.getString());
-        return names;
+    public List<String> getQueryNames() throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse {
+        return servicePort.getQueryNames(new EmptyParms()).getString();
     }
 
     /**
@@ -141,10 +134,9 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#getStandardVersion()
      */
-    public String getStandardVersion() throws ServiceException, RemoteException {
-        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        String stdVersion = stub.getStandardVersion(new EmptyParms());
-        return stdVersion;
+    public String getStandardVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse {
+        return servicePort.getStandardVersion(new EmptyParms());
     }
 
     /**
@@ -152,12 +144,11 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#getSubscriptionIds(java.lang.String)
      */
-    public List<String> getSubscriptionIds(final String queryName) throws ServiceException, RemoteException {
-        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        GetSubscriptionIDs parms = new GetSubscriptionIDs(queryName);
-        ArrayOfString res = stub.getSubscriptionIDs(parms);
-        List<String> ids = Arrays.asList(res.getString());
-        return ids;
+    public List<String> getSubscriptionIds(final String queryName) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse {
+        GetSubscriptionIDs parms = new GetSubscriptionIDs();
+        parms.setQueryName(queryName);
+        return servicePort.getSubscriptionIDs(parms).getString();
     }
 
     /**
@@ -165,24 +156,20 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#getVendorVersion()
      */
-    public String getVendorVersion() throws ServiceException, RemoteException {
-        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        String vdrVersion = stub.getVendorVersion(null);
-        return vdrVersion;
+    public String getVendorVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse {
+        return servicePort.getVendorVersion(new EmptyParms());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#poll(java.lang.String,
-     *      org.accada.epcis.soapapi.QueryParam[])
+     * @see org.accada.epcis.queryclient.QueryControlInterface#poll(org.accada.epcis.soap.model.Poll)
      */
-    public QueryResults poll(final String queryName, final QueryParam[] params) throws ServiceException,
-            RemoteException {
-        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        Poll poll = new Poll(queryName, params);
-        QueryResults results = stub.poll(poll);
-        return results;
+    public QueryResults poll(final Poll poll) throws ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
+            QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
+            NoSuchNameExceptionResponse, QueryParameterExceptionResponse {
+        return servicePort.poll(poll);
     }
 
     /**
@@ -214,13 +201,20 @@ public class QueryControlClient implements QueryControlInterface {
      *            The query in its XML form.
      * @return The QueryResults as it is returned from the repository's Query
      *         Operations Module.
-     * @throws RemoteException
-     *             If an error communicating with the Query Operations Module
-     *             occurred.
      * @throws ServiceException
      *             If an error within the Query Operations Module occurred.
+     * @throws IOException
+     * @throws QueryParameterExceptionResponse
+     * @throws NoSuchNameExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws QueryTooLargeExceptionResponse
+     * @throws QueryTooComplexExceptionResponse
+     * @throws ImplementationExceptionResponse
      */
-    public QueryResults poll(final String query) throws RemoteException, ServiceException {
+    public QueryResults poll(final String query) throws QueryTooComplexExceptionResponse,
+            QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
+            NoSuchNameExceptionResponse, QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
         InputStream is = new ByteArrayInputStream(query.getBytes());
         return poll(is);
     }
@@ -229,7 +223,7 @@ public class QueryControlClient implements QueryControlInterface {
      * Parses the query given in its XML representation and sends it to the
      * Query Operations Module.
      * 
-     * @param query
+     * @param queryStream
      *            The query in its XML form.
      * @return The QueryResults as it is returned from the repository's Query
      *         Operations Module.
@@ -238,29 +232,55 @@ public class QueryControlClient implements QueryControlInterface {
      *             occurred.
      * @throws ServiceException
      *             If an error within the Query Operations Module occurred.
+     * @throws QueryParameterExceptionResponse
+     * @throws NoSuchNameExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws QueryTooLargeExceptionResponse
+     * @throws QueryTooComplexExceptionResponse
+     * @throws ImplementationExceptionResponse
+     * @throws IOException
      */
-    public QueryResults poll(final InputStream query) throws RemoteException, ServiceException {
-        Document epcisq = parseAsDocument(query);
-        String queryName = epcisq.getElementsByTagName("queryName").item(0).getTextContent();
-        Element paramElems = (Element) epcisq.getElementsByTagName("params").item(0);
-        QueryParam[] params = parseQueryParams(paramElems);
-
-        QueryResults response = this.poll(queryName, params);
-        return response;
+    public QueryResults poll(final InputStream queryStream) throws ImplementationExceptionResponse,
+            QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse, NoSuchNameExceptionResponse, QueryParameterExceptionResponse, IOException {
+        try {
+            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            // setting schema to null will turn XML validation off
+            // unmarshaller.setSchema(null);
+            JAXBElement<Poll> elem = (JAXBElement) unmarshaller.unmarshal(queryStream);
+            Poll poll = elem.getValue();
+            return poll(poll);
+        } catch (JAXBException e) {
+            // wrap JAXBException into IOException to keep the interface
+            // JAXB-free
+            IOException ioe = new IOException(e.getMessage());
+            ioe.setStackTrace(e.getStackTrace());
+            throw ioe;
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#subscribe(java.lang.String,
-     *      org.accada.epcis.soapapi.QueryParam[], org.apache.axis.types.URI,
+     *      org.accada.epcis.soapapi.QueryParam[], java.lang.String,
      *      org.accada.epcis.soapapi.SubscriptionControls, java.lang.String)
      */
-    public void subscribe(final String queryName, final QueryParam[] params, final URI dest,
-            final SubscriptionControls controls, final String subscriptionId) throws ServiceException, RemoteException {
-        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        Subscribe subscribe = new Subscribe(queryName, params, dest, controls, subscriptionId);
-        stub.subscribe(subscribe);
+    public void subscribe(final String queryName, final QueryParams params, final String dest,
+            final SubscriptionControls controls, final String subscriptionId)
+            throws DuplicateSubscriptionExceptionResponse, ImplementationExceptionResponse,
+            QueryTooComplexExceptionResponse, SecurityExceptionResponse, InvalidURIExceptionResponse,
+            ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse, NoSuchNameExceptionResponse,
+            SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
+        Subscribe subscribe = new Subscribe();
+        subscribe.setControls(controls);
+        subscribe.setDest(dest);
+        subscribe.setParams(params);
+        subscribe.setQueryName(queryName);
+        subscribe.setSubscriptionID(subscriptionId);
+        servicePort.subscribe(subscribe);
     }
 
     /**
@@ -270,13 +290,25 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @param query
      *            The query in its XML form.
-     * @throws RemoteException
-     *             If an error communicating with the Query Operations Module
-     *             occurred.
      * @throws ServiceException
      *             If an error within the Query Operations Module occurred.
+     * @throws QueryParameterExceptionResponse
+     * @throws SubscriptionControlsExceptionResponse
+     * @throws NoSuchNameExceptionResponse
+     * @throws SubscribeNotPermittedExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws InvalidURIExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws QueryTooComplexExceptionResponse
+     * @throws ImplementationExceptionResponse
+     * @throws DuplicateSubscriptionExceptionResponse
+     * @throws IOException
      */
-    public void subscribe(final String query) throws RemoteException, ServiceException {
+    public void subscribe(final String query) throws DuplicateSubscriptionExceptionResponse,
+            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
+            InvalidURIExceptionResponse, ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse,
+            NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse,
+            IOException {
         InputStream is = new ByteArrayInputStream(query.getBytes());
         subscribe(is);
     }
@@ -292,23 +324,38 @@ public class QueryControlClient implements QueryControlInterface {
      *             occurred.
      * @throws ServiceException
      *             If an error within the Query Operations Module occurred.
+     * @throws QueryParameterExceptionResponse
+     * @throws SubscriptionControlsExceptionResponse
+     * @throws NoSuchNameExceptionResponse
+     * @throws SubscribeNotPermittedExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws InvalidURIExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws QueryTooComplexExceptionResponse
+     * @throws ImplementationExceptionResponse
+     * @throws DuplicateSubscriptionExceptionResponse
+     * @throws IOException
      */
-    public void subscribe(final InputStream query) throws RemoteException, ServiceException {
-        Document epcisq = parseAsDocument(query);
-        String queryName = epcisq.getElementsByTagName("queryName").item(0).getTextContent();
-        Element params = (Element) epcisq.getElementsByTagName("params").item(0);
-        QueryParam[] queryParams = parseQueryParams(params);
-
-        URI dest = parseURI(epcisq.getElementsByTagName("dest").item(0));
-        Element controlsElement = (Element) epcisq.getElementsByTagName("controls").item(0);
-        SubscriptionControls controls = parseSubscriptionControls(controlsElement);
-        String subscrId = null;
-        Node subscribeIdNode = epcisq.getElementsByTagName("subscriptionID").item(0);
-        if (subscribeIdNode != null) {
-            subscrId = subscribeIdNode.getTextContent();
+    public void subscribe(final InputStream query) throws DuplicateSubscriptionExceptionResponse,
+            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
+            InvalidURIExceptionResponse, ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse,
+            NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse,
+            IOException {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Poll.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            // setting schema to null will turn XML validation off
+            // unmarshaller.setSchema(null);
+            Subscribe subscribe = (Subscribe) unmarshaller.unmarshal(query);
+            subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(), subscribe.getControls(),
+                    subscribe.getSubscriptionID());
+        } catch (JAXBException e) {
+            // wrap JAXBException into IOException to keep the interface
+            // JAXB-free
+            IOException ioe = new IOException(e.getMessage());
+            ioe.setStackTrace(e.getStackTrace());
+            throw ioe;
         }
-
-        this.subscribe(queryName, queryParams, dest, controls, subscrId);
     }
 
     /**
@@ -316,10 +363,11 @@ public class QueryControlClient implements QueryControlInterface {
      * 
      * @see org.accada.epcis.queryclient.QueryControlInterface#unsubscribe(java.lang.String)
      */
-    public void unsubscribe(final String subscriptionId) throws ServiceException, RemoteException {
-        EPCISServiceBindingStub stub = (EPCISServiceBindingStub) service.getEPCglobalEPCISServicePort();
-        Unsubscribe parms = new Unsubscribe(subscriptionId);
-        stub.unsubscribe(parms);
+    public void unsubscribe(final String subscriptionId) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse {
+        Unsubscribe parms = new Unsubscribe();
+        parms.setSubscriptionID(subscriptionId);
+        servicePort.unsubscribe(parms);
     }
 
     /**
@@ -337,7 +385,7 @@ public class QueryControlClient implements QueryControlInterface {
      * @return The SOAP envelope containing the query.
      */
     private String wrapIntoSoapMessage(final String query) {
-        StringBuffer soap = new StringBuffer();
+        StringBuilder soap = new StringBuilder();
         soap.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         soap.append("<soapenv:Envelope ");
         soap.append("xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ");
@@ -404,220 +452,5 @@ public class QueryControlClient implements QueryControlInterface {
             response = response + line + "\n";
         }
         return response.trim();
-    }
-
-    /**
-     * Creates a DOM Document from the given XML query used for further parsing.
-     * 
-     * @param query
-     *            The query to be parsed.
-     * @return The query parsed as Document.
-     */
-    private Document parseAsDocument(final InputStream query) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document epcisq;
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            epcisq = builder.parse(query);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to parse the XML query.", e);
-        }
-        return epcisq;
-    }
-
-    /**
-     * Processes the query parameters.
-     * 
-     * @param params
-     *            The query parameter Element.
-     * @return The query parameters.
-     */
-    private QueryParam[] parseQueryParams(final Element params) {
-        NodeList paramList = params.getElementsByTagName("param");
-        int nofParams = paramList.getLength();
-        QueryParam[] queryParams = new QueryParam[nofParams];
-        for (int i = 0; i < nofParams; i++) {
-            Element param = (Element) paramList.item(i);
-            Element name = (Element) param.getElementsByTagName("name").item(0);
-            Element value = (Element) param.getElementsByTagName("value").item(0);
-            String paramName = name.getTextContent();
-            Object paramValue = parseParamValue(value);
-            QueryParam queryParam = new QueryParam(paramName, paramValue);
-            queryParams[i] = queryParam;
-        }
-        return queryParams;
-    }
-
-    /**
-     * Parses the value of a parameter element.
-     * 
-     * @param valueElement
-     *            The Element to be parsed.
-     * @return The parsed parameter value.
-     */
-    private Object parseParamValue(final Element valueElement) {
-        Object paramValue = null;
-        // check if we have an array of strings
-        NodeList stringNodes = valueElement.getElementsByTagName("string");
-        int size = stringNodes.getLength();
-        if (size > 0) {
-            String[] strings = new String[size];
-            boolean[] noHackAroundBugs = new boolean[size];
-            for (int i = 0; i < size; i++) {
-                String string = stringNodes.item(i).getTextContent();
-                strings[i] = string;
-                noHackAroundBugs[i] = true;
-            }
-            paramValue = new ArrayOfString(strings, noHackAroundBugs);
-        } else {
-            // check if we have an Integer
-            try {
-                paramValue = Integer.parseInt(valueElement.getTextContent());
-            } catch (Exception e) {
-                // check if we have a time value
-                try {
-                    paramValue = parseTime(valueElement);
-                } catch (Exception e1) {
-                    // check if we have an URI
-                    try {
-                        paramValue = parseURI(valueElement);
-                    } catch (Exception e2) {
-                        // ok lets take it as String
-                        paramValue = valueElement.getTextContent();
-                    }
-                }
-            }
-        }
-        return paramValue;
-    }
-
-    /**
-     * Parses the given subscription controls Element into a
-     * SubscriptionControls object.
-     * 
-     * @param controlsNode
-     *            The subscription controls Element.
-     * @return The parsed SubscriptionControls.
-     */
-    private SubscriptionControls parseSubscriptionControls(final Element controlsNode) {
-        Element scheduleNode = (Element) controlsNode.getElementsByTagName("schedule").item(0);
-        QuerySchedule schedule = parseQuerySchedule(scheduleNode);
-
-        URI trigger = null;
-        Node triggerNode = controlsNode.getElementsByTagName("trigger").item(0);
-        if (triggerNode != null) {
-            trigger = parseURI(triggerNode);
-        }
-
-        Node timeNode = controlsNode.getElementsByTagName("initialRecordTime").item(0);
-        Calendar initialRecordTime = null;
-        try {
-            initialRecordTime = parseTime(timeNode);
-        } catch (ParseException e) {
-            String msg = "Unable to parse time value for 'initialRecordTime': " + e.getMessage();
-            throw new RuntimeException(msg, e);
-        }
-
-        String boolStr = controlsNode.getElementsByTagName("reportIfEmpty").item(0).getTextContent();
-        boolean reportIfEmpty = Boolean.parseBoolean(boolStr);
-
-        // TODO handle extension
-        SubscriptionControlsExtensionType ext = null;
-
-        // TODO handle message
-        MessageElement[] msg = null;
-
-        SubscriptionControls controls = new SubscriptionControls(schedule, trigger, initialRecordTime, reportIfEmpty,
-                ext, msg);
-        return controls;
-    }
-
-    /**
-     * Parses the given schedule Element into a QuerySchedule.
-     * 
-     * @param scheduleNode
-     *            The schedule Element to be parsed.
-     * @return The parsed QuerySchedule.
-     */
-    private QuerySchedule parseQuerySchedule(final Element scheduleNode) {
-        QuerySchedule schedule = null;
-        if (scheduleNode != null) {
-            String sec = null;
-            Node secNode = scheduleNode.getElementsByTagName("second").item(0);
-            if (secNode != null) {
-                sec = secNode.getTextContent();
-            }
-            String min = null;
-            Node minNode = scheduleNode.getElementsByTagName("minute").item(0);
-            if (minNode != null) {
-                min = minNode.getTextContent();
-            }
-            String hr = null;
-            Node hrNode = scheduleNode.getElementsByTagName("hour").item(0);
-            if (hrNode != null) {
-                hr = hrNode.getTextContent();
-            }
-            String dom = null;
-            Node domNode = scheduleNode.getElementsByTagName("dayOfMonth").item(0);
-            if (domNode != null) {
-                dom = domNode.getTextContent();
-            }
-            String m = null;
-            Node mNode = scheduleNode.getElementsByTagName("month").item(0);
-            if (mNode != null) {
-                m = mNode.getTextContent();
-            }
-            String dow = null;
-            Node dowNode = scheduleNode.getElementsByTagName("dayOfWeek").item(0);
-            if (dowNode != null) {
-                dow = dowNode.getTextContent();
-            }
-
-            // TODO handle extension
-            QueryScheduleExtensionType extension = null;
-
-            // TODO handle message
-            MessageElement[] msg = null;
-
-            schedule = new QuerySchedule(sec, min, hr, dom, m, dow, extension, msg);
-        }
-        return schedule;
-    }
-
-    /**
-     * Parses the given uri Node into a URI.
-     * 
-     * @param node
-     *            The uri Node to be parsed.
-     * @return The parsed URI.
-     */
-    private URI parseURI(final Node node) {
-        URI uri = null;
-        if (node != null) {
-            try {
-                uri = new URI(node.getTextContent());
-            } catch (MalformedURIException e) {
-                throw new RuntimeException("URI '" + node.getTextContent() + "' is not valid.", e);
-            }
-        }
-        return uri;
-    }
-
-    /**
-     * Parses an event field containing a time value.
-     * 
-     * @param eventTimeNode
-     *            The Node with the time value.
-     * @return A Calendar representing the time value.
-     * @exception ParseException
-     *                If the date/time could not be parsed.
-     */
-    private Calendar parseTime(final Node eventTimeNode) throws ParseException {
-        Calendar cal = null;
-        if (eventTimeNode != null) {
-            String eventTimeStr = eventTimeNode.getTextContent();
-            cal = TimeParser.parseAsCalendar(eventTimeStr);
-        }
-        return cal;
     }
 }

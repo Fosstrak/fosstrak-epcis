@@ -42,7 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -61,15 +60,14 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
+import javax.xml.datatype.DatatypeFactory;
 
-import org.accada.epcis.soapapi.ArrayOfString;
-import org.accada.epcis.soapapi.QueryParam;
-import org.accada.epcis.soapapi.QuerySchedule;
-import org.accada.epcis.soapapi.Subscribe;
-import org.accada.epcis.soapapi.SubscriptionControls;
+import org.accada.epcis.soap.model.ArrayOfString;
+import org.accada.epcis.soap.model.QueryParam;
+import org.accada.epcis.soap.model.QuerySchedule;
+import org.accada.epcis.soap.model.Subscribe;
+import org.accada.epcis.soap.model.SubscriptionControls;
 import org.accada.epcis.utils.TimeParser;
-import org.apache.axis.AxisFault;
-import org.apache.axis.types.URI;
 
 /**
  * Implements the GUI part of the EPCIS Query Interface client.
@@ -1023,54 +1021,58 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             client.clearParameters();
 
             /* get event type selection from GUI */
-            Vector<String> eventVector = new Vector<String>();
+            ArrayOfString events = new ArrayOfString();
             if (mwObjectEventsCheckBox.isSelected()) {
-                eventVector.add("ObjectEvent");
+                events.getString().add("ObjectEvent");
             }
             if (mwAggregationEventsCheckBox.isSelected()) {
-                eventVector.add("AggregationEvent");
+                events.getString().add("AggregationEvent");
             }
             if (mwQuantityEventsCheckBox.isSelected()) {
-                eventVector.add("QuantityEvent");
+                events.getString().add("QuantityEvent");
             }
             if (mwTransactionEventsCheckBox.isSelected()) {
-                eventVector.add("TransactionEvent");
+                events.getString().add("TransactionEvent");
             }
             // print error if no event type is selected
-            if (eventVector.isEmpty()) {
+            if (events.getString().isEmpty()) {
                 JFrame frame = new JFrame();
                 JOptionPane.showMessageDialog(frame, "Please select at least one of the event types to be returned.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                        "Missing Input", JOptionPane.PLAIN_MESSAGE);
                 return;
             }
-            String[] eventArray = new String[eventVector.size()];
-            eventVector.toArray(eventArray);
-
-            ArrayOfString events = new ArrayOfString();
-            events.setString(eventArray);
-            client.addParameter(new QueryParam("eventType", events));
+            QueryParam queryParam = new QueryParam();
+            queryParam.setName("eventType");
+            queryParam.setValue(events);
+            client.addParameter(queryParam);
 
             String name;
             for (int i = 0; i < mwQueryArgumentTextFields.size() - 1; i++) {
                 name = ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).queryItem.getQueryText();
+                QueryParam param = new QueryParam();
+                param.setName(name);
                 switch (((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).queryItem.getParamType()) {
                 case ListOfString:
                     ArrayOfString valueArray = client.stringListToArray(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
-                    client.addParameter(new QueryParam(name, valueArray));
+                    param.setValue(valueArray);
+                    client.addParameter(param);
                     break;
                 case Int:
                     Integer valueInteger = Integer.decode(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
-                    client.addParameter(new QueryParam(name, valueInteger));
+                    param.setValue(valueInteger);
+                    client.addParameter(param);
                     break;
                 case Time:
                     // parse given ISO8601 date string into a calendar
                     String dateStr = ((JTextField) mwQueryArgumentTextFields.get(i)).getText();
                     Calendar cal = TimeParser.parseAsCalendar(dateStr);
-                    client.addParameter(new QueryParam(name, cal));
+                    param.setValue(cal);
+                    client.addParameter(param);
                     break;
                 default:
                     String value = ((JTextField) mwQueryArgumentTextFields.get(i)).getText();
-                    client.addParameter(new QueryParam(name, value));
+                    param.setValue(value);
+                    client.addParameter(param);
                     break;
                 }
             }
@@ -1078,18 +1080,18 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             if (isSubscribed.isSelected()) {
                 if (mwSubIdField.getText().equals("")) {
                     JFrame frame = new JFrame();
-                    JOptionPane.showMessageDialog(frame, "Please specify a SubscriptionID", "Service is responding",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Please specify a SubscriptionID", "Missing input",
+                            JOptionPane.PLAIN_MESSAGE);
                     return;
                 }
                 Subscribe subcr = new Subscribe();
-                subcr.setDest(new URI(mwDestUriTextField.getText()));
+                subcr.setDest(mwDestUriTextField.getText());
                 subcr.setQueryName("SimpleEventQuery");
                 subcr.setSubscriptionID(mwSubIdField.getText());
                 SubscriptionControls controls = new SubscriptionControls();
                 String dateStr = mwInitRecTimeField.getText();
-                Calendar cal = TimeParser.parseAsCalendar(dateStr);
-                controls.setInitialRecordTime(cal);
+                DatatypeFactory factory = DatatypeFactory.newInstance();
+                controls.setInitialRecordTime(factory.newXMLGregorianCalendar(dateStr));
                 controls.setReportIfEmpty(reportIf.isSelected());
                 QuerySchedule sched = new QuerySchedule();
 
@@ -1102,34 +1104,17 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                     sched.setDayOfWeek(mwScheduleWeekField.getText());
                     controls.setSchedule(sched);
                 } else {
-                    controls.setTrigger(new URI(mwDestUriTextField.getText()));
+                    controls.setTrigger(mwDestUriTextField.getText());
                 }
                 subcr.setControls(controls);
                 client.subscribeQuery(subcr);
                 JFrame frame = new JFrame();
-                JOptionPane.showMessageDialog(frame, "You have sucessfully subscribed to that Query",
-                        "Service is responding", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Query subscription successful.", "Service invocation successful",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 data = client.runQuery();
                 createResultsWindow();
             }
-        } catch (AxisFault af) {
-            String msg = new String("EPCIS Query Interface service error.\n");
-            if (af.getFaultDetails().length >= 2
-                    && af.getFaultDetails()[1].getTextContent().endsWith("ImplementationException")) {
-                msg += "Reason: " + af.getFaultDetails()[0].getChildNodes().item(0).getTextContent() + "\n";
-                msg += "Severity: " + af.getFaultDetails()[0].getChildNodes().item(1).getTextContent();
-            } else {
-                msg += af.getFaultDetails()[0].getTextContent();
-            }
-            dwOutputTextArea.append("\nCould not execute query:\n");
-            StringWriter detailed = new StringWriter();
-            PrintWriter pw = new PrintWriter(detailed);
-            af.printStackTrace(pw);
-            dwOutputTextArea.append(detailed.toString());
-
-            JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, msg, "EPCIS Query Interface service error", JOptionPane.ERROR_MESSAGE);
         } catch (ParseException e) {
             String msg = "Unable to parse a Time value.";
             dwOutputTextArea.append("\n" + msg + "\n");
@@ -1137,17 +1122,18 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             e.printStackTrace(pw);
             dwOutputTextArea.append(pw.toString());
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, msg + "\n" + e.getMessage(), msg, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, msg + "\n" + e.getMessage(), "Service invocation error",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            dwOutputTextArea.append("\nCould not execute query:\n");
-            StringWriter detailed = new StringWriter();
-            PrintWriter pw = new PrintWriter(detailed);
+            String msg = "Error while invoking EPCIS Query Interface.";
+            dwOutputTextArea.append("\n" + msg + "\n");
+            dwOutputTextArea.append(e.toString());
+            PrintWriter pw = new PrintWriter(new StringWriter());
             e.printStackTrace(pw);
-            dwOutputTextArea.append(detailed.toString());
-
+            dwOutputTextArea.append(pw.toString());
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, "Could not execute query:\n" + e.getMessage(),
-                    "Could not execute query", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, msg + "\n" + e.toString(), "Service invocation error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1189,14 +1175,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             client.setEndpointAddress(mwServiceUrlTextField.getText());
             String standardVersion = client.queryStandardVersion();
             String vendorVersion = client.queryVendorVersion();
-            String[] queryNames = client.queryNames();
-            String text = "Service is responding:\n" + "Implemented standard: " + standardVersion + "\n"
-                    + "Service version: " + vendorVersion + "\n" + "Supports the following queries: ";
+            List<String> queryNames = client.queryNames();
+            String text = "EPCIS Query Service responding:\n" + "Standard version: " + standardVersion + "\n"
+                    + "Service version: " + vendorVersion + "\n" + "Supported query names: ";
             for (String elem : queryNames) {
                 text += elem + "\n";
             }
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, text, "Service is responding", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, text, "Service invocation successful", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
 
@@ -1207,7 +1193,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             dwOutputTextArea.append(detailed.toString());
 
             JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, "Error:\n" + e.getMessage(), "Service not responding",
+            JOptionPane.showMessageDialog(frame, "Error:\n" + e.getMessage(), "Service invocation error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -1498,15 +1484,27 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             Query ex = new Query();
             ex.setDescription("Search for an aggregation onto a certain pallet");
             ex.setReturnAggregationEvents(true);
-            ex.getQueryParameters().add(new QueryParam("EQ_action", "ADD"));
-            ex.getQueryParameters().add(new QueryParam("MATCH_parentID", "urn:x:bar:5:036544:007325"));
+            QueryParam param = new QueryParam();
+            param.setName("EQ_action");
+            param.setValue("ADD");
+            ex.getQueryParameters().add(param);
+            param = new QueryParam();
+            param.setName("MATCH_parentID");
+            param.setValue("MATCH_parentID");
+            ex.getQueryParameters().add(param);
             examples.add(ex);
 
             ex = new Query();
             ex.setDescription("Find out what happened to a certain EPC after a " + "certain date");
             ex.setReturnObjectEvents(true);
-            ex.getQueryParameters().add(new QueryParam("GE_eventTime", "2006-01-01T05:20:31Z"));
-            ex.getQueryParameters().add(new QueryParam("MATCH_epc", "urn:epc:id:sgtin:0034000.987650.2686"));
+            param = new QueryParam();
+            param.setName("GE_eventTime");
+            param.setValue("2006-01-01T05:20:31Z");
+            ex.getQueryParameters().add(param);
+            param = new QueryParam();
+            param.setName("MATCH_epc");
+            param.setValue("urn:epc:id:sgtin:0034000.987650.2686");
+            ex.getQueryParameters().add(param);
             examples.add(ex);
 
             ex = new Query();
@@ -1515,24 +1513,48 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             ex.setReturnAggregationEvents(true);
             ex.setReturnQuantityEvents(true);
             ex.setReturnTransactionEvents(true);
-            ex.getQueryParameters().add(new QueryParam("EQ_readPoint", "urn:epcglobal:fmcg:ssl:0037000.00729.210,414"));
+            param = new QueryParam();
+            param.setName("EQ_readPoint");
+            param.setValue("urn:epcglobal:fmcg:ssl:0037000.00729.210,414");
+            ex.getQueryParameters().add(param);
             examples.add(ex);
 
             ex = new Query();
             ex.setDescription("Find out when a certain EPC was shipped");
             ex.setReturnObjectEvents(true);
-            ex.getQueryParameters().add(new QueryParam("EQ_action", "OBSERVE"));
-            ex.getQueryParameters().add(new QueryParam("EQ_bizStep", "urn:epcglobal:epcis:bizstep:fmcg:shipping"));
-            ex.getQueryParameters().add(new QueryParam("MATCH_epc", "urn:epc:id:sgtin:0057000.123430.2028"));
+            param = new QueryParam();
+            param.setName("EQ_action");
+            param.setValue("OBSERVE");
+            ex.getQueryParameters().add(param);
+            param = new QueryParam();
+            param.setName("EQ_bizStep");
+            param.setValue("urn:epcglobal:epcis:bizstep:fmcg:shipping");
+            ex.getQueryParameters().add(param);
+            param = new QueryParam();
+            param.setName("MATCH_epc");
+            param.setValue("urn:epc:id:sgtin:0057000.123430.2028");
+            ex.getQueryParameters().add(param);
             examples.add(ex);
 
             ex = new Query();
             ex.setDescription("Find all EPCs that have been in repair during 2006");
             ex.setReturnObjectEvents(true);
-            ex.getQueryParameters().add(new QueryParam("EQ_action", "OBSERVE"));
-            ex.getQueryParameters().add(new QueryParam("GE_eventTime", "2006-01-01T00:00:00Z"));
-            ex.getQueryParameters().add(new QueryParam("LT_eventTime", "2007-01-01T00:00:00Z"));
-            ex.getQueryParameters().add(new QueryParam("EQ_disposition", "urn:epcglobal:epcis:disp:fmcg:inrepair"));
+            param = new QueryParam();
+            param.setName("EQ_action");
+            param.setValue("OBSERVE");
+            ex.getQueryParameters().add(param);
+            param = new QueryParam();
+            param.setName("GE_eventTime");
+            param.setValue("2006-01-01T00:00:00Z");
+            ex.getQueryParameters().add(param);
+            param = new QueryParam();
+            param.setName("LT_eventTime");
+            param.setValue("2007-01-01T00:00:00Z");
+            ex.getQueryParameters().add(param);
+            param = new QueryParam();
+            param.setName("EQ_disposition");
+            param.setValue("urn:epcglobal:epcis:disp:fmcg:inrepair");
+            ex.getQueryParameters().add(param);
             examples.add(ex);
         }
 
