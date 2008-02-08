@@ -19,89 +19,164 @@
 
 
   <!-- =========================================================== -->
-  <!-- Properties                                                  -->
-  <!-- =========================================================== -->
-
-  <properties>
-    <package.structure.soapapi>org.accada.epcis.soapapi</package.structure.soapapi>
-    <directory.structure.soapapi>org/accada/epcis/soapapi</directory.structure.soapapi>
-  </properties>
-
-
-  <!-- =========================================================== -->
   <!-- Dependencies                                                -->
   <!-- =========================================================== -->
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis</artifactId>
-      <version>1.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis-jaxrpc</artifactId>
-      <version>1.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis-saaj</artifactId>
-      <version>1.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis-wsdl4j</artifactId>
-      <version>1.5.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis-ant</artifactId>
-      <version>1.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.12</version>
-      <scope>compile</scope>
-    </dependency>
+    <!-- common dependencies, required by all modules -->
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.1</version>
-      <scope>compile</scope>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>commons-discovery</groupId>
       <artifactId>commons-discovery</artifactId>
       <version>0.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
       <version>1.1</version>
-      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>jsr250-api</artifactId>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>[3.8,4)</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- dependencies required by CeltiXFire (CXF) -->
+    <dependency>
+	    <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+      <version>2.0.4-incubator</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-javamail_1.4_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-activation_1.1_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-annotation_1.0_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>velocity</groupId>
+          <artifactId>velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.neethi</groupId>
+          <artifactId>neethi</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http</artifactId>
+      <version>2.0.4-incubator</version>
+      <exclusions>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-databinding-jaxb</artifactId>
+      <version>2.0.4-incubator</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-javamail_1.4_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-activation_1.1_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-annotation_1.0_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-xjc</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>velocity</groupId>
+          <artifactId>velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
-
+  
   <!-- =========================================================== -->
   <!-- Build settings                                              -->
   <!-- =========================================================== -->
@@ -109,42 +184,38 @@
   <build>
     <plugins>
       <plugin>
-        <!-- this plugin allows the generation of axis stubs -->
-        <!-- see http://wiki.apache.org/ws/FrontPage/Axis/MavenIntegration for more info -->
-        <!-- also consider replacing ant with axistools-maven-plugin at a later time -->
-        <artifactId>maven-antrun-plugin</artifactId>
+        <!-- this plugin generates the java stubs (POJOs) from the WSDL file -->
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-codegen-plugin</artifactId>
         <executions>
           <execution>
-            <id>wsdl2java</id>
-            <!-- run wsdl2java during maven's generate-sources phase -->
-            <phase>generate-sources</phase>
+            <id>generate-pojos</id>
+            <!--<phase>generate-sources</phase>-->
             <configuration>
-              <tasks>
-                <mkdir dir="target/generated-sources/main/java" />
-                <taskdef resource="axis-tasks.properties" classpathref="maven.compile.classpath" />
-                <axis-wsdl2java output="target/generated-sources/main/java" deployScope="Application" serverSide="false" verbose="false" url="../epcis-repository/src/main/resources/wsdl/EPCglobal-epcis-query-1_0.wsdl">
-                  <mapping namespace="urn:epcglobal:epcis:wsdl:1" package="${package.structure.soapapi}" />
-                  <mapping namespace="urn:epcglobal:xsd:1" package="${package.structure.soapapi}" />
-                  <mapping namespace="urn:epcglobal:epcis:xsd:1" package="${package.structure.soapapi}" />
-                  <mapping namespace="urn:epcglobal:epcis-masterdata:xsd:1" package="${package.structure.soapapi}" />
-                  <mapping namespace="urn:epcglobal:epcis-query:xsd:1" package="${package.structure.soapapi}" />
-                  <mapping namespace="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader" package="${package.structure.soapapi}" />
-                </axis-wsdl2java>
-
-                <!--
-                  delete Axis-generated BusinessTransactionType.java and AttributeType.java,
-                  we provide our own implementation in src/main/java.
-                -->
-                <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/BusinessTransactionType.java" />
-                <delete file="target/generated-sources/main/java/${directory.structure.soapapi}/AttributeType.java" />
-              </tasks>
-              
-              <!-- add the "generated-sources" folders to the compile path -->
-              <sourceRoot>target/generated-sources/main/java</sourceRoot>
-              <testSourceRoot>target/generated-sources/test/java</testSourceRoot>
+              <sourceRoot>${basedir}/target/generated-sources/main/java</sourceRoot>
+              <wsdlOptions>
+                <wsdlOption>
+                  <wsdl>${basedir}/src/main/resources/wsdl/EPCglobal-epcis-query-1_0.wsdl</wsdl>
+                  <extraargs>
+                    <!-- namespace to package name mapping -->
+                    <extraarg>-p</extraarg>
+                    <extraarg>urn:epcglobal:epcis:xsd:1=org.accada.epcis.soap.model</extraarg>
+                    <extraarg>-p</extraarg>
+                    <extraarg>urn:epcglobal:epcis-query:xsd:1=org.accada.epcis.soap.model</extraarg>
+                    <extraarg>-p</extraarg>
+                    <extraarg>urn:epcglobal:epcis-masterdata:xsd:1=org.accada.epcis.soap.model</extraarg>
+                    <extraarg>-p</extraarg>
+                    <extraarg>urn:epcglobal:xsd:1=org.accada.epcis.soap.model</extraarg>
+                    <extraarg>-p</extraarg>
+                    <extraarg>urn:epcglobal:epcis:wsdl:1=org.accada.epcis.soap</extraarg>
+                    <extraarg>-p</extraarg>
+                    <extraarg>http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader=org.accada.epcis.soap</extraarg>
+                  </extraargs>
+                </wsdlOption>
+              </wsdlOptions>
             </configuration>
             <goals>
-              <goal>run</goal>
+              <goal>wsdl2java</goal>
             </goals>
           </execution>
         </executions>
@@ -163,14 +234,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.0</version>
         <configuration>
           <includes>**/*.java</includes>
           <excludes>org/accada/epcis/soapapi/*.*</excludes>
           <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
-          <headerLocation>${basedir}/../src/config/HEADER.txt</headerLocation>
           <enableRulesSummary>false</enableRulesSummary>
           <xrefLocation>xref</xrefLocation>
+          <propertyExpansion>samedir=${basedir}/../src/config</propertyExpansion>
         </configuration>
       </plugin>
       <plugin>
@@ -188,6 +258,5 @@
       </plugin>
     </plugins>
   </reporting>
-
 
 </project>
