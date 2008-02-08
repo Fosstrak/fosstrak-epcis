@@ -20,42 +20,48 @@
 
 package org.accada.epcis.repository;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.TimeZone;
 
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ServiceException;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
-import org.accada.epcis.soapapi.AggregationEventType;
-import org.accada.epcis.soapapi.EPCISException;
-import org.accada.epcis.soapapi.EPCISQueryBodyType;
-import org.accada.epcis.soapapi.EPCISQueryDocumentType;
-import org.accada.epcis.soapapi.EPCISServiceBindingStub;
-import org.accada.epcis.soapapi.EPCglobalEPCISServiceLocator;
-import org.accada.epcis.soapapi.EventListType;
-import org.accada.epcis.soapapi.ImplementationException;
-import org.accada.epcis.soapapi.ObjectEventType;
-import org.accada.epcis.soapapi.Poll;
-import org.accada.epcis.soapapi.QuantityEventType;
-import org.accada.epcis.soapapi.QueryParam;
-import org.accada.epcis.soapapi.QueryResults;
-import org.accada.epcis.soapapi.QueryTooLargeException;
-import org.accada.epcis.soapapi.TransactionEventType;
-import org.apache.axis.MessageContext;
-import org.apache.axis.encoding.SerializationContext;
-import org.apache.axis.message.NullAttributes;
-import org.apache.axis.types.URI;
-import org.apache.log4j.Logger;
+import org.accada.epcis.soap.EPCISServicePortType;
+import org.accada.epcis.soap.EPCglobalEPCISService;
+import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.model.EPCISQueryBodyType;
+import org.accada.epcis.soap.model.EPCISQueryDocumentType;
+import org.accada.epcis.soap.model.EventListType;
+import org.accada.epcis.soap.model.Poll;
+import org.accada.epcis.soap.model.QueryParam;
+import org.accada.epcis.soap.model.QueryParams;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.soap.model.QueryTooLargeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements a subscription to a query. Created upon using subscribe() on the
@@ -73,7 +79,7 @@ public class QuerySubscription implements Serializable {
      */
     private static final long serialVersionUID = -401176555052383495L;
 
-    private static final Logger LOG = Logger.getLogger(QuerySubscription.class);
+    private static final Log LOG = LogFactory.getLog(QuerySubscription.class);
 
     /**
      * SubscriptionID.
@@ -83,7 +89,7 @@ public class QuerySubscription implements Serializable {
     /**
      * Destination URI to send results to.
      */
-    protected URI dest;
+    protected String dest;
 
     /**
      * Initial record time.
@@ -101,14 +107,9 @@ public class QuerySubscription implements Serializable {
     protected String queryName;
 
     /**
-     * The URL at which the query service is available.
-     */
-    protected String queryUrl = null;
-
-    /**
      * Query parameters.
      */
-    private QueryParam[] queryParams;
+    private QueryParams queryParams;
 
     /**
      * Last time the query got executed. Used to restrict results to new ones.
@@ -134,7 +135,7 @@ public class QuerySubscription implements Serializable {
      * @param queryName
      *            queryName.
      */
-    public QuerySubscription(final String subscriptionID, final QueryParam[] queryParams, final URI dest,
+    public QuerySubscription(final String subscriptionID, final QueryParams queryParams, final String dest,
             final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
             final GregorianCalendar lastTimeExecuted, final String queryName) {
         LOG.debug("Constructing Query Subscription with ID '" + subscriptionID + "'.");
@@ -147,17 +148,61 @@ public class QuerySubscription implements Serializable {
         this.queryName = queryName;
         this.lastTimeExecuted = lastTimeExecuted;
 
-        // initialize the query URL
-        MessageContext msgContext = MessageContext.getCurrentContext();
-        this.queryUrl = (String) msgContext.getProperty(MessageContext.TRANS_URL);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Initial record time is '" + lastTimeExecuted.getTime() + "'.");
-            LOG.debug("URL of the query service is '" + queryUrl + "'.");
-        }
-
         // update/add GE_recordTime restriction to query params (we only need to
         // return results not previously returned!)
         updateRecordTime(queryParams, initialRecordTime);
+    }
+
+    /**
+     * Updates the subscription in the database. This is required in order to
+     * correctly re-initialize the subscriptions, especially the
+     * lastTimeExecuted field, after a context restart.
+     * 
+     * @param lastTimeExecuted
+     *            The new lastTimeExecuted.
+     */
+    private void updateSubscription(final GregorianCalendar lastTimeExecuted) {
+
+        try {
+            // open a database connection
+            Context initContext = new InitialContext();
+            Context env = (Context) initContext.lookup("java:comp/env");
+            DataSource db = (DataSource) env.lookup("jdbc/EPCISDB");
+            Connection dbconnection = db.getConnection();
+
+            // update the subscription in the database
+            String update = "UPDATE subscription SET lastexecuted=(?), params=(?)" + " WHERE subscriptionid=(?);";
+            PreparedStatement stmt = dbconnection.prepareStatement(update);
+            LOG.debug("QUERY: " + update);
+            Timestamp ts = new Timestamp(lastTimeExecuted.getTimeInMillis());
+            String time = ts.toString();
+            stmt.setString(1, time);
+            LOG.debug("       query param 1: " + time);
+
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            ObjectOutput out = new ObjectOutputStream(outStream);
+            out.writeObject(queryParams);
+            ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
+            stmt.setBinaryStream(2, inStream, inStream.available());
+            LOG.debug("       query param 2: [" + inStream.available() + " bytes]");
+
+            stmt.setString(3, subscriptionID);
+            LOG.debug("       query param 3: " + subscriptionID);
+
+            stmt.executeUpdate();
+
+            // close the database connection
+            dbconnection.close();
+        } catch (SQLException e) {
+            String msg = "An SQL error occurred while updating the subscriptions in the database.";
+            LOG.error(msg, e);
+        } catch (IOException e) {
+            String msg = "Unable to update the subscription in the database: " + e.getMessage();
+            LOG.error(msg, e);
+        } catch (NamingException e) {
+            String msg = "Unable to read configuration, check META-INF/context.xml for Resource 'jdbc/EPCISDB'.";
+            LOG.error(msg, e);
+        }
     }
 
     /**
@@ -170,11 +215,10 @@ public class QuerySubscription implements Serializable {
      *            The time to which the 'GE_recordTime' parameter will be
      *            updated.
      */
-    private void updateRecordTime(final QueryParam[] queryParams, final GregorianCalendar initialRecordTime) {
+    private void updateRecordTime(final QueryParams queryParams, final GregorianCalendar initialRecordTime) {
         // update or add GE_recordTime restriction
         boolean foundRecordTime = false;
-        List<QueryParam> tempParams = Arrays.asList(queryParams);
-        for (QueryParam p : tempParams) {
+        for (QueryParam p : this.queryParams.getParam()) {
             if (p.getName().equalsIgnoreCase("GE_recordTime")) {
                 LOG.debug("Updating query parameter 'GE_recordTime' with value '" + initialRecordTime.getTime() + "'.");
                 p.setValue(initialRecordTime);
@@ -182,17 +226,16 @@ public class QuerySubscription implements Serializable {
                 break;
             }
         }
-        this.queryParams = tempParams.toArray(queryParams);
         if (!foundRecordTime) {
-            List<QueryParam> arrayList = new ArrayList<QueryParam>();
-            arrayList.addAll(tempParams);
             LOG.debug("Adding query parameter 'GE_recordTime' with value '" + initialRecordTime.getTime() + "'.");
             QueryParam newParam = new QueryParam();
             newParam.setName("GE_recordTime");
             newParam.setValue(initialRecordTime);
-            arrayList.add(newParam);
-            this.queryParams = arrayList.toArray(queryParams);
+            this.queryParams.getParam().add(newParam);
         }
+
+        // update the subscription in the db
+        updateSubscription(initialRecordTime);
     }
 
     /**
@@ -201,11 +244,11 @@ public class QuerySubscription implements Serializable {
     public void executeQuery() {
         if (LOG.isDebugEnabled()) {
             LOG.debug("--------------------------------------------");
-            LOG.debug("Executing subscribed query '" + subscriptionID + "' which has " + queryParams.length
+            LOG.debug("Executing subscribed query '" + subscriptionID + "' which has " + queryParams.getParam().size()
                     + " parameters:");
-            for (int i = 0; i < queryParams.length; i++) {
-                LOG.debug(" param name:  " + queryParams[i].getName());
-                Object val = queryParams[i].getValue();
+            for (QueryParam p : queryParams.getParam()) {
+                LOG.debug(" param name:  " + p.getName());
+                Object val = p.getValue();
                 if (val instanceof GregorianCalendar) {
                     LOG.debug(" param value: " + ((GregorianCalendar) val).getTime());
                 } else {
@@ -215,14 +258,15 @@ public class QuerySubscription implements Serializable {
         }
 
         // poll the query
-        Poll poll = new Poll(queryName, queryParams);
+        Poll poll = new Poll();
+        poll.setQueryName(queryName);
+        poll.setParams(queryParams);
         try {
             QueryResults result = null;
             try {
                 // initialize the query service
-                EPCglobalEPCISServiceLocator queryLocator = new EPCglobalEPCISServiceLocator();
-                queryLocator.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
-                EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) queryLocator.getEPCglobalEPCISServicePort();
+                EPCglobalEPCISService s = new EPCglobalEPCISService();
+                EPCISServicePortType epcisQueryService = s.getEPCglobalEPCISServicePort();
 
                 // send the query and get current time
                 GregorianCalendar cal = new GregorianCalendar();
@@ -234,26 +278,25 @@ public class QuerySubscription implements Serializable {
                 cal.add(Calendar.MILLISECOND, offset);
                 cal.add(Calendar.SECOND, 1);
                 this.lastTimeExecuted = cal;
-            } catch (QueryTooLargeException e) {
+            } catch (QueryTooLargeExceptionResponse e) {
                 // send exception back to client
                 EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
-                e.setSubscriptionID(subscriptionID);
-                queryBody.setQueryTooLargeException(e);
+                QueryTooLargeException qtle = new QueryTooLargeException();
+                qtle.setQueryName(queryName);
+                qtle.setSubscriptionID(subscriptionID);
+                qtle.setReason(e.getMessage());
+                queryBody.setQueryTooLargeException(qtle);
                 serializeAndSend(queryBody);
                 return;
-            } catch (ImplementationException e) {
+            } catch (ImplementationExceptionResponse e) {
                 // send exception back to client
                 EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
-                e.setSubscriptionID(subscriptionID);
-                queryBody.setImplementationException(e);
+                e.getFaultInfo().setSubscriptionID(subscriptionID);
+                queryBody.setImplementationException(e.getFaultInfo());
                 serializeAndSend(queryBody);
                 return;
-            } catch (EPCISException e) {
-                // log exception
-                String msg = "An error executing a subscribed query occured: " + e.getReason();
-                LOG.error(msg, e);
-            } catch (ServiceException e) {
-                String msg = "An error retrieving the EPCIS query service occured: " + e.getMessage();
+            } catch (Exception e) {
+                String msg = "An error retrieving the EPCIS query service occurred: " + e.getMessage();
                 LOG.error(msg, e);
             }
             result.setSubscriptionID(subscriptionID);
@@ -261,29 +304,8 @@ public class QuerySubscription implements Serializable {
 
             // check if we have an empty result list
             boolean isEmpty = false;
-            if (eventList == null) {
-                isEmpty = true;
-            } else {
-                AggregationEventType[] aggrEvents = eventList.getAggregationEvent();
-                ObjectEventType[] objEvents = eventList.getObjectEvent();
-                QuantityEventType[] quantEvents = eventList.getQuantityEvent();
-                TransactionEventType[] transEvents = eventList.getTransactionEvent();
-                if (aggrEvents == null && objEvents == null && quantEvents == null && transEvents == null) {
-                    isEmpty = true;
-                } else {
-                    int nofAggrEvents = (aggrEvents != null) ? aggrEvents.length : 0;
-                    int nofObjEvents = (objEvents != null) ? objEvents.length : 0;
-                    int nofQuantEvents = (quantEvents != null) ? quantEvents.length : 0;
-                    int nofTransEvents = (transEvents != null) ? transEvents.length : 0;
-                    if (nofAggrEvents == 0 && nofObjEvents == 0 && nofQuantEvents == 0 && nofTransEvents == 0) {
-                        isEmpty = true;
-                    }
-                    LOG.debug("Subscribed query with ID '" + subscriptionID + "' contains " + nofAggrEvents
-                            + " AggregationEvents, " + nofObjEvents + " ObjectEvents, " + nofQuantEvents
-                            + " QuantityEvents, " + nofTransEvents + " TransactionEvents.");
-                }
-            }
-
+            isEmpty = (eventList == null) ? true
+                    : eventList.getObjectEventOrAggregationEventOrQuantityEvent().isEmpty();
             if (!reportIfEmpty && isEmpty) {
                 LOG.debug("Query returned no results, nothing to report.");
                 return;
@@ -296,7 +318,7 @@ public class QuerySubscription implements Serializable {
 
         } catch (IOException e) {
             String msg = "An error opening a connection to '" + dest
-                    + "' or serializing and sending contents occured: " + e.getMessage();
+                    + "' or serializing and sending contents occurred: " + e.getMessage();
             LOG.error(msg, e);
         }
 
@@ -310,23 +332,42 @@ public class QuerySubscription implements Serializable {
      * @param body
      *            The body of the EPCISQueryDocumentType.
      * @throws IOException
-     *             If a serialization or sending error occured.
+     *             If a serialization or sending error occurred.
      */
     protected void serializeAndSend(final EPCISQueryBodyType body) throws IOException {
         EPCISQueryDocumentType queryDoc = new EPCISQueryDocumentType();
-        queryDoc.setCreationDate(new GregorianCalendar());
-        queryDoc.setEPCISBody(body);
+        try {
+            DatatypeFactory factory = DatatypeFactory.newInstance();
+            queryDoc.setCreationDate(factory.newXMLGregorianCalendar((GregorianCalendar) GregorianCalendar.getInstance()));
+            queryDoc.setEPCISBody(body);
+        } catch (DatatypeConfigurationException e) {
+            // Never mind. Just ignore setting the creation date.
+        }
 
         // serialize the response
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStreamWriter writer = new OutputStreamWriter(baos);
-        SerializationContext serContext = new SerializationContext(writer);
-        QName queryDocXMLType = EPCISQueryDocumentType.getTypeDesc().getXmlType();
-        serContext.setWriteXMLType(queryDocXMLType);
-        serContext.serialize(queryDocXMLType, new NullAttributes(), queryDoc, queryDocXMLType,
-                EPCISQueryDocumentType.class, false, true);
-        writer.flush();
-        String data = baos.toString();
+        String data = null;
+        try {
+            JAXBContext context = JAXBContext.newInstance(EPCISQueryDocumentType.class);
+            StringWriter writer = new StringWriter();
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.marshal(queryDoc, writer);
+            data = writer.toString();
+        } catch (JAXBException e) {
+            throw new IOException(e.getMessage());
+        }
+
+        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // OutputStreamWriter writer = new OutputStreamWriter(baos);
+        // SerializationContext serContext = new SerializationContext(writer);
+        // QName queryDocXMLType =
+        // EPCISQueryDocumentType.getTypeDesc().getXmlType();
+        // serContext.setWriteXMLType(queryDocXMLType);
+        // serContext.serialize(queryDocXMLType, new NullAttributes(), queryDoc,
+        // queryDocXMLType,
+        // EPCISQueryDocumentType.class, false, true);
+        // writer.flush();
+        // String data = baos.toString();
 
         // set up connection and send data to given destination
         URL serviceUrl = new URL(dest.toString());
@@ -337,6 +378,8 @@ public class QuerySubscription implements Serializable {
 
     /**
      * Sends the given data String to the specified URL.
+     * <p>
+     * TODO: some http/https error handling would be nice!
      * 
      * @param url
      *            The URL to send the data to.
@@ -344,11 +387,13 @@ public class QuerySubscription implements Serializable {
      *            The data to send.
      * @return The HTTP response code.
      * @throws IOException
-     *             If a communication error occured.
+     *             If a communication error occurred.
      */
     private int sendData(final URL url, final String data) throws IOException {
         data.concat("\n");
         // setup connection
+        // this will be an instance of javax.net.ssl.HttpURLConnection if the
+        // https protocol is used in the url
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         // connection.setInstanceFollowRedirects(false);
         connection.setRequestMethod("POST");

@@ -28,20 +28,22 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.timer.Timer;
 
-import org.accada.epcis.soapapi.ImplementationException;
-import org.accada.epcis.soapapi.QueryParam;
-import org.apache.axis.types.URI;
-import org.apache.log4j.Logger;
+import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.model.ImplementationException;
+import org.accada.epcis.soap.model.QueryParams;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Special case of Subscription (from subscribe() on query interface) where the
  * subscription is scheduled.
  * 
- * @author Alain Remund, Arthur van Dorp
+ * @author Alain Remund
+ * @author Arthur van Dorp
  */
 public class QuerySubscriptionScheduled extends QuerySubscription implements NotificationListener, Serializable {
 
-    private static final Logger LOG = Logger.getLogger(QuerySubscriptionScheduled.class);
+    private static final Log LOG = LogFactory.getLog(QuerySubscriptionScheduled.class);
 
     /**
      * Generated unique ID for serialization.
@@ -80,10 +82,10 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
      * @throws ImplementationException
      *             If the Scheduler could not be started.
      */
-    public QuerySubscriptionScheduled(final String subscriptionID, final QueryParam[] queryParams, final URI dest,
+    public QuerySubscriptionScheduled(final String subscriptionID, final QueryParams queryParams, final String dest,
             final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
             final GregorianCalendar lastTimeExecuted, final Schedule schedule, final String queryName)
-            throws ImplementationException {
+            throws ImplementationExceptionResponse {
         super(subscriptionID, queryParams, dest, reportIfEmpty, initialRecordTime, lastTimeExecuted, queryName);
         this.schedule = schedule;
         if (LOG.isDebugEnabled()) {
@@ -100,7 +102,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
      * @throws ImplementationException
      *             If the next scheduled date cannot be evaluated.
      */
-    private void startThread() throws ImplementationException {
+    private void startThread() throws ImplementationExceptionResponse {
         Timer nextAction = new Timer();
         nextAction.addNotificationListener(this, null, nextAction);
 
@@ -155,9 +157,9 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
                 ((Timer) pHandback).addNotification("SubscriptionSchedule", "Please do the query", (Timer) pHandback,
                         nextSchedule);
 
-            } catch (ImplementationException e) {
+            } catch (ImplementationExceptionResponse e) {
                 String msg = "The next scheduled date for the subscribed query with ID '" + getSubscriptionID()
-                        + "' cannot be evaluated: " + e.getReason();
+                        + "' cannot be evaluated: " + e.getMessage();
                 LOG.error(msg, e);
             }
         }

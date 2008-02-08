@@ -27,14 +27,19 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
+ * TODO: Javadoc
+ * <p>
+ * TODO: Can we get rid of this class as we now use Hibernate?
+ * 
  * @author Sean Wellington
  */
 public class CaptureOperationsSession {
 
-    private static final Logger LOG = Logger.getLogger(CaptureOperationsSession.class);
+    private static final Log LOG = LogFactory.getLog(CaptureOperationsSession.class);
 
     private Connection connection;
 

@@ -26,15 +26,16 @@ import java.util.GregorianCalendar;
 import javax.management.Notification;
 import javax.management.timer.Timer;
 
-import org.accada.epcis.soapapi.ArrayOfString;
-import org.accada.epcis.soapapi.EPCISServiceBindingStub;
-import org.accada.epcis.soapapi.EPCglobalEPCISServiceLocator;
-import org.accada.epcis.soapapi.ImplementationException;
-import org.accada.epcis.soapapi.Poll;
-import org.accada.epcis.soapapi.QueryParam;
-import org.accada.epcis.soapapi.QueryResults;
-import org.apache.axis.types.URI;
-import org.apache.log4j.Logger;
+import org.accada.epcis.soap.EPCISServicePortType;
+import org.accada.epcis.soap.EPCglobalEPCISService;
+import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.model.ArrayOfString;
+import org.accada.epcis.soap.model.Poll;
+import org.accada.epcis.soap.model.QueryParam;
+import org.accada.epcis.soap.model.QueryParams;
+import org.accada.epcis.soap.model.QueryResults;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implementation of triggers. The Schedule checks every once in a while on the
@@ -48,14 +49,14 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
 
     private static final long serialVersionUID = 8922829364406110575L;
 
-    private static final Logger LOG = Logger.getLogger(QuerySubscriptionTriggered.class);
+    private static final Log LOG = LogFactory.getLog(QuerySubscriptionTriggered.class);
 
-    private URI trigger;
+    private String trigger;
 
-    public QuerySubscriptionTriggered(final String subscriptionID, final QueryParam[] queryParams, final URI dest,
+    public QuerySubscriptionTriggered(final String subscriptionID, final QueryParams queryParams, final String dest,
             final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
-            final GregorianCalendar lastTimeExecuted, final String queryName, final URI trigger,
-            final Schedule every10min) throws ImplementationException {
+            final GregorianCalendar lastTimeExecuted, final String queryName, final String trigger,
+            final Schedule every10min) throws ImplementationExceptionResponse {
         super(subscriptionID, queryParams, dest, reportIfEmpty, initialRecordTime, lastTimeExecuted, every10min,
               queryName);
         this.trigger = trigger;
@@ -80,18 +81,31 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
             try {
                 LOG.debug("Checking trigger condition ...");
                 String queryName = "SimpleEventQuery";
-                String[] epcs = { trigger.toString() };
-                QueryParam[] queryParam = {
-                        new QueryParam("MATCH_anyEPC", new ArrayOfString(epcs, null)),
-                        new QueryParam("GE_recordTime", initialRecordTime) };
+                QueryParams params = new QueryParams();
+
+                // add MATCH_anyEPC query param
+                QueryParam param = new QueryParam();
+                param.setName("MATCH_anyEPC");
+                ArrayOfString strings = new ArrayOfString();
+                strings.getString().add(trigger);
+                param.setValue(strings);
+                params.getParam().add(param);
+
+                // add GE_recordTime query param
+                param = new QueryParam();
+                param.setName("GE_recordTime");
+                param.setValue(initialRecordTime);
+                params.getParam().add(param);
 
                 // initialize the query service
-                EPCglobalEPCISServiceLocator queryLocator = new EPCglobalEPCISServiceLocator();
-                queryLocator.setEPCglobalEPCISServicePortEndpointAddress(queryUrl);
-                EPCISServiceBindingStub epcisQueryService = (EPCISServiceBindingStub) queryLocator.getEPCglobalEPCISServicePort();
+                EPCglobalEPCISService s = new EPCglobalEPCISService();
+                EPCISServicePortType epcisQueryService = s.getEPCglobalEPCISServicePort();
 
                 // send the query
-                QueryResults results = epcisQueryService.poll(new Poll(queryName, queryParam));
+                Poll poll = new Poll();
+                poll.setParams(params);
+                poll.setQueryName(queryName);
+                QueryResults results = epcisQueryService.poll(poll);
                 if (results.getResultsBody().getEventList() != null) {
                     LOG.debug("Trigger condition fulfilled!");
                     LOG.debug("Executing subscribed query associated with trigger event ...");
@@ -112,19 +126,11 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
                         + "' is '" + nextSchedule + "'.");
                 ((Timer) pHandback).addNotification("SubscriptionSchedule", "Please do the query", (Timer) pHandback,
                         nextSchedule);
-            } catch (ImplementationException e) {
+            } catch (ImplementationExceptionResponse e) {
                 String msg = "Next scheduled time for the subscribed query with ID '" + getSubscriptionID()
-                        + "' cannot be evaluated: " + e.getReason();
+                        + "' cannot be evaluated: " + e.getMessage();
                 LOG.error(msg, e);
             }
         }
     }
-
-    /**
-     * @return The trigger URI.
-     */
-    public URI getTrigger() {
-        return this.getTrigger();
-    }
-
 }

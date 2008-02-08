@@ -59,9 +59,8 @@ import org.accada.epcis.repository.model.ReadPointId;
 import org.accada.epcis.repository.model.TransactionEvent;
 import org.accada.epcis.repository.model.VocabularyElement;
 import org.accada.epcis.utils.TimeParser;
-import org.apache.axis.types.URI;
-import org.apache.axis.types.URI.MalformedURIException;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -83,22 +82,19 @@ import org.xml.sax.SAXException;
  */
 public class CaptureOperationsModule {
 
-	private static final Map<String, Class> m = new HashMap<String, Class>();
+    private static final Log LOG = LogFactory.getLog(CaptureOperationsModule.class);
 
-	static {
-    	m.put(Constants.BUSINESS_LOCATION_ID_VTYPE, BusinessLocationId.class);
-    	m.put(Constants.BUSINESS_STEP_ID_VTYPE, BusinessStepId.class);
-    	m.put(Constants.BUSINESS_TRANSACTION_VTYPE, BusinessTransactionId.class);
-    	m.put(Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE, BusinessTransactionTypeId.class);
-    	m.put(Constants.DISPOSITION_ID_VTYPE, DispositionId.class);
-    	m.put(Constants.EPC_CLASS_VTYPE, EPCClass.class);
-    	m.put(Constants.READ_POINT_ID_VTYPE, ReadPointId.class);
+    private static final Map<String, Class> m = new HashMap<String, Class>();
+
+    static {
+        m.put(Constants.BUSINESS_LOCATION_ID_VTYPE, BusinessLocationId.class);
+        m.put(Constants.BUSINESS_STEP_ID_VTYPE, BusinessStepId.class);
+        m.put(Constants.BUSINESS_TRANSACTION_VTYPE, BusinessTransactionId.class);
+        m.put(Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE, BusinessTransactionTypeId.class);
+        m.put(Constants.DISPOSITION_ID_VTYPE, DispositionId.class);
+        m.put(Constants.EPC_CLASS_VTYPE, EPCClass.class);
+        m.put(Constants.READ_POINT_ID_VTYPE, ReadPointId.class);
     }
-    
-    /**
-     * The log to write to.
-     */
-    private static final Logger LOG = Logger.getLogger(CaptureOperationsModule.class);
 
     /**
      * The XSD schema which validates the incoming messages.
@@ -125,72 +121,73 @@ public class CaptureOperationsModule {
      * Interface to the database.
      */
     private SessionFactory sessionFactory;
-    
-    
+
     /**
      * Resets the database.
-     * @throws SQLException If something goes wrong resetting the database.
-     * @throws IOException If something goes wrong reading the reset script.
-     * @throws UnsupportedOperationsException If database resets are not allowed.
+     * 
+     * @throws SQLException
+     *             If something goes wrong resetting the database.
+     * @throws IOException
+     *             If something goes wrong reading the reset script.
+     * @throws UnsupportedOperationsException
+     *             If database resets are not allowed.
      */
-    public void doDbReset() throws SQLException, IOException { 
-    	if (dbResetAllowed) {
+    public void doDbReset() throws SQLException, IOException {
+        if (dbResetAllowed) {
             Session session = null;
             try {
-            	session = sessionFactory.openSession();
-            	Transaction tx = null;
-            	try {
-            		tx = session.beginTransaction();
-            		Connection dbconnection = session.connection();
-            		LOG.info("Running db reset script.");
-            		Statement stmt = dbconnection.createStatement();
-            		if (dbResetScript != null) {
-            			BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
-            			String line;
-            			while ((line = reader.readLine()) != null) {
-            				stmt.addBatch(line);
-            			}
-            		}
-            		stmt.executeBatch();
-            		tx.commit();
-            	}
-            	catch (Exception e) {
-            		LOG.error("dbReset failed: " + e.toString(), e);
-            		tx.rollback();
-            		throw new SQLException(e.toString());
-            	}
+                session = sessionFactory.openSession();
+                Transaction tx = null;
+                try {
+                    tx = session.beginTransaction();
+                    Connection dbconnection = session.connection();
+                    LOG.info("Running db reset script.");
+                    Statement stmt = dbconnection.createStatement();
+                    if (dbResetScript != null) {
+                        BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            stmt.addBatch(line);
+                        }
+                    }
+                    stmt.executeBatch();
+                    tx.commit();
+                } catch (Exception e) {
+                    LOG.error("dbReset failed: " + e.toString(), e);
+                    tx.rollback();
+                    throw new SQLException(e.toString());
+                }
             } finally {
                 if (session != null) {
                     session.close();
                 }
             }
-    	}
-    	else {
-    		throw new UnsupportedOperationException();
-    	}
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
-    
+
     /**
      * Implements the EPCIS capture operation. Takes an input stream, extracts
      * the payload into an XML document, validates the document against the
      * EPCIS schema, and captures the EPCIS events given in the document.
+     * 
      * @throws IOException
      *             If an error occurred while validating the request or writing
      *             the response.
      * @throws ParserConfigurationException
-     * @throws MalformedURIException if a URI is malformed or invalid
-     * @throws SAXException If the XML document is malformed or invalid
+     * @throws SAXException
+     *             If the XML document is malformed or invalid
      */
-    
-    public void doCapture(InputStream in, Principal principal) throws 
-    SAXException, IOException, MalformedURIException {
 
-    	// parse the payload as XML document
-    	Document document;
-    	try {
+    public void doCapture(InputStream in, Principal principal) throws SAXException, IOException {
+
+        // parse the payload as XML document
+        Document document;
+        try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
-        	DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(in);
             LOG.debug("Payload successfully parsed as XML document.");
 
@@ -203,52 +200,52 @@ public class CaptureOperationsModule {
                 LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
             }
 
-        } catch (ParserConfigurationException e){
-        	throw new SAXException(e);
+        } catch (ParserConfigurationException e) {
+            throw new SAXException(e);
         }
-        
+
         // handle the capture operation
         Session session = null;
         try {
-        	session = sessionFactory.openSession();
-        	Transaction tx = null;
-        	try {
-        		tx = session.beginTransaction();
-        		LOG.debug("DB connection opened.");
-        		handleDocument(session, document);
-        		tx.commit();
-        		// return OK
-        		LOG.info("EPCIS Capture Interface request succeeded.");
-        	} catch (SAXException e) {
-        		LOG.error("EPCIS Capture Interface request failed: " + e.toString());
-        		tx.rollback();
-        		throw e;
-        	} catch (IOException e) {
-        		LOG.error("EPCIS Capture Interface request failed: " + e.toString());
-        		tx.rollback();
-        		throw e;
-        	} catch (Exception e) {
-        		// Hibernate throws RuntimeExceptions, so don't let them
-        		// (or anything else) escape without clean up
-        		LOG.error("EPCIS Capture Interface request failed: " + e.toString(), e);
-        		tx.rollback();
-        		throw new IOException(e.toString());
-        	}
+            session = sessionFactory.openSession();
+            Transaction tx = null;
+            try {
+                tx = session.beginTransaction();
+                LOG.debug("DB connection opened.");
+                handleDocument(session, document);
+                tx.commit();
+                // return OK
+                LOG.info("EPCIS Capture Interface request succeeded.");
+            } catch (SAXException e) {
+                LOG.error("EPCIS Capture Interface request failed: " + e.toString());
+                tx.rollback();
+                throw e;
+            } catch (IOException e) {
+                LOG.error("EPCIS Capture Interface request failed: " + e.toString());
+                tx.rollback();
+                throw e;
+            } catch (Exception e) {
+                // Hibernate throws RuntimeExceptions, so don't let them
+                // (or anything else) escape without clean up
+                LOG.error("EPCIS Capture Interface request failed: " + e.toString(), e);
+                tx.rollback();
+                throw new IOException(e.toString());
+            }
         } finally {
-        	if (session != null) {
-        		session.close();
-        	}
-        	sessionFactory.getStatistics().logSummary();
-        	LOG.debug("DB connection closed.");
+            if (session != null) {
+                session.close();
+            }
+            sessionFactory.getStatistics().logSummary();
+            LOG.debug("DB connection closed.");
         }
-        
+
     }
-    
+
     /**
      * Parses the entire document and handles the supplied events.
      * 
-     * @throws SAXException, IOException
-     *             If an error parsing the document occurred.
+     * @throws SAXException,
+     *             IOException If an error parsing the document occurred.
      */
     private void handleDocument(Session session, Document document) throws SAXException, IOException {
         NodeList eventList = document.getElementsByTagName("EventList");
@@ -260,13 +257,14 @@ public class CaptureOperationsModule {
             Node eventNode = events.item(i);
             String nodeName = eventNode.getNodeName();
 
-            if (nodeName.equals(Constants.OBJECT_EVENT) || nodeName.equals(Constants.AGGREGATION_EVENT) || nodeName.equals(Constants.QUANTITY_EVENT) || nodeName.equals(Constants.TRANSACTION_EVENT)) {
+            if (nodeName.equals(Constants.OBJECT_EVENT) || nodeName.equals(Constants.AGGREGATION_EVENT)
+                    || nodeName.equals(Constants.QUANTITY_EVENT) || nodeName.equals(Constants.TRANSACTION_EVENT)) {
                 LOG.debug("processing event " + i + ": '" + nodeName + "'.");
                 handleEvent(session, eventNode);
                 eventCount++;
                 if (eventCount % 50 == 0) {
-                	session.flush();
-                	session.clear();
+                    session.flush();
+                    session.clear();
                 }
             } else if (!nodeName.equals("#text") && !nodeName.equals("#comment")) {
                 throw new SAXException("Encountered unknown event '" + nodeName + "'.");
@@ -282,15 +280,14 @@ public class CaptureOperationsModule {
      * 
      * @param eventNode
      *            The current event node.
-     * @throws SAXException, IOException
-     *             If an error parsing the XML occurs.
+     * @throws SAXException,
+     *             IOException If an error parsing the XML occurs.
      */
     private void handleEvent(Session session, final Node eventNode) throws SAXException, IOException {
         if (eventNode != null && eventNode.getChildNodes().getLength() == 0) {
             throw new SAXException("Event element '" + eventNode.getNodeName() + "' has no children elements.");
         }
         Node curEventNode = null;
-
 
         // A lot of the initialized variables have type URI. This type isn't to
         // compare with the URI-Type of the standard. In fact, most of the
@@ -303,144 +300,142 @@ public class CaptureOperationsModule {
         String action = null;
         String parentId = null;
         Long quantity = null;
-        URI bizStepUri = null;
-        URI dispositionUri = null;
-        URI readPointUri = null;
-        URI bizLocationUri = null;
-        URI epcClassUri = null;
+        String bizStepUri = null;
+        String dispositionUri = null;
+        String readPointUri = null;
+        String bizLocationUri = null;
+        String epcClassUri = null;
 
         List<String> epcs = null;
         List<BusinessTransaction> bizTransList = null;
         List<EventFieldExtension> fieldNameExtList = new ArrayList<EventFieldExtension>();
 
-        try {
-            for (int i = 0; i < eventNode.getChildNodes().getLength(); i++) {
-                curEventNode = eventNode.getChildNodes().item(i);
-                String nodeName = curEventNode.getNodeName();
+        for (int i = 0; i < eventNode.getChildNodes().getLength(); i++) {
+            curEventNode = eventNode.getChildNodes().item(i);
+            String nodeName = curEventNode.getNodeName();
 
-                if (nodeName.equals("#text") || nodeName.equals("#comment")) {
-                    // ignore text or comments
-                    LOG.debug("  ignoring text or comment: '" + curEventNode.getTextContent().trim() + "'");
-                    continue;
+            if (nodeName.equals("#text") || nodeName.equals("#comment")) {
+                // ignore text or comments
+                LOG.debug("  ignoring text or comment: '" + curEventNode.getTextContent().trim() + "'");
+                continue;
+            }
+
+            LOG.debug("  handling event field: '" + nodeName + "'");
+            if (nodeName.equals("eventTime")) {
+                String xmlTime = curEventNode.getTextContent();
+                LOG.debug("    eventTime in xml is '" + xmlTime + "'");
+                try {
+                    eventTime = TimeParser.parseAsTimestamp(xmlTime);
+                } catch (ParseException e) {
+                    throw new SAXException("Invalid date/time (must be ISO8601).", e);
                 }
-
-                LOG.debug("  handling event field: '" + nodeName + "'");
-                if (nodeName.equals("eventTime")) {
-                    String xmlTime = curEventNode.getTextContent();
-                    LOG.debug("    eventTime in xml is '" + xmlTime + "'");
-                    try {
-                        eventTime = TimeParser.parseAsTimestamp(xmlTime);
-                    } catch (ParseException e) {
-                        throw new SAXException("Invalid date/time (must be ISO8601).", e);
-                    }
-                    LOG.debug("    eventTime parsed as '" + eventTime + "'");
-                } else if (nodeName.equals("recordTime")) { 
-                } else if (nodeName.equals("eventTimeZoneOffset")) {
-                    eventTimeZoneOffset = curEventNode.getTextContent();
-                } else if (nodeName.equals("epcList") || nodeName.equals("childEPCs")) {
-                    epcs = handleEpcs(curEventNode);
-                } else if (nodeName.equals("bizTransactionList")) {
-                    bizTransList = handleBizTransactions(session, curEventNode);
-                } else if (nodeName.equals("action")) {
-                    action = curEventNode.getTextContent();
-                    if (!action.equals("ADD") && !action.equals("OBSERVE") && !action.equals("DELETE")) {
-                        throw new SAXException("Encountered illegal 'action' value: " + action);
-                    }
-                } else if (nodeName.equals("bizStep")) {
-                    bizStepUri = new URI(curEventNode.getTextContent());
-                } else if (nodeName.equals("disposition")) {
-                    dispositionUri = new URI(curEventNode.getTextContent());
-                } else if (nodeName.equals("readPoint")) {
-                    Element attrElem = (Element) curEventNode;
-                    Node id = attrElem.getElementsByTagName("id").item(0);
-                    readPointUri = new URI(id.getTextContent());
-                } else if (nodeName.equals("bizLocation")) {
-                    Element attrElem = (Element) curEventNode;
-                    Node id = attrElem.getElementsByTagName("id").item(0);
-                    bizLocationUri = new URI(id.getTextContent());
-                } else if (nodeName.equals("epcClass")) {
-                    epcClassUri = new URI(curEventNode.getTextContent());
-                } else if (nodeName.equals("quantity")) {
-                    quantity = new Long(curEventNode.getTextContent());
-                } else if (nodeName.equals("parentID")) {
-                    parentId = curEventNode.getTextContent();
+                LOG.debug("    eventTime parsed as '" + eventTime + "'");
+            } else if (nodeName.equals("recordTime")) {
+            } else if (nodeName.equals("eventTimeZoneOffset")) {
+                eventTimeZoneOffset = curEventNode.getTextContent();
+            } else if (nodeName.equals("epcList") || nodeName.equals("childEPCs")) {
+                epcs = handleEpcs(curEventNode);
+            } else if (nodeName.equals("bizTransactionList")) {
+                bizTransList = handleBizTransactions(session, curEventNode);
+            } else if (nodeName.equals("action")) {
+                action = curEventNode.getTextContent();
+                if (!action.equals("ADD") && !action.equals("OBSERVE") && !action.equals("DELETE")) {
+                    throw new SAXException("Encountered illegal 'action' value: " + action);
+                }
+            } else if (nodeName.equals("bizStep")) {
+                bizStepUri = curEventNode.getTextContent();
+            } else if (nodeName.equals("disposition")) {
+                dispositionUri = curEventNode.getTextContent();
+            } else if (nodeName.equals("readPoint")) {
+                Element attrElem = (Element) curEventNode;
+                Node id = attrElem.getElementsByTagName("id").item(0);
+                readPointUri = id.getTextContent();
+            } else if (nodeName.equals("bizLocation")) {
+                Element attrElem = (Element) curEventNode;
+                Node id = attrElem.getElementsByTagName("id").item(0);
+                bizLocationUri = id.getTextContent();
+            } else if (nodeName.equals("epcClass")) {
+                epcClassUri = curEventNode.getTextContent();
+            } else if (nodeName.equals("quantity")) {
+                quantity = new Long(curEventNode.getTextContent());
+            } else if (nodeName.equals("parentID")) {
+                parentId = curEventNode.getTextContent();
+            } else {
+                String[] parts = nodeName.split(":");
+                if (parts.length == 2) {
+                    LOG.debug("    treating unknown event field as extension.");
+                    String prefix = parts[0];
+                    String localname = parts[1];
+                    // String namespace =
+                    // document.getDocumentElement().getAttribute("xmlns:" +
+                    // prefix);
+                    String namespace = curEventNode.lookupNamespaceURI(prefix);
+                    String value = curEventNode.getTextContent();
+                    EventFieldExtension evf = new EventFieldExtension(prefix, namespace, localname, value);
+                    fieldNameExtList.add(evf);
                 } else {
-                    String[] parts = nodeName.split(":");
-                    if (parts.length == 2) {
-                        LOG.debug("    treating unknown event field as extension.");
-                        String prefix = parts[0];
-                        String localname = parts[1];
-                        // String namespace = document.getDocumentElement().getAttribute("xmlns:" + prefix);
-                        String namespace = curEventNode.lookupNamespaceURI(prefix);
-                        String value = curEventNode.getTextContent();
-                        EventFieldExtension evf = new EventFieldExtension(prefix, namespace, localname, value);
-                        fieldNameExtList.add(evf);
-                    } else {
-                        // this is not a valid extension
-                        throw new SAXException("    encountered unknown event field: '" + nodeName + "'.");
-                    }
+                    // this is not a valid extension
+                    throw new SAXException("    encountered unknown event field: '" + nodeName + "'.");
                 }
             }
-        } catch (MalformedURIException e) {
-            throw new SAXException(
-                    "  event field '" + curEventNode.getNodeName() + "' is not of type URI: " + curEventNode.getTextContent(),
-                    e);
         }
 
         String nodeName = eventNode.getNodeName();
-		VocabularyElement bizStep = bizStepUri != null ? getOrInsertVocabularyElement(session, Constants.BUSINESS_STEP_ID_VTYPE, String.valueOf(bizStepUri)) : null;
-		VocabularyElement disposition = dispositionUri != null ? getOrInsertVocabularyElement(session, Constants.DISPOSITION_ID_VTYPE, String.valueOf(dispositionUri)) : null;
-		VocabularyElement readPoint = readPointUri != null ? getOrInsertVocabularyElement(session, Constants.READ_POINT_ID_VTYPE, String.valueOf(readPointUri)) : null;
-		VocabularyElement bizLocation = bizLocationUri != null ? getOrInsertVocabularyElement(session, Constants.BUSINESS_LOCATION_ID_VTYPE, String.valueOf(bizLocationUri)) : null;
-		VocabularyElement epcClass = epcClassUri != null ? getOrInsertVocabularyElement(session, Constants.EPC_CLASS_VTYPE, String.valueOf(epcClassUri)) : null;
+        VocabularyElement bizStep = bizStepUri != null ? getOrInsertVocabularyElement(session,
+                Constants.BUSINESS_STEP_ID_VTYPE, String.valueOf(bizStepUri)) : null;
+        VocabularyElement disposition = dispositionUri != null ? getOrInsertVocabularyElement(session,
+                Constants.DISPOSITION_ID_VTYPE, String.valueOf(dispositionUri)) : null;
+        VocabularyElement readPoint = readPointUri != null ? getOrInsertVocabularyElement(session,
+                Constants.READ_POINT_ID_VTYPE, String.valueOf(readPointUri)) : null;
+        VocabularyElement bizLocation = bizLocationUri != null ? getOrInsertVocabularyElement(session,
+                Constants.BUSINESS_LOCATION_ID_VTYPE, String.valueOf(bizLocationUri)) : null;
+        VocabularyElement epcClass = epcClassUri != null ? getOrInsertVocabularyElement(session,
+                Constants.EPC_CLASS_VTYPE, String.valueOf(epcClassUri)) : null;
 
-		BaseEvent be;
+        BaseEvent be;
         if (nodeName.equals(Constants.AGGREGATION_EVENT)) {
-        	AggregationEvent ae = new AggregationEvent();
-        	ae.setParentId(parentId);
-        	ae.setChildEpcs(epcs);
-        	ae.setAction(Action.valueOf(action));
-        	be = ae;
+            AggregationEvent ae = new AggregationEvent();
+            ae.setParentId(parentId);
+            ae.setChildEpcs(epcs);
+            ae.setAction(Action.valueOf(action));
+            be = ae;
         } else if (nodeName.equals(Constants.OBJECT_EVENT)) {
-        	ObjectEvent oe = new ObjectEvent();
-        	oe.setAction(Action.valueOf(action));
-        	if (epcs != null && epcs.size() > 0) {
-        		oe.setEpcList(epcs);
-        	}
-        	be = oe;
+            ObjectEvent oe = new ObjectEvent();
+            oe.setAction(Action.valueOf(action));
+            if (epcs != null && epcs.size() > 0) {
+                oe.setEpcList(epcs);
+            }
+            be = oe;
         } else if (nodeName.equals(Constants.QUANTITY_EVENT)) {
-        	QuantityEvent qe = new QuantityEvent();
-        	qe.setEpcClass((EPCClass)epcClass);
-        	qe.setQuantity(quantity);
-        	be = qe;
+            QuantityEvent qe = new QuantityEvent();
+            qe.setEpcClass((EPCClass) epcClass);
+            qe.setQuantity(quantity);
+            be = qe;
         } else if (nodeName.equals(Constants.TRANSACTION_EVENT)) {
-        	TransactionEvent te = new TransactionEvent();
-        	te.setParentId(parentId);
-        	te.setEpcList(epcs);
-        	te.setAction(Action.valueOf(action));
-        	be = te;
+            TransactionEvent te = new TransactionEvent();
+            te.setParentId(parentId);
+            te.setEpcList(epcs);
+            te.setAction(Action.valueOf(action));
+            be = te;
         } else {
-        	throw new SAXException("Encountered unknown event element '" + nodeName + "'.");
+            throw new SAXException("Encountered unknown event element '" + nodeName + "'.");
         }
-        
-    	be.setEventTime(eventTime);
-    	be.setRecordTime(recordTime);
-    	be.setEventTimeZoneOffset(eventTimeZoneOffset);
-    	be.setBizStep((BusinessStepId)bizStep);
-    	be.setDisposition((DispositionId)disposition);
-    	be.setBizLocation((BusinessLocationId)bizLocation);
-    	be.setReadPoint((ReadPointId)readPoint);
-    	if (bizTransList != null && bizTransList.size() > 0) {
-    		be.setBizTransList(bizTransList);
-    	}
+
+        be.setEventTime(eventTime);
+        be.setRecordTime(recordTime);
+        be.setEventTimeZoneOffset(eventTimeZoneOffset);
+        be.setBizStep((BusinessStepId) bizStep);
+        be.setDisposition((DispositionId) disposition);
+        be.setBizLocation((BusinessLocationId) bizLocation);
+        be.setReadPoint((ReadPointId) readPoint);
+        if (bizTransList != null && bizTransList.size() > 0) {
+            be.setBizTransList(bizTransList);
+        }
         if (!fieldNameExtList.isEmpty()) {
-        	be.setExtensions(fieldNameExtList);
+            be.setExtensions(fieldNameExtList);
         }
 
-    	session.save(be);
-
-
-
+        session.save(be);
 
     }
 
@@ -449,19 +444,18 @@ public class CaptureOperationsModule {
      * 
      * @param epcNode
      *            The parent Node from which EPC URIs should be extracted.
-     * @return An array of vocabularies containing all the URIs found in the given node.
-     * @throws MalformedURIException
-     *             If a string is not parsable as URI.
+     * @return An array of vocabularies containing all the URIs found in the
+     *         given node.
      * @throws SAXException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private List<String> handleEpcs(final Node epcNode) throws MalformedURIException, SAXException {
+    private List<String> handleEpcs(final Node epcNode) throws SAXException {
         List<String> epcList = new ArrayList<String>();
 
         for (int i = 0; i < epcNode.getChildNodes().getLength(); i++) {
             Node curNode = epcNode.getChildNodes().item(i);
             if (curNode.getNodeName().equals("epc")) {
-                epcList.add(new URI(curNode.getTextContent()).toString());
+                epcList.add(curNode.getTextContent());
             } else {
                 if (curNode.getNodeName() != "#text" && curNode.getNodeName() != "#comment") {
                     throw new SAXException("Unknown XML tag: " + curNode.getNodeName(), null);
@@ -479,37 +473,36 @@ public class CaptureOperationsModule {
      *            The parent Node from which BizTransaction URIs should be
      *            extracted.
      * @return A List of BizTransaction.
-     * @throws MalformedURIException
-     *             If a string is not parsable as URI.
      * @throws SAXException
      *             If an unknown tag (no &lt;epc&gt;) is encountered.
      */
-    private List<BusinessTransaction> handleBizTransactions(Session session, Node bizNode) throws MalformedURIException,
-            SAXException {
+    private List<BusinessTransaction> handleBizTransactions(Session session, Node bizNode) throws SAXException {
         List<BusinessTransaction> bizTransactionList = new ArrayList<BusinessTransaction>();
 
         for (int i = 0; i < bizNode.getChildNodes().getLength(); i++) {
             Node curNode = bizNode.getChildNodes().item(i);
             if (curNode.getNodeName().equals("bizTransaction")) {
-                URI bizTransTypeUri = new URI(curNode.getAttributes().item(0).getTextContent());
-                URI bizTransUri = new URI(curNode.getTextContent());
-                BusinessTransactionId bizTrans = (BusinessTransactionId)getOrInsertVocabularyElement(session, Constants.BUSINESS_TRANSACTION_VTYPE, bizTransUri.toString()); 
-                BusinessTransactionTypeId type = (BusinessTransactionTypeId)getOrInsertVocabularyElement(session, Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE, bizTransTypeUri.toString());
+                String bizTransTypeUri = curNode.getAttributes().item(0).getTextContent();
+                String bizTransUri = curNode.getTextContent();
+                BusinessTransactionId bizTrans = (BusinessTransactionId) getOrInsertVocabularyElement(session,
+                        Constants.BUSINESS_TRANSACTION_VTYPE, bizTransUri.toString());
+                BusinessTransactionTypeId type = (BusinessTransactionTypeId) getOrInsertVocabularyElement(session,
+                        Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE, bizTransTypeUri.toString());
 
                 Criteria c0 = session.createCriteria(BusinessTransaction.class);
                 c0.add(Restrictions.eq("bizTransaction", bizTrans));
                 c0.add(Restrictions.eq("type", type));
-                BusinessTransaction bizTransaction = (BusinessTransaction)c0.uniqueResult();
+                BusinessTransaction bizTransaction = (BusinessTransaction) c0.uniqueResult();
 
                 if (bizTransaction == null) {
-                	bizTransaction = new BusinessTransaction();
-	                bizTransaction.setBizTransaction(bizTrans);
-	                bizTransaction.setType(type);
-	                session.save(bizTransaction);
+                    bizTransaction = new BusinessTransaction();
+                    bizTransaction.setBizTransaction(bizTrans);
+                    bizTransaction.setType(type);
+                    session.save(bizTransaction);
                 }
-                
+
                 bizTransactionList.add(bizTransaction);
-                
+
             } else {
                 if (!curNode.getNodeName().equals("#text") && !curNode.getNodeName().equals("#comment")) {
                     throw new SAXException("Unknown XML tag: " + curNode.getNodeName(), null);
@@ -528,58 +521,56 @@ public class CaptureOperationsModule {
      * @param tableName
      *            The name of the vocabulary table.
      * @param uri
-     *            The vocabulary adapting the URI to be inserted into the vocabulary
-     *            table.
+     *            The vocabulary adapting the URI to be inserted into the
+     *            vocabulary table.
      * @return The ID of an already existing vocabulary table with the given
      *         uri.
-     * @throws UnsupportedOperationException 
+     * @throws UnsupportedOperationException
      *             If we are not allowed to insert a missing vocabulary.
      */
-    public VocabularyElement getOrInsertVocabularyElement(Session session, String vocabularyType, 
-    		String vocabularyElement) throws SAXException {
-    	Class c = m.get(vocabularyType);
-    	Criteria c0 = session.createCriteria(c);
-    	c0.setCacheable(true);
-    	c0.add(Restrictions.eq("uri", vocabularyElement));
-    	VocabularyElement ve = (VocabularyElement)c0.uniqueResult();
-    	if (ve == null) {
-	        // the uri does not yet exist: insert it if allowed. According to
-	        // the specs, some vocabulary is not allowed to be extended; this is
-	        // currently ignored here
-    		if (!insertMissingVoc) {
-    			throw new UnsupportedOperationException("Not allowed to add new vocabulary - use " + 
-    			"existing vocabulary");
-    		} else {
-    			// VocabularyElement subclasses should always have public
-    			// zero-arg constructor to avoid problems here
-    			try {
-    				ve = (VocabularyElement)c.newInstance();
-    			}
-    			catch (InstantiationException e) {
-    				throw new RuntimeException(e);
-    			}
-    			catch (IllegalAccessException e) {
-    				throw new RuntimeException(e);
-    			}
+    public VocabularyElement getOrInsertVocabularyElement(Session session, String vocabularyType,
+            String vocabularyElement) throws SAXException {
+        Class c = m.get(vocabularyType);
+        Criteria c0 = session.createCriteria(c);
+        c0.setCacheable(true);
+        c0.add(Restrictions.eq("uri", vocabularyElement));
+        VocabularyElement ve = (VocabularyElement) c0.uniqueResult();
+        if (ve == null) {
+            // the uri does not yet exist: insert it if allowed. According to
+            // the specs, some vocabulary is not allowed to be extended; this is
+            // currently ignored here
+            if (!insertMissingVoc) {
+                throw new UnsupportedOperationException("Not allowed to add new vocabulary - use "
+                        + "existing vocabulary");
+            } else {
+                // VocabularyElement subclasses should always have public
+                // zero-arg constructor to avoid problems here
+                try {
+                    ve = (VocabularyElement) c.newInstance();
+                } catch (InstantiationException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
 
-    			ve.setUri(vocabularyElement);
-    			session.save(ve);
-    			session.flush();
+                ve.setUri(vocabularyElement);
+                session.save(ve);
+                session.flush();
 
-    		}
-    	}
-    	return ve;
+            }
+        }
+        return ve;
     }
-    
+
     public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
+        return sessionFactory;
+    }
 
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
-	public boolean isDbResetAllowed() {
+    public boolean isDbResetAllowed() {
         return dbResetAllowed;
     }
 

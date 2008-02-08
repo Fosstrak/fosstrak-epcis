@@ -36,9 +36,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.accada.epcis.soapapi.BusinessTransactionType;
-import org.apache.axis.types.URI;
-import org.apache.log4j.Logger;
+import org.accada.epcis.repository.model.EventFieldExtension;
+import org.accada.epcis.soap.model.BusinessTransactionType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The CaptureOperationsBackend provides persistence functionality for the
@@ -46,6 +47,8 @@ import org.apache.log4j.Logger;
  * EPCIS events to the underlying database. A CaptureOperationsSession object
  * which wraps the JDBC Connection is required to be passed into each of the
  * methods in this class.
+ * <p>
+ * TODO: Can we get rid of this class as we now use Hibernate?
  * 
  * @author Alain Remund
  * @author Marco Steybe
@@ -53,7 +56,7 @@ import org.apache.log4j.Logger;
  */
 public class CaptureOperationsBackend {
 
-    private static final Logger LOG = Logger.getLogger(CaptureOperationsBackend.class);
+    private static final Log LOG = LogFactory.getLog(CaptureOperationsBackend.class);
 
     /**
      * The ObjectEvent-query without data.
@@ -484,7 +487,7 @@ public class CaptureOperationsBackend {
             rs = ps.executeQuery();
             if (rs.next()) {
                 // the uri already exists
-                return rs.getLong("id");
+                return Long.valueOf(rs.getLong("id"));
             } else {
                 return null;
             }
@@ -639,13 +642,13 @@ public class CaptureOperationsBackend {
         }
     }
 
-    private long getOrInsertBizTransaction(final CaptureOperationsSession session, final URI bizTrans,
-            final URI bizTransType) throws SQLException {
-        Long bizTransactionId = getBusinessTransaction(session, String.valueOf(bizTrans), String.valueOf(bizTransType));
+    private long getOrInsertBizTransaction(final CaptureOperationsSession session, final String bizTrans,
+            final String bizTransType) throws SQLException {
+        Long bizTransactionId = getBusinessTransaction(session, bizTrans, bizTransType);
         if (bizTransactionId != null) {
             return bizTransactionId;
         } else {
-            return insertBusinessTransaction(session, String.valueOf(bizTrans), String.valueOf(bizTransType));
+            return insertBusinessTransaction(session, bizTrans, bizTransType);
         }
     }
 

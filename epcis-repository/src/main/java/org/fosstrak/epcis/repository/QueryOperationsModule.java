@@ -38,63 +38,89 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.accada.epcis.soapapi.ActionType;
-import org.accada.epcis.soapapi.AggregationEventType;
-import org.accada.epcis.soapapi.ArrayOfString;
-import org.accada.epcis.soapapi.AttributeType;
-import org.accada.epcis.soapapi.BusinessLocationType;
-import org.accada.epcis.soapapi.BusinessTransactionType;
-import org.accada.epcis.soapapi.DuplicateSubscriptionException;
-import org.accada.epcis.soapapi.EPC;
-import org.accada.epcis.soapapi.EPCISServicePortType;
-import org.accada.epcis.soapapi.EmptyParms;
-import org.accada.epcis.soapapi.EventListType;
-import org.accada.epcis.soapapi.GetSubscriptionIDs;
-import org.accada.epcis.soapapi.ImplementationException;
-import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
-import org.accada.epcis.soapapi.InvalidURIException;
-import org.accada.epcis.soapapi.NoSuchNameException;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
-import org.accada.epcis.soapapi.ObjectEventType;
-import org.accada.epcis.soapapi.Poll;
-import org.accada.epcis.soapapi.QuantityEventType;
-import org.accada.epcis.soapapi.QueryParam;
-import org.accada.epcis.soapapi.QueryParameterException;
-import org.accada.epcis.soapapi.QueryResults;
-import org.accada.epcis.soapapi.QueryResultsBody;
-import org.accada.epcis.soapapi.QuerySchedule;
-import org.accada.epcis.soapapi.QueryTooComplexException;
-import org.accada.epcis.soapapi.QueryTooLargeException;
-import org.accada.epcis.soapapi.ReadPointType;
-import org.accada.epcis.soapapi.Subscribe;
-import org.accada.epcis.soapapi.SubscribeNotPermittedException;
-import org.accada.epcis.soapapi.SubscriptionControls;
-import org.accada.epcis.soapapi.SubscriptionControlsException;
-import org.accada.epcis.soapapi.TransactionEventType;
-import org.accada.epcis.soapapi.Unsubscribe;
-import org.accada.epcis.soapapi.ValidationException;
-import org.accada.epcis.soapapi.VocabularyElementType;
-import org.accada.epcis.soapapi.VocabularyType;
-import org.accada.epcis.soapapi.VoidHolder;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+
+import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
+import org.accada.epcis.soap.EPCISServicePortType;
+import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.InvalidURIExceptionResponse;
+import org.accada.epcis.soap.NoSuchNameExceptionResponse;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
+import org.accada.epcis.soap.QueryParameterExceptionResponse;
+import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
+import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.SecurityExceptionResponse;
+import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
+import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
+import org.accada.epcis.soap.ValidationExceptionResponse;
+import org.accada.epcis.soap.model.ActionType;
+import org.accada.epcis.soap.model.AggregationEventType;
+import org.accada.epcis.soap.model.ArrayOfString;
+import org.accada.epcis.soap.model.AttributeType;
+import org.accada.epcis.soap.model.BusinessLocationType;
+import org.accada.epcis.soap.model.BusinessTransactionListType;
+import org.accada.epcis.soap.model.BusinessTransactionType;
+import org.accada.epcis.soap.model.DuplicateSubscriptionException;
+import org.accada.epcis.soap.model.EPC;
+import org.accada.epcis.soap.model.EPCListType;
+import org.accada.epcis.soap.model.EmptyParms;
+import org.accada.epcis.soap.model.EventListType;
+import org.accada.epcis.soap.model.GetSubscriptionIDs;
+import org.accada.epcis.soap.model.IDListType;
+import org.accada.epcis.soap.model.ImplementationException;
+import org.accada.epcis.soap.model.ImplementationExceptionSeverity;
+import org.accada.epcis.soap.model.InvalidURIException;
+import org.accada.epcis.soap.model.NoSuchNameException;
+import org.accada.epcis.soap.model.NoSuchSubscriptionException;
+import org.accada.epcis.soap.model.ObjectEventType;
+import org.accada.epcis.soap.model.Poll;
+import org.accada.epcis.soap.model.QuantityEventType;
+import org.accada.epcis.soap.model.QueryParam;
+import org.accada.epcis.soap.model.QueryParameterException;
+import org.accada.epcis.soap.model.QueryParams;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.soap.model.QueryResultsBody;
+import org.accada.epcis.soap.model.QuerySchedule;
+import org.accada.epcis.soap.model.QueryTooComplexException;
+import org.accada.epcis.soap.model.QueryTooLargeException;
+import org.accada.epcis.soap.model.ReadPointType;
+import org.accada.epcis.soap.model.Subscribe;
+import org.accada.epcis.soap.model.SubscribeNotPermittedException;
+import org.accada.epcis.soap.model.SubscriptionControls;
+import org.accada.epcis.soap.model.SubscriptionControlsException;
+import org.accada.epcis.soap.model.TransactionEventType;
+import org.accada.epcis.soap.model.Unsubscribe;
+import org.accada.epcis.soap.model.ValidationException;
+import org.accada.epcis.soap.model.VocabularyElementListType;
+import org.accada.epcis.soap.model.VocabularyElementType;
+import org.accada.epcis.soap.model.VocabularyListType;
+import org.accada.epcis.soap.model.VocabularyType;
+import org.accada.epcis.soap.model.VoidHolder;
 import org.accada.epcis.utils.TimeParser;
-import org.apache.axis.MessageContext;
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.Text;
-import org.apache.axis.types.URI;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.dom.DOMElement;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * EPCIS Query Operations Module implementing the SOAP/HTTP binding of the Query
@@ -108,7 +134,7 @@ import org.apache.log4j.Logger;
  */
 public class QueryOperationsModule implements EPCISServicePortType {
 
-    private static final Logger LOG = Logger.getLogger(QueryOperationsModule.class);
+    private static final Log LOG = LogFactory.getLog(QueryOperationsModule.class);
 
     /**
      * The version of the standard that this service is implementing.
@@ -123,87 +149,104 @@ public class QueryOperationsModule implements EPCISServicePortType {
     private static final String VDR_VERSION = "";
 
     /**
+     * The database dependent identifier quotation sign.
+     * <p>
+     * TODO: We should not use this delimiter to quote everything. Usually,
+     * delimited identifiers are used when the user needs to use an SQL reserved
+     * word as an identifier (e.g., a table column name called 'type').
+     */
+    private static final String delimiter = "`";
+
+    /**
      * Basic SQL query string for transaction events.
      */
-    private static final String transactionEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
-            + "`event_TransactionEvent`.id, eventTime, recordTime, "
-            + "eventTimeZoneOffset, action, parentID, "
-            + "`voc_BizStep`.uri AS bizStep, "
-            + "`voc_Disposition`.uri AS disposition, "
-            + "`voc_ReadPoint`.uri AS readPoint, "
-            + "`voc_BizLoc`.uri AS bizLocation "
-            + "FROM `event_TransactionEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_TransactionEvent`.bizStep = `voc_BizStep`.id "
-            + "LEFT JOIN `voc_Disposition` ON `event_TransactionEvent`.disposition = `voc_Disposition`.id "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_TransactionEvent`.readPoint = `voc_ReadPoint`.id "
-            + "LEFT JOIN `voc_BizLoc` ON `event_TransactionEvent`.bizLocation = `voc_BizLoc`.id "
-            + "LEFT JOIN `event_TransactionEvent_extensions` ON `event_TransactionEvent`.id = `event_TransactionEvent_extensions`.event_id "
-            + "WHERE 1 ";
+    private static final String transactionEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT " + delimiter
+            + "event_TransactionEvent" + delimiter
+            + ".id, eventTime, recordTime, eventTimeZoneOffset, action, parentID, " + delimiter + "voc_BizStep"
+            + delimiter + ".uri AS bizStep, " + delimiter + "voc_Disposition" + delimiter + ".uri AS disposition, "
+            + delimiter + "voc_ReadPoint" + delimiter + ".uri AS readPoint, " + delimiter + "voc_BizLoc" + delimiter
+            + ".uri AS bizLocation " + "FROM " + delimiter + "event_TransactionEvent" + delimiter + " LEFT JOIN "
+            + delimiter + "voc_BizStep" + delimiter + " ON " + delimiter + "event_TransactionEvent" + delimiter
+            + ".bizStep = " + delimiter + "voc_BizStep" + delimiter + ".id " + "LEFT JOIN " + delimiter
+            + "voc_Disposition" + delimiter + " ON " + delimiter + "event_TransactionEvent" + delimiter
+            + ".disposition = " + delimiter + "voc_Disposition" + delimiter + ".id " + "LEFT JOIN " + delimiter
+            + "voc_ReadPoint" + delimiter + " ON " + delimiter + "event_TransactionEvent" + delimiter + ".readPoint = "
+            + delimiter + "voc_ReadPoint" + delimiter + ".id " + "LEFT JOIN " + delimiter + "voc_BizLoc" + delimiter
+            + " ON " + delimiter + "event_TransactionEvent" + delimiter + ".bizLocation = " + delimiter + "voc_BizLoc"
+            + delimiter + ".id " + "LEFT JOIN " + delimiter + "event_TransactionEvent_extensions" + delimiter + " ON "
+            + delimiter + "event_TransactionEvent" + delimiter + ".id = " + delimiter
+            + "event_TransactionEvent_extensions" + delimiter + ".event_id " + "WHERE 1 ";
 
     /**
      * Basic SQL query string for quantity events.
      */
-    private static final String quantityEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
-            + "`event_QuantityEvent`.id, eventTime, recordTime, eventTimeZoneOffset, "
-            + "`voc_EPCClass`.uri AS epcClass, quantity, "
-            + "`voc_BizStep`.uri AS bizStep, "
-            + "`voc_Disposition`.uri AS disposition, "
-            + "`voc_ReadPoint`.uri AS readPoint, "
-            + "`voc_BizLoc`.uri AS bizLocation "
-            + "FROM `event_QuantityEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_QuantityEvent`.bizStep = `voc_BizStep`.id "
-            + "LEFT JOIN `voc_Disposition` ON `event_QuantityEvent`.disposition = `voc_Disposition`.id "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_QuantityEvent`.readPoint = `voc_ReadPoint`.id "
-            + "LEFT JOIN `voc_BizLoc` ON `event_QuantityEvent`.bizLocation = `voc_BizLoc`.id "
-            + "LEFT JOIN `voc_EPCClass` ON `event_QuantityEvent`.epcClass = `voc_EPCClass`.id "
-            + "LEFT JOIN `event_QuantityEvent_extensions` ON `event_QuantityEvent`.id = `event_QuantityEvent_extensions`.event_id "
-            + "WHERE 1 ";
+    private static final String quantityEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT " + delimiter
+            + "event_QuantityEvent" + delimiter + ".id, eventTime, recordTime, eventTimeZoneOffset, " + delimiter
+            + "voc_EPCClass" + delimiter + ".uri AS epcClass, quantity, " + delimiter + "voc_BizStep" + delimiter
+            + ".uri AS bizStep, " + delimiter + "voc_Disposition" + delimiter + ".uri AS disposition, " + delimiter
+            + "voc_ReadPoint" + delimiter + ".uri AS readPoint, " + delimiter + "voc_BizLoc" + delimiter
+            + ".uri AS bizLocation " + "FROM " + delimiter + "event_QuantityEvent" + delimiter + " LEFT JOIN "
+            + delimiter + "voc_BizStep" + delimiter + " ON " + delimiter + "event_QuantityEvent" + delimiter
+            + ".bizStep = " + delimiter + "voc_BizStep" + delimiter + ".id " + "LEFT JOIN " + delimiter
+            + "voc_Disposition" + delimiter + " ON " + delimiter + "event_QuantityEvent" + delimiter
+            + ".disposition = " + delimiter + "voc_Disposition" + delimiter + ".id " + "LEFT JOIN " + delimiter
+            + "voc_ReadPoint" + delimiter + " ON " + delimiter + "event_QuantityEvent" + delimiter + ".readPoint = "
+            + delimiter + "voc_ReadPoint" + delimiter + ".id " + "LEFT JOIN " + delimiter + "voc_BizLoc" + delimiter
+            + " ON " + delimiter + "event_QuantityEvent" + delimiter + ".bizLocation = " + delimiter + "voc_BizLoc"
+            + delimiter + ".id " + "LEFT JOIN " + delimiter + "voc_EPCClass" + delimiter + " ON " + delimiter
+            + "event_QuantityEvent" + delimiter + ".epcClass = " + delimiter + "voc_EPCClass" + delimiter + ".id "
+            + "LEFT JOIN " + delimiter + "event_QuantityEvent_extensions" + delimiter + " ON " + delimiter
+            + "event_QuantityEvent" + delimiter + ".id = " + delimiter + "event_QuantityEvent_extensions" + delimiter
+            + ".event_id " + "WHERE 1 ";
 
     /**
      * Basic SQL query string for aggregation events.
      */
-    private static final String aggregationEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
-            + "`event_AggregationEvent`.id, eventTime, recordTime, "
-            + "eventTimeZoneOffset, parentID, action, "
-            + "`voc_BizStep`.uri AS bizStep, "
-            + "`voc_Disposition`.uri AS disposition, "
-            + "`voc_ReadPoint`.uri AS readPoint, "
-            + "`voc_BizLoc`.uri AS bizLocation "
-            + "FROM `event_AggregationEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_AggregationEvent`.bizStep = `voc_BizStep`.id "
-            + "LEFT JOIN `voc_Disposition` ON `event_AggregationEvent`.disposition  = `voc_Disposition`.id "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_AggregationEvent`.readPoint = `voc_ReadPoint`.id "
-            + "LEFT JOIN `voc_BizLoc` ON `event_AggregationEvent`.bizLocation = `voc_BizLoc`.id "
-            + "LEFT JOIN `event_AggregationEvent_extensions` ON `event_AggregationEvent`.id = `event_AggregationEvent_extensions`.event_id "
-            + "WHERE 1 ";
+    private static final String aggregationEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT " + delimiter
+            + "event_AggregationEvent" + delimiter
+            + ".id, eventTime, recordTime, eventTimeZoneOffset, parentID, action, " + delimiter + "voc_BizStep"
+            + delimiter + ".uri AS bizStep, " + delimiter + "voc_Disposition" + delimiter + ".uri AS disposition, "
+            + delimiter + "voc_ReadPoint" + delimiter + ".uri AS readPoint, " + delimiter + "voc_BizLoc" + delimiter
+            + ".uri AS bizLocation " + "FROM " + delimiter + "event_AggregationEvent" + delimiter + " LEFT JOIN "
+            + delimiter + "voc_BizStep" + delimiter + " ON " + delimiter + "event_AggregationEvent" + delimiter
+            + ".bizStep = " + delimiter + "voc_BizStep" + delimiter + ".id " + "LEFT JOIN " + delimiter
+            + "voc_Disposition" + delimiter + " ON " + delimiter + "event_AggregationEvent" + delimiter
+            + ".disposition  = " + delimiter + "voc_Disposition" + delimiter + ".id " + "LEFT JOIN " + delimiter
+            + "voc_ReadPoint" + delimiter + " ON " + delimiter + "event_AggregationEvent" + delimiter + ".readPoint = "
+            + delimiter + "voc_ReadPoint" + delimiter + ".id " + "LEFT JOIN " + delimiter + "voc_BizLoc" + delimiter
+            + " ON " + delimiter + "event_AggregationEvent" + delimiter + ".bizLocation = " + delimiter + "voc_BizLoc"
+            + delimiter + ".id " + "LEFT JOIN " + delimiter + "event_AggregationEvent_extensions" + delimiter + " ON "
+            + delimiter + "event_AggregationEvent" + delimiter + ".id = " + delimiter
+            + "event_AggregationEvent_extensions" + delimiter + ".event_id " + "WHERE 1 ";
 
     /**
      * Basic SQL query string for object events.
      */
-    private static final String objectEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT "
-            + "`event_ObjectEvent`.id, eventTime, recordTime, "
-            + "eventTimeZoneOffset, action, "
-            + "`voc_BizStep`.uri AS bizStep, "
-            + "`voc_Disposition`.uri AS disposition, "
-            + "`voc_ReadPoint`.uri AS readPoint, "
-            + "`voc_BizLoc`.uri AS bizLocation "
-            + "FROM `event_ObjectEvent` "
-            + "LEFT JOIN `voc_BizStep` ON `event_ObjectEvent`.bizStep = `voc_BizStep`.id "
-            + "LEFT JOIN `voc_Disposition` ON `event_ObjectEvent`.disposition = `voc_Disposition`.id "
-            + "LEFT JOIN `voc_ReadPoint` ON `event_ObjectEvent`.readPoint = `voc_ReadPoint`.id "
-            + "LEFT JOIN `voc_BizLoc` ON `event_ObjectEvent`.bizLocation = `voc_BizLoc`.id "
-            + "LEFT JOIN `event_ObjectEvent_extensions` ON `event_ObjectEvent`.id = `event_ObjectEvent_extensions`.event_id "
-            + "WHERE 1";
+    private static final String objectEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT " + delimiter
+            + "event_ObjectEvent" + delimiter + ".id, eventTime, recordTime, eventTimeZoneOffset, action, " + delimiter
+            + "voc_BizStep" + delimiter + ".uri AS bizStep, " + delimiter + "voc_Disposition" + delimiter
+            + ".uri AS disposition, " + delimiter + "voc_ReadPoint" + delimiter + ".uri AS readPoint, " + delimiter
+            + "voc_BizLoc" + delimiter + ".uri AS bizLocation " + "FROM " + delimiter + "event_ObjectEvent" + delimiter
+            + " LEFT JOIN " + delimiter + "voc_BizStep" + delimiter + " ON " + delimiter + "event_ObjectEvent"
+            + delimiter + ".bizStep = " + delimiter + "voc_BizStep" + delimiter + ".id " + "LEFT JOIN " + delimiter
+            + "voc_Disposition" + delimiter + " ON " + delimiter + "event_ObjectEvent" + delimiter + ".disposition = "
+            + delimiter + "voc_Disposition" + delimiter + ".id " + "LEFT JOIN " + delimiter + "voc_ReadPoint"
+            + delimiter + " ON " + delimiter + "event_ObjectEvent" + delimiter + ".readPoint = " + delimiter
+            + "voc_ReadPoint" + delimiter + ".id " + "LEFT JOIN " + delimiter + "voc_BizLoc" + delimiter + " ON "
+            + delimiter + "event_ObjectEvent" + delimiter + ".bizLocation = " + delimiter + "voc_BizLoc" + delimiter
+            + ".id " + "LEFT JOIN " + delimiter + "event_ObjectEvent_extensions" + delimiter + " ON " + delimiter
+            + "event_ObjectEvent" + delimiter + ".id = " + delimiter + "event_ObjectEvent_extensions" + delimiter
+            + ".event_id " + "WHERE 1";
 
     /**
-     * The connection to the database.
+     * The names of all the implemented queries.
      */
-    private Connection dbconnection = null;
+    private static final List<String> QUERYNAMES = new ArrayList<String>();
 
-    /**
-     * The database dependent identifier quotation sign.
-     */
-    private String delimiter;
+    static {
+        QUERYNAMES.add("SimpleEventQuery");
+        QUERYNAMES.add("SimpleMasterDataQuery");
+    }
 
     /**
      * Before returning the Results of the query, it checks if the set is too
@@ -231,37 +274,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
      */
     private String triggerConditionMinutes = null;
 
-    /**
-     * The names of all the implemented queries.
-     */
-    private final Set<String> queryNames = new HashSet<String>() {
-        private static final long serialVersionUID = -3868728341409854448L;
-        {
-            add("SimpleEventQuery");
-            add("SimpleMasterDataQuery");
-        }
-    };
+    @Resource
+    private WebServiceContext context;
 
-    /**
-     * Constructs a new QueryOperationsModule. Reads the properties from the
-     * passed message context, which is set by the QueryInitHandler's invoke
-     * method.
-     */
-    public QueryOperationsModule() {
-        LOG.info("QueryOperationsModule invoked.");
-        MessageContext msgContext = MessageContext.getCurrentContext();
-        delimiter = (String) msgContext.getProperty("delimiter");
-        LOG.debug("delimiter=" + delimiter);
-        dbconnection = (Connection) msgContext.getProperty("dbconnection");
-        Properties properties = (Properties) msgContext.getProperty("properties");
-        maxQueryRows = Integer.parseInt(properties.getProperty("maxQueryResultRows", "-1"));
-        LOG.debug("maxQueryResultRows=" + maxQueryRows);
-        maxQueryTime = Integer.parseInt(properties.getProperty("maxQueryExecutionTime", "10000"));
-        LOG.debug("maxQueryExecutionTime=" + maxQueryTime);
-        triggerConditionSeconds = properties.getProperty("trigger.condition.check.sec", "0,30");
-        triggerConditionMinutes = properties.getProperty("trigger.condition.check.min");
+    private DataSource dataSource;
 
-    }
+    private Connection connection;
 
     /**
      * Returns whether subscriptionID already exists in DB.
@@ -276,7 +294,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
     private boolean fetchExistsSubscriptionId(final String subscrId) throws SQLException {
         String query = "SELECT EXISTS(SELECT subscriptionid FROM " + delimiter + "subscription" + delimiter
                 + " WHERE subscriptionid = (?))";
-        PreparedStatement pstmt = dbconnection.prepareStatement(query);
+        PreparedStatement pstmt = connection.prepareStatement(query);
         pstmt.setString(1, subscrId);
         LOG.debug("QUERY: " + query);
         LOG.debug("       query param 1: " + subscrId);
@@ -299,16 +317,15 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws SQLException
      *             If a database access error occurred.
      */
-    private EPC[] fetchEPCs(final PreparedStatement stmt) throws SQLException {
+    private EPCListType fetchEPCs(final PreparedStatement stmt) throws SQLException {
         ResultSet rs = stmt.executeQuery();
-        List<EPC> epcList = new ArrayList<EPC>();
+        EPCListType epcs = new EPCListType();
         while (rs.next()) {
-            EPC epc = new EPC(rs.getString("epc"));
-            epcList.add(epc);
+            EPC epc = new EPC();
+            epc.setValue(rs.getString("epc"));
+            epcs.getEpc().add(epc);
         }
-        EPC[] epcs = new EPC[epcList.size()];
-        epcs = epcList.toArray(epcs);
-        return epcs;
+        return epcs.getEpc().isEmpty() ? null : epcs;
     }
 
     /**
@@ -324,10 +341,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws SQLException
      *             If a database access error occurred.
      */
-    private MessageElement[] fetchMessageElements(final String tableName, final PreparedStatement stmt)
+    private void fetchExtensions(final String tableName, final PreparedStatement stmt, List<Object> extensions)
             throws SQLException {
         ResultSet rs = stmt.executeQuery();
-        List<MessageElement> meList = new ArrayList<MessageElement>();
         while (rs.next()) {
             String fieldname = rs.getString("fieldname");
             String[] parts = fieldname.split("#");
@@ -351,14 +367,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (value == null) {
                 throw new SQLException("All value columns in '" + tableName + "' are null.");
             }
-            MessageElement me = new MessageElement(localPart, prefix, namespace);
-            me.setValue(value);
-            LOG.debug("message element resolved to " + me.toString());
-            meList.add(me);
+            JAXBElement<String> elem = new JAXBElement<String>(new javax.xml.namespace.QName(namespace, localPart,
+                    prefix), String.class, value);
+            extensions.add(elem);
         }
-        MessageElement[] any = new MessageElement[meList.size()];
-        any = meList.toArray(any);
-        return any;
     }
 
     /**
@@ -374,48 +386,18 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *             If an error retrieving or transforming data from the query
      *             result occurred.
      */
-    private BusinessTransactionType[] fetchBizTransactions(final PreparedStatement stmt) throws SQLException,
-            ImplementationException {
+    private BusinessTransactionListType fetchBizTransactions(final PreparedStatement stmt) throws SQLException,
+            ImplementationExceptionResponse {
         ResultSet rs = stmt.executeQuery();
-        List<BusinessTransactionType> bizTransList = new ArrayList<BusinessTransactionType>();
+        BusinessTransactionListType list = new BusinessTransactionListType();
         while (rs.next()) {
-            URI uri = stringToUri(rs.getString("uri"));
-            BusinessTransactionType btrans = new BusinessTransactionType(uri);
-            btrans.setType(stringToUri(rs.getString("typeuri")));
-            bizTransList.add(btrans);
+            String uri = rs.getString("uri");
+            BusinessTransactionType btrans = new BusinessTransactionType();
+            btrans.setValue(uri);
+            btrans.setType(rs.getString("typeuri"));
+            list.getBizTransaction().add(btrans);
         }
-        BusinessTransactionType[] bizTrans = new BusinessTransactionType[bizTransList.size()];
-        bizTrans = bizTransList.toArray(bizTrans);
-        return bizTrans;
-    }
-
-    /**
-     * Convert a string to a URI. Exceptions are caught and a meaningful
-     * ImplementationException is thrown instead. This method works on axis
-     * URIs, not Java URIs. Make sure you have the right imports.
-     * 
-     * @param uriString
-     *            String to convert to URI
-     * @return URI
-     * @throws ImplementationException
-     *             Thrown when string not in URI format.
-     */
-    private URI stringToUri(final String uriString) throws ImplementationException {
-        try {
-            if (uriString == null) {
-                return null;
-            }
-            URI uri = new URI(uriString);
-            return uri;
-        } catch (URI.MalformedURIException e) {
-            String msg = "Malformed URI value: " + uriString;
-            LOG.error(msg, e);
-            ImplementationException iex = new ImplementationException();
-            iex.setReason(msg);
-            iex.setStackTrace(e.getStackTrace());
-            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-            throw iex;
-        }
+        return list.getBizTransaction().isEmpty() ? null : list;
     }
 
     /**
@@ -427,72 +409,69 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws SQLException
      *             Problem on db backend. The Query must return ObjectEvents,
      *             otherwise this leads to an SQLException as well. is thrown.
-     * @throws ImplementationException
+     * @throws ImplementationExceptionResponse
      *             Problem with data or on implementation side. (i.e. uri value
      *             in DB is actually not an uri)
-     * @throws QueryTooLargeException
+     * @throws QueryTooLargeExceptionResponse
      *             If the rows returned by the query is larger than specified or
      *             larger than this implementation is willing to accept.
-     * @throws QueryTooComplexException
+     * @throws QueryTooComplexExceptionResponse
      *             If the query takes too long to return.
      */
-    private ObjectEventType[] runObjectEventQuery(final PreparedStatement objectEventQuery) throws SQLException,
-            ImplementationException, QueryTooLargeException, QueryTooComplexException {
+    private void runObjectEventQuery(final PreparedStatement objectEventQuery, EventListType eventList)
+            throws SQLException, ImplementationExceptionResponse, QueryTooLargeExceptionResponse,
+            QueryTooComplexExceptionResponse {
         if (objectEventQuery == null) {
-            return null;
+            return;
         }
 
         // run the query and get all ObjectEvents
         ResultSet rs = executeStatement(objectEventQuery, maxQueryTime);
-        checkQueryRows();
+        // TODO: checkQueryRows();
 
         // prepare some queries
-        String bizTransQuery = "SELECT "
-                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
-                + "`BizTransaction` JOIN `event_ObjectEvent_bizTrans` ON `BizTransaction`.id = `event_ObjectEvent_bizTrans`.bizTrans_id"
-                + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
-                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
-                + " WHERE `event_ObjectEvent_bizTrans`.event_id = ?";
-        String epcQuery = "SELECT epc FROM `event_ObjectEvent_EPCs` WHERE event_id = ?";
-        String extQuery = "SELECT * FROM `event_ObjectEvent_extensions` WHERE event_id = ?";
-        PreparedStatement bizTransStmt, epcStmt, extStmt;
-        if (LOG.isDebugEnabled()) {
-            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
-            epcStmt = new LoggableStatement(dbconnection, epcQuery);
-            extStmt = new LoggableStatement(dbconnection, extQuery);
-        } else {
-            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
-            epcStmt = dbconnection.prepareStatement(epcQuery);
-            extStmt = dbconnection.prepareStatement(extQuery);
-        }
+        String bizTransQuery = "SELECT " + delimiter + "voc_BizTrans" + delimiter + ".uri, " + delimiter
+                + "voc_BizTransType" + delimiter + ".uri AS typeuri FROM ((" + delimiter + "BizTransaction" + delimiter
+                + " JOIN " + delimiter + "event_ObjectEvent_bizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".id = " + delimiter + "event_ObjectEvent_bizTrans" + delimiter
+                + ".bizTrans_id" + ") JOIN " + delimiter + "voc_BizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".bizTrans = " + delimiter + "voc_BizTrans" + delimiter + ".id)"
+                + " LEFT OUTER JOIN " + delimiter + "voc_BizTransType" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".type = " + delimiter + "voc_BizTransType" + delimiter + ".id"
+                + " WHERE " + delimiter + "event_ObjectEvent_bizTrans" + delimiter + ".event_id = ?";
+        String epcQuery = "SELECT epc FROM " + delimiter + "event_ObjectEvent_EPCs" + delimiter + " WHERE event_id = ?";
+        String extQuery = "SELECT * FROM " + delimiter + "event_ObjectEvent_extensions" + delimiter
+                + " WHERE event_id = ?";
+        PreparedStatement bizTransStmt = connection.prepareStatement(bizTransQuery);
+        PreparedStatement epcStmt = connection.prepareStatement(epcQuery);
+        PreparedStatement extStmt = connection.prepareStatement(extQuery);
 
-        List<ObjectEventType> objectEventList = new ArrayList<ObjectEventType>();
         while (rs.next()) {
             ObjectEventType objectEvent = new ObjectEventType();
             int eventId = rs.getInt("id");
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            objectEvent.setEventTime(TimeParser.convert(time));
+            objectEvent.setEventTime(createXmlCalendarFromSqlTimestamp(time));
             time = rs.getTimestamp("recordTime");
-            objectEvent.setRecordTime(TimeParser.convert(time));
+            objectEvent.setRecordTime(createXmlCalendarFromSqlTimestamp(time));
             objectEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set action
-            ActionType action = ActionType.fromString(rs.getString("action"));
+            ActionType action = ActionType.valueOf(rs.getString("action"));
             objectEvent.setAction(action);
 
             // set all URIs
-            objectEvent.setBizStep(stringToUri(rs.getString("bizStep")));
-            objectEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            objectEvent.setBizStep(rs.getString("bizStep"));
+            objectEvent.setDisposition(rs.getString("disposition"));
             if (rs.getString("readPoint") != null) {
                 ReadPointType rp = new ReadPointType();
-                rp.setId(stringToUri(rs.getString("readPoint")));
+                rp.setId(rs.getString("readPoint"));
                 objectEvent.setReadPoint(rp);
             }
             if (rs.getString("bizLocation") != null) {
                 BusinessLocationType blt = new BusinessLocationType();
-                blt.setId(stringToUri(rs.getString("bizLocation")));
+                blt.setId(rs.getString("bizLocation"));
                 objectEvent.setBizLocation(blt);
             }
 
@@ -501,32 +480,25 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + bizTransStmt.toString());
             }
-            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
-            objectEvent.setBizTransactionList(btt);
+            objectEvent.setBizTransactionList(fetchBizTransactions(bizTransStmt));
 
             // set EPCs
             epcStmt.setInt(1, eventId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + epcStmt.toString());
             }
-            EPC[] epcs = fetchEPCs(epcStmt);
-            objectEvent.setEpcList(epcs);
+            objectEvent.setEpcList(fetchEPCs(epcStmt));
 
             // set field extensions
             extStmt.setInt(1, eventId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + extStmt.toString());
             }
-            MessageElement[] any = fetchMessageElements("event_ObjectEvent_extensions", extStmt);
-            objectEvent.set_any(any);
+            fetchExtensions("event_ObjectEvent_extensions", extStmt, objectEvent.getAny());
 
-            objectEventList.add(objectEvent);
+            eventList.getObjectEventOrAggregationEventOrQuantityEvent().add(objectEvent);
         }
         rs.close();
-        ObjectEventType[] objectEvents = {};
-        objectEvents = objectEventList.toArray(objectEvents);
-
-        return objectEvents;
     }
 
     /**
@@ -548,64 +520,62 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryTooComplexException
      *             If a query takes too long to return.
      */
-    private AggregationEventType[] runAggregationEventQuery(final PreparedStatement aggregationEventQuery)
-            throws SQLException, ImplementationException, QueryTooLargeException, QueryTooComplexException {
+    private void runAggregationEventQuery(final PreparedStatement aggregationEventQuery, EventListType eventList)
+            throws SQLException, ImplementationExceptionResponse, QueryTooLargeExceptionResponse,
+            QueryTooComplexExceptionResponse {
         if (aggregationEventQuery == null) {
-            return null;
+            return;
         }
 
         // run the query and get all AggregationEvents
         ResultSet rs = executeStatement(aggregationEventQuery, maxQueryTime);
-        checkQueryRows();
+        // TODO: checkQueryRows();
 
         // prepare some queries
-        String bizTransQuery = "SELECT "
-                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
-                + "`BizTransaction` JOIN `event_AggregationEvent_bizTrans` ON `BizTransaction`.id = `event_AggregationEvent_bizTrans`.bizTrans_id"
-                + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
-                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
-                + " WHERE `event_AggregationEvent_bizTrans`.event_id = ?";
-        String epcQuery = "SELECT epc FROM `event_AggregationEvent_EPCs` WHERE event_id = ?";
-        String extQuery = "SELECT * FROM `event_AggregationEvent_extensions` WHERE event_id = ?";
-        PreparedStatement bizTransStmt, epcStmt, extStmt;
-        if (LOG.isDebugEnabled()) {
-            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
-            epcStmt = new LoggableStatement(dbconnection, epcQuery);
-            extStmt = new LoggableStatement(dbconnection, extQuery);
-        } else {
-            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
-            epcStmt = dbconnection.prepareStatement(epcQuery);
-            extStmt = dbconnection.prepareStatement(extQuery);
-        }
+        String bizTransQuery = "SELECT " + delimiter + "voc_BizTrans" + delimiter + ".uri, " + delimiter
+                + "voc_BizTransType" + delimiter + ".uri AS typeuri FROM ((" + delimiter + "BizTransaction" + delimiter
+                + " JOIN " + delimiter + "event_AggregationEvent_bizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".id = " + delimiter + "event_AggregationEvent_bizTrans" + delimiter
+                + ".bizTrans_id" + ") JOIN " + delimiter + "voc_BizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".bizTrans = " + delimiter + "voc_BizTrans" + delimiter + ".id)"
+                + " LEFT OUTER JOIN " + delimiter + "voc_BizTransType" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".type = " + delimiter + "voc_BizTransType" + delimiter + ".id"
+                + " WHERE " + delimiter + "event_AggregationEvent_bizTrans" + delimiter + ".event_id = ?";
+        String epcQuery = "SELECT epc FROM " + delimiter + "event_AggregationEvent_EPCs" + delimiter
+                + " WHERE event_id = ?";
+        String extQuery = "SELECT * FROM " + delimiter + "event_AggregationEvent_extensions" + delimiter
+                + " WHERE event_id = ?";
+        PreparedStatement bizTransStmt = connection.prepareStatement(bizTransQuery);
+        PreparedStatement epcStmt = connection.prepareStatement(epcQuery);
+        PreparedStatement extStmt = connection.prepareStatement(extQuery);
 
-        List<AggregationEventType> aggrEventList = new ArrayList<AggregationEventType>();
         while (rs.next()) {
             AggregationEventType aggrEvent = new AggregationEventType();
             int eventId = rs.getInt("id");
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            aggrEvent.setEventTime(TimeParser.convert(time));
+            aggrEvent.setEventTime(createXmlCalendarFromSqlTimestamp(time));
             time = rs.getTimestamp("recordTime");
-            aggrEvent.setRecordTime(TimeParser.convert(time));
+            aggrEvent.setRecordTime(createXmlCalendarFromSqlTimestamp(time));
             aggrEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set action
-            ActionType action = ActionType.fromString(rs.getString("action"));
+            ActionType action = ActionType.valueOf(rs.getString("action"));
             aggrEvent.setAction(action);
 
             // set all URIs
-            aggrEvent.setParentID(stringToUri(rs.getString("parentID")));
-            aggrEvent.setBizStep(stringToUri(rs.getString("bizStep")));
-            aggrEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            aggrEvent.setParentID(rs.getString("parentID"));
+            aggrEvent.setBizStep(rs.getString("bizStep"));
+            aggrEvent.setDisposition(rs.getString("disposition"));
             if (rs.getString("readPoint") != null) {
                 ReadPointType rpt = new ReadPointType();
-                rpt.setId(stringToUri(rs.getString("readPoint")));
+                rpt.setId(rs.getString("readPoint"));
                 aggrEvent.setReadPoint(rpt);
             }
             if (rs.getString("bizLocation") != null) {
                 BusinessLocationType blt = new BusinessLocationType();
-                blt.setId(stringToUri(rs.getString("bizLocation")));
+                blt.setId(rs.getString("bizLocation"));
                 aggrEvent.setBizLocation(blt);
             }
 
@@ -614,31 +584,28 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + bizTransStmt.toString());
             }
-            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
-            aggrEvent.setBizTransactionList(btt);
+            aggrEvent.setBizTransactionList(fetchBizTransactions(bizTransStmt));
 
             // set EPCs
             epcStmt.setInt(1, eventId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + epcStmt.toString());
             }
-            EPC[] epcs = fetchEPCs(epcStmt);
-            aggrEvent.setChildEPCs(epcs);
+            aggrEvent.setChildEPCs(fetchEPCs(epcStmt));
 
             // set field extensions
             extStmt.setInt(1, eventId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + extStmt.toString());
             }
-            MessageElement[] any = fetchMessageElements("event_AggregationEvent_extensions", extStmt);
-            aggrEvent.set_any(any);
+            // AggregationEventExtensionType ext = new
+            // AggregationEventExtensionType();
+            fetchExtensions("event_AggregationEvent_extensions", extStmt, aggrEvent.getAny());
+            // aggrEvent.setExtension(ext);
 
-            aggrEventList.add(aggrEvent);
+            eventList.getObjectEventOrAggregationEventOrQuantityEvent().add(aggrEvent);
         }
         rs.close();
-        AggregationEventType[] aggrEvents = new AggregationEventType[aggrEventList.size()];
-        aggrEvents = aggrEventList.toArray(aggrEvents);
-        return aggrEvents;
     }
 
     /**
@@ -660,62 +627,60 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryTooComplexException
      *             If a query takes too long to return.
      */
-    private QuantityEventType[] runQuantityEventQuery(final PreparedStatement quantityEventQuery) throws SQLException,
-            ImplementationException, QueryTooLargeException, QueryTooComplexException {
+    private void runQuantityEventQuery(final PreparedStatement quantityEventQuery, EventListType eventList)
+            throws SQLException, ImplementationExceptionResponse, QueryTooLargeExceptionResponse,
+            QueryTooComplexExceptionResponse {
         if (quantityEventQuery == null) {
-            return null;
+            return;
         }
 
         // run the query and get all QuantityEvents
         ResultSet rs = executeStatement(quantityEventQuery, maxQueryTime);
-        checkQueryRows();
+        // TODO: checkQueryRows();
 
         // prepare some queries
-        String bizTransQuery = "SELECT "
-                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
-                + "`BizTransaction` JOIN `event_QuantityEvent_bizTrans` ON `BizTransaction`.id = `event_QuantityEvent_bizTrans`.bizTrans_id"
-                + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
-                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
-                + " WHERE `event_QuantityEvent_bizTrans`.event_id = ?";
-        String extQuery = "SELECT * FROM `event_QuantityEvent_extensions` WHERE event_id = ?";
-        PreparedStatement bizTransStmt, extStmt;
-        if (LOG.isDebugEnabled()) {
-            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
-            extStmt = new LoggableStatement(dbconnection, extQuery);
-        } else {
-            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
-            extStmt = dbconnection.prepareStatement(extQuery);
-        }
+        String bizTransQuery = "SELECT " + delimiter + "voc_BizTrans" + delimiter + ".uri, " + delimiter
+                + "voc_BizTransType" + delimiter + ".uri AS typeuri FROM ((" + delimiter + "BizTransaction" + delimiter
+                + " JOIN " + delimiter + "event_QuantityEvent_bizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".id = " + delimiter + "event_QuantityEvent_bizTrans" + delimiter
+                + ".bizTrans_id" + ") JOIN " + delimiter + "voc_BizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".bizTrans = " + delimiter + "voc_BizTrans" + delimiter + ".id)"
+                + " LEFT OUTER JOIN " + delimiter + "voc_BizTransType" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".type = " + delimiter + "voc_BizTransType" + delimiter + ".id"
+                + " WHERE " + delimiter + "event_QuantityEvent_bizTrans" + delimiter + ".event_id = ?";
+        String extQuery = "SELECT * FROM " + delimiter + "event_QuantityEvent_extensions" + delimiter
+                + " WHERE event_id = ?";
+        PreparedStatement bizTransStmt = connection.prepareStatement(bizTransQuery);
+        PreparedStatement extStmt = connection.prepareStatement(extQuery);
 
-        List<QuantityEventType> quantEventList = new ArrayList<QuantityEventType>();
         while (rs.next()) {
             QuantityEventType quantEvent = new QuantityEventType();
             int eventId = rs.getInt("id");
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            quantEvent.setEventTime(TimeParser.convert(time));
+            quantEvent.setEventTime(createXmlCalendarFromSqlTimestamp(time));
             time = rs.getTimestamp("recordTime");
-            quantEvent.setRecordTime(TimeParser.convert(time));
+            quantEvent.setRecordTime(createXmlCalendarFromSqlTimestamp(time));
             quantEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set EPCClass
-            quantEvent.setEpcClass(stringToUri(rs.getString("epcClass")));
+            quantEvent.setEpcClass(rs.getString("epcClass"));
 
             // set quantity
             quantEvent.setQuantity(rs.getInt("quantity"));
 
             // set all URIs
-            quantEvent.setBizStep(stringToUri(rs.getString("bizStep")));
-            quantEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            quantEvent.setBizStep(rs.getString("bizStep"));
+            quantEvent.setDisposition(rs.getString("disposition"));
             if (rs.getString("readPoint") != null) {
                 ReadPointType rpt = new ReadPointType();
-                rpt.setId(stringToUri(rs.getString("readPoint")));
+                rpt.setId(rs.getString("readPoint"));
                 quantEvent.setReadPoint(rpt);
             }
             if (rs.getString("bizLocation") != null) {
                 BusinessLocationType blt = new BusinessLocationType();
-                blt.setId(stringToUri(rs.getString("bizLocation")));
+                blt.setId(rs.getString("bizLocation"));
                 quantEvent.setBizLocation(blt);
             }
 
@@ -724,24 +689,21 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + bizTransStmt.toString());
             }
-            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
-            quantEvent.setBizTransactionList(btt);
+            quantEvent.setBizTransactionList(fetchBizTransactions(bizTransStmt));
 
             // set field extensions
             extStmt.setInt(1, eventId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + extStmt.toString());
             }
-            MessageElement[] any = fetchMessageElements("event_QuantityEvent_extensions", extStmt);
-            quantEvent.set_any(any);
+            // QuantityEventExtensionType ext = new
+            // QuantityEventExtensionType();
+            fetchExtensions("event_QuantityEvent_extensions", extStmt, quantEvent.getAny());
+            // quantEvent.setExtension(ext);
 
-            quantEventList.add(quantEvent);
+            eventList.getObjectEventOrAggregationEventOrQuantityEvent().add(quantEvent);
         }
         rs.close();
-
-        QuantityEventType[] quantEvents = new QuantityEventType[quantEventList.size()];
-        quantEvents = quantEventList.toArray(quantEvents);
-        return quantEvents;
     }
 
     /**
@@ -763,64 +725,62 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryTooComplexException
      *             If a query takes too long to return.
      */
-    private TransactionEventType[] runTransactionEventQuery(final PreparedStatement transactionEventQuery)
-            throws SQLException, ImplementationException, QueryTooLargeException, QueryTooComplexException {
+    private void runTransactionEventQuery(final PreparedStatement transactionEventQuery, EventListType eventList)
+            throws SQLException, ImplementationExceptionResponse, QueryTooLargeExceptionResponse,
+            QueryTooComplexExceptionResponse {
         if (transactionEventQuery == null) {
-            return null;
+            return;
         }
 
         // run the query and get all TransactionEvents
         ResultSet rs = executeStatement(transactionEventQuery, maxQueryTime);
-        checkQueryRows();
+        // TODO: checkQueryRows();
 
         // prepare some queries
-        String bizTransQuery = "SELECT "
-                + "`voc_BizTrans`.uri, `voc_BizTransType`.uri AS typeuri FROM (("
-                + "`BizTransaction` JOIN `event_TransactionEvent_bizTrans` ON `BizTransaction`.id = `event_TransactionEvent_bizTrans`.bizTrans_id"
-                + ") JOIN `voc_BizTrans` ON `BizTransaction`.bizTrans = `voc_BizTrans`.id)"
-                + " LEFT OUTER JOIN `voc_BizTransType` ON `BizTransaction`.type = `voc_BizTransType`.id"
-                + " WHERE `event_TransactionEvent_bizTrans`.event_id = ?";
-        String epcQuery = "SELECT epc FROM `event_TransactionEvent_EPCs` WHERE event_id = ?";
-        String extQuery = "SELECT * FROM `event_TransactionEvent_extensions` WHERE event_id = ?";
-        PreparedStatement bizTransStmt, epcStmt, extStmt;
-        if (LOG.isDebugEnabled()) {
-            bizTransStmt = new LoggableStatement(dbconnection, bizTransQuery);
-            epcStmt = new LoggableStatement(dbconnection, epcQuery);
-            extStmt = new LoggableStatement(dbconnection, extQuery);
-        } else {
-            bizTransStmt = dbconnection.prepareStatement(bizTransQuery);
-            epcStmt = dbconnection.prepareStatement(epcQuery);
-            extStmt = dbconnection.prepareStatement(extQuery);
-        }
+        String bizTransQuery = "SELECT " + delimiter + "voc_BizTrans" + delimiter + ".uri, " + delimiter
+                + "voc_BizTransType" + delimiter + ".uri AS typeuri FROM ((" + delimiter + "BizTransaction" + delimiter
+                + " JOIN " + delimiter + "event_TransactionEvent_bizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".id = " + delimiter + "event_TransactionEvent_bizTrans" + delimiter
+                + ".bizTrans_id" + ") JOIN " + delimiter + "voc_BizTrans" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".bizTrans = " + delimiter + "voc_BizTrans" + delimiter + ".id)"
+                + " LEFT OUTER JOIN " + delimiter + "voc_BizTransType" + delimiter + " ON " + delimiter
+                + "BizTransaction" + delimiter + ".type = " + delimiter + "voc_BizTransType" + delimiter + ".id"
+                + " WHERE " + delimiter + "event_TransactionEvent_bizTrans" + delimiter + ".event_id = ?";
+        String epcQuery = "SELECT epc FROM " + delimiter + "event_TransactionEvent_EPCs" + delimiter
+                + " WHERE event_id = ?";
+        String extQuery = "SELECT * FROM " + delimiter + "event_TransactionEvent_extensions" + delimiter
+                + " WHERE event_id = ?";
+        PreparedStatement bizTransStmt = connection.prepareStatement(bizTransQuery);
+        PreparedStatement epcStmt = connection.prepareStatement(epcQuery);
+        PreparedStatement extStmt = connection.prepareStatement(extQuery);
 
-        List<TransactionEventType> transEventList = new ArrayList<TransactionEventType>();
         while (rs.next()) {
             TransactionEventType transEvent = new TransactionEventType();
             int eventId = rs.getInt("id");
 
             // set EventTime, RecordTime, and EventTimezoneOffset
             Timestamp time = rs.getTimestamp("eventTime");
-            transEvent.setEventTime(TimeParser.convert(time));
+            transEvent.setEventTime(createXmlCalendarFromSqlTimestamp(time));
             time = rs.getTimestamp("recordTime");
-            transEvent.setRecordTime(TimeParser.convert(time));
+            transEvent.setRecordTime(createXmlCalendarFromSqlTimestamp(time));
             transEvent.setEventTimeZoneOffset(rs.getString("eventTimeZoneOffset"));
 
             // set action
-            ActionType action = ActionType.fromString(rs.getString("action"));
+            ActionType action = ActionType.valueOf(rs.getString("action"));
             transEvent.setAction(action);
 
             // set all URIs
-            transEvent.setParentID(stringToUri(rs.getString("parentID")));
-            transEvent.setBizStep(stringToUri(rs.getString("bizStep")));
-            transEvent.setDisposition(stringToUri(rs.getString("disposition")));
+            transEvent.setParentID(rs.getString("parentID"));
+            transEvent.setBizStep(rs.getString("bizStep"));
+            transEvent.setDisposition(rs.getString("disposition"));
             if (rs.getString("readPoint") != null) {
                 ReadPointType rpt = new ReadPointType();
-                rpt.setId(stringToUri(rs.getString("readPoint")));
+                rpt.setId(rs.getString("readPoint"));
                 transEvent.setReadPoint(rpt);
             }
             if (rs.getString("bizLocation") != null) {
                 BusinessLocationType blt = new BusinessLocationType();
-                blt.setId(stringToUri(rs.getString("bizLocation")));
+                blt.setId(rs.getString("bizLocation"));
                 transEvent.setBizLocation(blt);
             }
 
@@ -829,32 +789,28 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + bizTransStmt.toString());
             }
-            BusinessTransactionType[] btt = fetchBizTransactions(bizTransStmt);
-            transEvent.setBizTransactionList(btt);
+            transEvent.setBizTransactionList(fetchBizTransactions(bizTransStmt));
 
             // set EPCs
             epcStmt.setInt(1, eventId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + epcStmt.toString());
             }
-            EPC[] epcs = fetchEPCs(epcStmt);
-            transEvent.setEpcList(epcs);
+            transEvent.setEpcList(fetchEPCs(epcStmt));
 
             // set field extensions
             extStmt.setInt(1, eventId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("QUERY: " + extStmt.toString());
             }
-            MessageElement[] any = fetchMessageElements("event_TransactionEvent_extensions", extStmt);
-            transEvent.set_any(any);
+            // TransactionEventExtensionType ext = new
+            // TransactionEventExtensionType();
+            fetchExtensions("event_TransactionEvent_extensions", extStmt, transEvent.getAny());
+            // transEvent.setExtension(ext);
 
-            transEventList.add(transEvent);
+            eventList.getObjectEventOrAggregationEventOrQuantityEvent().add(transEvent);
         }
         rs.close();
-
-        TransactionEventType[] transEvents = new TransactionEventType[transEventList.size()];
-        transEvents = transEventList.toArray(transEvents);
-        return transEvents;
     }
 
     /**
@@ -869,14 +825,17 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *             If the rows returned by the query is larger than specified or
      *             larger than this implementation is willing to accept.
      */
-    private void checkQueryRows() throws SQLException, QueryTooLargeException {
+    private void checkQueryRows() throws SQLException, QueryTooLargeExceptionResponse {
         // check the number of rows calculated for the query
-        Statement stmt = dbconnection.createStatement();
+        Statement stmt = connection.createStatement();
         ResultSet rows = stmt.executeQuery("SELECT FOUND_ROWS() AS rowcount;");
         int rowCount = maxQueryRows;
         if (rows.first()) {
             rowCount = rows.getInt(1);
         }
+        LOG.debug("rowCount: " + rowCount);
+        LOG.debug("maxQueryRows: " + maxQueryRows);
+        LOG.debug("maxEventCount: " + maxEventCount);
         if (rowCount > maxQueryRows || (maxEventCount > -1 && rowCount > maxEventCount)) {
             String msg = "The query returned more results (" + rowCount + ") than ";
             if (rowCount > maxQueryRows) {
@@ -887,39 +846,86 @@ public class QueryOperationsModule implements EPCISServicePortType {
             LOG.info("USER ERROR: " + msg);
             QueryTooLargeException e = new QueryTooLargeException();
             e.setReason(msg);
-            throw e;
+            throw new QueryTooLargeExceptionResponse(msg, e);
         }
     }
 
     /**
-     * Transforms an array of strings into sql IN (...) notation. Takes the
-     * string array, the query string and the argument vector This function is
-     * designed to be used with PreparedStatement
+     * Appends the String values from the given <code>strings</code> List into
+     * an SQL IN (?,?,..) notation, intended to be used with PreparedStatement.
+     * The correct number of '?' will be added to the given SQL StringBuilder,
+     * and the String values from the <code>strings</code> List will be added
+     * to the <code>queryArgs</code> List.
+     * <p>
+     * TODO: This method is superfluous if the query arguments were directly
+     * appended to the <code>queryArgs</code> List and the correct number of
+     * '?' were appended to the SQL query in the end.
      * 
      * @param strings
-     *            Array of strings to be added to sql IN (...) expression.
-     * @param query
-     *            The query which will be appended with the appropriate amounts
-     *            of question marks for the parameters.
+     *            A List of strings to be appended to the <code>queryArgs</code>
+     *            List.
+     * @param sql
+     *            The SQL query which will be appended with the appropriate
+     *            number of '?'.
      * @param queryArgs
-     *            The queryArgs vector which will take the additional query
-     *            parameters specified in 'strings'.
+     *            The <code>queryArgs</code> List to which the query
+     *            parameters will be appended to.
      */
-    private void stringArrayToSQL(final String[] strings, final StringBuffer query, final List<String> queryArgs) {
-        int j = 0;
-        while (j < strings.length - 1) {
-            query.append("?,");
-            queryArgs.add(strings[j]);
-            j++;
+    private void listOfStringToSql(final List<String> strings, final StringBuilder sql, final List<String> queryArgs) {
+        if (strings.isEmpty()) {
+            return;
         }
-        if (strings.length > 0) {
-            query.append("?");
-            queryArgs.add(strings[j]);
+        Iterator<String> it = strings.iterator();
+        while (it.hasNext()) {
+            sql.append('?');
+            queryArgs.add(it.next());
+            if (it.hasNext()) {
+                sql.append(',');
+            }
         }
     }
 
     /**
-     * Create an SQL query string from a list of Query Parameters.
+     * Create an SQL query string from the given query parameters.
+     * <p>
+     * Note: the CXF framework always returns an instance of org.w3c.dom.Element
+     * for the query parameter value given in the <code>queryParams</code>
+     * argument, because the spec defines this value to be of type
+     * <code>anyType</code>. CXF <i>does not</i> resolve the type of the
+     * query parameter value from the query name as Axis does! However, if the
+     * user specifies the XML type in the request, then CXF returns an instance
+     * of the corresponding type.
+     * <p>
+     * Consider the following example of a query parameter:
+     * 
+     * <pre>
+     * &lt;param&gt;
+     *   &lt;name&gt;GE_eventTime&lt;/name&gt;
+     *   &lt;value&gt;2007-07-07T07:07:07+02:00&lt;/value&gt;
+     * &lt;/param&gt;
+     * </pre>
+     * 
+     * For the query parameter value, CXF will return an instance of
+     * org.w3c.dom.Element containing the text value
+     * "2007-07-07T07:07:07+02:00". However, if the user provides the following
+     * instead, CXF will return an instance of
+     * javax.xml.datatype.XMLGregorianCalendar.
+     * 
+     * <pre>
+     * &lt;param&gt;
+     *   &lt;name&gt;GE_eventTime&lt;/name&gt;
+     *   &lt;value
+     *       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+     *       xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;
+     *       xsi:type=&quot;xs:dateTime&quot;&gt;
+     *     2007-07-07T07:07:07+02:00
+     *   &lt;/value&gt;
+     * &lt;/param&gt;
+     * </pre>
+     * 
+     * As a consequence, we always first need to check if the value is an
+     * instance of Element, and if so, we need to parse it manually according to
+     * the semantics of the parameter name.
      * 
      * @param queryParams
      *            The query parameters.
@@ -934,25 +940,25 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             If an error in the implementation occurred.
      */
-    private PreparedStatement createEventQuery(final QueryParam[] queryParams, final String eventType)
-            throws SQLException, QueryParameterException, ImplementationException {
+    private PreparedStatement createEventQuery(final QueryParams queryParams, final String eventType)
+            throws SQLException, QueryParameterExceptionResponse, ImplementationExceptionResponse {
 
-        StringBuffer query;
+        StringBuilder query;
         if (eventType.equals("ObjectEvent")) {
-            query = new StringBuffer(objectEventQueryBase);
+            query = new StringBuilder(objectEventQueryBase);
         } else if (eventType.equals("AggregationEvent")) {
-            query = new StringBuffer(aggregationEventQueryBase);
+            query = new StringBuilder(aggregationEventQueryBase);
         } else if (eventType.equals("QuantityEvent")) {
-            query = new StringBuffer(quantityEventQueryBase);
+            query = new StringBuilder(quantityEventQueryBase);
         } else if (eventType.equals("TransactionEvent")) {
-            query = new StringBuffer(transactionEventQueryBase);
+            query = new StringBuilder(transactionEventQueryBase);
         } else {
             ImplementationException iex = new ImplementationException();
             String msg = "Invalid event type encountered: " + eventType;
             LOG.error(msg);
             iex.setReason(msg);
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-            throw iex;
+            throw new ImplementationExceptionResponse(msg, iex);
         }
 
         String orderBy = "";
@@ -962,9 +968,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
         List<String> params = new LinkedList<String>();
         List<String> queryArgs = new ArrayList<String>();
 
-        for (int i = 0; i < queryParams.length; i++) {
-            String paramName = queryParams[i].getName();
-            Object paramValue = queryParams[i].getValue();
+        for (QueryParam param : queryParams.getParam()) {
+            String paramName = param.getName();
+            Object paramValue = param.getValue();
 
             // check if empty param value is provided
             if ((paramValue == null || (paramValue instanceof String && paramValue.toString().equals("")))
@@ -978,18 +984,31 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (params.contains(paramName)) {
                 String msg = "Two or more inputs are provided for the same parameter '" + paramName + "'.";
                 LOG.info("USER ERROR: " + msg);
-                throw new QueryParameterException(msg);
+                throw new QueryParameterExceptionResponse(msg);
             } else {
                 params.add(paramName);
             }
 
             try {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Handling '" + paramName + "' query parameter with parameter value instance of '"
+                            + paramValue.getClass() + "'");
+                }
+                // TODO: for the sake of code readability: outsource all the
+                // code fragments in the different cases into separate methods
+                // e.g. handleEventType, handleEventTime, etc.
+
+                // TODO: for all cases: the casts of paramValue to a specific
+                // class (e.g. cast to ArrayOfString or Calendar) may fail if
+                // the Web service framework is unable to resolve the type of
+                // the value (i.e. because the XML type of the paramValue is
+                // xsd:anyType) -> cast to Element and parse manually (c.f.
+                // handleEventType)
                 if (paramName.equals("eventType")) {
                     // check if current eventType argument is contained in the
                     // 'eventType' query parameter, otherwise return
-                    String[] eventTypes = ((ArrayOfString) paramValue).getString();
-                    List<String> eventTypeList = Arrays.asList(eventTypes);
-                    if (!eventTypeList.contains(eventType)) {
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    if (!aos.getString().contains(eventType)) {
                         return null;
                     }
 
@@ -1005,16 +1024,19 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     } else if (paramName.equals("LT_recordTime")) {
                         query.append(" AND (recordTime < ?) ");
                     }
-                    Timestamp ts = TimeParser.convert((Calendar) paramValue);
+                    Timestamp ts = parseAsTimestamp(paramValue, paramName);
                     queryArgs.add(ts.toString());
 
                 } else if (paramName.equals("EQ_action")) {
                     if (!eventType.equals("QuantityEvent")) {
-                        String[] actions = ((ArrayOfString) paramValue).getString();
-                        checkActionValues(actions);
-                        query.append(" AND (action IN (");
-                        stringArrayToSQL(actions, query, queryArgs);
-                        query.append(")) ");
+                        ArrayOfString aos = parseAsArrayOfString(paramValue);
+                        // check if parameter value provided
+                        if (!aos.getString().isEmpty()) {
+                            checkActionValues(aos.getString());
+                            query.append(" AND (action IN (");
+                            listOfStringToSql(aos.getString(), query, queryArgs);
+                            query.append(")) ");
+                        }
                     } else {
                         // QuantityEvents have no action so no event matches!
                         query.append(" AND 0 ");
@@ -1022,40 +1044,44 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
                 } else if (paramName.equals("EQ_bizStep") || paramName.equals("EQ_disposition")
                         || paramName.equals("EQ_readPoint") || paramName.equals("EQ_bizLocation")) {
-                    if (paramName.equals("EQ_bizStep")) {
-                        query.append(" AND (`voc_BizStep`.uri IN (");
-                    } else if (paramName.equals("EQ_disposition")) {
-                        query.append(" AND (`voc_Disposition`.uri IN (");
-                    } else if (paramName.equals("EQ_readPoint")) {
-                        query.append(" AND (`voc_ReadPoint`.uri IN (");
-                    } else if (paramName.equals("EQ_bizLocation")) {
-                        query.append(" AND (`voc_BizLoc`.uri IN (");
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    // check if parameter value provided
+                    if (!aos.getString().isEmpty()) {
+                        if (paramName.equals("EQ_bizStep")) {
+                            query.append(" AND (").append(delimiter).append("voc_BizStep").append(delimiter).append(
+                                    ".uri IN (");
+                        } else if (paramName.equals("EQ_disposition")) {
+                            query.append(" AND (" + delimiter + "voc_Disposition" + delimiter + ".uri IN (");
+                        } else if (paramName.equals("EQ_readPoint")) {
+                            query.append(" AND (").append(delimiter).append("voc_ReadPoint").append(delimiter).append(
+                                    ".uri IN (");
+                        } else if (paramName.equals("EQ_bizLocation")) {
+                            query.append(" AND (").append(delimiter).append("voc_BizLoc").append(delimiter).append(
+                                    ".uri IN (");
+                        }
+                        listOfStringToSql(aos.getString(), query, queryArgs);
+                        query.append(")) ");
                     }
-                    stringArrayToSQL(((ArrayOfString) paramValue).getString(), query, queryArgs);
-                    query.append(")) ");
 
                 } else if (paramName.equals("WD_readPoint") || paramName.equals("WD_bizLocation")) {
-                    String[] attrs = null;
-                    try {
-                        attrs = ((ArrayOfString) paramValue).getString();
-                    } catch (ClassCastException e) {
-                        // we have the URI directly (no ArrayOfString wrapper)
-                        attrs = new String[1];
-                        attrs[0] = paramValue.toString();
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    // check if parameter value provided
+                    if (!aos.getString().isEmpty()) {
+                        String tablename = delimiter + "voc_ReadPoint" + delimiter;
+                        if (paramName.equals("WD_bizLocation")) {
+                            tablename = delimiter + "voc_BizLoc" + delimiter;
+                        }
+                        // the % allows any possible ending, which should
+                        // implement
+                        // the semantics of "With Descendant"
+                        query.append(" AND (");
+                        for (String attr : aos.getString()) {
+                            query.append(tablename);
+                            query.append(".uri LIKE ? OR ");
+                            queryArgs.add(attr + "%");
+                        }
+                        query.append("0) ");
                     }
-                    String tablename = "`voc_ReadPoint`";
-                    if (paramName.equals("WD_bizLocation")) {
-                        tablename = "`voc_BizLoc`";
-                    }
-                    // the % allows any possible ending, which should implement
-                    // the semantics of "With Descendant"
-                    query.append(" AND (");
-                    for (int j = 0; j < attrs.length; j++) {
-                        query.append(tablename);
-                        query.append(".uri LIKE ? OR ");
-                        queryArgs.add(attrs[j] + "%");
-                    }
-                    query.append("0) ");
 
                 } else if (paramName.startsWith("EQ_bizTransaction_")) {
                     // this query is subdivided into several subqueries
@@ -1063,36 +1089,41 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     // subquery for selecting IDs from voc_BizTransType
                     // type extracted from parameter name
                     String type = paramName.substring(18);
-                    String vocBizTransTypeId = "SELECT id FROM `voc_BizTransType` WHERE uri=\"" + type + "\"";
+                    String vocBizTransTypeId = "SELECT id FROM " + delimiter + "voc_BizTransType" + delimiter
+                            + " WHERE uri=\"" + type + "\"";
 
                     // subquery for selecting IDs from voc_BizTrans
-                    StringBuffer temp = new StringBuffer();
-                    temp.append("(SELECT id AS vocBizTransId FROM `voc_BizTrans` WHERE `voc_BizTrans`.uri IN (");
-                    String[] strings = ((ArrayOfString) paramValue).getString();
-                    int j = 0;
-                    while (j < strings.length - 1) {
-                        temp.append("\"" + strings[j] + "\",");
-                        j++;
+                    StringBuilder temp = new StringBuilder();
+                    temp.append("(SELECT id AS vocBizTransId FROM ").append(delimiter).append("voc_BizTrans").append(
+                            delimiter).append(" WHERE ").append(delimiter).append("voc_BizTrans").append(delimiter).append(
+                            ".uri IN (");
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    if (aos.getString().size() > 0) {
+                        for (String s : aos.getString()) {
+                            temp.append("\"").append(s).append("\",");
+                        }
                     }
-                    if (strings.length > 0) {
-                        temp.append("\"" + strings[j] + "\"");
-                    }
+                    // remove last comma
+                    temp.delete(temp.length() - 1, temp.length());
                     temp.append(")) AS SelectedVocBizTrans");
                     String vocBizTransIds = temp.toString();
 
                     // subquery for selecting IDs from BizTransaction
-                    String selectedBizTrans = "(SELECT id AS bizTransId, bizTrans FROM `BizTransaction` bt WHERE bt.type=("
-                            + vocBizTransTypeId + ")) AS SelectedBizTrans";
+                    String selectedBizTrans = "(SELECT id AS bizTransId, bizTrans FROM " + delimiter + "BizTransaction"
+                            + delimiter + " bt WHERE bt.type=(" + vocBizTransTypeId + ")) AS SelectedBizTrans";
                     String bizTransId = "SELECT bizTransId FROM " + vocBizTransIds + " INNER JOIN " + selectedBizTrans
                             + " ON SelectedBizTrans.bizTrans=SelectedVocBizTrans.vocBizTransId";
 
-                    query.append(" AND (`event_" + eventType + "`.id IN (");
+                    query.append(" AND (").append(delimiter).append("event_").append(eventType).append(delimiter).append(
+                            ".id IN (");
                     query.append("SELECT event_id AS id ");
-                    query.append("FROM `event_" + eventType + "_bizTrans` ");
+                    query.append("FROM ").append(delimiter).append("event_").append(eventType).append("_bizTrans").append(
+                            delimiter).append(" ");
                     query.append("INNER JOIN (");
                     query.append(bizTransId);
                     query.append(") AS BizTransIds ");
-                    query.append("ON BizTransIds.bizTransId=`event_" + eventType + "_bizTrans`.bizTrans_id");
+                    query.append("ON BizTransIds.bizTransId=").append(delimiter).append(
+                            "event_" + eventType + "_bizTrans").append(delimiter).append(".bizTrans_id");
                     query.append("))");
 
                 } else if (paramName.equals("MATCH_epc") || paramName.equals("MATCH_anyEPC")) {
@@ -1101,33 +1132,41 @@ public class QueryOperationsModule implements EPCISServicePortType {
                         // exclude event from result set
                         query.append(" AND 0 ");
                     } else {
-                        String[] epcs = ((ArrayOfString) paramValue).getString();
-                        query.append(" AND (`event_");
-                        query.append(eventType);
-                        query.append("`.id IN (");
-                        query.append("SELECT event_id FROM `event_");
-                        query.append(eventType);
-                        query.append("_EPCs` WHERE ");
-                        for (int j = 0; j < epcs.length; j++) {
-                            String val = epcs[j].replaceAll("\\*", "%");
-                            query.append("epc LIKE '" + val + "' OR ");
-                        }
-                        query.append("0))");
-                        if (paramName.equals("MATCH_anyEPC")
-                                && (eventType.equals("AggregationEvent") || eventType.equals("TransactionEvent"))) {
-                            // also look in parentID field
-                            query.append(" OR (parentID IN (");
-                            stringArrayToSQL(epcs, query, queryArgs);
+                        ArrayOfString aos = parseAsArrayOfString(paramValue);
+                        // check if parameter value provided
+                        if (!aos.getString().isEmpty()) {
+                            query.append(" AND (").append(delimiter).append("event_");
+                            query.append(eventType);
+                            query.append(delimiter).append(".id IN (");
+                            query.append("SELECT event_id FROM ").append(delimiter).append("event_");
+                            query.append(eventType);
+                            query.append("_EPCs").append(delimiter).append(" WHERE ");
+                            for (String epc : aos.getString()) {
+                                String val = epc.replaceAll("\\*", "%");
+                                query.append("epc LIKE '").append(val).append("' OR ");
+                            }
+                            query.append("0");
+                            if (paramName.equals("MATCH_anyEPC")
+                                    && (eventType.equals("AggregationEvent") || eventType.equals("TransactionEvent"))) {
+                                // also look in parentID field
+                                query.append(" OR (parentID IN (");
+                                listOfStringToSql(aos.getString(), query, queryArgs);
+                                query.append("))");
+                            }
                             query.append("))");
                         }
                     }
 
                 } else if (paramName.equals("MATCH_parentID")) {
                     if (eventType.equals("AggregationEvent") || eventType.equals("TransactionEvent")) {
-                        query.append(" AND (parentID IN (");
-                        String[] epcs = ((ArrayOfString) paramValue).getString();
-                        stringArrayToSQL(epcs, query, queryArgs);
-                        query.append("))");
+                        ArrayOfString aos = parseAsArrayOfString(paramValue);
+                        // check if parameter value provided
+                        if (!aos.getString().isEmpty()) {
+                            query.append(" AND (parentID IN (");
+
+                            listOfStringToSql(aos.getString(), query, queryArgs);
+                            query.append("))");
+                        }
                     } else {
                         // the parameter is not allowed for other events,
                         // exclude event from result set
@@ -1136,28 +1175,18 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
                 } else if (paramName.equals("MATCH_epcClass")) {
                     if (eventType.equals("QuantityEvent")) {
-                        query.append(" AND (epcClass IN (");
-                        query.append("SELECT id FROM `voc_EPCClass` WHERE uri IN (");
-                        String[] epcs = ((ArrayOfString) paramValue).getString();
-                        stringArrayToSQL(epcs, query, queryArgs);
-                        query.append(")))");
+                        ArrayOfString aos = parseAsArrayOfString(paramValue);
+                        // check if parameter value provided
+                        if (!aos.getString().isEmpty()) {
+                            query.append(" AND (epcClass IN (");
+                            query.append("SELECT id FROM ").append(delimiter).append("voc_EPCClass").append(delimiter).append(
+                                    " WHERE uri IN (");
+                            listOfStringToSql(aos.getString(), query, queryArgs);
+                            query.append(")))");
+                        }
                     } else {
                         // the parameter is not allowed for other events,
                         // exclude event from result set
-                        query.append(" AND 0 ");
-                    }
-
-                } else if (paramName.equals("MATCH_childEPC")) {
-                    // TODO: this parameter is only kept for consistency to an
-                    // older draft version of the EPCIS specification and to the
-                    // test kit. it should be removed!
-                    if (eventType.equals("AggregationEvent")) {
-                        query.append(" AND (`event_AggregationEvent`.id IN (");
-                        query.append("SELECT event_id FROM `event_AggregationEvent_EPCs` WHERE epc IN (");
-                        String[] epcs = ((ArrayOfString) paramValue).getString();
-                        stringArrayToSQL(epcs, query, queryArgs);
-                        query.append(")))");
-                    } else {
                         query.append(" AND 0 ");
                     }
 
@@ -1176,7 +1205,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                         query.append(" AND (quantity");
                         query.append(op);
                         query.append("?) ");
-                        queryArgs.add(((Integer) paramValue).toString());
+                        Integer quantity = parseAsInteger(paramValue);
+                        queryArgs.add(parseAsInteger(paramValue).toString());
                     } else {
                         query.append(" AND 0 ");
                     }
@@ -1190,7 +1220,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     if (parts.length != 2) {
                         String msg = "The parameter " + paramName + " cannot be recognised.";
                         LOG.info("USER ERROR: " + msg);
-                        throw new QueryParameterException(msg);
+                        QueryParameterException e = new QueryParameterException();
+                        e.setReason(msg);
+                        throw new QueryParameterExceptionResponse(msg, e);
                     }
 
                     // extract the operand
@@ -1208,39 +1240,41 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     // determine WHERE clause (depending on param value)
                     String where;
                     try {
-                        Integer intVal = (Integer) paramValue;
+                        Integer intVal = parseAsInteger(paramValue);
                         where = "intValue" + op + intVal;
-                    } catch (ClassCastException e1) {
+                    } catch (NumberFormatException e1) {
                         try {
-                            Float floatVal = (Float) paramValue;
+                            Float floatVal = parseAsFloat(paramValue);
                             where = "floatValue" + op + floatVal;
-                        } catch (ClassCastException e2) {
+                        } catch (NumberFormatException e2) {
                             try {
-                                Calendar cal = TimeParser.parseAsCalendar(paramValue.toString());
-                                Timestamp ts = new Timestamp(cal.getTimeInMillis());
+                                Timestamp ts = parseAsTimestamp(paramValue, paramName);
                                 where = "dateValue" + op + "\"" + ts.toString() + "\"";
-                            } catch (ParseException e) {
+                            } catch (QueryParameterExceptionResponse e) {
                                 try {
-                                    String[] strVals = ((ArrayOfString) paramValue).getString();
-                                    StringBuffer sb = new StringBuffer();
+                                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                                    StringBuilder sb = new StringBuilder();
                                     sb.append("strValue IN (");
-                                    int j = 0;
-                                    while (j < strVals.length - 1) {
-                                        sb.append("'" + strVals[j] + "',");
-                                        j++;
+                                    if (!aos.getString().isEmpty()) {
+                                        for (String s : aos.getString()) {
+                                            sb.append("'").append(s).append("',");
+                                        }
+                                        // remove last comma
+                                        sb.delete(sb.length() - 1, sb.length());
                                     }
-                                    sb.append("'" + strVals[j] + "')");
                                     where = sb.toString();
                                 } catch (ClassCastException e3) {
-                                    String strVal = paramValue.toString();
+                                    String strVal = parseAsString(paramValue);
                                     where = "strValue" + op + "\"" + strVal + "\"";
                                 }
                             }
                         }
                     }
-                    query.append(" AND `event_" + eventType + "_extensions`.");
+                    query.append(" AND ").append(delimiter).append("event_" + eventType + "_extensions").append(
+                            delimiter).append(".");
                     query.append(where);
-                    query.append(" AND `event_" + eventType + "_extensions`.fieldname=\"");
+                    query.append(" AND ").append(delimiter).append("event_" + eventType + "_extensions").append(
+                            delimiter).append(".fieldname=\"");
                     query.append(fieldname);
                     query.append("\"");
 
@@ -1248,19 +1282,25 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     String fieldname = paramName.substring(7);
                     if (fieldname.equals("childEPCs")) {
                         if (eventType.equals("AggregationEvent")) {
-                            query.append(" AND (`event_AggregationEvent`.id IN (");
-                            query.append("SELECT event_id FROM `event_AggregationEvent_EPCs`");
+                            query.append(" AND (").append(delimiter).append("event_AggregationEvent").append(delimiter).append(
+                                    ".id IN (");
+                            query.append("SELECT event_id FROM ").append(delimiter).append(
+                                    "event_AggregationEvent_EPCs").append(delimiter);
                             query.append("))");
                         } else {
                             query.append(" AND 0");
                         }
                     } else if (fieldname.equals("epcList")) {
-                        query.append(" AND (`event_" + eventType + "`.id IN (");
-                        query.append("SELECT event_id FROM `event_" + eventType + "_EPCs`");
+                        query.append(" AND (").append(delimiter).append("event_" + eventType).append(delimiter).append(
+                                ".id IN (");
+                        query.append("SELECT event_id FROM ").append(delimiter).append("event_" + eventType + "_EPCs").append(
+                                delimiter);
                         query.append("))");
                     } else if (fieldname.equals("bizTransactionList")) {
-                        query.append(" AND (`event_" + eventType + "`.id IN (");
-                        query.append("SELECT event_id FROM `event_" + eventType + "_bizTrans`");
+                        query.append(" AND (").append(delimiter).append("event_" + eventType).append(delimiter).append(
+                                ".id IN (");
+                        query.append("SELECT event_id FROM ").append(delimiter).append(
+                                "event_" + eventType + "_bizTrans").append(delimiter);
                         query.append("))");
                     } else {
                         // lets see if we have an extension fieldname
@@ -1272,8 +1312,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
                             queryArgs.add(fieldname);
                         } else {
                             // yep, extension fieldname: check extension table
-                            query.append(" AND (`event_" + eventType + "`.id IN (");
-                            query.append("SELECT event_id FROM `event_" + eventType + "_extensions` ");
+                            query.append(" AND (").append(delimiter).append("event_" + eventType).append(delimiter).append(
+                                    ".id IN (");
+                            query.append("SELECT event_id FROM ").append(delimiter).append(
+                                    "event_" + eventType + "_extensions").append(delimiter).append(" ");
                             query.append("WHERE fieldname='" + fieldname + "'");
                             query.append("))");
                         }
@@ -1290,7 +1332,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
                             String msg = "Parameter '" + paramName
                                     + "' is invalid as it does not follow the pattern 'EQATTR_fieldname_attrname'.";
                             LOG.info("USER ERROR: " + msg);
-                            throw new QueryParameterException(msg);
+                            QueryParameterException e = new QueryParameterException();
+                            e.setReason(msg);
+                            throw new QueryParameterExceptionResponse(msg, e);
                         } else if (parts.length == 2) {
                             // restrict also by attrname
                             fieldname = parts[0];
@@ -1330,35 +1374,38 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     // construct the query
                     if (tablename != null) {
                         if (biztrans != null) {
-                            query.append(" AND `event_");
+                            query.append(" AND ").append(delimiter).append("event_");
                             query.append(eventType);
-                            query.append("`.id IN (SELECT event_id FROM `event_");
+                            query.append(delimiter).append(".id IN (SELECT event_id FROM ").append(delimiter).append(
+                                    "event_");
                             query.append(eventType);
-                            query.append("_BizTrans` AS btrans WHERE btrans.bizTrans_id IN (");
-                            query.append("SELECT id FROM `BizTransaction` WHERE `BizTransaction`.");
+                            query.append("_BizTrans").append(delimiter).append(
+                                    " AS btrans WHERE btrans.bizTrans_id IN (");
+                            query.append("SELECT id FROM ").append(delimiter).append("BizTransaction").append(delimiter).append(
+                                    " WHERE ").append(delimiter).append("BizTransaction").append(delimiter).append(".");
                             query.append(biztrans);
-                            query.append(" IN (SELECT id FROM `voc_");
+                            query.append(" IN (SELECT id FROM ").append(delimiter).append("voc_");
                             query.append(tablename);
-                            query.append("` WHERE ");
+                            query.append(delimiter).append(" WHERE ");
                         } else {
                             query.append(" AND ");
                         }
-                        query.append("`voc_");
+                        query.append(delimiter).append("voc_");
                         query.append(tablename);
-                        query.append("`.id IN (SELECT id FROM `voc_");
+                        query.append(delimiter).append(".id IN (SELECT id FROM ").append(delimiter).append("voc_");
                         query.append(tablename);
-                        query.append("_attr` WHERE `voc_");
+                        query.append("_attr").append(delimiter).append(" WHERE ").append(delimiter).append("voc_");
                         query.append(tablename);
-                        query.append("_attr`.attribute");
+                        query.append("_attr").append(delimiter).append(".attribute");
                         if (attrname != null) {
-                            query.append("=? AND `voc_");
+                            query.append("=? AND ").append(delimiter).append("voc_");
                             query.append(tablename);
-                            query.append("_attr`.value");
+                            query.append("_attr").append(delimiter).append(".value");
                             queryArgs.add(attrname);
                         }
                         query.append(" IN (");
-                        ArrayOfString attrs = (ArrayOfString) paramValue;
-                        stringArrayToSQL(attrs.getString(), query, queryArgs);
+                        ArrayOfString aos = parseAsArrayOfString(paramValue);
+                        listOfStringToSql(aos.getString(), query, queryArgs);
                         query.append("))");
                         if (biztrans != null) {
                             query.append(")))");
@@ -1366,39 +1413,48 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     }
 
                 } else if (paramName.equals("orderBy")) {
-                    orderBy = (String) paramValue;
+                    orderBy = parseAsString(paramValue);
 
                 } else if (paramName.equals("orderDirection")) {
-                    orderDirection = (String) paramValue;
+                    orderDirection = parseAsString(paramValue);
 
                 } else if (paramName.equals("eventCountLimit")) {
-                    limit = (Integer) paramValue;
+                    limit = parseAsInteger(paramValue);
 
                 } else if (paramName.equals("maxEventCount")) {
-                    maxEventCount = ((Integer) paramValue).intValue();
+                    maxEventCount = parseAsInteger(paramValue).intValue();
                 } else {
                     String msg = "The parameter " + paramName + " cannot be recognised.";
                     LOG.info("USER ERROR: " + msg);
-                    throw new QueryParameterException(msg);
+                    QueryParameterException e = new QueryParameterException();
+                    e.setReason(msg);
+                    throw new QueryParameterExceptionResponse(msg, e);
                 }
             } catch (ClassCastException e) {
                 String msg = "The type of the value for query parameter '" + paramName + "': " + paramValue
                         + " is invalid.";
                 LOG.info("USER ERROR: " + msg);
-                throw new QueryParameterException(msg);
+                LOG.debug(msg, e);
+                QueryParameterException qpe = new QueryParameterException();
+                qpe.setReason(msg);
+                throw new QueryParameterExceptionResponse(msg, qpe, e);
             }
         }
 
         if (maxEventCount > -1 && limit > -1) {
             String msg = "Paramters 'maxEventCount' and 'eventCountLimit' are mutually exclusive.";
             LOG.info("USER ERROR: " + msg);
-            throw new QueryParameterException(msg);
+            QueryParameterException e = new QueryParameterException();
+            e.setReason(msg);
+            throw new QueryParameterExceptionResponse(msg, e);
         }
 
         if (orderBy.equals("") && limit > -1) {
             String msg = "Parameter 'eventCountLimit' may only be used when 'orderBy' is specified.";
             LOG.info("USER ERROR: " + msg);
-            throw new QueryParameterException(msg);
+            QueryParameterException e = new QueryParameterException();
+            e.setReason(msg);
+            throw new QueryParameterExceptionResponse(msg, e);
         }
 
         if (!orderBy.equals("")) {
@@ -1416,14 +1472,149 @@ public class QueryOperationsModule implements EPCISServicePortType {
         }
 
         String q = query.toString();
-        String qs = q.replaceAll("`", delimiter);
-        LOG.debug("QUERY: " + qs);
-        PreparedStatement ps = dbconnection.prepareStatement(qs);
+        LOG.debug("QUERY: " + q);
+        PreparedStatement ps = connection.prepareStatement(q);
         for (int i = 0; i < queryArgs.size(); i++) {
             ps.setString(i + 1, (String) queryArgs.get(i));
             LOG.debug("       query param " + (i + 1) + ": " + queryArgs.get(i));
         }
         return ps;
+    }
+
+    /**
+     * Parses the given query parameter value as String.
+     * 
+     * @param queryParamValue
+     *            The query parameter value to be parsed as String.
+     * @return The Float holding the value of the query parameter.
+     */
+    private String parseAsString(Object queryParamValue) throws ClassCastException {
+        try {
+            return (String) queryParamValue;
+        } catch (ClassCastException e) {
+            // trying to parse manually
+            Element elem = (Element) queryParamValue;
+            return elem.getTextContent();
+        }
+    }
+
+    /**
+     * Parses the given query parameter value as Float.
+     * 
+     * @param queryParamValue
+     *            The query parameter value to be parsed as Float.
+     * @return The Float holding the value of the query parameter.
+     * @throws NumberFormatException
+     *             If the query parameter value cannot be parsed as Float.
+     */
+    private Float parseAsFloat(Object queryParamValue) throws ClassCastException, NumberFormatException {
+        try {
+            return (Float) queryParamValue;
+        } catch (ClassCastException e) {
+            // trying to parse manually
+            Element elem = (Element) queryParamValue;
+            return Float.valueOf(elem.getTextContent());
+        }
+    }
+
+    /**
+     * Parses the given query parameter value as Timestamp.
+     * 
+     * @param queryParamValue
+     *            The query parameter value to be parsed as Timestamp.
+     * @param queryParamName
+     *            The query parameter name.
+     * @return The Timestamp holding the value of the query parameter.
+     * @throws QueryParameterExceptionResponse
+     *             If the query parameter value cannot be parsed as Timestamp.
+     */
+    private Timestamp parseAsTimestamp(Object queryParamValue, String queryParamName) throws ClassCastException,
+            QueryParameterExceptionResponse {
+        Timestamp ts;
+        if (queryParamValue instanceof Calendar) {
+            // Axis returns a Calendar instance
+            ts = TimeParser.convert((Calendar) queryParamValue);
+        } else if (queryParamValue instanceof XMLGregorianCalendar) {
+            // CXF returns an XMLGregorianCalendar instance if the
+            // XML type is
+            // specified
+            ts = TimeParser.convert(((XMLGregorianCalendar) queryParamValue).toGregorianCalendar());
+        } else {
+            // try to parse the value manually
+            String date = null;
+            if (queryParamValue instanceof Element) {
+                // CXF returns an Element instance if no XML type
+                // was specified in the request
+                Element elem = (Element) queryParamValue;
+                date = elem.getTextContent();
+            } else {
+                date = queryParamValue.toString();
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Trying to parse the value (" + date + ") for parameter " + queryParamName + " as date/time");
+            }
+            try {
+                ts = TimeParser.parseAsTimestamp(date);
+            } catch (ParseException e) {
+                String msg = "Unable to parse the value for query parameter '" + queryParamName + "' as date/time";
+                LOG.warn(msg, e);
+                QueryParameterException qpe = new QueryParameterException();
+                qpe.setReason(msg);
+                throw new QueryParameterExceptionResponse(msg, qpe, e);
+            }
+        }
+        return ts;
+    }
+
+    /**
+     * Parses the given query parameter value as Integer.
+     * 
+     * @param queryParamValue
+     *            The query parameter value to be parsed as Integer.
+     * @return The Integer holding the value of the query parameter.
+     * @throws NumberFormatException
+     *             If the query parameter value cannot be parsed as Integer.
+     */
+    private Integer parseAsInteger(Object queryParamValue) throws ClassCastException, NumberFormatException {
+        try {
+            return (Integer) queryParamValue;
+        } catch (ClassCastException e) {
+            // trying to parse manually
+            Element elem = (Element) queryParamValue;
+            return Integer.valueOf(elem.getTextContent());
+        }
+    }
+
+    /**
+     * Parses the given query parameter value into an ArrayOfString object.
+     * 
+     * @param queryParamValue
+     *            The value of the query parameter to be parsed.
+     * @return The ArrayOfString object representing the list of strings from
+     *         the given parameter value.
+     * @throws ClassCastException
+     *             If the given paramValue instance cannot be cast to either an
+     *             ArrayOfString or Element class.
+     */
+    private ArrayOfString parseAsArrayOfString(Object queryParamValue) throws ClassCastException {
+        try {
+            return (ArrayOfString) queryParamValue;
+        } catch (ClassCastException e) {
+            // trying to parse manually
+            Element elem = (Element) queryParamValue;
+            NodeList strings = elem.getChildNodes();
+            ArrayOfString aos = new ArrayOfString();
+            for (int i = 0; i < strings.getLength(); i++) {
+                if ("string".equals(strings.item(i).getNodeName())) {
+                    String s = strings.item(i).getTextContent();
+                    aos.getString().add(s);
+                }
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("ArrayOfString parsed to: " + aos.getString());
+            }
+            return aos;
+        }
     }
 
     /**
@@ -1433,17 +1624,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @return An ArrayOfString containing the names of all implemented queries.
      */
     public ArrayOfString getQueryNames(final EmptyParms parms) {
+        LOG.debug("Invoking 'getQueryNames'");
         ArrayOfString qNames = new ArrayOfString();
-        String[] qNamesArray = new String[queryNames.size()];
-        qNamesArray = queryNames.toArray(qNamesArray);
-        qNames.setString(qNamesArray);
+        qNames.getString().addAll(QUERYNAMES);
         return qNames;
     }
 
     /**
      * Subscribes a query.
      * 
-     * @see org.accada.epcis.soapapi.EPCISServicePortType#subscribe(org.accada.epcis.soapapi.Subscribe)
+     * @see org.accada.epcis.soap.EPCISServicePortType#subscribe(org.accada.epcis.soap.model.Subscribe)
      * @param parms
      *            A Subscribe object containing the query to be subscribed..
      * @return Nothing.
@@ -1464,18 +1654,22 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws NoSuchNameException
      *             If a query name is not implemented yet.
      */
-    public VoidHolder subscribe(final Subscribe parms) throws ImplementationException, InvalidURIException,
-            SubscribeNotPermittedException, SubscriptionControlsException, ValidationException,
-            DuplicateSubscriptionException, NoSuchNameException {
-        QueryParam[] qParams = parms.getParams();
-        URI dest = parms.getDest();
+    public VoidHolder subscribe(final Subscribe parms) throws DuplicateSubscriptionExceptionResponse,
+            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
+            InvalidURIExceptionResponse, ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse,
+            NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
+        LOG.debug("Invoking 'subscribe'");
+        initConnection();
+
+        QueryParams qParams = parms.getParams();
+        String dest = parms.getDest();
         String subscrId = parms.getSubscriptionID();
         SubscriptionControls controls = parms.getControls();
-        URI triggerURI = controls.getTrigger();
+        String triggerURI = controls.getTrigger();
         QuerySubscriptionScheduled newSubscription = null;
         String queryName = parms.getQueryName();
         Schedule schedule = null;
-        GregorianCalendar initialRecordTime = (GregorianCalendar) parms.getControls().getInitialRecordTime();
+        GregorianCalendar initialRecordTime = parms.getControls().getInitialRecordTime().toGregorianCalendar();
         if (initialRecordTime == null) {
             initialRecordTime = new GregorianCalendar();
         }
@@ -1489,42 +1683,54 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (dest == null || dest.toString().equals("")) {
                 String msg = "Destination URI is empty. This implementation doesn't support pre-arranged destinations.";
                 LOG.info("USER ERROR: " + msg);
-                throw new InvalidURIException(msg);
+                InvalidURIException e = new InvalidURIException();
+                e.setReason(msg);
+                throw new InvalidURIExceptionResponse(msg, e);
             }
             try {
                 new URL(dest.toString());
-            } catch (MalformedURLException e) {
-                String msg = "Destination URI is invalid: " + e.getMessage();
+            } catch (MalformedURLException ex) {
+                String msg = "Destination URI is invalid: " + ex.getMessage();
                 LOG.info("USER ERROR: " + msg);
-                throw new InvalidURIException(msg);
+                InvalidURIException e = new InvalidURIException();
+                e.setReason(msg);
+                throw new InvalidURIExceptionResponse(msg, e, ex);
             }
 
             // check query name
-            if (!queryNames.contains(queryName)) {
+            if (!QUERYNAMES.contains(queryName)) {
                 String msg = "Illegal query name '" + queryName + "'.";
                 LOG.info("USER ERROR: " + msg);
-                throw new NoSuchNameException(msg);
+                NoSuchNameException e = new NoSuchNameException();
+                e.setReason(msg);
+                throw new NoSuchNameExceptionResponse(msg, e);
             }
 
             // SimpleMasterDataQuery only valid for polling
             if (queryName.equals("SimpleMasterDataQuery")) {
                 String msg = "Subscription not allowed for SimpleMasterDataQuery.";
                 LOG.info("USER ERROR: " + msg);
-                throw new SubscribeNotPermittedException(msg);
+                SubscribeNotPermittedException e = new SubscribeNotPermittedException();
+                e.setReason(msg);
+                throw new SubscribeNotPermittedExceptionResponse(msg, e);
             }
 
             // subscriptionID mustn't be empty.
             if (subscrId == null || subscrId.equals("")) {
                 String msg = "SubscriptionID is empty. Choose a valid subscriptionID.";
                 LOG.info(msg);
-                throw new ValidationException(msg);
+                ValidationException e = new ValidationException();
+                e.setReason(msg);
+                throw new ValidationExceptionResponse(msg, e);
             }
 
             // subscriptionID mustn't exist yet.
             if (fetchExistsSubscriptionId(subscrId)) {
                 String msg = "SubscriptionID '" + subscrId + "' already exists. Choose a different subscriptionID.";
                 LOG.info("USER ERROR: " + msg);
-                throw new DuplicateSubscriptionException(msg);
+                DuplicateSubscriptionException e = new DuplicateSubscriptionException();
+                e.setReason(msg);
+                throw new DuplicateSubscriptionExceptionResponse(msg, e);
             }
 
             // trigger and schedule may no be used together, but one of them
@@ -1532,12 +1738,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
             if (controls.getSchedule() != null && controls.getTrigger() != null) {
                 String msg = "Schedule and trigger mustn't be used together.";
                 LOG.info("USER ERROR: " + msg);
-                throw new SubscriptionControlsException(msg);
+                SubscriptionControlsException e = new SubscriptionControlsException();
+                e.setReason(msg);
+                throw new SubscriptionControlsExceptionResponse(msg, e);
             }
             if (controls.getSchedule() == null && controls.getTrigger() == null) {
                 String msg = "Either schedule or trigger has to be set.";
                 LOG.info("USER ERROR: " + msg);
-                throw new SubscriptionControlsException(msg);
+                SubscriptionControlsException e = new SubscriptionControlsException();
+                e.setReason(msg);
+                throw new SubscriptionControlsExceptionResponse(msg, e);
             }
             if (controls.getSchedule() != null) {
                 // Scheduled Query -> parse schedule
@@ -1568,7 +1778,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     + "params, dest, sched, trigg, initialrecordingtime, "
                     + "exportifempty, queryname, lastexecuted) VALUES "
                     + "((?), (?), (?), (?), (?), (?), (?), (?), (?))";
-            PreparedStatement stmt = dbconnection.prepareStatement(insert);
+            PreparedStatement stmt = connection.prepareStatement(insert);
             LOG.debug("QUERY: " + insert);
             try {
                 stmt.setString(1, subscrId);
@@ -1619,9 +1829,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 LOG.error(msg);
                 ImplementationException iex = new ImplementationException();
                 iex.setReason(msg);
-                iex.setStackTrace(e.getStackTrace());
                 iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-                throw iex;
+                throw new ImplementationExceptionResponse(msg, iex, e);
             }
 
             // store the new Query to the HashMap
@@ -1634,9 +1843,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
             LOG.error(msg, e);
             ImplementationException iex = new ImplementationException();
             iex.setReason(msg);
-            iex.setStackTrace(e.getStackTrace());
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-            throw iex;
+            throw new ImplementationExceptionResponse(msg, iex, e);
+        } finally {
+            releaseConnection();
         }
     }
 
@@ -1650,10 +1860,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             If a problem with the EPCIS implementation occurred.
      */
-    private Map<String, QuerySubscriptionScheduled> fetchSubscriptions() throws SQLException, ImplementationException {
+    private Map<String, QuerySubscriptionScheduled> fetchSubscriptions() throws SQLException,
+            ImplementationExceptionResponse {
         String query = "SELECT * FROM subscription";
         LOG.debug("QUERY: " + query);
-        Statement stmt = dbconnection.createStatement();
+        Statement stmt = connection.createStatement();
         QuerySubscriptionScheduled storedSubscription;
         GregorianCalendar initrectime = new GregorianCalendar();
 
@@ -1665,8 +1876,13 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
                 ObjectInput in = new ObjectInputStream(rs.getBinaryStream("params"));
 
-                QueryParam[] params = (QueryParam[]) in.readObject();
-                URI dest = stringToUri(rs.getString("dest"));
+                QueryParam[] paramArray = (QueryParam[]) in.readObject();
+                // convert QueryParam[] to QueryParams
+                QueryParams params = new QueryParams();
+                for (int i = 0; i < paramArray.length; i++) {
+                    params.getParam().add(paramArray[i]);
+                }
+                String dest = rs.getString("dest");
 
                 in = new ObjectInputStream(rs.getBinaryStream("sched"));
                 Schedule sched = (Schedule) in.readObject();
@@ -1683,7 +1899,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
                             initrectime, new GregorianCalendar(), sched, queryName);
                 } else {
                     storedSubscription = new QuerySubscriptionTriggered(subscrId, params, dest, exportifempty,
-                            initrectime, new GregorianCalendar(), queryName, stringToUri(trigger), sched);
+                            initrectime, new GregorianCalendar(), queryName, trigger, sched);
                 }
                 subscribedMap.put(subscrId, storedSubscription);
             } catch (SQLException e) {
@@ -1695,9 +1911,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 LOG.error(msg, e);
                 ImplementationException iex = new ImplementationException();
                 iex.setReason(msg);
-                iex.setStackTrace(e.getStackTrace());
-                iex.setSeverity(ImplementationExceptionSeverity.SEVERE);
-                throw iex;
+                iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+                throw new ImplementationExceptionResponse(msg, iex, e);
             }
         }
         rs.close();
@@ -1707,7 +1922,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
     /**
      * Stops a subscribed query from further invocations.
      * 
-     * @see org.accada.epcis.soapapi.EPCISServicePortType#unsubscribe(org.accada.epcis.soapapi.Unsubscribe)
+     * @see org.accada.epcis.soap.EPCISServicePortType#unsubscribe(org.accada.epcis.soapapi.Unsubscribe)
      * @param parms
      *            An Unsubscribe object containing the ID of the query to be
      *            unsubscribed.
@@ -1717,7 +1932,10 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws NoSuchSubscriptionException
      *             If the suscription id is not subscribed.
      */
-    public VoidHolder unsubscribe(final Unsubscribe parms) throws ImplementationException, NoSuchSubscriptionException {
+    public VoidHolder unsubscribe(final Unsubscribe parms) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse {
+        LOG.debug("Invoking 'unsubscribe'");
+        initConnection();
         try {
             Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions();
             String subscrId = parms.getSubscriptionID();
@@ -1731,7 +1949,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
 
                 // delete subscription from database
                 String delete = "DELETE FROM subscription WHERE " + "subscriptionid = (?)";
-                PreparedStatement stmt = dbconnection.prepareStatement(delete);
+                PreparedStatement stmt = connection.prepareStatement(delete);
                 stmt.setString(1, subscrId);
                 LOG.debug("QUERY: " + delete);
                 LOG.debug("        query param 1: " + subscrId);
@@ -1741,81 +1959,55 @@ public class QueryOperationsModule implements EPCISServicePortType {
             } else {
                 String msg = "There is no subscription with ID '" + subscrId + "'.";
                 LOG.info("USER ERROR: " + msg);
-                throw new NoSuchSubscriptionException(msg);
+                NoSuchSubscriptionException e = new NoSuchSubscriptionException();
+                e.setReason(msg);
+                throw new NoSuchSubscriptionExceptionResponse(msg, e);
             }
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "SQL error during query execution: " + e.getMessage();
             LOG.error(msg, e);
             iex.setReason(msg);
-            iex.setStackTrace(e.getStackTrace());
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-            throw iex;
+            throw new ImplementationExceptionResponse(msg, iex, e);
+        } finally {
+            releaseConnection();
         }
-    }
-
-    /**
-     * Saves the map with the subscriptions to the message context.
-     * 
-     * @param subscribedMap
-     *            The map with the subscriptions.
-     */
-    private void saveSubscriptions(final Map<String, QuerySubscriptionScheduled> subscribedMap) {
-        MessageContext msgContext = MessageContext.getCurrentContext();
-        msgContext.setProperty("subscribedMap", subscribedMap);
-    }
-
-    /**
-     * Retrieves the map with the subscriptions from the servlet context.
-     * 
-     * @return The map with the subscriptions.
-     * @throws ImplementationException
-     *             If the map could not be reloaded.
-     * @throws SQLException
-     *             If a database error occurred.
-     */
-    private Map<String, QuerySubscriptionScheduled> loadSubscriptions() throws ImplementationException, SQLException {
-        MessageContext msgContext = MessageContext.getCurrentContext();
-        Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String, QuerySubscriptionScheduled>) msgContext.getProperty("subscribedMap");
-        if (subscribedMap == null) {
-            subscribedMap = fetchSubscriptions();
-        }
-        return subscribedMap;
     }
 
     /**
      * Returns an ArrayOfString containing IDs of all subscribed queries.
      * 
-     * @see org.accada.epcis.soapapi.EPCISServicePortType#getSubscriptionIDs(org.accada.epcis.soapapi.GetSubscriptionIDs)
+     * @see org.accada.epcis.soap.EPCISServicePortType#getSubscriptionIDs(org.accada.epcis.soap.model.GetSubscriptionIDs)
      * @param parms
      *            An empty parameter.
      * @return An ArrayOfString containing IDs of all subscribed queries.
      * @throws ImplementationException
      *             If a problem with the EPCIS implementation occurred.
      */
-    public ArrayOfString getSubscriptionIDs(final GetSubscriptionIDs parms) throws ImplementationException {
+    public ArrayOfString getSubscriptionIDs(GetSubscriptionIDs parms) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse {
+        LOG.debug("Invoking 'getSubscriptionIDs'");
         try {
             Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions();
-            String[] temp = {};
-            temp = subscribedMap.keySet().toArray(temp);
+            Set<String> temp = subscribedMap.keySet();
             ArrayOfString arrOfStr = new ArrayOfString();
-            arrOfStr.setString(temp);
+            arrOfStr.getString().addAll(temp);
             return arrOfStr;
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "SQL error during query execution: " + e.getMessage();
             LOG.error(msg, e);
             iex.setReason(msg);
-            iex.setStackTrace(e.getStackTrace());
             iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-            throw iex;
+            throw new ImplementationExceptionResponse(msg, iex, e);
         }
     }
 
     /**
      * Runs (polls) a query.
      * 
-     * @see org.accada.epcis.soapapi.EPCISServicePortType#poll(org.accada.epcis.soapapi.Poll)
+     * @see org.accada.epcis.soap.EPCISServicePortType#poll(org.accada.epcis.soap.model.Poll)
      * @param parms
      *            The query to poll.
      * @return A QueryResults object containing the result of the query.
@@ -1830,42 +2022,43 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryTooComplexException
      *             If a query takes too long to return.
      */
-    public QueryResults poll(final Poll parms) throws ImplementationException, QueryTooLargeException,
-            QueryParameterException, NoSuchNameException, QueryTooComplexException {
+    public QueryResults poll(Poll parms) throws ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
+            QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
+            NoSuchNameExceptionResponse, QueryParameterExceptionResponse {
+        LOG.debug("Invoking 'poll'");
+        initConnection();
 
         // query type must be implemented.
-        if (!queryNames.contains(parms.getQueryName())) {
+        if (!QUERYNAMES.contains(parms.getQueryName())) {
             String msg = "Invalid query name '" + parms.getQueryName() + "' provided.";
             LOG.info("USER ERROR: " + msg);
-            throw new NoSuchNameException(msg);
+            NoSuchNameException e = new NoSuchNameException();
+            e.setReason(msg);
+            throw new NoSuchNameExceptionResponse(msg, e);
         }
 
         String queryName = parms.getQueryName();
         if (queryName.equals("SimpleEventQuery")) {
             try {
-                QueryParam[] queryParams = parms.getParams();
+                QueryParams queryParams = parms.getParams();
+                EventListType eventList = new EventListType();
 
                 PreparedStatement ps = createEventQuery(queryParams, "ObjectEvent");
-                ObjectEventType[] tempObjectEvent = runObjectEventQuery(ps);
+                runObjectEventQuery(ps, eventList);
 
                 ps = createEventQuery(queryParams, "AggregationEvent");
-                AggregationEventType[] tempAggrEvent = runAggregationEventQuery(ps);
+                runAggregationEventQuery(ps, eventList);
 
                 ps = createEventQuery(queryParams, "QuantityEvent");
-                QuantityEventType[] tempQuantityEvent = runQuantityEventQuery(ps);
+                runQuantityEventQuery(ps, eventList);
 
                 ps = createEventQuery(queryParams, "TransactionEvent");
-                TransactionEventType[] tempTransEvent = runTransactionEventQuery(ps);
-
-                // construct QueryResults
-                EventListType eventList = new EventListType();
-                eventList.setObjectEvent(tempObjectEvent);
-                eventList.setAggregationEvent(tempAggrEvent);
-                eventList.setQuantityEvent(tempQuantityEvent);
-                eventList.setTransactionEvent(tempTransEvent);
+                runTransactionEventQuery(ps, eventList);
 
                 QueryResultsBody resultsBody = new QueryResultsBody();
-                resultsBody.setEventList(eventList);
+                if (!eventList.getObjectEventOrAggregationEventOrQuantityEvent().isEmpty()) {
+                    resultsBody.setEventList(eventList);
+                }
 
                 QueryResults results = new QueryResults();
                 results.setResultsBody(resultsBody);
@@ -1878,12 +2071,13 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 String msg = "SQL error during query execution: " + e.getMessage();
                 LOG.error(msg, e);
                 iex.setReason(msg);
-                iex.setStackTrace(e.getStackTrace());
                 iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-                throw iex;
+                throw new ImplementationExceptionResponse(msg, iex, e);
+            } finally {
+                releaseConnection();
             }
         } else if (queryName.equals("SimpleMasterDataQuery")) {
-            QueryParam[] queryParams = parms.getParams();
+            QueryParams queryParams = parms.getParams();
             try {
                 QueryResults results = createMasterDataQuery(queryParams);
 
@@ -1894,14 +2088,18 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 String msg = "SQL error during query execution: " + e.getMessage();
                 LOG.error(msg, e);
                 iex.setReason(msg);
-                iex.setStackTrace(e.getStackTrace());
                 iex.setSeverity(ImplementationExceptionSeverity.ERROR);
-                throw iex;
+                throw new ImplementationExceptionResponse(msg, iex, e);
+            } finally {
+                releaseConnection();
             }
         } else {
+            releaseConnection();
             String msg = "Unsupported query name '" + parms.getQueryName() + "' provided.";
             LOG.info("USER ERROR: " + msg);
-            throw new NoSuchNameException(msg);
+            NoSuchNameException e = new NoSuchNameException();
+            e.setReason(msg);
+            throw new NoSuchNameExceptionResponse(msg, e);
         }
     }
 
@@ -1921,13 +2119,12 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryTooLargeException
      *             If the query is too large to be executed.
      */
-    private QueryResults createMasterDataQuery(final QueryParam[] queryParams) throws SQLException,
-            QueryParameterException, ImplementationException, QueryTooLargeException {
+    private QueryResults createMasterDataQuery(final QueryParams queryParams) throws SQLException,
+            QueryParameterExceptionResponse, ImplementationExceptionResponse, QueryTooLargeExceptionResponse {
 
         // populate a sorted map with the given parameters
-        List<QueryParam> paramList = Arrays.asList(queryParams);
         SortedMap<String, Object> params = new TreeMap<String, Object>();
-        for (QueryParam param : paramList) {
+        for (QueryParam param : queryParams.getParam()) {
             params.put(param.getName(), param.getValue());
         }
 
@@ -1940,7 +2137,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
         } catch (NullPointerException e) {
             String msg = "Invalid MasterDataQuery: missing required parameter 'includeAttributes' or invalid value provided.";
             LOG.info("USER ERROR: " + msg, e);
-            throw new QueryParameterException(msg);
+            QueryParameterException qpe = new QueryParameterException();
+            qpe.setReason(msg);
+            throw new QueryParameterExceptionResponse(msg, qpe, e);
         }
 
         // check for parameter 'includeChildren'
@@ -1952,51 +2151,53 @@ public class QueryOperationsModule implements EPCISServicePortType {
         } catch (NullPointerException e) {
             String msg = "Invalid MasterDataQuery: missing required parameter 'includeChildren' or invalid value provided.";
             LOG.info("USER ERROR: " + msg);
-            throw new QueryParameterException(msg);
+            QueryParameterException qpe = new QueryParameterException();
+            qpe.setReason(msg);
+            throw new QueryParameterExceptionResponse(msg, qpe, e);
         }
 
         // fetch vocabulary table names
-        String[] uris = new String[0];
+        List<String> uris = new ArrayList<String>();
         if (params.containsKey("vocabularyName")) {
             Object val = params.remove("vocabularyName");
             uris = ((ArrayOfString) val).getString();
         }
-        Map<String, URI> tableNames = fetchVocabularyTableNames(uris);
+        Map<String, String> tableNames = fetchVocabularyTableNames(uris);
 
         // filter vocabularies by name
-        String[] filterVocNames = new String[0];
+        List<String> filterVocNames = new ArrayList<String>();
         if (params.containsKey("EQ_name")) {
             Object val = params.remove("EQ_name");
             filterVocNames = ((ArrayOfString) val).getString();
         }
 
         // filter vocabularies by name with desendants
-        String[] filterVocNamesWd = new String[0];
+        List<String> filterVocNamesWd = new ArrayList<String>();
         if (params.containsKey("WD_name")) {
             Object val = params.remove("WD_name");
             filterVocNamesWd = ((ArrayOfString) val).getString();
         }
 
         // filter vocabularies by attribute name
-        String[] filterVocAttrNames = new String[0];
+        List<String> filterVocAttrNames = new ArrayList<String>();
         if (params.containsKey("HASATTR")) {
             Object val = params.remove("HASATTR");
             filterVocAttrNames = ((ArrayOfString) val).getString();
         }
 
         // filter vocabularies by attribute value
-        Map<String, String[]> filterAttrs = new HashMap<String, String[]>();
+        Map<String, List<String>> filterAttrs = new HashMap<String, List<String>>();
         for (String param : params.keySet()) {
             if (param.startsWith("EQATTR_")) {
                 String attrname = param.substring(7);
                 Object val = params.remove(param);
-                String[] values = ((ArrayOfString) val).getString();
+                List<String> values = ((ArrayOfString) val).getString();
                 filterAttrs.put(attrname, values);
             }
         }
 
         // filter attributes by name
-        String[] filterAttrNames = new String[0];
+        List<String> filterAttrNames = new ArrayList<String>();
         if (params.containsKey("attributeNames") && includeAttributes) {
             Object val = params.remove("attributeNames");
             filterAttrNames = ((ArrayOfString) val).getString();
@@ -2015,17 +2216,16 @@ public class QueryOperationsModule implements EPCISServicePortType {
             List<VocabularyElementType> vocElemList = new ArrayList<VocabularyElementType>();
 
             // fetch all vocabularies filtered by the given arguments
-            List<URI> vocs = fetchVocabularies(vocTableName, filterVocNames, filterVocNamesWd, filterAttrs,
+            List<String> vocs = fetchVocabularies(vocTableName, filterVocNames, filterVocNamesWd, filterAttrs,
                     filterVocAttrNames, maxElementCount);
 
             // handle each vocabulary element
-            for (URI voc : vocs) {
+            for (String voc : vocs) {
                 VocabularyElementType vocElem = new VocabularyElementType();
                 vocElem.setId(voc);
 
-                AttributeType[] attributes = null;
+                List<AttributeType> attrList = vocElem.getAttribute();
                 if (includeAttributes) {
-                    List<AttributeType> attrList = new ArrayList<AttributeType>();
 
                     // fetch all attributes for current vocabulary element
                     Map<String, String> attrMap = fetchAttributes(vocTableName, voc.toString(), filterAttrNames);
@@ -2033,36 +2233,30 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     // handle each attribute element
                     for (String attrId : attrMap.keySet()) {
                         AttributeType attr = new AttributeType();
-                        attr.setId(stringToUri(attrId));
+                        attr.setId(attrId);
                         String attrValue = attrMap.get(attrId);
-                        // attr value must be set with a text message element
-                        MessageElement[] val = new MessageElement[] { new MessageElement(new Text(attrValue)) };
-                        attr.set_any(val);
+                        // TODO attr value must be set with a text message
+                        // element; is this correct?
+                        Element elem = new DOMElement(attrValue);
+                        elem.setNodeValue(attrValue);
+                        attr.getAny().add(elem);
                         attrList.add(attr);
                     }
-                    if (attrList.size() > 0) {
-                        attributes = new AttributeType[attrList.size()];
-                        attributes = attrList.toArray(attributes);
-                    }
                 }
-                vocElem.setAttribute(attributes);
 
-                URI[] children = null;
+                IDListType idList = null;
                 if (includeChildren) {
                     // fetch all children for current vocabulary element
-                    List<URI> childrenList = fetchChildren(vocTableName, voc.toString());
-                    if (childrenList.size() > 0) {
-                        children = new URI[childrenList.size()];
-                        children = childrenList.toArray(children);
-                    }
+                    idList = new IDListType();
+                    fetchChildren(vocTableName, voc.toString(), idList.getId());
                 }
-                vocElem.setChildren(children);
+                vocElem.setChildren(idList);
                 vocElemList.add(vocElem);
             }
-            VocabularyElementType[] vocElems = null;
+            VocabularyElementListType vocElems = null;
             if (vocElemList.size() > 0) {
-                vocElems = new VocabularyElementType[vocElemList.size()];
-                vocElems = vocElemList.toArray(vocElems);
+                vocElems = new VocabularyElementListType();
+                vocElems.getVocabularyElement().addAll(vocElemList);
 
                 VocabularyType voc = new VocabularyType();
                 voc.setVocabularyElementList(vocElems);
@@ -2070,14 +2264,11 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 vocList.add(voc);
             }
         }
-        VocabularyType[] vocs = null;
-        if (vocList.size() > 0) {
-            vocs = new VocabularyType[vocList.size()];
-            vocs = vocList.toArray(vocs);
-        }
+        VocabularyListType vocListType = new VocabularyListType();
+        vocListType.getVocabulary().addAll(vocList);
 
         QueryResultsBody resultsBody = new QueryResultsBody();
-        resultsBody.setVocabularyList(vocs);
+        resultsBody.setVocabularyList(vocListType);
 
         QueryResults results = new QueryResults();
         results.setQueryName("SimpleMasterDataQuery");
@@ -2116,26 +2307,27 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *             If the actual number of returned vocabularies would exceed
      *             the given maxElementCount.
      */
-    private List<URI> fetchVocabularies(final String table, final String[] filterVocNames,
-            final String[] filterVocNamesWd, final Map<String, String[]> filterAttrs, final String[] attrs,
-            final int maxElementCount) throws SQLException, ImplementationException, QueryTooLargeException {
-        List<URI> vocs = new ArrayList<URI>();
+    private List<String> fetchVocabularies(final String table, final List<String> filterVocNames,
+            final List<String> filterVocNamesWd, final Map<String, List<String>> filterAttrs, final List<String> attrs,
+            final int maxElementCount) throws SQLException, ImplementationExceptionResponse,
+            QueryTooLargeExceptionResponse {
+        List<String> vocs = new ArrayList<String>();
 
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
         List<String> queryArgs = new ArrayList<String>();
-        sql.append("SELECT DISTINCT uri FROM `voc_");
-        sql.append(table);
-        sql.append("` AS vocTable");
+        sql.append("SELECT DISTINCT uri FROM ").append(delimiter);
+        sql.append("voc_").append(table);
+        sql.append(delimiter).append(" AS vocTable");
         // filter by attribute
-        if (attrs.length > 0 || filterAttrs.size() > 0) {
-            sql.append(", `voc_");
-            sql.append(table);
-            sql.append("_attr` AS attrTable ");
+        if (attrs.size() > 0 || filterAttrs.size() > 0) {
+            sql.append(", ").append(delimiter);
+            sql.append("voc_").append(table).append("_attr");
+            sql.append(delimiter).append(" AS attrTable ");
             sql.append("WHERE vocTable.id=attrTable.id");
-            if (attrs.length > 0) {
+            if (attrs.size() > 0) {
                 // filter by attribute name
                 sql.append(" AND attrTable.attribute IN (");
-                stringArrayToSQL(attrs, sql, queryArgs);
+                listOfStringToSql(attrs, sql, queryArgs);
                 sql.append(")");
             }
             if (filterAttrs.size() > 0) {
@@ -2144,35 +2336,32 @@ public class QueryOperationsModule implements EPCISServicePortType {
                     sql.append(" AND attrTable.attribute=?");
                     queryArgs.add(attrname);
                     sql.append(" AND attrTable.value IN (");
-                    stringArrayToSQL(filterAttrs.get(attrname), sql, queryArgs);
+                    listOfStringToSql(filterAttrs.get(attrname), sql, queryArgs);
                     sql.append(")");
                 }
             }
         } else {
             sql.append(" WHERE 1");
         }
-        if (filterVocNames.length > 0) {
+        if (!filterVocNames.isEmpty()) {
             // filter by voc name
             sql.append(" AND vocTable.uri IN (");
-            stringArrayToSQL(filterVocNames, sql, queryArgs);
+            listOfStringToSql(filterVocNames, sql, queryArgs);
             sql.append(")");
         }
-        if (filterVocNamesWd.length > 0) {
-            // filter by voc name with descendants
-            sql.append(" AND (vocTable.uri LIKE ?");
-            queryArgs.add(filterVocNamesWd[0] + "%");
-            for (int i = 1; i < filterVocNamesWd.length; i++) {
-                sql.append(" OR vocTable.uri LIKE ?");
-                queryArgs.add(filterVocNamesWd[i] + "%");
+        if (!filterVocNamesWd.isEmpty()) {
+            sql.append(" AND (");
+            for (String uri : filterVocNamesWd) {
+                sql.append("vocTable.uri LIKE ? OR ");
+                queryArgs.add(uri + "%");
             }
-            sql.append(")");
+            sql.append("0)");
         }
         sql.append(";");
 
-        String q = sql.toString();
-        String qs = q.replaceAll("`", delimiter);
-        PreparedStatement ps = dbconnection.prepareStatement(qs);
-        LOG.debug("QUERY: " + qs);
+        String query = sql.toString();
+        PreparedStatement ps = connection.prepareStatement(query);
+        LOG.debug("QUERY: " + query);
         int i = 1;
         for (String arg : queryArgs) {
             LOG.debug("       query param " + i + ": " + arg);
@@ -2187,10 +2376,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 QueryTooLargeException qtle = new QueryTooLargeException();
                 qtle.setReason(msg);
                 qtle.setQueryName("SimpleMasterDataQuery");
-                throw qtle;
+                throw new QueryTooLargeExceptionResponse(msg, qtle);
             }
-            URI uri = stringToUri(rs.getString("uri"));
-            vocs.add(uri);
+            vocs.add(rs.getString("uri"));
             count++;
         }
 
@@ -2208,23 +2396,23 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws ImplementationException
      *             If an error converting a String to an URI occurred.
      */
-    private Map<String, URI> fetchVocabularyTableNames(final String[] uris) throws SQLException,
-            ImplementationException {
-        Map<String, URI> tableNames = new HashMap<String, URI>();
+    private Map<String, String> fetchVocabularyTableNames(final List<String> uris) throws SQLException,
+            ImplementationExceptionResponse {
+        Map<String, String> tableNames = new HashMap<String, String>();
 
-        List<String> queryArgs = new ArrayList<String>(uris.length);
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT table_name, uri FROM `Vocabularies`");
-        if (uris.length > 0) {
+        List<String> queryArgs = new ArrayList<String>(uris.size());
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT table_name, uri FROM ");
+        sql.append(delimiter).append("Vocabularies").append(delimiter);
+        if (uris.size() > 0) {
             sql.append(" WHERE uri IN (");
-            stringArrayToSQL(uris, sql, queryArgs);
+            listOfStringToSql(uris, sql, queryArgs);
             sql.append(")");
         }
         sql.append(";");
-        String q = sql.toString();
-        String qs = q.replaceAll("`", delimiter);
-        LOG.debug("QUERY: " + qs);
-        PreparedStatement ps = dbconnection.prepareStatement(qs);
+        String query = sql.toString();
+        LOG.debug("QUERY: " + query);
+        PreparedStatement ps = connection.prepareStatement(query);
         int i = 1;
         for (String arg : queryArgs) {
             LOG.debug("       query param " + i + ": " + arg);
@@ -2234,7 +2422,7 @@ public class QueryOperationsModule implements EPCISServicePortType {
         while (rs.next()) {
             String tableName = rs.getString("table_name");
             String uri = rs.getString("uri");
-            tableNames.put(tableName, stringToUri(uri));
+            tableNames.put(tableName, uri);
         }
         return tableNames;
     }
@@ -2257,31 +2445,28 @@ public class QueryOperationsModule implements EPCISServicePortType {
      *             If an error accessing the database occurred.
      */
     private Map<String, String> fetchAttributes(final String vocTableName, final String vocName,
-            final String[] filterAttrNames) throws SQLException {
+            final List<String> filterAttrNames) throws SQLException {
         Map<String, String> attributes = new HashMap<String, String>();
 
-        List<String> queryArgs = new ArrayList<String>(filterAttrNames.length);
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT attribute, value FROM `voc_");
-        sql.append(vocTableName);
-        sql.append("_attr` AS attrTable WHERE attrTable.id=(");
-        sql.append("SELECT id FROM `voc_");
-        sql.append(vocTableName);
-        sql.append("` WHERE uri=?)");
+        List<String> queryArgs = new ArrayList<String>(filterAttrNames.size());
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT attribute, value FROM ").append(delimiter);
+        sql.append("voc_").append(vocTableName).append("_attr").append(delimiter);
+        sql.append(" AS attrTable WHERE attrTable.id=(SELECT id FROM ").append(delimiter);
+        sql.append("voc_").append(vocTableName).append(delimiter).append(" WHERE uri=?)");
         queryArgs.add(vocName);
-        if (filterAttrNames.length > 0) {
+        if (filterAttrNames.size() > 0) {
             // filter by attribute names
             sql.append(" AND attribute IN (");
-            stringArrayToSQL(filterAttrNames, sql, queryArgs);
+            listOfStringToSql(filterAttrNames, sql, queryArgs);
             sql.append(");");
         } else {
             sql.append(";");
         }
 
-        String q = sql.toString();
-        String qs = q.replaceAll("`", delimiter);
-        PreparedStatement ps = dbconnection.prepareStatement(qs);
-        LOG.debug("QUERY: " + qs);
+        String query = sql.toString();
+        PreparedStatement ps = connection.prepareStatement(query);
+        LOG.debug("QUERY: " + query);
         int i = 1;
         for (String arg : queryArgs) {
             LOG.debug("       query param " + i + ": " + arg);
@@ -2306,59 +2491,58 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @param vocUri
      *            The vocabulary uri string for which the children should be
      *            retrieved.
-     * @return A List of URI containing the children.
      * @throws SQLException
      *             If a DB access error occurred.
      * @throws ImplementationException
      *             If a String could not be converted into an URI.
      */
-    private List<URI> fetchChildren(final String vocTableName, final String vocUri) throws SQLException,
-            ImplementationException {
-        List<URI> children = new ArrayList<URI>();
+    private void fetchChildren(final String vocTableName, final String vocUri, List<String> children)
+            throws SQLException, ImplementationExceptionResponse {
 
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT DISTINCT uri FROM `voc_");
-        sql.append(vocTableName);
-        sql.append("` AS vocTable WHERE vocTable.uri LIKE ?;");
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT DISTINCT uri FROM ").append(delimiter);
+        sql.append("voc_").append(vocTableName).append(delimiter);
+        sql.append(" AS vocTable WHERE vocTable.uri LIKE ?;");
 
-        String q = sql.toString();
-        String qs = q.replaceAll("`", delimiter);
-        PreparedStatement ps = dbconnection.prepareStatement(qs);
+        String query = sql.toString();
+        PreparedStatement ps = connection.prepareStatement(query);
         String arg = vocUri + "_%";
-        LOG.debug("QUERY: " + qs);
+        LOG.debug("QUERY: " + query);
         LOG.debug("       query param 1: " + arg);
         ps.setString(1, arg);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-            URI uri = stringToUri(rs.getString("uri"));
-            children.add(uri);
+            children.add(rs.getString("uri"));
         }
-        return children;
     }
 
     /**
      * Returns the standard version.
      * 
-     * @see org.accada.epcis.soapapi.EPCISServicePortType#getStandardVersion(org.accada.epcis.soapapi.EmptyParms)
+     * @see org.accada.epcis.soap.EPCISServicePortType#getStandardVersion(org.accada.epcis.soap.model.EmptyParms)
      * @param parms
      *            An empty parameter.
      * @return The standard version.
      */
-    public String getStandardVersion(final EmptyParms parms) {
+    public String getStandardVersion(EmptyParms arg0) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse {
+        LOG.debug("Invoking 'getStandardVersion'");
         return STD_VERSION;
     }
 
     /**
      * Returns the vendor version.
      * 
-     * @see org.accada.epcis.soapapi.EPCISServicePortType#getVendorVersion(org.accada.epcis.soapapi.EmptyParms)
+     * @see org.accada.epcis.soap.EPCISServicePortType#getVendorVersion(org.accada.epcis.soap.model.EmptyParms)
      * @param parms
      *            An empty parameter.
      * @return The vendor version. The empty string indicates that the
      *         implementation implements only standard functionality with no
      *         vendor extensions.
      */
-    public String getVendorVersion(final EmptyParms parms) {
+    public String getVendorVersion(EmptyParms arg0) throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse {
+        LOG.debug("Invoking 'getVendorVersion'");
         return VDR_VERSION;
     }
 
@@ -2372,13 +2556,15 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws QueryParameterException
      *             If one of the action values are invalid.
      */
-    private void checkActionValues(final String[] actions) throws QueryParameterException {
-        for (int i = 0; i < actions.length; i++) {
-            if (!(actions[i].equalsIgnoreCase("ADD") || actions[i].equalsIgnoreCase("OBSERVE") || actions[i].equalsIgnoreCase("DELETE"))) {
-                String msg = "Invalid value for parameter EQ_action: " + actions[i]
+    private void checkActionValues(final List<String> actions) throws QueryParameterExceptionResponse {
+        for (String action : actions) {
+            if (!(action.equalsIgnoreCase("ADD") || action.equalsIgnoreCase("OBSERVE") || action.equalsIgnoreCase("DELETE"))) {
+                String msg = "Invalid value for parameter EQ_action: " + action
                         + ". Must be one of ADD, OBSERVE, or DELETE.";
                 LOG.info("USER ERROR: " + msg);
-                throw new QueryParameterException(msg);
+                QueryParameterException qpe = new QueryParameterException();
+                qpe.setReason(msg);
+                throw new QueryParameterExceptionResponse(msg, qpe);
             }
         }
     }
@@ -2398,8 +2584,8 @@ public class QueryOperationsModule implements EPCISServicePortType {
      * @throws SQLException
      *             If the execution of the query threw an exception.
      */
-    private ResultSet executeStatement(final PreparedStatement ps, final long timeout) throws QueryTooComplexException,
-            SQLException {
+    private ResultSet executeStatement(final PreparedStatement ps, final long timeout)
+            throws QueryTooComplexExceptionResponse, SQLException {
         if (timeout > 0) {
             // start query execution in a new thread
             Query query = new Query(ps);
@@ -2421,7 +2607,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 // query has not yet finished and takes too long
                 String msg = "Execution of a query takes longer than this implementation is willing to accept.";
                 LOG.info("USER ERROR: " + msg);
-                throw new QueryTooComplexException(msg);
+                QueryTooComplexException e = new QueryTooComplexException();
+                e.setReason(msg);
+                throw new QueryTooComplexExceptionResponse(msg, e);
             }
 
             // query returned before timeout
@@ -2438,7 +2626,9 @@ public class QueryOperationsModule implements EPCISServicePortType {
             // timeout value is actually set to an invalid value!
             String msg = "Execution of a query takes longer than this implementation is willing to accept.";
             LOG.info("USER ERROR: " + msg);
-            throw new QueryTooComplexException(msg);
+            QueryTooComplexException e = new QueryTooComplexException();
+            e.setReason(msg);
+            throw new QueryTooComplexExceptionResponse(msg, e);
         }
     }
 
@@ -2519,5 +2709,163 @@ public class QueryOperationsModule implements EPCISServicePortType {
                 throw sqlException;
             }
         }
+    }
+
+    /**
+     * Saves the map with the subscriptions to the message context.
+     * 
+     * @param subscriptions
+     *            The map with the subscriptions.
+     */
+    private void saveSubscriptions(final Map<String, QuerySubscriptionScheduled> subscriptions) {
+        MessageContext msgContext = context.getMessageContext();
+        ServletContext ctx = (ServletContext) msgContext.get(MessageContext.SERVLET_CONTEXT);
+        ctx.setAttribute("subscribedMap", subscriptions);
+    }
+
+    /**
+     * Retrieves the map with the subscriptions from the servlet context.
+     * 
+     * @return The map with the subscriptions.
+     * @throws ImplementationException
+     *             If the map could not be reloaded.
+     * @throws SQLException
+     *             If a database error occurred.
+     */
+    private Map<String, QuerySubscriptionScheduled> loadSubscriptions() throws ImplementationExceptionResponse,
+            SQLException {
+        MessageContext msgContext = context.getMessageContext();
+        ServletContext ctx = (ServletContext) msgContext.get(MessageContext.SERVLET_CONTEXT);
+        Map<String, QuerySubscriptionScheduled> subscriptions = (HashMap<String, QuerySubscriptionScheduled>) ctx.getAttribute("subscribedMap");
+        if (subscriptions == null) {
+            subscriptions = fetchSubscriptions();
+        }
+        return subscriptions;
+    }
+
+    /**
+     * Creates a new XMLGregorianCalendar from the given java.sql.Timestamp.
+     * 
+     * @param time
+     *            The time to convert.
+     * @return The converted calendar.
+     * @throws ImplementationExceptionResponse
+     */
+    private XMLGregorianCalendar createXmlCalendarFromSqlTimestamp(Timestamp time)
+            throws ImplementationExceptionResponse {
+        try {
+            DatatypeFactory factory = DatatypeFactory.newInstance();
+            Calendar cal = TimeParser.convert(time);
+            return factory.newXMLGregorianCalendar((GregorianCalendar) cal);
+        } catch (DatatypeConfigurationException e) {
+            String msg = "Unable to instantiate an XML representation for a date/time datatype.";
+            ImplementationException iex = new ImplementationException();
+            iex.setReason(msg);
+            iex.setSeverity(ImplementationExceptionSeverity.SEVERE);
+            throw new ImplementationExceptionResponse(msg, iex, e);
+        }
+    }
+
+    private void initConnection() throws ImplementationExceptionResponse {
+        try {
+            connection = getDataSource().getConnection();
+            LOG.debug("Database connection established");
+        } catch (SQLException e) {
+            ImplementationException iex = new ImplementationException();
+            String msg = "SQL error when initializing database connection";
+            LOG.error(msg, e);
+            iex.setReason(msg);
+            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+            throw new ImplementationExceptionResponse(msg, iex, e);
+        }
+    }
+
+    private void releaseConnection() throws ImplementationExceptionResponse {
+        try {
+            connection.close();
+            LOG.debug("Database connection closed");
+        } catch (SQLException e) {
+            ImplementationException iex = new ImplementationException();
+            String msg = "SQL error when releasing database connection";
+            LOG.error(msg, e);
+            iex.setReason(msg);
+            iex.setSeverity(ImplementationExceptionSeverity.ERROR);
+            throw new ImplementationExceptionResponse(msg, iex, e);
+        }
+    }
+
+    /**
+     * @return the dataSource
+     */
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * @param dataSource
+     *            the dataSource to set
+     */
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    /**
+     * @return the maxQueryRows
+     */
+    public int getMaxQueryRows() {
+        return maxQueryRows;
+    }
+
+    /**
+     * @param maxQueryRows
+     *            the maxQueryRows to set
+     */
+    public void setMaxQueryRows(int maxQueryRows) {
+        this.maxQueryRows = maxQueryRows;
+    }
+
+    /**
+     * @return the maxQueryTime
+     */
+    public int getMaxQueryTime() {
+        return maxQueryTime;
+    }
+
+    /**
+     * @param maxQueryTime
+     *            the maxQueryTime to set
+     */
+    public void setMaxQueryTime(int maxQueryTime) {
+        this.maxQueryTime = maxQueryTime;
+    }
+
+    /**
+     * @return the triggerConditionSeconds
+     */
+    public String getTriggerConditionSeconds() {
+        return triggerConditionSeconds;
+    }
+
+    /**
+     * @param triggerConditionSeconds
+     *            the triggerConditionSeconds to set
+     */
+    public void setTriggerConditionSeconds(String triggerConditionSeconds) {
+        this.triggerConditionSeconds = triggerConditionSeconds;
+    }
+
+    /**
+     * @return the triggerConditionMinutes
+     */
+    public String getTriggerConditionMinutes() {
+        return triggerConditionMinutes;
+    }
+
+    /**
+     * @param triggerConditionMinutes
+     *            the triggerConditionMinutes to set
+     */
+    public void setTriggerConditionMinutes(String triggerConditionMinutes) {
+        this.triggerConditionMinutes = triggerConditionMinutes;
     }
 }

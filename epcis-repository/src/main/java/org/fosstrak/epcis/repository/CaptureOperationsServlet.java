@@ -38,7 +38,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -47,6 +48,10 @@ import org.xml.sax.SAXException;
 /**
  * CaptureOperationsModule implements the core capture operations. Converts XML
  * events delivered by HTTP POST into SQL and inserts them into the database.
+ * <p>
+ * TODO: We can get rid of the logging initialization (see
+ * RepositoryContextListener). The other properties should be passed to
+ * CaptureOperationsModule in setter methods (similar to QueryInitServlet).
  * 
  * @author David Gubler
  * @author Alain Remund
@@ -56,7 +61,7 @@ public class CaptureOperationsServlet extends HttpServlet {
 
     private static final long serialVersionUID = -1507276940747086042L;
 
-    private static final Logger LOG = Logger.getLogger(CaptureOperationsServlet.class);
+    private static final Log LOG = LogFactory.getLog(CaptureOperationsServlet.class);
 
     private CaptureOperationsModule captureOperationsModule = new CaptureOperationsModule();
 
@@ -67,7 +72,7 @@ public class CaptureOperationsServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        // load log4j config 
+        // load log4j config
         String servletPath = getServletContext().getRealPath("/");
         String log4jConfigFile = getServletContext().getInitParameter("log4jConfigFile");
         if (log4jConfigFile != null) {
@@ -78,10 +83,10 @@ public class CaptureOperationsServlet extends HttpServlet {
 
         // read configuration and set up hibernate ...
         try {
-        	Configuration c = new Configuration();
-        	c.configure(); // from WEB-INF/classes/hibernate.cfg.xml
-        	SessionFactory sessionFactory = c.buildSessionFactory();
-        	captureOperationsModule.setSessionFactory(sessionFactory);
+            Configuration c = new Configuration();
+            c.configure(); // from WEB-INF/classes/hibernate.cfg.xml
+            SessionFactory sessionFactory = c.buildSessionFactory();
+            captureOperationsModule.setSessionFactory(sessionFactory);
         } catch (Exception e) {
             String msg = "Unable to configure Hibernate: " + e.toString();
             LOG.error(msg, e);
@@ -122,7 +127,7 @@ public class CaptureOperationsServlet extends HttpServlet {
             LOG.warn("Unable to load the schema validator.", e);
             LOG.warn("Schema validation will not be available!");
         }
-        
+
     }
 
     /**
@@ -157,7 +162,6 @@ public class CaptureOperationsServlet extends HttpServlet {
         out.flush();
         out.close();
     }
-
 
     /**
      * Implements the EPCIS capture operation. Takes HTTP POST request, extracts
@@ -194,21 +198,21 @@ public class CaptureOperationsServlet extends HttpServlet {
                 LOG.debug("Found 'dbReset' parameter set to 'true'.");
                 rsp.setContentType("text/plain");
                 try {
-                	captureOperationsModule.doDbReset();
-                	String msg = "db reset successfull";
-                	LOG.info(msg);
-                	rsp.setStatus(HttpServletResponse.SC_OK);
-                	out.println(msg);
+                    captureOperationsModule.doDbReset();
+                    String msg = "db reset successfull";
+                    LOG.info(msg);
+                    rsp.setStatus(HttpServletResponse.SC_OK);
+                    out.println(msg);
                 } catch (SQLException e) {
-                	String msg = "An error involving the database occurred.";
-                	LOG.error(msg, e);
-                	rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                	out.println(msg);
+                    String msg = "An error involving the database occurred.";
+                    LOG.error(msg, e);
+                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.println(msg);
                 } catch (IOException e) {
-                	String msg = "An unknown error occurred.";
-                	LOG.error(msg, e);
-                	rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                	out.println(msg);
+                    String msg = "An unknown error occurred.";
+                    LOG.error(msg, e);
+                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.println(msg);
                 } catch (UnsupportedOperationException e) {
                     String msg = "'dbReset' operation not allowed!";
                     LOG.info(msg);
@@ -222,25 +226,23 @@ public class CaptureOperationsServlet extends HttpServlet {
         } else {
             is = req.getInputStream();
             try {
-            	captureOperationsModule.doCapture(is, req.getUserPrincipal());
-        		rsp.setStatus(HttpServletResponse.SC_OK);
-        		out.println("Capture request succeeded.");
+                captureOperationsModule.doCapture(is, req.getUserPrincipal());
+                rsp.setStatus(HttpServletResponse.SC_OK);
+                out.println("Capture request succeeded.");
             } catch (SAXException e) {
-        		String msg = "An error processing the XML document occurred.";
-        		LOG.error(msg, e);
-        		rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        		out.println(msg);
-        	} catch (final Exception e) {
-        		String msg = "An unknown error occurred.";
-        		LOG.error(msg, e);
-        		rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        		out.println(msg);
-        	}
-            
+                String msg = "An error processing the XML document occurred.";
+                LOG.error(msg, e);
+                rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.println(msg);
+            } catch (final Exception e) {
+                String msg = "An unknown error occurred.";
+                LOG.error(msg, e);
+                rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.println(msg);
+            }
+
             out.flush();
             out.close();
-
         }
     }
-
 }
