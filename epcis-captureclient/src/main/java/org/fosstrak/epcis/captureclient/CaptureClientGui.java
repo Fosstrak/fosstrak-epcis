@@ -1792,7 +1792,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
          * note that we cannot use java.text.SimpleDateFormat for formatting
          * because it can't handle years <= 0 and TZD's
          */
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         // year ([-]YYYY)
         buf.append(XXXX_FORMAT.format(year));
         buf.append('-');
@@ -1827,7 +1827,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      * @return The time zone designator from the given Calendar.
      */
     private static String getTimeZone(final Calendar cal) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         TimeZone tz = cal.getTimeZone();
         // determine offset of timezone from UTC (incl. daylight saving)
         int offset = tz.getOffset(cal.getTimeInMillis());
