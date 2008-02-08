@@ -21,15 +21,12 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.QueryTooComplexException;
+import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
 
 /**
  * Tests for QueryTooLargeException (SE49). Note 'maxQueryExecutionTime'
@@ -42,17 +39,15 @@ public class QueryTooComplexTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if QueryTooComplexException is raised.
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE49() throws IOException, ServiceException {
+    public void testSE49() throws Exception {
         System.out.println("SETUP: 'maxQueryExecutionTime' property must be set to 0!");
         final String query = "Test-EPCIS10-SE49-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
@@ -60,7 +55,7 @@ public class QueryTooComplexTest extends TestCase {
             client.poll(fis);
             fis.close();
             fail("QueryTooComplexException expected");
-        } catch (QueryTooComplexException e) {
+        } catch (QueryTooComplexExceptionResponse e) {
             // ok
             fis.close();
         }

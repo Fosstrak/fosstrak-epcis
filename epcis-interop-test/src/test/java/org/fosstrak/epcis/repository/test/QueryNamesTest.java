@@ -20,10 +20,7 @@
 
 package org.accada.epcis.repository.test;
 
-import java.rmi.RemoteException;
 import java.util.List;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
@@ -36,18 +33,16 @@ import org.accada.epcis.queryclient.QueryControlClient;
  */
 public class QueryNamesTest extends TestCase {
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if the two query types "SimpleEventQuery" and
      * "SimpleMasterDataQuery" are supported by the implementation.
      * 
-     * @throws ServiceException
-     *             If an EPCIS query service error occurs.
-     * @throws RemoteException
-     *             If an Axis error occurs.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE45() throws ServiceException, RemoteException {
+    public void testSE45() throws Exception {
         List<String> queryNames = client.getQueryNames();
 
         // must contain SimpleEventQuery and SimpleMasterDataQuery

@@ -23,8 +23,6 @@ package org.accada.epcis.repository.test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import javax.xml.rpc.ServiceException;
-
 import junit.framework.TestCase;
 
 import org.accada.epcis.captureclient.CaptureClient;
@@ -48,12 +46,10 @@ public class EventFieldExtensionTest extends TestCase {
     /**
      * Tests event fieldname extensions.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testExtension() throws IOException, ServiceException {
+    public void testExtension() throws Exception {
 
         // send event1
         CaptureClient captureClient = new CaptureClient();

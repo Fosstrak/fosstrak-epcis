@@ -21,17 +21,15 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.QueryParameterException;
-import org.accada.epcis.soapapi.QueryResults;
-import org.accada.epcis.soapapi.QueryTooLargeException;
+import org.accada.epcis.soap.QueryParameterExceptionResponse;
+import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.utils.QueryResultsComparator;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**
@@ -48,17 +46,15 @@ public class EventQueryTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response-1-poll.xml";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests the GE_eventTime attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE10() throws IOException, ServiceException {
+    public void testSE10() throws Exception {
         int testNr = 10;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -67,20 +63,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the LT_eventTime attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE11() throws IOException, ServiceException {
+    public void testSE11() throws Exception {
         int testNr = 11;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -89,20 +83,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the GE_recordTime attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE12() throws IOException, ServiceException {
+    public void testSE12() throws Exception {
         int testNr = 12;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -111,20 +103,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the LT_recordTime attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE13() throws IOException, ServiceException {
+    public void testSE13() throws Exception {
         int testNr = 13;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -133,20 +123,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQ_action attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE14() throws IOException, ServiceException {
+    public void testSE14() throws Exception {
         int testNr = 14;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -155,20 +143,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQ_disposition attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE15() throws IOException, ServiceException {
+    public void testSE15() throws Exception {
         int testNr = 15;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -177,20 +163,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQ_readPoint attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE16() throws IOException, ServiceException {
+    public void testSE16() throws Exception {
         int testNr = 16;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -202,20 +186,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the WD_readPoint attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE17() throws IOException, ServiceException {
+    public void testSE17() throws Exception {
         int testNr = 17;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -224,20 +206,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQ_bizLocation attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE18() throws IOException, ServiceException {
+    public void testSE18() throws Exception {
         int testNr = 18;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -246,20 +226,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the WD_bizLocation attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE19() throws IOException, ServiceException {
+    public void testSE19() throws Exception {
         int testNr = 19;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -268,20 +246,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQ_bizTransaction attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE20() throws IOException, ServiceException {
+    public void testSE20() throws Exception {
         int testNr = 20;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -290,20 +266,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the MATCH_epc attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE21() throws IOException, ServiceException {
+    public void testSE21() throws Exception {
         int testNr = 21;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -312,20 +286,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the MATCH_parentID attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE22() throws IOException, ServiceException {
+    public void testSE22() throws Exception {
         int testNr = 22;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -334,20 +306,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the MATCH_childEPC attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE23() throws IOException, ServiceException {
+    public void testSE23() throws Exception {
         int testNr = 23;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -356,20 +326,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the MATCH_epcClass attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE24() throws IOException, ServiceException {
+    public void testSE24() throws Exception {
         int testNr = 24;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -378,20 +346,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQ_quantity attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE25() throws IOException, ServiceException {
+    public void testSE25() throws Exception {
         int testNr = 25;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -400,20 +366,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the GT_quantity attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE26() throws IOException, ServiceException {
+    public void testSE26() throws Exception {
         int testNr = 26;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -422,20 +386,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the GE_quantity attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE27() throws IOException, ServiceException {
+    public void testSE27() throws Exception {
         int testNr = 27;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -444,10 +406,10 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
         try {
-            QueryResultsParser.compareResults(expResults, actResults);
+            assertTrue(QueryResultsComparator.identical(expResults, actResults));
         } catch (AssertionError e) {
             fail(e.getMessage());
         }
@@ -456,12 +418,10 @@ public class EventQueryTest extends TestCase {
     /**
      * Tests the LT_quantity attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE28() throws IOException, ServiceException {
+    public void testSE28() throws Exception {
         int testNr = 28;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -470,20 +430,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the LE_quantity attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE29() throws IOException, ServiceException {
+    public void testSE29() throws Exception {
         int testNr = 29;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -492,20 +450,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQ_fieldname extension field.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE30() throws IOException, ServiceException {
+    public void testSE30() throws Exception {
         int testNr = 30;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -514,20 +470,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the GT_fieldname attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE31() throws IOException, ServiceException {
+    public void testSE31() throws Exception {
         int testNr = 31;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -536,20 +490,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the LT_fieldname attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE32() throws IOException, ServiceException {
+    public void testSE32() throws Exception {
         int testNr = 32;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -558,20 +510,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EXISTS_fieldname attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE33() throws IOException, ServiceException {
+    public void testSE33() throws Exception {
         int testNr = 33;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -580,20 +530,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the HASATTR_fieldname positive case.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE34() throws IOException, ServiceException {
+    public void testSE34() throws Exception {
         int testNr = 34;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -602,20 +550,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the EQATTR_fieldname_attrname attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE35() throws IOException, ServiceException {
+    public void testSE35() throws Exception {
         int testNr = 35;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -624,20 +570,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the orderDirection. TODO test Order direction
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE36() throws IOException, ServiceException {
+    public void testSE36() throws Exception {
         int testNr = 36;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -646,20 +590,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests a combination of attributes.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE37() throws IOException, ServiceException {
+    public void testSE37() throws Exception {
         int testNr = 37;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -668,20 +610,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests a combination of attributes.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE38() throws IOException, ServiceException {
+    public void testSE38() throws Exception {
         int testNr = 38;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -690,20 +630,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests the eventCountLimit. TODO assert that cases 1-5 match
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE39() throws IOException, ServiceException {
+    public void testSE39() throws Exception {
         int testNr = 39;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -712,27 +650,25 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Test the maxEventCounts attribute.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE40() throws IOException, ServiceException {
+    public void testSE40() throws Exception {
         int testNr = 40;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         try {
             client.poll(fis);
             fail("should raise a QueryTooLargeException");
-        } catch (QueryTooLargeException e) {
+        } catch (QueryTooLargeExceptionResponse e) {
             // success
         }
         fis.close();
@@ -741,19 +677,17 @@ public class EventQueryTest extends TestCase {
     /**
      * Test impossible eventCount limits.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE41() throws IOException, ServiceException {
+    public void testSE41() throws Exception {
         int testNr = 41;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
         try {
             client.poll(fis);
             fail("should raise a QueryParameterException");
-        } catch (QueryParameterException e) {
+        } catch (QueryParameterExceptionResponse e) {
             // success
         }
         fis.close();
@@ -762,12 +696,10 @@ public class EventQueryTest extends TestCase {
     /**
      * Test the OR operator of attributes.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE42() throws IOException, ServiceException {
+    public void testSE42() throws Exception {
         int testNr = 42;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -776,20 +708,18 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Test the AND + OR operators of attributes.
      * 
-     * @throws IOException
-     *             Filehandling Error
-     * @throws ServiceException
-     *             Something while executing the poll went wrong
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE43() throws IOException, ServiceException {
+    public void testSE43() throws Exception {
         int testNr = 43;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -798,16 +728,16 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Tests empty value.
      * 
      * @throws Exception
-     *             Something went wrong
+     *             Any exception, caught by the JUnit framework.
      */
     public void testSE73() throws Exception {
         int testNr = 73;
@@ -818,8 +748,8 @@ public class EventQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + "-Response-1-QueryResults.xml";
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 }

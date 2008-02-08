@@ -21,17 +21,15 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.QueryResults;
-import org.accada.epcis.soapapi.QueryTooLargeException;
-import org.accada.epcis.soapapi.SubscribeNotPermittedException;
+import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.utils.QueryResultsComparator;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**
@@ -48,17 +46,15 @@ public class MasterDataQueryTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-MD";
     private static final String RESP_SUFFIX = "-Response.xml";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * TEST MD1.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD1() throws IOException, ServiceException {
+    public void testMD1() throws Exception {
         int testNr = 1;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -67,20 +63,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD2.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD2() throws IOException, ServiceException {
+    public void testMD2() throws Exception {
         int testNr = 2;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -89,20 +83,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD3.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD3() throws IOException, ServiceException {
+    public void testMD3() throws Exception {
         int testNr = 3;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -111,20 +103,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD4.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD4() throws IOException, ServiceException {
+    public void testMD4() throws Exception {
         int testNr = 4;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -133,20 +123,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD5.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD5() throws IOException, ServiceException {
+    public void testMD5() throws Exception {
         int testNr = 5;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -155,20 +143,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD6.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD6() throws IOException, ServiceException {
+    public void testMD6() throws Exception {
         int testNr = 6;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -177,20 +163,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD7.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD7() throws IOException, ServiceException {
+    public void testMD7() throws Exception {
         int testNr = 7;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -199,20 +183,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD8.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD8() throws IOException, ServiceException {
+    public void testMD8() throws Exception {
         int testNr = 8;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -222,7 +204,7 @@ public class MasterDataQueryTest extends TestCase {
             // fail
             fis.close();
             fail("QueryTooLargeException expected!");
-        } catch (QueryTooLargeException e) {
+        } catch (QueryTooLargeExceptionResponse e) {
             // ok
             fis.close();
         }
@@ -231,12 +213,10 @@ public class MasterDataQueryTest extends TestCase {
     /**
      * TEST MD9.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD9() throws IOException, ServiceException {
+    public void testMD9() throws Exception {
         int testNr = 9;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -245,20 +225,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD10.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD10() throws IOException, ServiceException {
+    public void testMD10() throws Exception {
         int testNr = 10;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -267,20 +245,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD11.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD11() throws IOException, ServiceException {
+    public void testMD11() throws Exception {
         int testNr = 11;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -289,20 +265,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD12.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD12() throws IOException, ServiceException {
+    public void testMD12() throws Exception {
         int testNr = 12;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -311,20 +285,18 @@ public class MasterDataQueryTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST MD13.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testMD13() throws IOException, ServiceException {
+    public void testMD13() throws Exception {
         int testNr = 13;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -333,8 +305,8 @@ public class MasterDataQueryTest extends TestCase {
             fis.close();
 
             fail("SubscribeNotPermittedException expected");
-        } catch (SubscribeNotPermittedException e) {
-            assertEquals("Subscription not allowed for SimpleMasterDataQuery.", e.getReason());
+        } catch (SubscribeNotPermittedExceptionResponse e) {
+            assertEquals("Subscription not allowed for SimpleMasterDataQuery.", e.getMessage());
         }
     }
 }

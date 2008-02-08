@@ -27,9 +27,10 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
-import org.accada.epcis.soapapi.QueryResults;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
+import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.utils.QueryCallbackListener;
+import org.accada.epcis.utils.QueryResultsComparator;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**
@@ -41,13 +42,13 @@ public class CallbackRecordTimeTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if setting the initialRecordTime parameter has effect.
      * 
      * @throws Exception
-     *             If an error executing the test occurred.
+     *             Any exception, caught by the JUnit framework.
      */
     public void testSE66() throws Exception {
 
@@ -75,17 +76,13 @@ public class CallbackRecordTimeTest extends TestCase {
 
         // parse and compare response
         InputStream is = new ByteArrayInputStream(resp1.getBytes());
-        QueryResults actResults = QueryResultsParser.parseQueryResults(is);
+        QueryResults actResults = QueryResultsParser.parseResults(is);
         is.close();
         query = "Test-EPCIS10-SE66-Response-1-2-QueryResults.xml";
         fis = new FileInputStream(PATH + "responses/" + query);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
         client.unsubscribe("QuerySE66");
 
         // run second query
@@ -108,26 +105,20 @@ public class CallbackRecordTimeTest extends TestCase {
 
         // parse and compare response
         is = new ByteArrayInputStream(resp2.getBytes());
-        actResults = QueryResultsParser.parseQueryResults(is);
+        actResults = QueryResultsParser.parseResults(is);
         is.close();
         query = "Test-EPCIS10-SE66-Response-1-3-QueryResults.xml";
         fis = new FileInputStream(PATH + "responses/" + query);
-        expResults = QueryResultsParser.parseQueryResults(fis);
+        expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        try {
-            QueryResultsParser.compareResults(expResults, actResults);
-        } catch (AssertionError e) {
-            fail(e.getMessage());
-        }
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
 
         client.unsubscribe("QuerySE66");
         listener.stopRunning();
     }
 
     /**
-     * Clears all event data from the repository.
-     * 
-     * {@inheritDoc}
+     * Clears all event data from the repository. {@inheritDoc}
      * 
      * @see junit.framework.TestCase#tearDown()
      */
@@ -135,7 +126,7 @@ public class CallbackRecordTimeTest extends TestCase {
     protected void tearDown() throws Exception {
         try {
             client.unsubscribe("QuerySE66");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
     }
 }

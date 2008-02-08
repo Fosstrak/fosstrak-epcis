@@ -28,12 +28,11 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
 import org.accada.epcis.utils.QueryCallbackListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -51,23 +50,16 @@ public class CallbackReportIfEmptyTest extends TestCase {
     private static final String REQUEST_1 = "Test-EPCIS10-SE48-Request-1-Subscribe.xml";
     private static final String REQUEST_2 = "Test-EPCIS10-SE48-Request-2-Subscribe.xml";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests that no response is provided if the reportIfEmpty tag is set to
      * false.
      * 
-     * @throws IOException
-     *             If some I/O error occures.
-     * @throws ParserConfigurationException
-     *             If the parser for parsing the response could not be set up.
-     * @throws SAXException
-     *             If an error parsing the response occurs.
-     * @throws ServiceException
-     *             If an EPCIS query service error occurs.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE48() throws IOException, ServiceException,
-            ParserConfigurationException, SAXException {
+    public void testSE48() throws Exception {
 
         // subscribe the first query
         InputStream fis = new FileInputStream(PATH + REQUEST_1);
@@ -98,7 +90,7 @@ public class CallbackReportIfEmptyTest extends TestCase {
         // unsubscribe first query
         try {
             client.unsubscribe("QuerySE48-1");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
 
         // subscribe the second query
@@ -147,11 +139,11 @@ public class CallbackReportIfEmptyTest extends TestCase {
     protected void tearDown() throws Exception {
         try {
             client.unsubscribe("QuerySE48-1");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
         try {
             client.unsubscribe("QuerySE48-2");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
     }
 }

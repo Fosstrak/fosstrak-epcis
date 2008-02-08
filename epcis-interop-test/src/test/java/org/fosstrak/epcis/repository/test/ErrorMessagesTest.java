@@ -21,19 +21,16 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.DuplicateSubscriptionException;
-import org.accada.epcis.soapapi.InvalidURIException;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
-import org.accada.epcis.soapapi.QueryParameterException;
-import org.accada.epcis.soapapi.SubscriptionControlsException;
+import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
+import org.accada.epcis.soap.InvalidURIExceptionResponse;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
+import org.accada.epcis.soap.QueryParameterExceptionResponse;
+import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 
 /**
  * Tests for exceptions and error messages (SE51-SE65, SE68-SE72, SE74).
@@ -45,17 +42,15 @@ public class ErrorMessagesTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if InvalidURIException is raised.
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE52() throws IOException, ServiceException {
+    public void testSE52() throws Exception {
         final String query = "Test-EPCIS10-SE52-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -63,21 +58,19 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE52"); // clean up
             fail("InvalidURIException expected");
-        } catch (InvalidURIException e) {
+        } catch (InvalidURIExceptionResponse e) {
             fis.close();
-            assertEquals("Destination URI is invalid: unknown protocol: htto", e.getReason());
+            assertEquals("Destination URI is invalid: unknown protocol: htto", e.getMessage());
         }
     }
 
     /**
      * Tests if DuplicateSubscriptionException is raised.
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE53() throws IOException, ServiceException {
+    public void testSE53() throws Exception {
         // subscribe first query
         final String query = "Test-EPCIS10-SE53-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
@@ -93,22 +86,20 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE53"); // clean up
             fail("DuplicateSubscriptionException expected");
-        } catch (DuplicateSubscriptionException e) {
+        } catch (DuplicateSubscriptionExceptionResponse e) {
             fis.close();
             client.unsubscribe("QuerySE53"); // clean up
-            assertEquals("SubscriptionID 'QuerySE53' already exists. Choose a different subscriptionID.", e.getReason());
+            assertEquals("SubscriptionID 'QuerySE53' already exists. Choose a different subscriptionID.", e.getMessage());
         }
     }
 
     /**
      * Tests if NoSuchSubscriptionException is raised.
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE54() throws IOException, ServiceException {
+    public void testSE54() throws Exception {
         final String query = "Test-EPCIS10-SE54-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         client.subscribe(fis);
@@ -120,10 +111,10 @@ public class ErrorMessagesTest extends TestCase {
             // fail
             client.unsubscribe("QuerySE54-1"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
             // ok
             client.unsubscribe("QuerySE54-1");
-            assertEquals("There is no subscription with ID 'QuerySE54-2'.", e.getReason());
+            assertEquals("There is no subscription with ID 'QuerySE54-2'.", e.getMessage());
         }
     }
 
@@ -131,12 +122,10 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (second value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE55() throws IOException, ServiceException {
+    public void testSE55() throws Exception {
         final String query = "Test-EPCIS10-SE55-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -145,10 +134,10 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE55"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value '61' for parameter 'second' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value '61' for parameter 'second' is invalid in the query schedule.", e.getMessage());
         }
     }
 
@@ -156,12 +145,10 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (second value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE56() throws IOException, ServiceException {
+    public void testSE56() throws Exception {
         final String query = "Test-EPCIS10-SE56-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -170,22 +157,20 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE56"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value '-1' for parameter 'second' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value '-1' for parameter 'second' is invalid in the query schedule.", e.getMessage());
         }
     }
 
     /**
      * Tests if SubscriptionControlsException is raised (second value invalid).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE57() throws IOException, ServiceException {
+    public void testSE57() throws Exception {
         final String query = "Test-EPCIS10-SE57-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -194,10 +179,10 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE57"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value 'a' for parameter 'second' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value 'a' for parameter 'second' is invalid in the query schedule.", e.getMessage());
         }
     }
 
@@ -205,12 +190,10 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (dayOfWeek value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE58() throws IOException, ServiceException {
+    public void testSE58() throws Exception {
         final String query = "Test-EPCIS10-SE58-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -219,10 +202,10 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE58"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value '[1-8]' for parameter 'dayOfWeek' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value '[1-8]' for parameter 'dayOfWeek' is invalid in the query schedule.", e.getMessage());
         }
     }
 
@@ -230,12 +213,10 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (dayOfWeek value
      * invalid).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE59() throws IOException, ServiceException {
+    public void testSE59() throws Exception {
         final String query = "Test-EPCIS10-SE59-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -244,10 +225,10 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE59"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value 'x' for parameter 'dayOfWeek' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value 'x' for parameter 'dayOfWeek' is invalid in the query schedule.", e.getMessage());
         }
     }
 
@@ -255,12 +236,10 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (minute value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE60() throws IOException, ServiceException {
+    public void testSE60() throws Exception {
         final String query = "Test-EPCIS10-SE60-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -269,10 +248,10 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE60"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value '-1' for parameter 'minute' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value '-1' for parameter 'minute' is invalid in the query schedule.", e.getMessage());
         }
     }
 
@@ -280,12 +259,10 @@ public class ErrorMessagesTest extends TestCase {
      * Tests if SubscriptionControlsException is raised (minute value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE61() throws IOException, ServiceException {
+    public void testSE61() throws Exception {
         final String query = "Test-EPCIS10-SE61-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -294,22 +271,20 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE61"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value '61' for parameter 'minute' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value '61' for parameter 'minute' is invalid in the query schedule.", e.getMessage());
         }
     }
 
     /**
-     * Tests if SubscriptionControlsException is raised (minute value invalid).
+     * Tests if SubscriptionControlsExceptionResponse is raised (minute value invalid).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE62() throws IOException, ServiceException {
+    public void testSE62() throws Exception {
         final String query = "Test-EPCIS10-SE62-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -318,23 +293,21 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE62"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value 'a' for parameter 'minute' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value 'a' for parameter 'minute' is invalid in the query schedule.", e.getMessage());
         }
     }
 
     /**
-     * Tests if SubscriptionControlsException is raised (hour value out of
+     * Tests if SubscriptionControlsExceptionResponse is raised (hour value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE63() throws IOException, ServiceException {
+    public void testSE63() throws Exception {
         final String query = "Test-EPCIS10-SE63-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -343,23 +316,21 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE63"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value '24' for parameter 'hour' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value '24' for parameter 'hour' is invalid in the query schedule.", e.getMessage());
         }
     }
 
     /**
-     * Tests if SubscriptionControlsException is raised (hour value out of
+     * Tests if SubscriptionControlsExceptionResponse is raised (hour value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE64() throws IOException, ServiceException {
+    public void testSE64() throws Exception {
         final String query = "Test-EPCIS10-SE64-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -368,23 +339,21 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE64"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value '-1' for parameter 'hour' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value '-1' for parameter 'hour' is invalid in the query schedule.", e.getMessage());
         }
     }
 
     /**
-     * Tests if SubscriptionControlsException is raised (hour value out of
+     * Tests if SubscriptionControlsExceptionResponse is raised (hour value out of
      * range).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE65() throws IOException, ServiceException {
+    public void testSE65() throws Exception {
         final String query = "Test-EPCIS10-SE65-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
@@ -393,80 +362,74 @@ public class ErrorMessagesTest extends TestCase {
             fis.close();
             client.unsubscribe("QuerySE65"); // clean up
             fail("NoSuchSubscriptionException expected");
-        } catch (SubscriptionControlsException e) {
+        } catch (SubscriptionControlsExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The value 'a' for parameter 'hour' is invalid in the query schedule.", e.getReason());
+            assertEquals("The value 'a' for parameter 'hour' is invalid in the query schedule.", e.getMessage());
         }
     }
 
     /**
-     * Tests if QueryParameterException is raised (parameter name not defined).
+     * Tests if QueryParameterExceptionResponse is raised (parameter name not defined).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE70() throws IOException, ServiceException {
+    public void testSE70() throws Exception {
         final String query = "Test-EPCIS10-SE70-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
             client.poll(fis);
             // fail
             fis.close();
-            fail("QueryParameterException expected");
-        } catch (QueryParameterException e) {
+            fail("QueryParameterExceptionResponse expected");
+        } catch (QueryParameterExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The parameter EQ_abcd cannot be recognised.", e.getReason());
+            assertEquals("The parameter EQ_abcd cannot be recognised.", e.getMessage());
         }
     }
 
     /**
-     * Tests if QueryParameterException is raised (invalid parameter value).
+     * Tests if QueryParameterExceptionResponse is raised (invalid parameter value).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE71() throws IOException, ServiceException {
+    public void testSE71() throws Exception {
         final String query = "Test-EPCIS10-SE71-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
             client.poll(fis);
             // fail
             fis.close();
-            fail("QueryParameterException expected");
-        } catch (QueryParameterException e) {
+            fail("QueryParameterExceptionResponse expected");
+        } catch (QueryParameterExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("The type of the value for query parameter 'GE_quantity': 3.1459 is invalid.", e.getReason());
+            assertEquals("The type of the value for query parameter 'GE_quantity': 3.1459 is invalid.", e.getMessage());
         }
     }
 
     /**
-     * Tests if QueryParameterException is raised (multiple occurences of same
+     * Tests if QueryParameterExceptionResponse is raised (multiple occurrences of same
      * parameter).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE72() throws IOException, ServiceException {
+    public void testSE72() throws Exception {
         final String query = "Test-EPCIS10-SE72-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
             client.poll(fis);
             // fail
             fis.close();
-            fail("QueryParameterException expected");
-        } catch (QueryParameterException e) {
+            fail("QueryParameterExceptionResponse expected");
+        } catch (QueryParameterExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals("Two or more inputs are provided for the same parameter 'EQ_bizStep'.", e.getReason());
+            assertEquals("Two or more inputs are provided for the same parameter 'EQ_bizStep'.", e.getMessage());
         }
     }
 }

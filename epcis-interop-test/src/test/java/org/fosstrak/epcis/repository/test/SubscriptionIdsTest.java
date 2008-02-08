@@ -21,16 +21,13 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
 
 /**
  * Test for getSubscriptionID() (SE46).
@@ -43,18 +40,16 @@ public class SubscriptionIdsTest extends TestCase {
     private static final String REQUEST_1 = "Test-EPCIS10-SE46-Request-1-Subscribe.xml";
     private static final String REQUEST_2 = "Test-EPCIS10-SE46-Request-2-Subscribe.xml";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if the getSubscriptionIDs() function returns the correct values for
      * two subscribed queries.
      * 
-     * @throws IOException
-     *             If a problem reading the query xml occurred.
-     * @throws ServiceException
-     *             If an EPCIS query service error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE46() throws IOException, ServiceException {
+    public void testSE46() throws Exception {
 
         // subscribe the first query
         InputStream fis = new FileInputStream(PATH + REQUEST_1);
@@ -80,11 +75,11 @@ public class SubscriptionIdsTest extends TestCase {
     protected void tearDown() throws Exception {
         try {
             client.unsubscribe("QuerySE46-1");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
         try {
             client.unsubscribe("QuerySE46-2");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
     }
 }

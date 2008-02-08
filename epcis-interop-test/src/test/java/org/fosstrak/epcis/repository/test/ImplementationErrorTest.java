@@ -21,17 +21,13 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.ImplementationException;
-import org.accada.epcis.soapapi.ImplementationExceptionSeverity;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
 import org.accada.epcis.utils.QueryCallbackListener;
 
 /**
@@ -45,7 +41,7 @@ public class ImplementationErrorTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * No testing, just print a message that reminds that the setup for an
@@ -60,35 +56,29 @@ public class ImplementationErrorTest extends TestCase {
     /**
      * Tests if ImplementationException is raised.
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE51() throws IOException, ServiceException {
+    public void testSE51() throws Exception {
         final String query = "Test-EPCIS10-SE51-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
             client.poll(fis);
             fis.close();
             fail("ImplementationException expected");
-        } catch (ImplementationException e) {
+        } catch (ImplementationExceptionResponse e) {
             // ok
             fis.close();
-            assertEquals(e.getSeverity(),
-                    ImplementationExceptionSeverity.ERROR);
         }
     }
 
     /**
      * Tests if ImplementationException is raised (callback).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE69() throws IOException, ServiceException {
+    public void testSE69() throws Exception {
         // subscribe query
         final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
@@ -122,7 +112,7 @@ public class ImplementationErrorTest extends TestCase {
         // make sure the query is unsubscribed!
         try {
             client.unsubscribe("QuerySE69");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
     }
 }

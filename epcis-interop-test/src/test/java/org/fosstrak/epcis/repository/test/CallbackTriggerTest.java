@@ -28,19 +28,19 @@ import junit.framework.TestCase;
 
 import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
 import org.accada.epcis.utils.QueryCallbackListener;
 
 public class CallbackTriggerTest extends TestCase {
     private static final String PATH = "src/test/resources/queries/webservice/";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if setting the initialRecordTime parameter has effect.
      * 
      * @throws Exception
-     *             If an error executing the test occurred.
+     *             Any exception, caught by the JUnit framework.
      */
     public void testSE75() throws Exception {
 
@@ -82,7 +82,7 @@ public class CallbackTriggerTest extends TestCase {
     protected void tearDown() throws Exception {
         try {
             client.unsubscribe("QuerySE75");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
         // reset the database
         new CaptureClient().dbReset();

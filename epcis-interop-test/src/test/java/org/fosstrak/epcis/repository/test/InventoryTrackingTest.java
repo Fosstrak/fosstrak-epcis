@@ -21,15 +21,13 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.QueryResults;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.utils.QueryResultsComparator;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**
@@ -46,17 +44,15 @@ public class InventoryTrackingTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response.xml";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * TEST SE8.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE8() throws IOException, ServiceException {
+    public void testSE8() throws Exception {
         int testNr = 8;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -65,19 +61,17 @@ public class InventoryTrackingTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
-        QueryResultsParser.compareResults(expResults, actResults);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * TEST SE9.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE9() throws IOException, ServiceException {
+    public void testSE9() throws Exception {
         int testNr = 9;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -86,8 +80,8 @@ public class InventoryTrackingTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 }

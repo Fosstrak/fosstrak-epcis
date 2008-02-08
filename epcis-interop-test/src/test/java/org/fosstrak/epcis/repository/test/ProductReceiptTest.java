@@ -21,16 +21,14 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.NoSuchNameException;
-import org.accada.epcis.soapapi.QueryResults;
+import org.accada.epcis.soap.NoSuchNameExceptionResponse;
+import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.utils.QueryResultsComparator;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**
@@ -47,17 +45,15 @@ public class ProductReceiptTest extends TestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response.xml";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Test SE4.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE4() throws IOException, ServiceException {
+    public void testSE4() throws Exception {
         int testNr = 4;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -66,32 +62,28 @@ public class ProductReceiptTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Test SE5.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE5() throws IOException, ServiceException {
+    public void testSE5() throws Exception {
         fail("Authentication not supported!");
     }
 
     /**
      * Test SE6.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE6() throws IOException, ServiceException {
+    public void testSE6() throws Exception {
         int testNr = 6;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -100,20 +92,18 @@ public class ProductReceiptTest extends TestCase {
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
-        QueryResults expResults = QueryResultsParser.parseQueryResults(fis);
+        QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
-        QueryResultsParser.compareResults(expResults, actResults);
+        assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
     /**
      * Test SE7.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an error in the service occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE7() throws IOException, ServiceException {
+    public void testSE7() throws Exception {
         int testNr = 7;
         String query = REQ_PATH + REQ_PREFIX + testNr + REQ_SUFFIX;
         InputStream fis = new FileInputStream(query);
@@ -122,7 +112,7 @@ public class ProductReceiptTest extends TestCase {
             // fail
             fis.close();
             fail("NoSuchNameException expected!");
-        } catch (NoSuchNameException e) {
+        } catch (NoSuchNameExceptionResponse e) {
             // success
             fis.close();
         }

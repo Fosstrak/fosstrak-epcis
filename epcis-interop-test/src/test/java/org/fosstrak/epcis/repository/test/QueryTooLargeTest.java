@@ -21,16 +21,13 @@
 package org.accada.epcis.repository.test;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.captureclient.CaptureClient;
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.QueryTooLargeException;
+import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.utils.QueryCallbackListener;
 
 /**
@@ -43,7 +40,7 @@ public class QueryTooLargeTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
     private CaptureClient capture = new CaptureClient();
 
     /**
@@ -86,19 +83,17 @@ public class QueryTooLargeTest extends TestCase {
     /**
      * Tests if QueryTooLargeException is raised.
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE50() throws IOException, ServiceException {
+    public void testSE50() throws Exception {
         final String query = "Test-EPCIS10-SE50-Request-1-Poll.xml";
         InputStream fis = new FileInputStream(PATH + query);
         try {
             client.poll(fis);
             fis.close();
             fail("QueryTooLargeException expected");
-        } catch (QueryTooLargeException e) {
+        } catch (QueryTooLargeExceptionResponse e) {
             // ok
             fis.close();
         }
@@ -107,12 +102,10 @@ public class QueryTooLargeTest extends TestCase {
     /**
      * Tests if QueryTooLargeException is raised (callback).
      * 
-     * @throws ServiceException
-     *             If an error in the EPCIS query service occurred.
-     * @throws IOException
-     *             If an I/O error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE68() throws IOException, ServiceException {
+    public void testSE68() throws Exception {
         // subscribe query
         final String query = "Test-EPCIS10-SE68-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);

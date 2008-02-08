@@ -20,10 +20,6 @@
 
 package org.accada.epcis.repository.test;
 
-import java.io.IOException;
-
-import javax.xml.rpc.ServiceException;
-
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
@@ -35,17 +31,15 @@ import org.accada.epcis.queryclient.QueryControlClient;
  */
 public class VersionTest extends TestCase {
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if the supported Standard Version is "1.0".
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an EPCIS query service error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE47() throws IOException, ServiceException {
+    public void testSE47() throws Exception {
         String stdVersion = client.getStandardVersion();
         assertEquals(stdVersion, "1.0");
     }
@@ -53,12 +47,10 @@ public class VersionTest extends TestCase {
     /**
      * Tests if the vendor version is defined.
      * 
-     * @throws IOException
-     *             If an I/O error occurred.
-     * @throws ServiceException
-     *             If an EPCIS query service error occurred.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE67() throws IOException, ServiceException {
+    public void testSE67() throws Exception {
         String version = client.getVendorVersion();
         assertTrue(version.startsWith(""));
     }

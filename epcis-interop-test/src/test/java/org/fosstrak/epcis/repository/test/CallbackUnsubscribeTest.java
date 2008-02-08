@@ -28,12 +28,11 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.rpc.ServiceException;
 
 import junit.framework.TestCase;
 
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soapapi.NoSuchSubscriptionException;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
 import org.accada.epcis.utils.QueryCallbackListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -49,24 +48,16 @@ public class CallbackUnsubscribeTest extends TestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Tests if we receive a notification for a subscribed query, and we receive
      * no further notification after the query is unsubscribed.
      * 
-     * @throws IOException
-     *             If an I/O excpetion occurred.
-     * @throws ServiceException
-     *             If the EPCIS query service encountered a problem.
-     * @throws ParserConfigurationException
-     *             If the parser for parsing the response could not be
-     *             configured.
-     * @throws SAXException
-     *             If the response could not be parsed.
+     * @throws Exception
+     *             Any exception, caught by the JUnit framework.
      */
-    public void testSE44() throws IOException, ServiceException,
-            ParserConfigurationException, SAXException {
+    public void testSE44() throws Exception {
         final String query = "Test-EPCIS10-SE44-Request-1-Subscribe.xml";
 
         // subscribe a query
@@ -123,8 +114,7 @@ public class CallbackUnsubscribeTest extends TestCase {
      * @throws IOException
      *             If an I/O error occurred.
      */
-    private Document parseResponse(final String resp)
-            throws ParserConfigurationException, SAXException, IOException {
+    private Document parseResponse(final String resp) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource xmlInput = new InputSource(new StringReader(resp));
@@ -139,7 +129,7 @@ public class CallbackUnsubscribeTest extends TestCase {
     protected void tearDown() throws Exception {
         try {
             client.unsubscribe("QuerySE44");
-        } catch (NoSuchSubscriptionException e) {
+        } catch (NoSuchSubscriptionExceptionResponse e) {
         }
     }
 }
