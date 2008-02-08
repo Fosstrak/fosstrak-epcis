@@ -1,4 +1,4 @@
-<epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+<epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" xmlns:hls="http://schema.hls.com/extension">
   <queryName>SimpleEventQuery</queryName>
   <subscriptionID>QuerySE4</subscriptionID>
   <resultsBody>
