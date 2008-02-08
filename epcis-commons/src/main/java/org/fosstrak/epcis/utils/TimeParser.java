@@ -28,7 +28,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The <code>TimeParser</code> utility class provides helper methods to deal
@@ -59,7 +60,7 @@ import org.apache.log4j.Logger;
  */
 public final class TimeParser {
 
-    private static final Logger LOG = Logger.getLogger(TimeParser.class);
+    private static final Log LOG = LogFactory.getLog(TimeParser.class);
 
     /**
      * Miscellaneous numeric formats used in formatting.
@@ -225,7 +226,7 @@ public final class TimeParser {
             curPos++;
             try {
                 // read all digits (number of digits unknown)
-                StringBuffer millis = new StringBuffer();
+                StringBuilder millis = new StringBuilder();
                 while (curPos < time.length() && isNumeric(time.charAt(curPos))) {
                     millis.append(time.charAt(curPos));
                     curPos++;
@@ -272,7 +273,7 @@ public final class TimeParser {
         }
 
         // initialize Calendar object
-        Calendar cal = Calendar.getInstance(tz);
+        Calendar cal = GregorianCalendar.getInstance(tz);
         cal.setLenient(false);
         if (sign == '-' || year == 0) {
             // not CE, need to set era (BCE) and adjust year
@@ -350,7 +351,7 @@ public final class TimeParser {
          * note that we cannot use java.text.SimpleDateFormat for formatting
          * because it can't handle years <= 0 and TZD's
          */
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         // year ([-]YYYY)
         buf.append(XXXX_FORMAT.format(year));
         buf.append('-');
@@ -408,7 +409,7 @@ public final class TimeParser {
      * @return The Calendar object representing the given timestamp.
      */
     public static Calendar convert(final Timestamp ts) {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        Calendar cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTimeInMillis(ts.getTime());
         return cal;
     }
