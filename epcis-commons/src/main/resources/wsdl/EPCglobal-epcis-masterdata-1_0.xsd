@@ -77,7 +77,7 @@
 		<xsd:anyAttribute processContents="lax"/>
 	</xsd:complexType>
 	<xsd:complexType name="AttributeType">
-		<xsd:complexContent>
+		<xsd:complexContent mixed="true">
 			<xsd:extension base="xsd:anyType">
 				<xsd:attribute name="id" type="xsd:anyURI" use="required"/>
 				<xsd:anyAttribute processContents="lax"/>
