@@ -1,6 +1,5 @@
 package org.accada.epcis.soap;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -22,14 +21,7 @@ public class EPCglobalEPCISService extends Service {
     public final static QName EPCglobalEPCISServicePort = new QName("urn:epcglobal:epcis:wsdl:1",
             "EPCglobalEPCISServicePort");
     static {
-        URL url = null;
-        try {
-            url = new URL("file:/D:/Projects/accada/epcis/epcis-commons/src/main/wsdl/EPCglobal-epcis-query-1_0.wsdl");
-        } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from file:/D:/Projects/accada/epcis/epcis-commons/src/main/wsdl/EPCglobal-epcis-query-1_0.wsdl");
-            // e.printStackTrace();
-        }
-        WSDL_LOCATION = url;
+        WSDL_LOCATION = EPCglobalEPCISService.class.getResource("/wsdl/EPCglobal-epcis-query-1_0.wsdl");
     }
 
     public EPCglobalEPCISService(URL wsdlLocation) {
