@@ -32,8 +32,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.DifferenceConstants;
 import org.custommonkey.xmlunit.DifferenceListener;
-import org.custommonkey.xmlunit.ElementNameQualifier;
-import org.custommonkey.xmlunit.examples.MultiLevelElementNameAndTextQualifier;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -43,6 +42,10 @@ import org.w3c.dom.Node;
  * @author Marco Steybe
  */
 public final class QueryResultsComparator {
+
+    static {
+        XMLUnit.setNormalizeWhitespace(true);
+    }
 
     /**
      * Empty default constructor. Utility classes should not have public
@@ -70,13 +73,13 @@ public final class QueryResultsComparator {
 
         Diff diff = new Diff(expDoc, actDoc);
         diff.overrideDifferenceListener(new MyDifferenceLister());
-        if (!diff.identical()) {
-            DetailedDiff ddiff = new DetailedDiff(diff);
-            List<Difference> diffs = ddiff.getAllDifferences();
-            for (Difference d : diffs) {
-                System.out.println(d);
-            }
-        }
+        // if (!diff.identical()) {
+        // DetailedDiff ddiff = new DetailedDiff(diff);
+        // List<Difference> diffs = ddiff.getAllDifferences();
+        // for (Difference d : diffs) {
+        // System.out.println(d.getId() + ": " + d);
+        // }
+        // }
         return diff.identical();
     }
 
@@ -93,16 +96,18 @@ public final class QueryResultsComparator {
             ignore.add(DifferenceConstants.COMMENT_VALUE);
         }
 
-        /**
-         * @see org.custommonkey.xmlunit.DifferenceListener#differenceFound(org.custommonkey.xmlunit.Difference)
-         */
         public int differenceFound(Difference difference) {
-            // ignore <recordTime>
+            // ignore <recordTime> presence
             if (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
                     && "recordTime".equals(difference.getTestNodeDetail().getValue())) {
                 return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             }
-            // check if eventTime equal
+            // ignore <recordTime> value
+            if (difference.equals(DifferenceConstants.TEXT_VALUE)
+                    && "recordTime".equals(difference.getTestNodeDetail().getNode().getParentNode().getNodeName())) {
+                return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
+            }
+            // check if <eventTime> equal
             if (difference.equals(DifferenceConstants.TEXT_VALUE)
                     && "eventTime".equals(difference.getTestNodeDetail().getNode().getParentNode().getNodeName())) {
                 try {
