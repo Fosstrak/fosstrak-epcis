@@ -58,7 +58,7 @@
 
     <!-- dependencies required by CeltiXFire (CXF) -->
     <dependency>
-	    <groupId>org.apache.cxf</groupId>
+      <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxws</artifactId>
       <version>2.0.4-incubator</version>
       <exclusions>
@@ -174,6 +174,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-local</artifactId>
+      <version>2.0.4-incubator</version>
+    </dependency>
   </dependencies>
 
   
@@ -182,22 +187,32 @@
   <!-- =========================================================== -->
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
-        <!-- this plugin generates the java stubs (POJOs) from the WSDL file -->
+        <!--
+            This plugin generates the java stubs (POJOs) from the WSDL file
+            using a JAXB data binding. To run this plugin manually, type: mvn
+            cxf-codegen:wsdl2java. To run this plugin during Maven's
+            generate-sources phase, uncomment the <executions> elements.
+        -->
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-codegen-plugin</artifactId>
-        <executions>
+        <!--<executions>
           <execution>
             <id>generate-pojos</id>
-            <!--<phase>generate-sources</phase>-->
+            <phase>generate-sources</phase>-->
             <configuration>
               <sourceRoot>${basedir}/target/generated-sources/main/java</sourceRoot>
               <wsdlOptions>
                 <wsdlOption>
                   <wsdl>${basedir}/src/main/resources/wsdl/EPCglobal-epcis-query-1_0.wsdl</wsdl>
                   <extraargs>
-                    <!-- namespace to package name mapping -->
                     <extraarg>-p</extraarg>
                     <extraarg>urn:epcglobal:epcis:xsd:1=org.accada.epcis.soap.model</extraarg>
                     <extraarg>-p</extraarg>
@@ -214,14 +229,56 @@
                 </wsdlOption>
               </wsdlOptions>
             </configuration>
-            <goals>
+            <!--<goals>
               <goal>wsdl2java</goal>
             </goals>
           </execution>
-        </executions>
+        </executions>-->
       </plugin>
     </plugins>
   </build>
+
+
+
+  <!-- =========================================================== -->
+  <!-- Repositories                                                   -->
+  <!-- =========================================================== -->
+
+  <repositories>
+    <repository>
+      <!-- e.g. for cxf -->
+      <id>apache-incubating</id>
+      <name>Apache Incubating Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <!-- e.g. for jaxb -->
+      <id>java.net</id>
+      <name>java.net Maven Repository</name>
+      <url>http://download.java.net/maven/1</url>
+      <layout>legacy</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <!-- e.g. for cxf-codegen-plugin -->
+      <id>apache-plugin-incubating</id>
+      <name>Apache Plugin Incubating Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository</url>
+    </pluginRepository>
+  </pluginRepositories>
 
 
 

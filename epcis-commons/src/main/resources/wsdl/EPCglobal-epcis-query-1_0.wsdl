@@ -323,10 +323,8 @@
 	</wsdl:binding>
 	<wsdl:service name="EPCglobalEPCISService">
 		<wsdl:port name="EPCglobalEPCISServicePort" binding="impl:EPCISServiceBinding">
-			<wsdlsoap:address location="http://localhost:8080/epcis-repository-0.2.4-SNAPSHOT/query"/>
-			<!-- The address shown below is an example; an implementation MAY specify
-         any port it wishes
-     -->
+			<!-- The address shown below is an example (default); an implementation MAY specify any port it wishes -->
+			<wsdlsoap:address location="${url.query}"/>
 		</wsdl:port>
 	</wsdl:service>
 	<wsdl:documentation>
