@@ -1,32 +1,32 @@
 <epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-  <queryName>SimpleEventQuery</queryName>
-  <params>
-    <param>
-      <name>eventType</name>
-      <value>
-        <string>ObjectEvent</string>
-      </value>
-    </param>
-    <param>
-      <name>WD_bizLocation</name>
-      <value>
-        <string>urn:epcglobal:fmcg:loc:0614141073468</string>
-      </value>
-    </param>
-    <param>
-      <name>LT_recordTime</name>
-      <value>2006-06-25T05:10:01Z</value>
-    </param>
-  </params>
-  <dest>http://127.0.0.1:8899/</dest>
-  <controls>
-    <schedule>
-      <second>0,10,20,30,40,50</second>
-    </schedule>
-    <!-- NOTE: The value for initialRecordTime should be set according
-      to the prepared event data. -->
-    <initialRecordTime>2006-06-25T04:30:00Z</initialRecordTime>
-    <reportIfEmpty>false</reportIfEmpty>
-  </controls>
-  <subscriptionID>QuerySE66</subscriptionID>
+    <queryName>SimpleEventQuery</queryName>
+    <params>
+        <param>
+            <name>eventType</name>
+            <value>
+                <string>ObjectEvent</string>
+            </value>
+        </param>
+        <param>
+            <name>WD_bizLocation</name>
+            <value>
+                <string>urn:epcglobal:fmcg:loc:0614141073468</string>
+            </value>
+        </param>
+        <param>
+            <name>LT_recordTime</name>
+            <value>2006-06-25T05:10:01Z</value>
+        </param>
+    </params>
+    <dest>http://127.0.0.1:8899/</dest>
+    <controls>
+        <schedule>
+            <second>0,10,20,30,40,50</second>
+        </schedule>
+        <!-- NOTE: The value for initialRecordTime should be set according
+            to the prepared event data. -->
+        <initialRecordTime>2006-06-25T04:30:00Z</initialRecordTime>
+        <reportIfEmpty>false</reportIfEmpty>
+    </controls>
+    <subscriptionID>QuerySE66</subscriptionID>
 </epcisq:Subscribe>

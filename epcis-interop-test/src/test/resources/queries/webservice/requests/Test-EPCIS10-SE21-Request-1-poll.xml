@@ -1,18 +1,17 @@
 <epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-  <queryName>SimpleEventQuery</queryName>
-  <params>
-    <param>
-      <name>MATCH_epc</name>
-      <value>
-        <string>urn:epc:id:sgtin:0614141.107340.*</string>
-      </value>
-    </param>
-    <param>
-      <name>EQ_bizStep</name>
-      <value>
-        <string>urn:epcglobal:hls:bizstep:commissioning</string>
-      </value>
-    </param>
-
-  </params>
+    <queryName>SimpleEventQuery</queryName>
+    <params>
+        <param>
+            <name>MATCH_epc</name>
+            <value>
+                <string>urn:epc:id:sgtin:0614141.107340.*</string>
+            </value>
+        </param>
+        <param>
+            <name>EQ_bizStep</name>
+            <value>
+                <string>urn:epcglobal:hls:bizstep:commissioning</string>
+            </value>
+        </param>
+    </params>
 </epcisq:Poll>

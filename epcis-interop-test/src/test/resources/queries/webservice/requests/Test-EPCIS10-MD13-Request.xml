@@ -1,24 +1,24 @@
 <epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleMasterDataQuery</queryName>
-	<params>
-		<param>
-			<name>includeAttributes</name>
-			<value>false</value>
-		</param>
-		<param>
-			<name>EQ_name</name>
-			<value>
-				<string>urn:epcglobal:fmcg:loc:0614141073468.RP-1</string>
-			</value>
-		</param>
-	</params>
-	<dest>http://127.0.0.1:8899/</dest>
-	<controls>
-		<schedule>
-			<second>0</second>
-		</schedule>
-		<initialRecordTime>2001-12-17T09:30:47.000Z</initialRecordTime>
-		<reportIfEmpty>false</reportIfEmpty>
-	</controls>
-	<subscriptionID>Query Q</subscriptionID>
+    <queryName>SimpleMasterDataQuery</queryName>
+    <params>
+        <param>
+            <name>includeAttributes</name>
+            <value>false</value>
+        </param>
+        <param>
+            <name>EQ_name</name>
+            <value>
+                <string>urn:epcglobal:fmcg:loc:0614141073468.RP-1</string>
+            </value>
+        </param>
+    </params>
+    <dest>http://127.0.0.1:8899/</dest>
+    <controls>
+        <schedule>
+            <second>0</second>
+        </schedule>
+        <initialRecordTime>2001-12-17T09:30:47.000Z</initialRecordTime>
+        <reportIfEmpty>false</reportIfEmpty>
+    </controls>
+    <subscriptionID>Query Q</subscriptionID>
 </epcisq:Subscribe>

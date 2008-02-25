@@ -1,7 +1,5 @@
 <epcisq:Subscribe xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-
     <queryName>SimpleEventQuery</queryName>
-
     <params>
         <param>
             <name>eventType</name>
@@ -32,9 +30,7 @@
             </value>
         </param>
     </params>
-
     <dest>http://127.0.0.1:8899/</dest>
-
     <controls>
         <schedule>
             <second>0</second>
@@ -43,7 +39,5 @@
         <initialRecordTime>2000-07-05T00:00:00.0Z</initialRecordTime>
         <reportIfEmpty>false</reportIfEmpty>
     </controls>
-
     <subscriptionID>QuerySE8</subscriptionID>
-
 </epcisq:Subscribe>

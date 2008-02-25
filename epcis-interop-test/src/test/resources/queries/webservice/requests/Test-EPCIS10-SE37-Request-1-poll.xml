@@ -1,13 +1,13 @@
 <epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<params>
-		<param>
-			<name>GT_quantity</name>
-			<value>3</value>
-		</param>
-		<param>
-			<name>LT_quantity</name>
-			<value>8</value>
-		</param>
-	</params>
+    <queryName>SimpleEventQuery</queryName>
+    <params>
+        <param>
+            <name>GT_quantity</name>
+            <value>3</value>
+        </param>
+        <param>
+            <name>LT_quantity</name>
+            <value>8</value>
+        </param>
+    </params>
 </epcisq:Poll>
