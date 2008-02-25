@@ -418,7 +418,8 @@ public class Schedule implements Serializable {
      * @throws ImplementationException
      *             Almost any error.
      */
-    private boolean setFieldToMinimum(final GregorianCalendar cal, final int field) throws ImplementationExceptionResponse {
+    private boolean setFieldToMinimum(final GregorianCalendar cal, final int field)
+            throws ImplementationExceptionResponse {
         int min;
         TreeSet<Integer> values = getValues(field);
         if (values.isEmpty()) {

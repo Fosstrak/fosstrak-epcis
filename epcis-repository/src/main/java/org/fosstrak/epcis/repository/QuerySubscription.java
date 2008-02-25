@@ -34,8 +34,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.naming.Context;
@@ -43,6 +45,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -52,9 +55,13 @@ import org.accada.epcis.soap.EPCISServicePortType;
 import org.accada.epcis.soap.EPCglobalEPCISService;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.model.EPCISException;
 import org.accada.epcis.soap.model.EPCISQueryBodyType;
 import org.accada.epcis.soap.model.EPCISQueryDocumentType;
 import org.accada.epcis.soap.model.EventListType;
+import org.accada.epcis.soap.model.ImplementationException;
+import org.accada.epcis.soap.model.ImplementationExceptionSeverity;
+import org.accada.epcis.soap.model.ObjectFactory;
 import org.accada.epcis.soap.model.Poll;
 import org.accada.epcis.soap.model.QueryParam;
 import org.accada.epcis.soap.model.QueryParams;
@@ -62,10 +69,16 @@ import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.soap.model.QueryTooLargeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
 
 /**
  * Implements a subscription to a query. Created upon using subscribe() on the
  * querying interface side.
+ * <p>
+ * TODO: this class is in need of some refactoring (see the TODOs in the javadoc
+ * of the individual methods)
  * 
  * @author Alain Remund
  * @author Arthur van Dorp
@@ -138,7 +151,8 @@ public class QuerySubscription implements Serializable {
     public QuerySubscription(final String subscriptionID, final QueryParams queryParams, final String dest,
             final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
             final GregorianCalendar lastTimeExecuted, final String queryName) {
-        LOG.debug("Constructing Query Subscription with ID '" + subscriptionID + "'.");
+        LOG.debug("Constructing Query Subscription with ID '" + subscriptionID + "'");
+        setUpBus();
 
         this.queryParams = queryParams;
         this.subscriptionID = subscriptionID;
@@ -153,16 +167,31 @@ public class QuerySubscription implements Serializable {
         updateRecordTime(queryParams, initialRecordTime);
     }
 
+    private void setUpBus() {
+        Bus bus = CXFBusFactory.getDefaultBus();
+        ClientOnlyHTTPTransportFactory httpTransport = new ClientOnlyHTTPTransportFactory();
+        httpTransport.setBus(bus);
+        List<String> transportIds = Arrays.asList(new String[] {
+                "http://schemas.xmlsoap.org/wsdl/soap/http", "http://schemas.xmlsoap.org/soap/http",
+                "http://www.w3.org/2003/05/soap/bindings/HTTP/", "http://schemas.xmlsoap.org/wsdl/http/",
+                "http://cxf.apache.org/transports/http/configuration", "http://cxf.apache.org/bindings/xformat", });
+        httpTransport.setTransportIds(transportIds);
+        httpTransport.registerWithBindingManager();
+    }
+
     /**
      * Updates the subscription in the database. This is required in order to
      * correctly re-initialize the subscriptions, especially the
      * lastTimeExecuted field, after a context restart.
+     * <p>
+     * TODO: This is a backend method: move this method to the
+     * QueryOperationsBackend and delegate to it (thus we would need a reference
+     * to the QueryOperationsBackend in this class).
      * 
      * @param lastTimeExecuted
      *            The new lastTimeExecuted.
      */
     private void updateSubscription(final GregorianCalendar lastTimeExecuted) {
-
         try {
             // open a database connection
             Context initContext = new InitialContext();
@@ -173,7 +202,7 @@ public class QuerySubscription implements Serializable {
             // update the subscription in the database
             String update = "UPDATE subscription SET lastexecuted=(?), params=(?)" + " WHERE subscriptionid=(?);";
             PreparedStatement stmt = dbconnection.prepareStatement(update);
-            LOG.debug("QUERY: " + update);
+            LOG.debug("SQL: " + update);
             Timestamp ts = new Timestamp(lastTimeExecuted.getTimeInMillis());
             String time = ts.toString();
             stmt.setString(1, time);
@@ -240,6 +269,11 @@ public class QuerySubscription implements Serializable {
 
     /**
      * Runs the query assigned to this subscription. Advances lastTimeExecuted.
+     * <p>
+     * TODO: Currently we 'poll' a query using an ordinary Web service request
+     * that goes all the way through both the client-side Web service stack and
+     * the server-side Web service stack. It would be more efficient and more
+     * sensible if we could avoid these stacks and perform a local call.
      */
     public void executeQuery() {
         if (LOG.isDebugEnabled()) {
@@ -280,20 +314,25 @@ public class QuerySubscription implements Serializable {
                 this.lastTimeExecuted = cal;
             } catch (QueryTooLargeExceptionResponse e) {
                 // send exception back to client
-                EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
-                QueryTooLargeException qtle = new QueryTooLargeException();
-                qtle.setQueryName(queryName);
-                qtle.setSubscriptionID(subscriptionID);
-                qtle.setReason(e.getMessage());
-                queryBody.setQueryTooLargeException(qtle);
-                serializeAndSend(queryBody);
+                QueryTooLargeException qtle = e.getFaultInfo();
+                if (qtle == null) {
+                    qtle = new QueryTooLargeException();
+                    qtle.setQueryName(queryName);
+                    qtle.setSubscriptionID(subscriptionID);
+                    qtle.setReason(e.getMessage());
+                }
+                serializeAndSendException(qtle);
                 return;
             } catch (ImplementationExceptionResponse e) {
                 // send exception back to client
-                EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
-                e.getFaultInfo().setSubscriptionID(subscriptionID);
-                queryBody.setImplementationException(e.getFaultInfo());
-                serializeAndSend(queryBody);
+                ImplementationException ie = e.getFaultInfo();
+                if (ie == null) {
+                    ie = new ImplementationException();
+                    ie.setQueryName(queryName);
+                    ie.setReason(e.getMessage());
+                    ie.setSubscriptionID(subscriptionID);
+                }
+                serializeAndSendException(ie);
                 return;
             } catch (Exception e) {
                 String msg = "An error retrieving the EPCIS query service occurred: " + e.getMessage();
@@ -311,10 +350,7 @@ public class QuerySubscription implements Serializable {
                 return;
             }
 
-            EPCISQueryBodyType queryBody = new EPCISQueryBodyType();
-            queryBody.setQueryResults(result);
-
-            serializeAndSend(queryBody);
+            serializeAndSend(result);
 
         } catch (IOException e) {
             String msg = "An error opening a connection to '" + dest
@@ -328,46 +364,80 @@ public class QuerySubscription implements Serializable {
 
     /**
      * Serializes and sends the query response back to the client.
+     * <p>
+     * TODO: this is actually the callbackResults method of the Query Callback
+     * Interface - extract this method to an implementation of the Query
+     * Callback Interface
      * 
      * @param body
      *            The body of the EPCISQueryDocumentType.
      * @throws IOException
      *             If a serialization or sending error occurred.
      */
-    protected void serializeAndSend(final EPCISQueryBodyType body) throws IOException {
-        EPCISQueryDocumentType queryDoc = new EPCISQueryDocumentType();
-        try {
-            DatatypeFactory factory = DatatypeFactory.newInstance();
-            queryDoc.setCreationDate(factory.newXMLGregorianCalendar((GregorianCalendar) GregorianCalendar.getInstance()));
-            queryDoc.setEPCISBody(body);
-        } catch (DatatypeConfigurationException e) {
-            // Never mind. Just ignore setting the creation date.
-        }
-
+    protected void serializeAndSend(final QueryResults results) throws IOException {
         // serialize the response
         String data = null;
         try {
-            JAXBContext context = JAXBContext.newInstance(EPCISQueryDocumentType.class);
+            ObjectFactory factory = new ObjectFactory();
+            JAXBElement<QueryResults> item = factory.createQueryResults(results);
+            JAXBContext context = JAXBContext.newInstance(QueryResults.class);
             StringWriter writer = new StringWriter();
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-            marshaller.marshal(queryDoc, writer);
+            marshaller.marshal(item, writer);
             data = writer.toString();
         } catch (JAXBException e) {
-            throw new IOException(e.getMessage());
+            IOException ioe = new IOException(e.getLinkedException().getMessage());
+            ioe.setStackTrace(e.getLinkedException().getStackTrace());
+            throw ioe;
         }
 
-        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // OutputStreamWriter writer = new OutputStreamWriter(baos);
-        // SerializationContext serContext = new SerializationContext(writer);
-        // QName queryDocXMLType =
-        // EPCISQueryDocumentType.getTypeDesc().getXmlType();
-        // serContext.setWriteXMLType(queryDocXMLType);
-        // serContext.serialize(queryDocXMLType, new NullAttributes(), queryDoc,
-        // queryDocXMLType,
-        // EPCISQueryDocumentType.class, false, true);
-        // writer.flush();
-        // String data = baos.toString();
+        // set up connection and send data to given destination
+        URL serviceUrl = new URL(dest.toString());
+        LOG.debug("Sending results of subscribed query with ID '" + subscriptionID + "' to '" + serviceUrl + "'.");
+        int responseCode = sendData(serviceUrl, data);
+        LOG.debug("Response " + responseCode);
+    }
+
+    /**
+     * Serializes and sends the query response back to the client.
+     * <p>
+     * TODO: this are actually the callbackImplementationException and
+     * callbackQueryTooLargeException methods of the Query Callback Interface -
+     * extract this method to an implementation of the Query Callback Interface
+     * 
+     * @param body
+     *            The body of the EPCISQueryDocumentType.
+     * @throws IOException
+     *             If a serialization or sending error occurred.
+     */
+    protected void serializeAndSendException(final EPCISException exception) throws IOException {
+        // serialize the response
+        String data = null;
+        try {
+            ObjectFactory factory = new ObjectFactory();
+            JAXBElement<?> item;
+            JAXBContext context;
+            if (exception instanceof QueryTooLargeException) {
+                item = factory.createQueryTooLargeException((QueryTooLargeException) exception);
+                context = JAXBContext.newInstance(QueryTooLargeException.class);
+            } else if (exception instanceof ImplementationException) {
+                item = factory.createImplementationException((ImplementationException) exception);
+                context = JAXBContext.newInstance(ImplementationException.class);
+            } else {
+                item = factory.createEPCISException(exception);
+                context = JAXBContext.newInstance(EPCISException.class);
+            }
+            StringWriter writer = new StringWriter();
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.marshal(item, writer);
+            data = writer.toString();
+        } catch (JAXBException e) {
+            IOException ioe = new IOException(e.getLinkedException().getMessage());
+            ioe.setStackTrace(e.getLinkedException().getStackTrace());
+            throw ioe;
+        }
 
         // set up connection and send data to given destination
         URL serviceUrl = new URL(dest.toString());
@@ -391,14 +461,18 @@ public class QuerySubscription implements Serializable {
      */
     private int sendData(final URL url, final String data) throws IOException {
         data.concat("\n");
-        // setup connection
-        // this will be an instance of javax.net.ssl.HttpURLConnection if the
-        // https protocol is used in the url
+        /*
+         * Setup the connection. The URL.openConnection() method returns an
+         * instance of javax.net.ssl.HttpURLConnection, which extends
+         * java.net.HttpURLConnection, if the https protocol is used in the URL.
+         * Therefore we support both the HTTP and HTTPS binding of the query
+         * callback interface.
+         */
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        // connection.setInstanceFollowRedirects(false);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-type", "text/plain");
         connection.setRequestProperty("Content-length", "" + data.length());
+        // connection.setInstanceFollowRedirects(false);
         // connection.setDoInput(true);
         connection.setDoOutput(true);
 
