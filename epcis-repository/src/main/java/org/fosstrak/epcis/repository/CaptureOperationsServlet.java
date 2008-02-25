@@ -28,6 +28,8 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,88 +48,120 @@ import org.hibernate.cfg.Configuration;
 import org.xml.sax.SAXException;
 
 /**
- * CaptureOperationsModule implements the core capture operations. Converts XML
- * events delivered by HTTP POST into SQL and inserts them into the database.
- * <p>
- * TODO: We can get rid of the logging initialization (see
- * RepositoryContextListener). The other properties should be passed to
- * CaptureOperationsModule in setter methods (similar to QueryInitServlet).
+ * This CaptureOperationsServlet accepts and analyzes HTTP POST requests and
+ * delegates them to the appropriate handler methods in the
+ * CaptureOperationsModule. This servlet also initializes the
+ * CaptureOperationsModule properly and returns a simple information page upon
+ * GET requests.
  * 
- * @author David Gubler
- * @author Alain Remund
  * @author Marco Steybe
  */
 public class CaptureOperationsServlet extends HttpServlet {
 
-    private static final long serialVersionUID = -1507276940747086042L;
+    private static final String APP_CONFIG_LOCATION = "appConfigLocation";
+    private static final String PROP_INSERT_MISSING_VOC = "insertMissingVoc";
+    private static final String PROP_DB_RESET_ALLOWED = "dbResetAllowed";
+    private static final String PROP_DB_RESET_SCRIPT = "dbResetScript";
+    private static final String PROP_SERVLET_PATH = "servletPath";
+    private static final String PROP_EPCIS_SCHEMA_FILE = "epcisSchemaFile";
 
     private static final Log LOG = LogFactory.getLog(CaptureOperationsServlet.class);
 
-    private CaptureOperationsModule captureOperationsModule = new CaptureOperationsModule();
+    private CaptureOperationsModule captureOperationsModule;
 
     /**
-     * @see javax.servlet.GenericServlet#init()
-     * @throws ServletException
-     *             If the context could not be loaded.
+     * {@inheritDoc}
      */
-    @Override
     public void init() throws ServletException {
-        // load log4j config
-        String servletPath = getServletContext().getRealPath("/");
-        String log4jConfigFile = getServletContext().getInitParameter("log4jConfigFile");
-        if (log4jConfigFile != null) {
-            // if no log4j properties file found, then do not try
-            // to load it (the application runs without logging)
-            PropertyConfigurator.configure(servletPath + log4jConfigFile);
-        }
+        ServletConfig servletConfig = getServletConfig();
+        Properties props = loadApplicationProperties(servletConfig);
+        SessionFactory hibernateSessionFactory = initHibernate();
+        Schema epcisSchema = initEpcisSchema(props);
 
-        // read configuration and set up hibernate ...
+        LOG.debug("Initializing capture operations module");
+        captureOperationsModule = new CaptureOperationsModule();
+        captureOperationsModule.setSessionFactory(hibernateSessionFactory);
+        captureOperationsModule.setInsertMissingVoc(Boolean.parseBoolean(props.getProperty(PROP_INSERT_MISSING_VOC,
+                "true")));
+        captureOperationsModule.setDbResetAllowed(Boolean.parseBoolean(props.getProperty(PROP_DB_RESET_ALLOWED, "false")));
+        captureOperationsModule.setDbResetScript(props.getProperty(PROP_SERVLET_PATH) + "WEB-INF/classes"
+                + props.getProperty(PROP_DB_RESET_SCRIPT));
+        captureOperationsModule.setSchema(epcisSchema);
+    }
+
+    /**
+     * Loads the application properties and populates a java.util.Properties
+     * instance.
+     * 
+     * @param servletConfig
+     *            The ServletConfig used to locate the application property
+     *            file.
+     * @return The application properties.
+     */
+    private Properties loadApplicationProperties(ServletConfig servletConfig) {
+        // read application properties from servlet context
+        ServletContext ctx = servletConfig.getServletContext();
+        String path = ctx.getRealPath("/");
+        String appConfigFile = ctx.getInitParameter(APP_CONFIG_LOCATION);
+        Properties properties = new Properties();
+        try {
+            InputStream is = new FileInputStream(path + appConfigFile);
+            properties.load(is);
+            is.close();
+            LOG.info("Loaded application properties from " + path + appConfigFile);
+        } catch (IOException e) {
+            LOG.error("Unable to load application properties from " + path + appConfigFile, e);
+        }
+        properties.put(PROP_SERVLET_PATH, path);
+        return properties;
+    }
+
+    /**
+     * Initializes Hibernate. Reads the configuration from hibernate.cfg.xml
+     * located in the classpath (WEB-INF/classes/)
+     * 
+     * @return The Hibernate SessionFactory.
+     * @throws ServletException
+     */
+    private SessionFactory initHibernate() throws ServletException {
         try {
             Configuration c = new Configuration();
             c.configure(); // from WEB-INF/classes/hibernate.cfg.xml
-            SessionFactory sessionFactory = c.buildSessionFactory();
-            captureOperationsModule.setSessionFactory(sessionFactory);
+            return c.buildSessionFactory();
         } catch (Exception e) {
             String msg = "Unable to configure Hibernate: " + e.toString();
             LOG.error(msg, e);
             throw new ServletException(msg, e);
         }
+    }
 
-        // load properties
-        String appConfigFile = getServletContext().getInitParameter("appConfigFile");
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(servletPath + appConfigFile));
-        } catch (IOException e) {
-            LOG.error("Unable to load application properties from " + servletPath + appConfigFile);
-        }
-        captureOperationsModule.setInsertMissingVoc(Boolean.parseBoolean(properties.getProperty("insertMissingVoc",
-                "true")));
-        String dbResetAllowedStr = getServletContext().getInitParameter("dbResetAllowed");
-        captureOperationsModule.setDbResetAllowed(Boolean.parseBoolean(dbResetAllowedStr));
-        captureOperationsModule.setDbResetScript(servletPath + getServletContext().getInitParameter("dbResetScript"));
-
-        // load the schema validator
-        try {
-            String schemaPath = servletPath + getServletContext().getInitParameter("schemaPath");
-            String schemaFile = getServletContext().getInitParameter("schemaFile");
-            File xsd = new File(schemaPath + System.getProperty("file.separator") + schemaFile);
-            LOG.debug("Reading schema from '" + xsd.getAbsolutePath() + "'.");
-            if (!xsd.exists()) {
-                LOG.warn("Unable to find the schema file (check 'pathToSchemaFiles' parameter in META-INF/context.xml)");
-                LOG.warn("Schema validation will not be available!");
-            } else {
-                // load the schema to validate against
-                SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Source schemaSrc = new StreamSource(xsd);
-                Schema schema = schemaFact.newSchema(schemaSrc);
-                captureOperationsModule.setSchema(schema);
+    /**
+     * Initializes the EPCIS schema used for validating incoming capture
+     * requests. Loads the WSDL and XSD files from the classpath (the schema is
+     * bundled with epcis-commons.jar).
+     * 
+     * @return An instantiated schema validation object.
+     */
+    private Schema initEpcisSchema(Properties props) {
+        String xsdFile = props.getProperty(PROP_EPCIS_SCHEMA_FILE);
+        InputStream is = CaptureOperationsServlet.class.getResourceAsStream(xsdFile);
+        if (is != null) {
+            try {
+                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Source schemaSrc = new StreamSource(is);
+                schemaSrc.setSystemId(CaptureOperationsServlet.class.getResource(xsdFile).toString());
+                Schema schema = schemaFactory.newSchema(schemaSrc);
+                LOG.debug("EPCIS schema file initialized and loaded successfully");
+                return schema;
+            } catch (Exception e) {
+                LOG.warn("Unable to load or parse the EPCIS schema", e);
             }
-        } catch (Exception e) {
-            LOG.warn("Unable to load the schema validator.", e);
-            LOG.warn("Schema validation will not be available!");
+        } else {
+            LOG.error("Unable to load the EPCIS schema file from classpath: cannot find resource "
+                    + PROP_EPCIS_SCHEMA_FILE);
         }
-
+        LOG.warn("Schema validation will not be available!");
+        return null;
     }
 
     /**
@@ -177,7 +211,6 @@ public class CaptureOperationsServlet extends HttpServlet {
      *             If an error occurred while validating the request or writing
      *             the response.
      */
-    @Override
     public void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
         LOG.info("EPCIS Capture Interface invoked.");
         rsp.setContentType("text/plain");

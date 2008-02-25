@@ -30,7 +30,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO: javadoc
+ * This RepositoryContextListener performs the initialization and termination
+ * (shut-down) work required by the Accada EPCIS repository application, such as
+ * initializing the logging framework. This class receives notifications about
+ * changes to the servlet context of the web application, e.g., when the servlet
+ * context is loaded, or is about to be shut down.
  * 
  * @author Marco Steybe
  */
@@ -48,12 +52,12 @@ public class RepositoryContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent event) {
         ServletContext ctx = event.getServletContext();
 
-        /* Note: logging is initialized automatically by reading
+        /*
+         * Note: logging is initialized automatically by reading
          * logging.properties and log4j.properties from the classpath.
-         * logging.properties is used to tell commons-logging to use
-         * LOG4J as its underlying logging toolkit; log4j.properties is
-         * used to configure LOG4J
-         * To initialize LOG4J manually from LOG4J_CONFIG_LOCATION,
+         * logging.properties is used to tell commons-logging to use LOG4J as
+         * its underlying logging toolkit; log4j.properties is used to configure
+         * LOG4J. To initialize LOG4J manually from LOG4J_CONFIG_LOCATION,
          * un-comment the following code ...
          */
         // String path = ctx.getRealPath("/");

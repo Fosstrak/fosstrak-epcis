@@ -34,6 +34,7 @@ import javax.servlet.ServletException;
 import javax.sql.DataSource;
 import javax.xml.ws.Endpoint;
 
+import org.accada.epcis.soap.EPCISServicePortType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.BusFactory;
@@ -45,7 +46,8 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 /**
- * TODO: javadoc
+ * TODO: javadoc<br>
+ * TODO: read WS_SERVICE_ADDRESS and JNDI_DATASOURCE_NAME from properties!
  * 
  * @author Marco Steybe
  */
@@ -74,30 +76,45 @@ public class QueryInitServlet extends CXFNonSpringServlet {
     public void loadBus(ServletConfig servletConfig) throws ServletException {
         super.loadBus(servletConfig);
         BusFactory.setDefaultBus(getBus());
-        getBus().getInInterceptors().add(new LoggingInInterceptor());
-        getBus().getOutInterceptors().add(new LoggingOutInterceptor());
-        //getBus().getOutFaultInterceptors().add(new FaultOutInterceptor());
-        //getBus().getOutFaultInterceptors().add(new LoggingOutInterceptor());
-        //getBus().getInFaultInterceptors().add(new LoggingInInterceptor());
-        setupQueryOperationsModule(servletConfig);
-    }
-
-    private void setupQueryOperationsModule(ServletConfig servletConfig) {
-        Properties props = loadApplicationProperties(servletConfig);
-        DataSource dataSource = loadDataSource();
-
-        LOG.debug("Initializing query operations module");
-        QueryOperationsModule service = new QueryOperationsModule();
-        service.setMaxQueryRows(Integer.parseInt(props.getProperty(PROP_MAX_QUERY_ROWS)));
-        service.setMaxQueryTime(Integer.parseInt(props.getProperty(PROP_MAX_QUERY_TIME)));
-        service.setTriggerConditionMinutes(props.getProperty(PROP_TRIGGER_CHECK_MIN));
-        service.setTriggerConditionSeconds(props.getProperty(PROP_TRIGGER_CHECK_SEC));
-        service.setDataSource(dataSource);
+        if (LOG.isDebugEnabled()) {
+            getBus().getInInterceptors().add(new LoggingInInterceptor());
+            getBus().getOutInterceptors().add(new LoggingOutInterceptor());
+            getBus().getOutFaultInterceptors().add(new LoggingOutInterceptor());
+            getBus().getInFaultInterceptors().add(new LoggingInInterceptor());
+        }
+        EPCISServicePortType service = setupQueryOperationsModule(servletConfig);
 
         LOG.debug("Publishing query operations module service at " + WS_SERVICE_ADDRESS);
         Endpoint.publish(WS_SERVICE_ADDRESS, service);
     }
 
+    private EPCISServicePortType setupQueryOperationsModule(ServletConfig servletConfig) {
+        Properties props = loadApplicationProperties(servletConfig);
+        DataSource dataSource = loadDataSource();
+
+        LOG.debug("Initializing query operations module");
+        QueryOperationsModule module = new QueryOperationsModule();
+        module.setMaxQueryRows(Integer.parseInt(props.getProperty(PROP_MAX_QUERY_ROWS)));
+        module.setMaxQueryTime(Integer.parseInt(props.getProperty(PROP_MAX_QUERY_TIME)));
+        module.setTriggerConditionMinutes(props.getProperty(PROP_TRIGGER_CHECK_MIN));
+        module.setTriggerConditionSeconds(props.getProperty(PROP_TRIGGER_CHECK_SEC));
+        module.setDataSource(dataSource);
+        module.setServletContext(servletConfig.getServletContext());
+
+        LOG.debug("Initializing query operations web service");
+        QueryOperationsWebService service = new QueryOperationsWebService(module);
+        return service;
+    }
+
+    /**
+     * Loads the application properties and populates a java.util.Properties
+     * instance.
+     * 
+     * @param servletConfig
+     *            The ServletConfig used to locate the application property
+     *            file.
+     * @return The application properties.
+     */
     private Properties loadApplicationProperties(ServletConfig servletConfig) {
         // read application properties from servlet context
         ServletContext ctx = servletConfig.getServletContext();
@@ -115,10 +132,14 @@ public class QueryInitServlet extends CXFNonSpringServlet {
         return properties;
     }
 
+    /**
+     * Loads the data source from the application context via JNDI.
+     * 
+     * @return The application DataSource instance.
+     */
     private DataSource loadDataSource() {
         DataSource dataSource = null;
         try {
-            // read data source from application context via JNDI
             Context ctx = new InitialContext();
             dataSource = (DataSource) ctx.lookup(JNDI_DATASOURCE_NAME);
             LOG.info("Loaded data source via JNDI from " + JNDI_DATASOURCE_NAME);
@@ -127,20 +148,4 @@ public class QueryInitServlet extends CXFNonSpringServlet {
         }
         return dataSource;
     }
-
-    // try {
-    // String delimiter = dbconnection.getMetaData().getIdentifierQuoteString();
-    // LOG.debug("Resolved string delimiter used to quote SQL identifiers as '"
-    // + delimiter + "'.");
-    //
-    // Map<String, QuerySubscriptionScheduled> subscribedMap = (HashMap<String,
-    // QuerySubscriptionScheduled>) ctx.getAttribute("subscribedMap");
-    // if (subscribedMap != null && log.isDebugEnabled()) {
-    // LOG.debug("Restored " + subscribedMap.size() + " subscriptions from
-    // servlet context");
-    // }
-    // }catch (SQLException e) {
-    // String msg = "An error connecting to the database occurred";
-    // LOG.error(msg, e);
-    // }
 }
