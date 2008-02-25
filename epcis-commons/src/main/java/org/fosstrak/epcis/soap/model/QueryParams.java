@@ -1,6 +1,7 @@
 
 package org.accada.epcis.soap.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "QueryParams", propOrder = {
     "param"
 })
-public class QueryParams {
+public class QueryParams implements Serializable {
 
     @XmlElement(required = true)
     protected List<QueryParam> param;
