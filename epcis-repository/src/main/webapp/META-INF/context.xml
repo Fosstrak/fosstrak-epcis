@@ -8,20 +8,6 @@
      context, then put them in application.properties file.
    -->
 
-  <Parameter name="schemaPath" value="WEB-INF/classes/wsdl"/>
-  <Parameter name="schemaFile" value="EPCglobal-epcis-1_0.xsd"/>
-
-  <Parameter name="log4jConfigFile" value="META-INF/log4j.properties"/>
-  <Parameter name="appConfigFile" value="META-INF/application.properties"/>
-  
-  <!-- Allow remote clients to invoke the database reset script (see
-       parameter "dbResetScript). -->
-  <Parameter name="dbResetAllowed" value="${db.reset.allowed}"/>
-
-  <!-- Script containing SQL statements to initialize repository to a
-       predefined state. (Used for JUnit testing only.) -->
-  <Parameter name="dbResetScript" value="WEB-INF/classes/sql/epcis_test_data_reset.sql"/>
-
   <Resource
     name="jdbc/EPCISDB"
     type="javax.sql.DataSource"
@@ -33,7 +19,5 @@
     url="jdbc:mysql://localhost:3306/${db.database}?autoReconnect=true">
   </Resource>
 
-  <WatchedResource>WEB-INF/web.xml</WatchedResource>
-  <WatchedResource>META-INF/context.xml</WatchedResource>
   <WatchedResource>META-INF/application.properties</WatchedResource>
 </Context>
