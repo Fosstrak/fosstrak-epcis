@@ -33,37 +33,6 @@
       <version>2.5</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <!--
-         This CXF dependency is only required by the Web service client and
-         is thus not included in the epcis-commons module's dependency set
-      -->
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-transports-http-jetty</artifactId>
-      <version>2.0.4-incubator</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.cxf</groupId>
-          <artifactId>cxf-rt-transports-http</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>jetty</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-servlet_2.5_spec</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
 
 
