@@ -22,6 +22,7 @@ package org.accada.epcis.queryclient;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.xml.namespace.QName;
 
 import org.accada.epcis.soap.EPCISServicePortType;
 import org.accada.epcis.soap.EPCglobalEPCISService;
@@ -57,14 +59,16 @@ import org.accada.epcis.utils.TimeParser;
  * Implements a Class to interface with the axis stubs for the EPCIS Query
  * Interface. Also offers some helper methods to convert between different
  * formats and for debug output.
+ * <p>
+ * TODO: refactor this GUI helper class to reuse the QueryControlClient (MVC
+ * pattern!)<br>
+ * FIXME: setEndpointAddress has no effect!
  * 
  * @author David Gubler
  */
 public class QueryClientGuiHelper {
-    /**
-     * The EPCIS service port to be invoked.
-     */
-    private EPCISServicePortType service = new EPCglobalEPCISService().getEPCglobalEPCISServicePort();
+    
+    private static QueryControlClient queryClient;
 
     /**
      * Holds the query parameters.
@@ -87,6 +91,7 @@ public class QueryClientGuiHelper {
      */
     public QueryClientGuiHelper(final String queryUrl, final JTextArea area) {
         debugTextArea = area;
+        queryClient = new QueryControlClient(queryUrl);
     }
 
     /**
@@ -96,6 +101,7 @@ public class QueryClientGuiHelper {
      *            The URL of the query web service.
      */
     public void setEndpointAddress(final String queryUrl) {
+        queryClient.setEndpointAddress(queryUrl);
     }
 
     /**
@@ -354,7 +360,7 @@ public class QueryClientGuiHelper {
         poll.setParams(queryParams);
 
         debugTextArea.append("running query...\n");
-        QueryResults results = service.poll(poll);
+        QueryResults results = queryClient.poll(poll);
         debugTextArea.append("done\n");
 
         // print to debug window and return result
@@ -377,7 +383,7 @@ public class QueryClientGuiHelper {
             debugTextArea.append(queryParam.getName() + " " + queryParam.getValue() + "\n");
         }
         subscribe.setParams(queryParams);
-        service.subscribe(subscribe);
+        queryClient.subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(), subscribe.getControls(), subscribe.getSubscriptionID());
     }
 
     /**
@@ -396,7 +402,7 @@ public class QueryClientGuiHelper {
             }
             Unsubscribe parms = new Unsubscribe();
             parms.setSubscriptionID(subscriptionID);
-            service.unsubscribe(parms);
+            queryClient.unsubscribe(parms.getSubscriptionID());
             JOptionPane.showMessageDialog(frame, "Successfully unsubscribed.", "Service is responding",
                     JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
@@ -419,7 +425,7 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public String queryStandardVersion() throws Exception {
-        return service.getStandardVersion(new EmptyParms());
+        return queryClient.getStandardVersion();
     }
 
     /**
@@ -431,8 +437,7 @@ public class QueryClientGuiHelper {
         try {
             GetSubscriptionIDs parms = new GetSubscriptionIDs();
             parms.setQueryName("simpleQuery");
-            ArrayOfString resp = service.getSubscriptionIDs(parms);
-            List<String> subscriptionIDs = resp.getString();
+            List<String> subscriptionIDs = queryClient.getSubscriptionIds(parms.getQueryName());
             if (subscriptionIDs != null && !subscriptionIDs.isEmpty()) {
                 msg.append("The Service found the following SubscriptionID(s):\n");
                 for (String s : subscriptionIDs) {
@@ -458,7 +463,7 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public String queryVendorVersion() throws Exception {
-        return service.getVendorVersion(new EmptyParms());
+        return queryClient.getVendorVersion();
     }
 
     /**
@@ -469,7 +474,7 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public List<String> queryNames() throws Exception {
-        return service.getQueryNames(new EmptyParms()).getString();
+        return queryClient.getQueryNames();
     }
 
     /**

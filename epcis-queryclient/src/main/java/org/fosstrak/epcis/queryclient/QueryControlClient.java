@@ -22,22 +22,27 @@ package org.accada.epcis.queryclient;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPBinding;
 
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.EPCISServicePortType;
@@ -61,36 +66,40 @@ import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.soap.model.Subscribe;
 import org.accada.epcis.soap.model.SubscriptionControls;
 import org.accada.epcis.soap.model.Unsubscribe;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.jaxws.JaxWsClientProxy;
+import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.servlet.ServletTransportFactory;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 /**
- * This query client is a wrapper for EPCISServiceBindingStub which performs the
- * calls to the Query Operations Module. Additionally this client provides some
- * convenience methods for polling and subscribing queries given in XML form.
+ * This query client makes calls against the EPCIS query control interface and
+ * also provides some convenience methods for polling and subscribing queries
+ * given in XML form.
  * 
  * @author Marco Steybe
  */
 public class QueryControlClient implements QueryControlInterface {
 
     private static final String PROPERTY_FILE = "/queryclient.properties";
-
-    private static final String PROPERTY_QUERY_URL = "default.url";
+    private static final String PROP_QUERY_URL = "default.url";
+    private static final String PROP_WSDL_LOCATION = "wsdlLocation";
+    private static final String DEFAULT_QUERY_URL = "http://demo.accada.org/epcis/query";
 
     private static final QName SERVICE = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISService");
     private static final QName PORT = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePort");
 
-    private static URL WSDL_LOCATION;
-
-    static {
-        // TODO: do not hard code the wsdl location here! better to read it
-        // from properties
-        WSDL_LOCATION = ClassLoader.getSystemResource("wsdl/EPCglobal-epcis-query-1_0.wsdl");
-    }
+    private URL wsdlLocation;
 
     /**
      * The URL String at which the Query Operations Module listens.
      */
-    private String queryUrl = null;
+    private String endpointAddress = null;
 
     /**
      * The locator for the service.
@@ -102,7 +111,7 @@ public class QueryControlClient implements QueryControlInterface {
      * Operations Module listening at a default url address.
      */
     public QueryControlClient() {
-        this(WSDL_LOCATION);
+        this(null);
     }
 
     /**
@@ -112,11 +121,87 @@ public class QueryControlClient implements QueryControlInterface {
      * @param wsdlLocation
      *            The URL String the query module is listening at.
      */
-    public QueryControlClient(final URL wsdlLocation) {
-        // Service service = new Service(wsdlLocation, SERVICE);
-        // servicePort = service.getPort(PORT, EPCISServicePortType.class);
-        EPCglobalEPCISService service = new EPCglobalEPCISService(wsdlLocation, SERVICE);
-        servicePort = service.getEPCglobalEPCISServicePort();
+    public QueryControlClient(final String queryUrl) {
+        configureService(queryUrl);
+    }
+
+    private void configureService(final String queryUrl) {
+        if (queryUrl == null) {
+            Properties props = loadProperties();
+            wsdlLocation = getClass().getResource(
+                    props.getProperty(PROP_WSDL_LOCATION, "wsdl/EPCglobal-epcis-query-1_0.wsdl"));
+            endpointAddress = props.getProperty(PROP_QUERY_URL, DEFAULT_QUERY_URL);
+        } else {
+            endpointAddress = queryUrl;
+        }
+
+        // check if the endpointAddress is valid
+        try {
+            new URL(endpointAddress);
+        } catch (Exception e) {
+            System.out.println("Invalid endpoint address provided. Using default: " + DEFAULT_QUERY_URL);
+            endpointAddress = DEFAULT_QUERY_URL;
+        }
+
+        // setup the CXF bus
+        setUpBus();
+
+        // instantiates a client proxy object from the EPCISServicePortType
+        // interface using the JAX-WS API
+        Service service = Service.create(SERVICE);
+        service.addPort(PORT, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
+        servicePort = service.getPort(PORT, EPCISServicePortType.class);
+
+        /*
+         * For instantiating a client proxy object using reflection (CXF simple
+         * frontend), use the ClientProxyFactoryBean and provide it with the
+         * service interface. The setter methods on the factory object can be
+         * used to configure the client proxy.
+         */
+        // ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+        // factory.setServiceClass(EPCISServicePortType.class);
+        // factory.setAddress(endpointAddress);
+        // factory.setBindingId(SOAPBinding.SOAP11HTTP_BINDING);
+        // servicePort = (EPCISServicePortType) factory.create();
+        /*
+         * For instantiating a client proxy object using the CXF-generated
+         * service implementation, uncomment the following lines. This will
+         * create the proxy from the WSDL file, using the endpointAddress from
+         * the <wsdlsoap:address> element inside the WSDL document.
+         */
+        // EPCglobalEPCISService s = new EPCglobalEPCISService(wsdlLocation,
+        // SERVICE);
+        // servicePort = s.getEPCglobalEPCISServicePort();
+    }
+
+    private void setUpBus() {
+        Bus bus = CXFBusFactory.getDefaultBus();
+        ClientOnlyHTTPTransportFactory httpTransport = new ClientOnlyHTTPTransportFactory();
+        // httpTransport = new ServletTransportFactory();
+        httpTransport.setBus(bus);
+        List<String> transportIds = Arrays.asList(new String[] {
+                "http://schemas.xmlsoap.org/wsdl/soap/http", "http://schemas.xmlsoap.org/soap/http",
+                "http://www.w3.org/2003/05/soap/bindings/HTTP/", "http://schemas.xmlsoap.org/wsdl/http/",
+                "http://cxf.apache.org/transports/http/configuration", "http://cxf.apache.org/bindings/xformat", });
+        httpTransport.setTransportIds(transportIds);
+        httpTransport.registerWithBindingManager();
+        // httpTransport.register();
+    }
+
+    /**
+     * @return The queryclient properties.
+     */
+    private Properties loadProperties() {
+        InputStream is = getClass().getResourceAsStream(PROPERTY_FILE);
+        Properties props = new Properties();
+        try {
+            props.load(is);
+            is.close();
+        } catch (IOException e) {
+            System.out.println("Unable to load queryclient properties from "
+                    + QueryControlClient.class.getResource(PROPERTY_FILE).toString() + ". Using defaults.");
+        }
+        return props;
     }
 
     /**
@@ -342,13 +427,11 @@ public class QueryControlClient implements QueryControlInterface {
             NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse,
             IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance(Poll.class);
+            JAXBContext context = JAXBContext.newInstance(Subscribe.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            // setting schema to null will turn XML validation off
-            // unmarshaller.setSchema(null);
-            Subscribe subscribe = (Subscribe) unmarshaller.unmarshal(query);
-            subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(), subscribe.getControls(),
-                    subscribe.getSubscriptionID());
+            JAXBElement<Subscribe> elem = (JAXBElement) unmarshaller.unmarshal(query);
+            Subscribe subscribe = elem.getValue();
+            servicePort.subscribe(subscribe);
         } catch (JAXBException e) {
             // wrap JAXBException into IOException to keep the interface
             // JAXB-free
@@ -373,8 +456,12 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * @return The URL String at which the Query Operations Module listens.
      */
-    public String getQueryUrl() {
-        return queryUrl;
+    public String getEndpointAddress() {
+        return endpointAddress;
+    }
+
+    public void setEndpointAddress(String queryUrl) {
+        configureService(queryUrl);
     }
 
     /**
@@ -423,7 +510,7 @@ public class QueryControlClient implements QueryControlInterface {
      */
     private String doPost(final byte[] data) throws IOException {
         // the url where the query interface listens
-        URL serviceUrl = new URL(queryUrl);
+        URL serviceUrl = new URL(endpointAddress);
 
         // open an http connection
         HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
