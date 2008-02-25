@@ -7,23 +7,24 @@
 <web-app>
   <display-name>EPCIS Repository</display-name>
 
+  <context-param>
+    <param-name>appConfigLocation</param-name>
+    <param-value>META-INF/application.properties</param-value>
+  </context-param>
   <!--
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>META-INF/applicationContext.xml</param-value>
   </context-param>
-  -->
-  <!--
   <context-param>
     <param-name>log4jConfigLocation</param-name>
     <param-value>META-INF/log4j.properties</param-value>
   </context-param>
   -->
-  <context-param>
-    <param-name>appConfigLocation</param-name>
-    <param-value>META-INF/application.properties</param-value>
-  </context-param>
 
+  <listener>
+    <listener-class>org.accada.epcis.repository.RepositoryContextListener</listener-class>
+  </listener>
   <!--
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -32,17 +33,7 @@
     <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
   </listener>
   -->
-  <listener>
-    <listener-class>org.accada.epcis.repository.RepositoryContextListener</listener-class>
-  </listener>
 
-  <!--
-  <servlet>
-    <servlet-name>epcisRepository</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  -->
   <servlet>
     <!-- CXFServlet providing the Query Interface Endpoint -->
     <servlet-name>EpcisQueryInterface</servlet-name>
@@ -66,6 +57,13 @@
     <servlet-class>org.accada.epcis.repository.CaptureOperationsServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>
+  <!--
+  <servlet>
+    <servlet-name>epcisRepository</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  -->
 
   <servlet-mapping>
     <!-- The capture servlet will be available at http://{url:port}/{context-path}/capture -->
