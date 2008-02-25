@@ -1,4 +1,4 @@
 <epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<resultsBody/>
+    <queryName>SimpleEventQuery</queryName>
+    <resultsBody />
 </epcisq:QueryResults>

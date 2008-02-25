@@ -1,6 +1,7 @@
-<epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" xmlns:fmcg="urn:epcglobal:fmcg:xsd:1">
-  	<queryName>SimpleEventQuery</queryName>
-	<resultsBody>
-		<EventList/>
-	</resultsBody>
+<epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1"
+    xmlns:fmcg="urn:epcglobal:fmcg:xsd:1">
+    <queryName>SimpleEventQuery</queryName>
+    <resultsBody>
+        <EventList />
+    </resultsBody>
 </epcisq:QueryResults>

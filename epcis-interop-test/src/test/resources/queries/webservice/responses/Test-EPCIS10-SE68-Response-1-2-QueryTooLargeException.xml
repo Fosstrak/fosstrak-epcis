@@ -1,5 +1,6 @@
-<epcisq:QueryTooLargeException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>Reason string for the QueryTooLargeException.</reason>
-	<queryName>SimpleEventQuery</queryName>
-	<subscriptionID>QuerySE68</subscriptionID>
+<epcisq:QueryTooLargeException
+    xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+    <reason>Reason string for the QueryTooLargeException.</reason>
+    <queryName>SimpleEventQuery</queryName>
+    <subscriptionID>QuerySE68</subscriptionID>
 </epcisq:QueryTooLargeException>

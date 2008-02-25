@@ -1,30 +1,31 @@
 <epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<subscriptionID>QuerySE44</subscriptionID>
-	<resultsBody>
-		<EventList>
-			<!-- This can be any object event generated at "Receive
-				Pallets" step, depending on the execution time of
-				the subscribe request. -->
-			<!-- FIXME -->
-			<!-- Waiting for the final version of the event data. -->
-			<ObjectEvent>
-				<eventTime>2006-06-25T05:01:00Z</eventTime>
-				<eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
-				<recordTime>2006-06-25T10:01:00.000Z</recordTime>
-				<epcList>
-					<epc>urn:epc:id:sscc:0614141.0000000001</epc>
-				</epcList>
-				<action>OBSERVE</action>
-				<bizStep>urn:epcglobal:fmcg:bizstep:receiving</bizStep>
-				<disposition>urn:epcglobal:hls:disp:active</disposition>
-				<readPoint>
-					<id>urn:epcglobal:fmcg:loc:0614141073468.RP-1</id>
-				</readPoint>
-				<bizLocation>
-					<id>urn:epcglobal:fmcg:loc:0614141073468.1</id>
-				</bizLocation>
-			</ObjectEvent>
-		</EventList>
-	</resultsBody>
+    <queryName>SimpleEventQuery</queryName>
+    <subscriptionID>QuerySE44</subscriptionID>
+    <resultsBody>
+        <EventList>
+            <!-- This can be any object event generated at "Receive
+                Pallets" step, depending on the execution time of
+                the subscribe request. -->
+            <!-- FIXME -->
+            <!-- Waiting for the final version of the event data. -->
+            <ObjectEvent>
+                <eventTime>2006-06-25T05:10:00.000Z</eventTime>
+                <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+                <recordTime>2006-06-25T05:10:00.000Z</recordTime>
+                <epcList>
+                    <epc>urn:epc:id:sscc:0614142.0000000010</epc>
+                </epcList>
+                <action>OBSERVE</action>
+                <bizStep>urn:epcglobal:fmcg:bizstep:receiving</bizStep>
+                <disposition>urn:epcglobal:hls:disp:active</disposition>
+                <readPoint>
+                    <id>urn:epcglobal:fmcg:loc:0614141073468.RP-1</id>
+                </readPoint>
+                <bizLocation>
+                    <id>urn:epcglobal:fmcg:loc:0614141073468.1</id>
+                </bizLocation>
+                <hls:temperature xmlns:hls="http://schema.hls.com/extension">22</hls:temperature>
+            </ObjectEvent>
+        </EventList>
+    </resultsBody>
 </epcisq:QueryResults>

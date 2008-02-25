@@ -1,3 +1,6 @@
-<epcisq:SubscriptionControlsException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>The value of 'dayOfWeek' is invalid in the query schedule.</reason>
+<epcisq:SubscriptionControlsException
+    xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+    <reason>
+        The value of 'dayOfWeek' is invalid in the query schedule.
+    </reason>
 </epcisq:SubscriptionControlsException>

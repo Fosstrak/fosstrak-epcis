@@ -1,11 +1,11 @@
 <epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleEventQuery</queryName>
-	<subscriptionID>QuerySE48-1</subscriptionID>
-	<resultsBody>
-		<EventList>
-			<!-- FIXME -->
-			<!-- Current XML schema does not provide us with a way to
-				describe an empty EventList. -->
-		</EventList>
-	</resultsBody>
+    <queryName>SimpleEventQuery</queryName>
+    <subscriptionID>QuerySE48-1</subscriptionID>
+    <resultsBody>
+        <EventList>
+            <!-- FIXME -->
+            <!-- Current XML schema does not provide us with a way to
+                describe an empty EventList. -->
+        </EventList>
+    </resultsBody>
 </epcisq:QueryResults>

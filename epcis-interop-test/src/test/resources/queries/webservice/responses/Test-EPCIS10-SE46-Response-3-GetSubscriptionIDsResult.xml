@@ -1,4 +1,5 @@
-<epcisq:GetSubscriptionIDsResult xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<string>QuerySE46-1</string>
-	<string>QuerySE46-2</string>
+<epcisq:GetSubscriptionIDsResult
+    xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+    <string>QuerySE46-1</string>
+    <string>QuerySE46-2</string>
 </epcisq:GetSubscriptionIDsResult>

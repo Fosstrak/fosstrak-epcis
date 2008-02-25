@@ -1,1 +1,4 @@
-<epcisq:GetStandardVersionResult xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">1.0</epcisq:GetStandardVersionResult>
+<epcisq:GetStandardVersionResult
+    xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+    1.0
+</epcisq:GetStandardVersionResult>

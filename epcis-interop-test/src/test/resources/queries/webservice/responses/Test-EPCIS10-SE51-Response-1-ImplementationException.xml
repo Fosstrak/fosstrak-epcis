@@ -1,5 +1,7 @@
-<epcisq:ImplementationException xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<reason>Reason string for the ImplementationException.</reason>
-	<severity>ERROR</severity> <!-- ERROR or SEVERE -->
-	<queryName>SimpleEventQuery</queryName>
+<epcisq:ImplementationException
+    xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+    <reason>Reason string for the ImplementationException.</reason>
+    <severity>ERROR</severity>
+    <!-- ERROR or SEVERE -->
+    <queryName>SimpleEventQuery</queryName>
 </epcisq:ImplementationException>

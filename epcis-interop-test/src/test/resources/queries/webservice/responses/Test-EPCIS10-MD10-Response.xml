@@ -1,23 +1,23 @@
-<epcisq:QueryResults  xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleMasterDataQuery</queryName>
-	<resultsBody>
-		<VocabularyList>
-			<Vocabulary type="urn:epcglobal:epcis:vtype:ReadPoint">
-				<VocabularyElementList>
-					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.RP-3">
-						<attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
-						<attribute id="urn:epcglobal:fmcg:mda:sslt">210</attribute>
-						<attribute id="urn:epcglobal:fmcg:mda:sslta">414</attribute>
-						<attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor6</attribute>
-					</VocabularyElement>
-					<VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.RP-1">
-						<attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
-						<attribute id="urn:epcglobal:fmcg:mda:sslt">209</attribute>
-						<attribute id="urn:epcglobal:fmcg:mda:sslta">414</attribute>
-						<attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor3</attribute>
-					</VocabularyElement>
-				</VocabularyElementList>
-			</Vocabulary>
-		</VocabularyList>
-	</resultsBody>
+<epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+    <queryName>SimpleMasterDataQuery</queryName>
+    <resultsBody>
+        <VocabularyList>
+            <Vocabulary type="urn:epcglobal:epcis:vtype:ReadPoint">
+                <VocabularyElementList>
+                    <VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.RP-1">
+                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor3</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sslt">209</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sslta">414</attribute>
+                    </VocabularyElement>
+                    <VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.RP-3">
+                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor6</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sslt">210</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sslta">414</attribute>
+                    </VocabularyElement>
+                </VocabularyElementList>
+            </Vocabulary>
+        </VocabularyList>
+    </resultsBody>
 </epcisq:QueryResults>

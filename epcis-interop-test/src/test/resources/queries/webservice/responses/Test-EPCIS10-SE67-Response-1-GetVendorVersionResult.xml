@@ -1,4 +1,5 @@
 <!-- NOTE: The result can be any string determined by implementation.
-	Null string should be returned if an implementation does not
-	implement any vendor extension. -->
-<epcisq:GetVendorVersionResult xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" />
+    Null string should be returned if an implementation does not
+    implement any vendor extension. -->
+<epcisq:GetVendorVersionResult
+    xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" />

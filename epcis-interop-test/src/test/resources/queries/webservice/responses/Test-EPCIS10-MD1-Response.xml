@@ -1,16 +1,16 @@
-<epcisq:QueryResults  xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
-	<queryName>SimpleMasterDataQuery</queryName>
-	<resultsBody>
-		<VocabularyList>
-			<Vocabulary type="urn:epcglobal:epcis:vtype:BusinessStep">
-				<VocabularyElementList>
-					<VocabularyElement id="urn:epcglobal:hls:bizstep:commissioning"/>
-					<VocabularyElement id="urn:epcglobal:hls:bizstep:casetopalletaggregation"/>
-					<VocabularyElement id="urn:epcglobal:fmcg:bizstep:receiving"/>
-					<VocabularyElement id="urn:epcglobal:fmcg:bizstep:picking"/>
-					<VocabularyElement id="urn:epcglobal:fmcg:bizstep:shipping"/>
-				</VocabularyElementList>
-			</Vocabulary>
-		</VocabularyList>
-	</resultsBody>
+<epcisq:QueryResults xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+    <queryName>SimpleMasterDataQuery</queryName>
+    <resultsBody>
+        <VocabularyList>
+            <Vocabulary type="urn:epcglobal:epcis:vtype:BusinessStep">
+                <VocabularyElementList>
+                    <VocabularyElement id="urn:epcglobal:hls:bizstep:commissioning" />
+                    <VocabularyElement id="urn:epcglobal:hls:bizstep:casetopalletaggregation" />
+                    <VocabularyElement id="urn:epcglobal:fmcg:bizstep:receiving" />
+                    <VocabularyElement id="urn:epcglobal:fmcg:bizstep:picking" />
+                    <VocabularyElement id="urn:epcglobal:fmcg:bizstep:shipping" />
+                </VocabularyElementList>
+            </Vocabulary>
+        </VocabularyList>
+    </resultsBody>
 </epcisq:QueryResults>
