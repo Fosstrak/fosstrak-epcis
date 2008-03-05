@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.accada.epcis.repository.query;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -66,7 +66,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
      * {@inheritDoc} First checks on the trigger condition: if fulfilled then
      * execute Query.
      * 
-     * @see org.accada.epcis.repository.QuerySubscriptionScheduled#handleNotification(javax.management.Notification,
+     * @see org.accada.epcis.repository.query.QuerySubscriptionScheduled#handleNotification(javax.management.Notification,
      *      java.lang.Object)
      */
     @Override

@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.accada.epcis.repository.query;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,8 +38,10 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.accada.epcis.repository.SimpleEventQuery.Operation;
-import org.accada.epcis.repository.SimpleEventQuery.OrderDirection;
+import org.accada.epcis.repository.EpcisConstants;
+import org.accada.epcis.repository.EpcisQueryControlInterface;
+import org.accada.epcis.repository.query.SimpleEventQuery.Operation;
+import org.accada.epcis.repository.query.SimpleEventQuery.OrderDirection;
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.InvalidURIExceptionResponse;

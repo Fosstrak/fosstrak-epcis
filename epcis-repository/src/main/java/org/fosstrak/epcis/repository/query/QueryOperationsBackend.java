@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.accada.epcis.repository.query;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,6 +47,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.accada.epcis.repository.EpcisConstants;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.soap.model.ActionType;

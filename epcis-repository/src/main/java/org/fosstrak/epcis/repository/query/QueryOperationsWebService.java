@@ -18,8 +18,9 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.accada.epcis.repository.query;
 
+import org.accada.epcis.repository.EpcisQueryControlInterface;
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.EPCISServicePortType;
 import org.accada.epcis.soap.ImplementationExceptionResponse;

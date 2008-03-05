@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.repository.query.Schedule;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.model.ImplementationException;

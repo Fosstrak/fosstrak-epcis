@@ -18,12 +18,14 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.accada.epcis.repository.query;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.accada.epcis.repository.EpcisConstants;
 
 /**
  * TODO: javadoc
