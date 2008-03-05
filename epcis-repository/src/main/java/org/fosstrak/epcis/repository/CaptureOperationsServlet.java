@@ -20,7 +20,6 @@
 
 package org.accada.epcis.repository;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +41,6 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.PropertyConfigurator;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.xml.sax.SAXException;
@@ -57,6 +55,8 @@ import org.xml.sax.SAXException;
  * @author Marco Steybe
  */
 public class CaptureOperationsServlet extends HttpServlet {
+
+    private static final long serialVersionUID = -2784063030245697695L;
 
     private static final String APP_CONFIG_LOCATION = "appConfigLocation";
     private static final String PROP_INSERT_MISSING_VOC = "insertMissingVoc";

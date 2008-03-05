@@ -40,23 +40,24 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.Log4jLogger;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 /**
- * TODO: javadoc<br>
+ * TODO: javadoc
+ * <p>
  * TODO: read WS_SERVICE_ADDRESS and JNDI_DATASOURCE_NAME from properties!
  * 
  * @author Marco Steybe
  */
 public class QueryInitServlet extends CXFNonSpringServlet {
 
+    private static final long serialVersionUID = 5711907120663766718L;
+
     private static final String APP_CONFIG_LOCATION = "appConfigLocation";
     private static final String PROP_MAX_QUERY_ROWS = "maxQueryResultRows";
     private static final String PROP_MAX_QUERY_TIME = "maxQueryExecutionTime";
-    private static final String PROP_INSERT_MISSING_VOC = "insertMissingVoc";
     private static final String PROP_TRIGGER_CHECK_SEC = "trigger.condition.check.sec";
     private static final String PROP_TRIGGER_CHECK_MIN = "trigger.condition.check.min";
     private static final String JNDI_DATASOURCE_NAME = "java:comp/env/jdbc/EPCISDB";
