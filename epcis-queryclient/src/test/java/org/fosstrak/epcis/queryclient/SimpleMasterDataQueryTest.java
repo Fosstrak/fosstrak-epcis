@@ -40,7 +40,7 @@ import org.accada.epcis.utils.QueryResultsParser;
  */
 public class SimpleMasterDataQueryTest {
 
-    private static QueryControlClient client = new QueryControlClient("http://localhost:8080/epcis-repository-0.2.4-SNAPSHOT/query");
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Creates a simple EPCIS masterdata query, sends it to the EPCIS query
