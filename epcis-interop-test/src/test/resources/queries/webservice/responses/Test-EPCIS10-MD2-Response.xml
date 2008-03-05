@@ -5,34 +5,34 @@
             <Vocabulary type="urn:epcglobal:epcis:vtype:ReadPoint">
                 <VocabularyElementList>
                     <VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073467.RP-1">
-                        <attribute id="urn:epcglobal:fmcg:mda:sle">PackagingLineX</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:gln">0614141073467</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslt">208</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslta">422</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sle">PackagingLineX</attribute>
                     </VocabularyElement>
                     <VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.RP-1">
-                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor3</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslt">209</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslta">414</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor3</attribute>
                     </VocabularyElement>
                     <VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.RP-2">
-                        <attribute id="urn:epcglobal:fmcg:mda:sle">PickArea5</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslt">299</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslta">422</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sle">PickArea5</attribute>
                     </VocabularyElement>
                     <VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073468.RP-3">
-                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor6</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:gln">0614141073468</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslt">210</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslta">414</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor6</attribute>
                     </VocabularyElement>
                     <VocabularyElement id="urn:epcglobal:fmcg:loc:0614141073469.RP-1">
-                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor1</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:gln">0614141073469</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslt">209</attribute>
                         <attribute id="urn:epcglobal:fmcg:mda:sslta">414</attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:sle">DockDoor1</attribute>
                     </VocabularyElement>
                 </VocabularyElementList>
             </Vocabulary>

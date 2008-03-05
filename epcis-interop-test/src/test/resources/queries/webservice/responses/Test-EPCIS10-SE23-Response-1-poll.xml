@@ -5,9 +5,9 @@
     <resultsBody>
         <EventList>
             <AggregationEvent>
-                <eventTime>2006-06-25T03:51:00Z</eventTime>
+                <eventTime>2006-06-25T03:51:00.000Z</eventTime>
                 <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
-                <recordTime>2006-06-25T03:51:00Z</recordTime>
+                <recordTime>2006-06-25T03:51:00.000Z</recordTime>
                 <parentID>urn:epc:id:sscc:0614141.0000000001</parentID>
                 <childEPCs>
                     <epc>urn:epc:id:sgtin:0614141.107340.1</epc>
@@ -22,9 +22,7 @@
                     <epc>urn:epc:id:sgtin:0614141.107340.10</epc>
                 </childEPCs>
                 <action>ADD</action>
-                <bizStep>
-                    urn:epcglobal:hls:bizstep:casetopalletaggregation
-                </bizStep>
+                <bizStep>urn:epcglobal:hls:bizstep:casetopalletaggregation</bizStep>
                 <disposition>urn:epcglobal:hls:disp:active</disposition>
                 <readPoint>
                     <id>urn:epcglobal:fmcg:loc:0614141073467.RP-1</id>
@@ -35,8 +33,8 @@
             </AggregationEvent>
             <ObjectEvent>
                 <eventTime>2006-06-25T00:09:00.000Z</eventTime>
-                <recordTime>2008-02-07T16:47:10.000Z</recordTime>
                 <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+                <recordTime>2006-06-25T00:09:00.000Z</recordTime>
                 <epcList>
                     <epc>urn:epc:id:sgtin:0614141.107340.9</epc>
                 </epcList>
@@ -54,8 +52,8 @@
             </ObjectEvent>
             <ObjectEvent>
                 <eventTime>2006-06-25T06:11:00.000Z</eventTime>
-                <recordTime>2008-02-07T16:47:15.000Z</recordTime>
                 <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+                <recordTime>2006-06-25T06:11:00.000Z</recordTime>
                 <epcList>
                     <epc>urn:epc:id:sgtin:0614141.107340.1</epc>
                     <epc>urn:epc:id:sgtin:0614141.107340.2</epc>
@@ -92,6 +90,86 @@
                 </bizTransactionList>
                 <hls:temperature xmlns:hls="http://schema.hls.com/extension">19</hls:temperature>
             </ObjectEvent>
+            <TransactionEvent>
+                <eventTime>2006-06-25T07:16:00.000Z</eventTime>
+                <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+                <recordTime>2006-06-25T07:16:00.000Z</recordTime>
+                <bizTransactionList>
+                    <bizTransaction type="urn:epcglobal:fmcg:btt:po">urn:epcglobal:fmcg:bti:po:0614141073468.1</bizTransaction>
+                    <bizTransaction type="urn:epcglobal:fmcg:btt:bol">urn:epcglobal:fmcg:bti:bol:0614141073468.A</bizTransaction>
+                </bizTransactionList>
+                <epcList>
+                    <epc>urn:epc:id:sgtin:0614141.107340.1</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.2</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.3</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.4</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.5</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.6</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.7</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.8</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.9</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.10</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.1</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.2</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.3</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.4</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.5</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.6</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.7</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.8</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.9</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.10</epc>
+                </epcList>
+                <action>ADD</action>
+                <bizStep>urn:epcglobal:fmcg:bizstep:shipping</bizStep>
+                <disposition>urn:epcglobal:fmcg:disp:sellable_available</disposition>
+                <readPoint>
+                    <id>urn:epcglobal:fmcg:loc:0614141073468.RP-3</id>
+                </readPoint>
+                <bizLocation>
+                    <id>urn:epcglobal:fmcg:loc:0614141073468.3</id>
+                </bizLocation>
+            </TransactionEvent>
+            <TransactionEvent>
+                <eventTime>2006-06-25T08:21:00.000Z</eventTime>
+                <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+                <recordTime>2006-06-25T08:21:00.000Z</recordTime>
+                <bizTransactionList>
+                    <bizTransaction type="urn:epcglobal:fmcg:btt:po">urn:epcglobal:fmcg:bti:po:0614141073468.1</bizTransaction>
+                    <bizTransaction type="urn:epcglobal:fmcg:btt:bol">urn:epcglobal:fmcg:bti:bol:0614141073468.A</bizTransaction>
+                </bizTransactionList>
+                <epcList>
+                    <epc>urn:epc:id:sgtin:0614141.107340.1</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.2</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.3</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.4</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.5</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.6</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.7</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.8</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.9</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107340.10</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.1</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.2</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.3</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.4</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.5</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.6</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.7</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.8</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.9</epc>
+                    <epc>urn:epc:id:sgtin:0614141.107341.10</epc>
+                </epcList>
+                <action>OBSERVE</action>
+                <bizStep>urn:epcglobal:fmcg:bizstep:receiving</bizStep>
+                <disposition>urn:epcglobal:fmcg:disp:sellable_available</disposition>
+                <readPoint>
+                    <id>urn:epcglobal:fmcg:loc:0614141073469.RP-1</id>
+                </readPoint>
+                <bizLocation>
+                    <id>urn:epcglobal:fmcg:loc:0614141073469.1</id>
+                </bizLocation>
+            </TransactionEvent>
         </EventList>
     </resultsBody>
 </epcisq:QueryResults>
