@@ -25,21 +25,29 @@ package org.accada.epcis.repository;
  * 
  * @author Sean Wellington
  */
-public class Functions {
+public class Utils {
 
     /**
-     * @return true if both o1 and o2 are null; or o1 and o2 are both non-null,
-     *         and equal according to their equals() methods.
+     * @return <code>true</code> if both <code>o1</code> and <code>o2</code>
+     *         are <code>null</code>; or <code>o1</code> and
+     *         <code>o2</code> are both non-<code>null</code> and equal
+     *         according to their <code>equals()</code> methods.
      */
     public static final boolean eq(Object o1, Object o2) {
         return (o1 == null && o2 == null) || (o1 != null && o2 != null && o1.equals(o2));
     }
 
     /**
-     * @return o.hashCode() or 0 if o is null.
+     * @return <code>o.hashCode()</code> or <code>0</code> if <code>o</code>
+     *         is <code>null</code>.
      */
     public static final int hc(Object o) {
         return o != null ? o.hashCode() : 0;
     }
 
+    /**
+     * Hidden default constructor.
+     */
+    private Utils() {
+    }
 }
