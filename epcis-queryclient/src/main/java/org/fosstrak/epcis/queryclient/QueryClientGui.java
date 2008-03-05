@@ -28,12 +28,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,7 +37,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -76,18 +71,14 @@ import org.accada.epcis.utils.TimeParser;
  */
 public class QueryClientGui extends WindowAdapter implements ActionListener {
 
-    private static final String PROPERTY_FILE = "/queryclient.properties";
-
-    private static final String PROPERTY_QUERY_URL = "default.url";
-
-    private static final String DEFAULT_URL = "http://demo.accada.org/EPCIS-Query-v0.2.0";
-
     /**
      * The enumaration of all possible Types a Queryparameter can have.
      */
     public enum ParameterType {
         ListOfString, Boolean, Int, Float, String, Time, noType
     };
+
+    private String queryUrl;
 
     /**
      * The HasMap wich holds all possible queryParameters. Key is the UserText.
@@ -116,11 +107,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * Contains the data for the result table.
      */
     private Object[][] data = {};
-
-    /**
-     * The endpoint URL for the query service.
-     */
-    private String queryUrl = null;
 
     /**
      * The query client instance. Has methods to actually execute a query.
@@ -225,46 +211,22 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      *            The address to send the queries to.
      */
     public QueryClientGui(final String address) {
-        String url = DEFAULT_URL;
-        if (address != null) {
-            try {
-                new URL(address);
-                url = address;
-            } catch (MalformedURLException e) {
-                // unable to parse address as url!
-                // read properties
-            }
-        } else {
-            // read properties
-            Properties props = new Properties();
-            InputStream is = this.getClass().getResourceAsStream(PROPERTY_FILE);
-            if (is != null) {
-                try {
-                    props.load(is);
-                } catch (IOException e) {
-                    // unable to load properties
-                    // use default address
-                }
-                url = props.getProperty(PROPERTY_QUERY_URL);
-                if (url == null) {
-                    url = DEFAULT_URL;
-                }
-            }
-        }
-        this.queryUrl = url;
-        initWindow();
-    }
-
-    /**
-     * Initializes the GUI window.
-     */
-    private void initWindow() {
         generateParamHashMap();
+
+        // setup client GUI
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createMainWindow();
+                createMainWindow(address);
             }
         });
+
+        // set up query client. The supplied JTextArea is used for debug output
+        createDebugWindow();
+        client = new QueryClientGuiHelper(address, dwOutputTextArea);
+
+        // update queryUrl, in case the provided address parameter was null
+        queryUrl = client.getEndpointAddress();
+        mwServiceUrlTextField.setText(queryUrl);
     }
 
     /**
@@ -542,7 +504,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     /**
      * Sets up the main window. To be called only once per program run
      */
-    private void createMainWindow() {
+    private void createMainWindow(String queryUrl) {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         mainWindow = new JFrame("EPCIS query interface client");
@@ -850,13 +812,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mainWindow.pack();
         mainWindow.setVisible(true);
 
-        /* set up debug window */
-        createDebugWindow();
-        /*
-         * set up query client. The supplied JTextArea is used for debug output
-         */
-        client = new QueryClientGuiHelper(queryUrl, dwOutputTextArea);
-
         /*
          * Find out how much the window has to be scaled whenever new components
          * are added. This must be done after rendering the GUI, otherwise the
@@ -1017,7 +972,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             resultsWindow.dispose();
         }
         try {
-            client.setEndpointAddress(mwServiceUrlTextField.getText());
+            checkQueryUrl(mwServiceUrlTextField.getText());
             client.clearParameters();
 
             /* get event type selection from GUI */
@@ -1034,17 +989,12 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             if (mwTransactionEventsCheckBox.isSelected()) {
                 events.getString().add("TransactionEvent");
             }
-            // print error if no event type is selected
-            if (events.getString().isEmpty()) {
-                JFrame frame = new JFrame();
-                JOptionPane.showMessageDialog(frame, "Please select at least one of the event types to be returned.",
-                        "Missing Input", JOptionPane.PLAIN_MESSAGE);
-                return;
+            if (!events.getString().isEmpty()) {
+                QueryParam queryParam = new QueryParam();
+                queryParam.setName("eventType");
+                queryParam.setValue(events);
+                client.addParameter(queryParam);
             }
-            QueryParam queryParam = new QueryParam();
-            queryParam.setName("eventType");
-            queryParam.setValue(events);
-            client.addParameter(queryParam);
 
             String name;
             for (int i = 0; i < mwQueryArgumentTextFields.size() - 1; i++) {
@@ -1118,19 +1068,21 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         } catch (ParseException e) {
             String msg = "Unable to parse a Time value.";
             dwOutputTextArea.append("\n" + msg + "\n");
-            PrintWriter pw = new PrintWriter(new StringWriter());
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            dwOutputTextArea.append(pw.toString());
+            dwOutputTextArea.append(sw.toString());
             JFrame frame = new JFrame();
             JOptionPane.showMessageDialog(frame, msg + "\n" + e.getMessage(), "Service invocation error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            String msg = "Error while invoking EPCIS Query Interface.";
+            String msg = "Unexpected error while invoking EPCIS Query Interface.";
             dwOutputTextArea.append("\n" + msg + "\n");
             dwOutputTextArea.append(e.toString());
-            PrintWriter pw = new PrintWriter(new StringWriter());
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            dwOutputTextArea.append(pw.toString());
+            dwOutputTextArea.append(sw.toString());
             JFrame frame = new JFrame();
             JOptionPane.showMessageDialog(frame, msg + "\n" + e.toString(), "Service invocation error",
                     JOptionPane.ERROR_MESSAGE);
@@ -1172,7 +1124,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private void mwInfoButtonPressed() {
         dwOutputTextArea.setText("");
         try {
-            client.setEndpointAddress(mwServiceUrlTextField.getText());
+            checkQueryUrl(mwServiceUrlTextField.getText());
             String standardVersion = client.queryStandardVersion();
             String vendorVersion = client.queryVendorVersion();
             List<String> queryNames = client.queryNames();
@@ -1195,6 +1147,22 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             JFrame frame = new JFrame();
             JOptionPane.showMessageDialog(frame, "Error:\n" + e.getMessage(), "Service invocation error",
                     JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Checks if the provided queryUrl is still a valid URL and updates the
+     * query client in case it has changed.
+     */
+    private void checkQueryUrl(String url) {
+        if (url == null || "".equals(url)) {
+            // query url has been deleted ... replace with previous url
+            mwServiceUrlTextField.setText(queryUrl);
+        } else if (!url.equals(queryUrl)) {
+            // query url has changed
+            System.out.println("Query service URL has changed, updating query client");
+            queryUrl = client.updateEndpointAddress(mwServiceUrlTextField.getText());
+            mwServiceUrlTextField.setText(queryUrl);
         }
     }
 
@@ -1379,7 +1347,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      */
     public class QueryItem {
 
-        private Boolean required;
+        private boolean required;
 
         private String userText;
 
@@ -1437,7 +1405,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         /**
          * @return the required
          */
-        public Boolean getRequired() {
+        public boolean getRequired() {
             return required;
         }
 
@@ -1445,7 +1413,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
          * @param required
          *            the required to set
          */
-        public void setRequired(final Boolean required) {
+        public void setRequired(final boolean required) {
             this.required = required;
         }
 

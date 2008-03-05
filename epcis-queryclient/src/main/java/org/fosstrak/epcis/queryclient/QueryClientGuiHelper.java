@@ -20,29 +20,28 @@
 
 package org.accada.epcis.queryclient;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Properties;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.xml.namespace.QName;
+import javax.xml.bind.JAXBElement;
 
-import org.accada.epcis.soap.EPCISServicePortType;
-import org.accada.epcis.soap.EPCglobalEPCISService;
 import org.accada.epcis.soap.model.AggregationEventType;
 import org.accada.epcis.soap.model.ArrayOfString;
 import org.accada.epcis.soap.model.BusinessTransactionType;
 import org.accada.epcis.soap.model.EPC;
 import org.accada.epcis.soap.model.EPCISEventType;
-import org.accada.epcis.soap.model.EmptyParms;
-import org.accada.epcis.soap.model.EventListType;
 import org.accada.epcis.soap.model.GetSubscriptionIDs;
 import org.accada.epcis.soap.model.ObjectEventType;
 import org.accada.epcis.soap.model.Poll;
@@ -56,24 +55,23 @@ import org.accada.epcis.soap.model.Unsubscribe;
 import org.accada.epcis.utils.TimeParser;
 
 /**
- * Implements a Class to interface with the axis stubs for the EPCIS Query
- * Interface. Also offers some helper methods to convert between different
- * formats and for debug output.
- * <p>
- * TODO: refactor this GUI helper class to reuse the QueryControlClient (MVC
- * pattern!)<br>
- * FIXME: setEndpointAddress has no effect!
+ * Implements a Class to interface with the EPCIS query client. Also offers some
+ * helper methods to convert between different formats and for debug output.
  * 
  * @author David Gubler
  */
 public class QueryClientGuiHelper {
-    
-    private static QueryControlClient queryClient;
+
+    private static final String PROPERTY_FILE = "/queryclient.properties";
+    private static final String PROP_QUERY_URL = "default.url";
+    private static final String DEFAULT_QUERY_URL = "http://demo.accada.org/epcis/query";
+
+    private QueryControlClient queryClient;
 
     /**
      * Holds the query parameters.
      */
-    private Vector<QueryParam> queryParamsVector = new Vector<QueryParam>();
+    private List<QueryParam> internalQueryParams = new ArrayList<QueryParam>();
 
     /**
      * All debug output is written into this text field.
@@ -82,7 +80,7 @@ public class QueryClientGuiHelper {
 
     /**
      * Constructor. Takes the service endpoint address and a JTextArea used for
-     * debug output as an arguments.
+     * debug output as arguments.
      * 
      * @param queryUrl
      *            The URL of the query web service.
@@ -94,14 +92,57 @@ public class QueryClientGuiHelper {
         queryClient = new QueryControlClient(queryUrl);
     }
 
+    public String updateEndpointAddress(final String address) {
+        String endpointAddress;
+        if (address == null) {
+            Properties props = loadProperties();
+            endpointAddress = props.getProperty(PROP_QUERY_URL, DEFAULT_QUERY_URL);
+        } else {
+            endpointAddress = address;
+        }
+
+        // check if the endpointAddress is valid
+        try {
+            new URL(endpointAddress);
+        } catch (Exception e) {
+            System.out.println("Invalid endpoint address provided. Using default: " + DEFAULT_QUERY_URL);
+            endpointAddress = DEFAULT_QUERY_URL;
+        }
+        setEndpointAddress(endpointAddress);
+        return endpointAddress;
+    }
+
     /**
      * Sets the service endpoint address.
      * 
      * @param queryUrl
      *            The URL of the query web service.
      */
-    public void setEndpointAddress(final String queryUrl) {
+    private void setEndpointAddress(final String queryUrl) {
         queryClient.setEndpointAddress(queryUrl);
+    }
+
+    /**
+     * @return The service endpoint address
+     */
+    public String getEndpointAddress() {
+        return queryClient.getEndpointAddress();
+    }
+
+    /**
+     * @return The query client properties.
+     */
+    private Properties loadProperties() {
+        InputStream is = getClass().getResourceAsStream(PROPERTY_FILE);
+        Properties props = new Properties();
+        try {
+            props.load(is);
+            is.close();
+        } catch (IOException e) {
+            System.out.println("Unable to load queryclient properties from "
+                    + QueryControlClient.class.getResource(PROPERTY_FILE).toString() + ". Using defaults.");
+        }
+        return props;
     }
 
     /**
@@ -129,193 +170,208 @@ public class QueryClientGuiHelper {
      * @return A two-dimensional array containing the matching events in a
      *         format suitable for displaying in a JTable object.
      */
-    private Object[][] processEvents(final EventListType eventList) {
-        int nofEvents = eventList.getObjectEventOrAggregationEventOrQuantityEvent().size();
+    private Object[][] processEvents(final List<Object> eventList) {
+        int nofEvents = eventList.size();
         Object[][] table = new Object[nofEvents][12];
         int row = 0;
 
-        debugTextArea.append("\n\nEvents returned by the server:\n\n");
-        for (Object o : eventList.getObjectEventOrAggregationEventOrQuantityEvent()) {
-            try {
-                EPCISEventType event = (EPCISEventType) o;
-                debugTextArea.append("[ EPCISEvent ]\n");
-                String eventTime = prettyStringCalendar(event.getEventTime().toGregorianCalendar());
-                debugTextArea.append("eventTime:\t" + eventTime + "\n");
-                table[row][1] = eventTime;
-                String recordTime = prettyStringCalendar(event.getRecordTime().toGregorianCalendar());
-                debugTextArea.append("recordTime:\t" + recordTime + "\n");
-                table[row][2] = recordTime;
-                debugTextArea.append("eventTimeZoneOffset:\t" + event.getEventTimeZoneOffset());
+        debugTextArea.append("\n\n" + nofEvents + " events returned by the server:\n\n");
+        for (Object o : eventList) {
+            if (o instanceof JAXBElement<?>) {
+                o = ((JAXBElement<?>) o).getValue();
+            }
+            EPCISEventType event = (EPCISEventType) o;
+            debugTextArea.append("[ EPCISEvent ]\n");
+            String eventTime = prettyStringCalendar(event.getEventTime().toGregorianCalendar());
+            debugTextArea.append("eventTime:\t" + eventTime + "\n");
+            table[row][1] = eventTime;
+            String recordTime = prettyStringCalendar(event.getRecordTime().toGregorianCalendar());
+            debugTextArea.append("recordTime:\t" + recordTime + "\n");
+            table[row][2] = recordTime;
+            debugTextArea.append("timeZoneOffset:\t" + event.getEventTimeZoneOffset() + "\n");
 
-                if (event instanceof ObjectEventType) {
-                    debugTextArea.append("[ ObjectEvent ]\n");
-                    ObjectEventType e = (ObjectEventType) event;
-                    table[row][0] = "Object";
-                    debugTextArea.append("epcList:\t");
-                    table[row][5] = "";
-                    for (EPC epc : e.getEpcList().getEpc()) {
-                        debugTextArea.append(" '" + epc.getValue() + "'");
-                        table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
-                    }
-                    debugTextArea.append("\n");
-                    debugTextArea.append("action:\t" + e.getAction().toString() + "\n");
-                    table[row][6] = e.getAction().toString();
-                    debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
-                    table[row][7] = e.getBizStep();
-                    debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
-                    table[row][8] = e.getDisposition();
-                    if (e.getReadPoint() != null) {
-                        debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
-                        table[row][9] = e.getReadPoint().getId();
-                    } else {
-                        debugTextArea.append("readPoint:\tnull\n");
-                    }
-                    if (e.getBizLocation() != null) {
-                        debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
-                        table[row][10] = e.getBizLocation().getId();
-                    } else {
-                        debugTextArea.append("bizLocation:\tnull\n");
-                    }
-                    debugTextArea.append("bizTransactions: Type, ID\n");
-                    table[row][11] = "";
-                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
-                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
-                                + "' ; ";
-                    }
-                    if (!"".equals(table[row][11])) {
-                        // remove last "; "
-                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
-                    }
-                    debugTextArea.append("\n");
-
-                } else if (event instanceof TransactionEventType) {
-                    debugTextArea.append("[ TransactionEvent ]\n");
-                    TransactionEventType e = (TransactionEventType) event;
-                    table[row][0] = "Transaction";
-                    debugTextArea.append("parentID:\t" + e.getParentID() + "\n");
-                    table[row][3] = e.getParentID();
-                    debugTextArea.append("epcList:\t");
-                    table[row][5] = "";
-                    for (EPC epc : e.getEpcList().getEpc()) {
-                        debugTextArea.append(" '" + epc.getValue() + "'");
-                        table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
-                    }
-                    debugTextArea.append("\n");
-                    debugTextArea.append("action:\t" + e.getAction().toString() + "\n");
-                    table[row][6] = e.getAction().toString();
-                    debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
-                    table[row][7] = e.getBizStep();
-                    debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
-                    table[row][8] = e.getDisposition();
-                    if (e.getReadPoint() != null) {
-                        debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
-                        table[row][9] = e.getReadPoint().getId();
-                    } else {
-                        debugTextArea.append("readPoint:\tnull\n");
-                    }
-                    if (e.getBizLocation() != null) {
-                        debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
-                        table[row][10] = e.getBizLocation().getId();
-                    } else {
-                        debugTextArea.append("bizLocation:\tnull\n");
-                    }
-                    debugTextArea.append("bizTransactions: Type, ID\n");
-                    table[row][11] = "";
-                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
-                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
-                                + "' ; ";
-                    }
-                    if (!"".equals(table[row][11])) {
-                        // remove last "; "
-                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
-                    }
-                    debugTextArea.append("\n");
-
-                } else if (event instanceof AggregationEventType) {
-                    debugTextArea.append("[ AggregationEvent ]\n");
-                    AggregationEventType e = (AggregationEventType) event;
-                    table[row][0] = "Aggregation";
-                    debugTextArea.append("parentID:\t" + e.getParentID() + "\n");
-                    table[row][3] = e.getParentID();
-                    debugTextArea.append("childEPCs:\t");
-                    table[row][5] = "";
-                    for (EPC epc : e.getChildEPCs().getEpc()) {
-                        debugTextArea.append(" '" + epc.getValue() + "'");
-                        table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
-                    }
-                    debugTextArea.append("\n");
-                    debugTextArea.append("action:\t" + e.getAction().toString() + "\n");
-                    table[row][6] = e.getAction().toString();
-                    debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
-                    table[row][7] = e.getBizStep();
-                    debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
-                    table[row][8] = e.getDisposition();
-                    if (e.getReadPoint() != null) {
-                        debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
-                        table[row][9] = e.getReadPoint().getId();
-                    } else {
-                        debugTextArea.append("readPoint:\tnull\n");
-                    }
-                    if (e.getBizLocation() != null) {
-                        debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
-                        table[row][10] = e.getBizLocation().getId();
-                    } else {
-                        debugTextArea.append("bizLocation:\tnull\n");
-                    }
-                    debugTextArea.append("bizTransactions: Type, ID\n");
-                    table[row][11] = "";
-                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
-                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
-                                + "' ; ";
-                    }
-                    if (!"".equals(table[row][11])) {
-                        // remove last "; "
-                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
-                    }
-                    debugTextArea.append("\n");
-
-                } else if (event instanceof QuantityEventType) {
-                    debugTextArea.append("[ QuantityEvent ]\n");
-                    QuantityEventType e = (QuantityEventType) event;
-                    debugTextArea.append("ecpClass:\t" + e.getEpcClass() + "\n");
-                    table[row][5] = e.getEpcClass();
-                    debugTextArea.append("quantity:\t" + e.getQuantity() + "\n");
-                    table[row][4] = e.getQuantity();
-                    debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
-                    table[row][7] = e.getBizStep();
-                    debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
-                    table[row][8] = e.getDisposition();
-                    if (e.getReadPoint() != null) {
-                        debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
-                        table[row][9] = e.getReadPoint().getId();
-                    } else {
-                        debugTextArea.append("readPoint:\tnull\n");
-                    }
-                    if (e.getBizLocation() != null) {
-                        debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
-                        table[row][10] = e.getBizLocation().getId();
-                    } else {
-                        debugTextArea.append("bizLocation:\tnull\n");
-                    }
-                    debugTextArea.append("bizTransactions: Type, ID\n");
-                    table[row][11] = "";
-                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
-                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
-                                + "' ; ";
-                    }
-                    if (!"".equals(table[row][11])) {
-                        // remove last "; "
-                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
-                    }
-                    debugTextArea.append("\n");
+            if (event instanceof ObjectEventType) {
+                debugTextArea.append("[ ObjectEvent ]\n");
+                ObjectEventType e = (ObjectEventType) event;
+                table[row][0] = "Object";
+                debugTextArea.append("epcList:\t");
+                table[row][5] = "";
+                for (EPC epc : e.getEpcList().getEpc()) {
+                    debugTextArea.append(" '" + epc.getValue() + "'");
+                    table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
                 }
-            } catch (ClassCastException e) {
-                // TODO
-                // throw meaningful exception
+                debugTextArea.append("\n");
+                debugTextArea.append("action:\t\t" + e.getAction().toString() + "\n");
+                table[row][6] = e.getAction().toString();
+                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debugTextArea.append("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debugTextArea.append("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debugTextArea.append("bizTrans:\tnull\n");
+                }
+                debugTextArea.append("\n");
+
+            } else if (event instanceof TransactionEventType) {
+                debugTextArea.append("[ TransactionEvent ]\n");
+                TransactionEventType e = (TransactionEventType) event;
+                table[row][0] = "Transaction";
+                debugTextArea.append("parentID:\t" + e.getParentID() + "\n");
+                table[row][3] = e.getParentID();
+                debugTextArea.append("epcList:\t");
+                table[row][5] = "";
+                for (EPC epc : e.getEpcList().getEpc()) {
+                    debugTextArea.append(" '" + epc.getValue() + "'");
+                    table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
+                }
+                debugTextArea.append("\n");
+                debugTextArea.append("action:\t\t" + e.getAction().toString() + "\n");
+                table[row][6] = e.getAction().toString();
+                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debugTextArea.append("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debugTextArea.append("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debugTextArea.append("bizTrans:\tnull\n");
+                }
+                debugTextArea.append("\n");
+
+            } else if (event instanceof AggregationEventType) {
+                debugTextArea.append("[ AggregationEvent ]\n");
+                AggregationEventType e = (AggregationEventType) event;
+                table[row][0] = "Aggregation";
+                debugTextArea.append("parentID:\t" + e.getParentID() + "\n");
+                table[row][3] = e.getParentID();
+                debugTextArea.append("childEPCs:\t");
+                table[row][5] = "";
+                for (EPC epc : e.getChildEPCs().getEpc()) {
+                    debugTextArea.append(" '" + epc.getValue() + "'");
+                    table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
+                }
+                debugTextArea.append("\n");
+                debugTextArea.append("action:\t\t" + e.getAction().toString() + "\n");
+                table[row][6] = e.getAction().toString();
+                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debugTextArea.append("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debugTextArea.append("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debugTextArea.append("bizTrans:\tnull\n");
+                }
+                debugTextArea.append("\n");
+
+            } else if (event instanceof QuantityEventType) {
+                debugTextArea.append("[ QuantityEvent ]\n");
+                QuantityEventType e = (QuantityEventType) event;
+                table[row][0] = "Quantity";
+                debugTextArea.append("quantity:\t" + e.getQuantity() + "\n");
+                table[row][4] = Integer.valueOf(e.getQuantity());
+                debugTextArea.append("ecpClass:\t" + e.getEpcClass() + "\n");
+                table[row][5] = e.getEpcClass();
+                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debugTextArea.append("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debugTextArea.append("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debugTextArea.append("bizTrans:\tnull\n");
+                }
+                debugTextArea.append("\n");
             }
             row++;
         }
@@ -326,7 +382,7 @@ public class QueryClientGuiHelper {
      * Reset the query arguments.
      */
     public void clearParameters() {
-        queryParamsVector.clear();
+        internalQueryParams.clear();
     }
 
     /**
@@ -336,7 +392,7 @@ public class QueryClientGuiHelper {
      *            The query parameter to add.
      */
     public void addParameter(final QueryParam param) {
-        queryParamsVector.add(param);
+        internalQueryParams.add(param);
     }
 
     /**
@@ -349,9 +405,9 @@ public class QueryClientGuiHelper {
      */
     public Object[][] runQuery() throws Exception {
         QueryParams queryParams = new QueryParams();
-        queryParams.getParam().addAll(queryParamsVector);
+        queryParams.getParam().addAll(internalQueryParams);
         debugTextArea.append("Number of query parameters: " + queryParams.getParam().size() + "\n");
-        for (QueryParam queryParam : queryParamsVector) {
+        for (QueryParam queryParam : internalQueryParams) {
             debugTextArea.append(queryParam.getName() + " " + queryParam.getValue() + "\n");
         }
 
@@ -364,7 +420,11 @@ public class QueryClientGuiHelper {
         debugTextArea.append("done\n");
 
         // print to debug window and return result
-        return processEvents(results.getResultsBody().getEventList());
+        if (results != null && results.getResultsBody() != null && results.getResultsBody().getEventList() != null) {
+            return processEvents(results.getResultsBody().getEventList().getObjectEventOrAggregationEventOrQuantityEvent());
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -377,13 +437,14 @@ public class QueryClientGuiHelper {
      */
     public void subscribeQuery(final Subscribe subscribe) throws Exception {
         QueryParams queryParams = new QueryParams();
-        queryParams.getParam().addAll(queryParamsVector);
+        queryParams.getParam().addAll(internalQueryParams);
         debugTextArea.append("Number of query parameters: " + queryParams.getParam().size() + "\n");
-        for (QueryParam queryParam : queryParamsVector) {
+        for (QueryParam queryParam : internalQueryParams) {
             debugTextArea.append(queryParam.getName() + " " + queryParam.getValue() + "\n");
         }
         subscribe.setParams(queryParams);
-        queryClient.subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(), subscribe.getControls(), subscribe.getSubscriptionID());
+        queryClient.subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(),
+                subscribe.getControls(), subscribe.getSubscriptionID());
     }
 
     /**
@@ -410,7 +471,7 @@ public class QueryClientGuiHelper {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             String stacktrace = sw.toString();
-            JOptionPane.showMessageDialog(frame, "Sorry, the Service returned " + "an Error:\n" + stacktrace,
+            JOptionPane.showMessageDialog(frame, "Sorry, the Service returned an Error:\n" + stacktrace,
                     "Service is not responding", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }

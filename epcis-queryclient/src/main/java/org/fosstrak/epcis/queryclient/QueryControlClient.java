@@ -22,13 +22,11 @@ package org.accada.epcis.queryclient;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Arrays;
@@ -40,13 +38,11 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.EPCISServicePortType;
-import org.accada.epcis.soap.EPCglobalEPCISService;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.InvalidURIExceptionResponse;
 import org.accada.epcis.soap.NoSuchNameExceptionResponse;
@@ -68,14 +64,7 @@ import org.accada.epcis.soap.model.SubscriptionControls;
 import org.accada.epcis.soap.model.Unsubscribe;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transport.servlet.ServletTransportFactory;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 /**
  * This query client makes calls against the EPCIS query control interface and
@@ -334,7 +323,7 @@ public class QueryControlClient implements QueryControlInterface {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             // setting schema to null will turn XML validation off
             // unmarshaller.setSchema(null);
-            JAXBElement<Poll> elem = (JAXBElement) unmarshaller.unmarshal(queryStream);
+            JAXBElement<Poll> elem = (JAXBElement<Poll>) unmarshaller.unmarshal(queryStream);
             Poll poll = elem.getValue();
             return poll(poll);
         } catch (JAXBException e) {
@@ -427,9 +416,9 @@ public class QueryControlClient implements QueryControlInterface {
             NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse,
             IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance(Subscribe.class);
+            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            JAXBElement<Subscribe> elem = (JAXBElement) unmarshaller.unmarshal(query);
+            JAXBElement<Subscribe> elem = (JAXBElement<Subscribe>) unmarshaller.unmarshal(query);
             Subscribe subscribe = elem.getValue();
             servicePort.subscribe(subscribe);
         } catch (JAXBException e) {
