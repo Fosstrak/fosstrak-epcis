@@ -103,12 +103,14 @@
         <configuration>
           <workDirectory>${project.build.directory}/site/webstart</workDirectory>
           <dependencies>
-            <includes>
-              <include>org.accada.epcis:epcis-commons</include>
-              <include>commons-discovery:commons-discovery</include>
-              <include>commons-logging:commons-logging</include>
-              <include>log4j:log4j</include>
-            </includes>
+            <!--
+               Exclude everything that is not absulutely necessary in order
+               to keep the footprint low and the download quick.
+            -->
+            <excludes>
+              <exclude>javax.mail:mail</exclude>
+              <exclude>javax.activation:activation</exclude>
+            </excludes>
           </dependencies>
           <jnlp>
             <outputFile>epcis-queryclient.jnlp</outputFile>
