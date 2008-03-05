@@ -20,8 +20,8 @@
 
 package org.accada.epcis.repository.model;
 
-import static org.accada.epcis.repository.Functions.eq;
-import static org.accada.epcis.repository.Functions.hc;
+import static org.accada.epcis.repository.Utils.eq;
+import static org.accada.epcis.repository.Utils.hc;
 
 /**
  * A business transaction as defined in section 7.2.6 of the spec.

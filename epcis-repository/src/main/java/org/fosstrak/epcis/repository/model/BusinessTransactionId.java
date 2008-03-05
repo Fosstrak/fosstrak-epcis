@@ -20,7 +20,7 @@
 
 package org.accada.epcis.repository.model;
 
-import org.accada.epcis.repository.Constants;
+import org.accada.epcis.repository.EpcisConstants;
 
 /**
  * A vocabulary type for representing business transaction identifiers, per section
@@ -31,7 +31,7 @@ public class BusinessTransactionId extends VocabularyElement {
 
 	@Override
 	public String getVocabularyType() {
-		return Constants.BUSINESS_TRANSACTION_VTYPE;
+		return EpcisConstants.BUSINESS_TRANSACTION;
 	}
 
 }

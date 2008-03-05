@@ -20,7 +20,7 @@
 
 package org.accada.epcis.repository.model;
 
-import org.accada.epcis.repository.Constants;
+import org.accada.epcis.repository.EpcisConstants;
 
 /**
  * A vocabulary type for representing EPC classes, per section
@@ -31,7 +31,7 @@ public class EPCClass extends VocabularyElement {
 
 	@Override
 	public String getVocabularyType() {
-		return Constants.EPC_CLASS_VTYPE;
+		return EpcisConstants.EPC_CLASS;
 	}
 
 }

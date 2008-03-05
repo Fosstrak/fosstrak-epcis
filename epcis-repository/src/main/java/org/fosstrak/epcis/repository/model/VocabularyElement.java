@@ -20,8 +20,8 @@
 
 package org.accada.epcis.repository.model;
 
-import static org.accada.epcis.repository.Functions.eq;
-import static org.accada.epcis.repository.Functions.hc;
+import static org.accada.epcis.repository.Utils.eq;
+import static org.accada.epcis.repository.Utils.hc;
 
 /**
  * A base class for vocabulary elements as described in section 6 of the spec.
