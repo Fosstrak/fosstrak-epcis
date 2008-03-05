@@ -38,9 +38,9 @@ import org.accada.epcis.utils.QueryResultsParser;
  * 
  * @author Marco Steybe
  */
-public class SimpleQueryTest {
+public class SimpleEventQueryTest {
 
-    private static QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient("http://localhost:8080/epcis-repository-0.2.4-SNAPSHOT/query");
 
     /**
      * Creates a simple EPCIS query, sends it to the EPCIS query service for
