@@ -28,9 +28,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * The <code>TimeParser</code> utility class provides helper methods to deal
  * with date/time formatting using a specific ISO8601-compliant format (see <a
@@ -59,8 +56,6 @@ import org.apache.commons.logging.LogFactory;
  * </pre>
  */
 public final class TimeParser {
-
-    private static final Log LOG = LogFactory.getLog(TimeParser.class);
 
     /**
      * Miscellaneous numeric formats used in formatting.
@@ -262,7 +257,7 @@ public final class TimeParser {
             tzID = "UTC";
         } else {
             // throw new ParseException("invalid time zone designator", curPos);
-            LOG.debug("No time zone designator found, using default 'UTC'");
+            // no time zone designator found, using default 'UTC'
             tzID = "UTC";
         }
 
