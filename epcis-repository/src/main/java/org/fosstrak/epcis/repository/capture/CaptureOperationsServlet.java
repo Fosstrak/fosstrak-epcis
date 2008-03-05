@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.accada.epcis.repository.capture;
 
 import java.io.FileInputStream;
 import java.io.IOException;

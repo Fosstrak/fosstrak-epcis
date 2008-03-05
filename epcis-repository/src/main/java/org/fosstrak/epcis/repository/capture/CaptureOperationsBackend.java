@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.accada.epcis.repository.capture;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -36,6 +36,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.accada.epcis.repository.EpcisConstants;
 import org.accada.epcis.repository.model.EventFieldExtension;
 import org.accada.epcis.soap.model.BusinessTransactionType;
 import org.apache.commons.logging.Log;
