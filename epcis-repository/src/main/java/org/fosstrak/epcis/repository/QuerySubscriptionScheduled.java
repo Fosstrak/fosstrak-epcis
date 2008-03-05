@@ -48,7 +48,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
     /**
      * Generated unique ID for serialization.
      */
-    private static final long serialVersionUID = 6243380509125848077L;
+    private static final long serialVersionUID = -2922511476030412610L;
 
     /**
      * Schedule indicating when subscription query is to be executed.
@@ -58,7 +58,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
     /**
      * Whether to continue with sending results.
      */
-    protected Boolean doItAgain = true;
+    protected Boolean doItAgain = Boolean.TRUE;
 
     /**
      * Constructor to be used when recreating from storage.
@@ -116,7 +116,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
      * subscribed query get's unsubscribed.
      */
     public void stopSubscription() {
-        doItAgain = false;
+        doItAgain = Boolean.FALSE;
     }
 
     /**
@@ -144,7 +144,7 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
             return;
         }
 
-        if (!doItAgain) {
+        if (!doItAgain.booleanValue()) {
             ((Timer) pHandback).stop();
         } else {
             try {

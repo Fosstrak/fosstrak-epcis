@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
 
-    private static final long serialVersionUID = 8922829364406110575L;
+    private static final long serialVersionUID = 1108013137860201366L;
 
     private static final Log LOG = LogFactory.getLog(QuerySubscriptionTriggered.class);
 
@@ -75,7 +75,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
             LOG.error("The timer stating the next scheduled query execution time is null!");
             return;
         }
-        if (!doItAgain) {
+        if (!doItAgain.booleanValue()) {
             ((Timer) pHandback).stop();
         } else {
             try {
