@@ -90,13 +90,13 @@ public class CaptureOperationsBackend {
 
     static {
         VOCABTYPE_TABLENAME_MAP = new HashMap<String, String>();
-        VOCABTYPE_TABLENAME_MAP.put(Constants.DISPOSITION_ID_VTYPE, "voc_Disposition");
-        VOCABTYPE_TABLENAME_MAP.put(Constants.READ_POINT_ID_VTYPE, "voc_ReadPoint");
-        VOCABTYPE_TABLENAME_MAP.put(Constants.EPC_CLASS_VTYPE, "voc_EPCClass");
-        VOCABTYPE_TABLENAME_MAP.put(Constants.BUSINESS_LOCATION_ID_VTYPE, "voc_BizLoc");
-        VOCABTYPE_TABLENAME_MAP.put(Constants.BUSINESS_STEP_ID_VTYPE, "voc_BizStep");
-        VOCABTYPE_TABLENAME_MAP.put(Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE, "voc_BizTransType");
-        VOCABTYPE_TABLENAME_MAP.put(Constants.BUSINESS_TRANSACTION_VTYPE, "voc_BizTrans");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.EPC_CLASS, "voc_EPCClass");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_LOCATION_ID, "voc_BizLoc");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_STEP_ID, "voc_BizStep");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, "voc_BizTransType");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_TRANSACTION, "voc_BizTrans");
     }
 
     /**
@@ -176,7 +176,7 @@ public class CaptureOperationsBackend {
             final Long dispositionId, final Long readPointId, final Long bizLocationId, final String action)
             throws SQLException {
         return insertEvent(session, eventTime, recordTime, eventTimeZoneOffset, bizStepId, dispositionId, readPointId,
-                bizLocationId, action, null, null, null, Constants.OBJECT_EVENT);
+                bizLocationId, action, null, null, null, EpcisConstants.OBJECT_EVENT);
     }
 
     /**
@@ -211,7 +211,7 @@ public class CaptureOperationsBackend {
             final Long dispositionId, final Long readPointId, final Long bizLocationId, final String action,
             final String parentId) throws SQLException {
         return insertEvent(session, eventTime, recordTime, eventTimeZoneOffset, bizStepId, dispositionId, readPointId,
-                bizLocationId, action, parentId, null, null, Constants.TRANSACTION_EVENT);
+                bizLocationId, action, parentId, null, null, EpcisConstants.TRANSACTION_EVENT);
     }
 
     /**
@@ -246,7 +246,7 @@ public class CaptureOperationsBackend {
             final Long dispositionId, final Long readPointId, final Long bizLocationId, final String action,
             final String parentId) throws SQLException {
         return insertEvent(session, eventTime, recordTime, eventTimeZoneOffset, bizStepId, dispositionId, readPointId,
-                bizLocationId, action, parentId, null, null, Constants.AGGREGATION_EVENT);
+                bizLocationId, action, parentId, null, null, EpcisConstants.AGGREGATION_EVENT);
     }
 
     /**
@@ -281,7 +281,7 @@ public class CaptureOperationsBackend {
             final Long dispositionId, final Long readPointId, final Long bizLocationId, final Long epcClassId,
             final long quantity) throws SQLException {
         return insertEvent(session, eventTime, recordTime, eventTimeZoneOffset, bizStepId, dispositionId, readPointId,
-                bizLocationId, null, null, epcClassId, quantity, Constants.QUANTITY_EVENT);
+                bizLocationId, null, null, epcClassId, quantity, EpcisConstants.QUANTITY_EVENT);
 
     }
 
@@ -326,13 +326,13 @@ public class CaptureOperationsBackend {
             throws SQLException {
 
         PreparedStatement ps;
-        if (eventName.equals(Constants.AGGREGATION_EVENT)) {
+        if (eventName.equals(EpcisConstants.AGGREGATION_EVENT)) {
             ps = session.getInsert(SQL_INSERT_AGGREGATIONEVENT);
-        } else if (eventName.equals(Constants.OBJECT_EVENT)) {
+        } else if (eventName.equals(EpcisConstants.OBJECT_EVENT)) {
             ps = session.getInsert(SQL_INSERT_OBJECTEVENT);
-        } else if (eventName.equals(Constants.QUANTITY_EVENT)) {
+        } else if (eventName.equals(EpcisConstants.QUANTITY_EVENT)) {
             ps = session.getInsert(SQL_INSERT_QUANTITYEVENT);
-        } else if (eventName.equals(Constants.TRANSACTION_EVENT)) {
+        } else if (eventName.equals(EpcisConstants.TRANSACTION_EVENT)) {
             ps = session.getInsert(SQL_INSERT_TRANSACTIONEVENT);
         } else {
             throw new SQLException("Encountered unknown event element '" + eventName + "'.");
@@ -583,11 +583,11 @@ public class CaptureOperationsBackend {
      * @throws SQLException
      *             If an SQL problem with the database occurred.
      */
-    public long insertBusinessTransaction(final CaptureOperationsSession session, final String bizTrans,
+    public Long insertBusinessTransaction(final CaptureOperationsSession session, final String bizTrans,
             final String bizTransType) throws SQLException {
 
-        final long id = getOrInsertVocabularyElement(session, Constants.BUSINESS_TRANSACTION_VTYPE, bizTrans);
-        final long type = getOrInsertVocabularyElement(session, Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE,
+        final long id = getOrInsertVocabularyElement(session, EpcisConstants.BUSINESS_TRANSACTION, bizTrans);
+        final long type = getOrInsertVocabularyElement(session, EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID,
                 bizTransType);
 
         String stmt = "INSERT INTO BizTransaction (bizTrans, type) VALUES (?, ?)";
@@ -642,7 +642,7 @@ public class CaptureOperationsBackend {
         }
     }
 
-    private long getOrInsertBizTransaction(final CaptureOperationsSession session, final String bizTrans,
+    private Long getOrInsertBizTransaction(final CaptureOperationsSession session, final String bizTrans,
             final String bizTransType) throws SQLException {
         Long bizTransactionId = getBusinessTransaction(session, bizTrans, bizTransType);
         if (bizTransactionId != null) {
@@ -669,9 +669,9 @@ public class CaptureOperationsBackend {
             ps.setString(2, ext.getFieldname());
             ps.setString(3, ext.getPrefix());
             if (ext.getIntValue() != null) {
-                ps.setInt(4, ext.getIntValue());
+                ps.setInt(4, ext.getIntValue().intValue());
             } else if (ext.getFloatValue() != null) {
-                ps.setFloat(4, ext.getFloatValue());
+                ps.setFloat(4, ext.getFloatValue().floatValue());
             } else if (ext.getDateValue() != null) {
                 ps.setTimestamp(4, ext.getDateValue());
             } else {

@@ -84,16 +84,16 @@ public class CaptureOperationsModule {
 
     private static final Log LOG = LogFactory.getLog(CaptureOperationsModule.class);
 
-    private static final Map<String, Class> m = new HashMap<String, Class>();
+    private static final Map<String, Class<?>> vocClassMap = new HashMap<String, Class<?>>();
 
     static {
-        m.put(Constants.BUSINESS_LOCATION_ID_VTYPE, BusinessLocationId.class);
-        m.put(Constants.BUSINESS_STEP_ID_VTYPE, BusinessStepId.class);
-        m.put(Constants.BUSINESS_TRANSACTION_VTYPE, BusinessTransactionId.class);
-        m.put(Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE, BusinessTransactionTypeId.class);
-        m.put(Constants.DISPOSITION_ID_VTYPE, DispositionId.class);
-        m.put(Constants.EPC_CLASS_VTYPE, EPCClass.class);
-        m.put(Constants.READ_POINT_ID_VTYPE, ReadPointId.class);
+        vocClassMap.put(EpcisConstants.BUSINESS_LOCATION_ID, BusinessLocationId.class);
+        vocClassMap.put(EpcisConstants.BUSINESS_STEP_ID, BusinessStepId.class);
+        vocClassMap.put(EpcisConstants.BUSINESS_TRANSACTION, BusinessTransactionId.class);
+        vocClassMap.put(EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, BusinessTransactionTypeId.class);
+        vocClassMap.put(EpcisConstants.DISPOSITION_ID, DispositionId.class);
+        vocClassMap.put(EpcisConstants.EPC_CLASS, EPCClass.class);
+        vocClassMap.put(EpcisConstants.READ_POINT_ID, ReadPointId.class);
     }
 
     /**
@@ -154,7 +154,9 @@ public class CaptureOperationsModule {
                     tx.commit();
                 } catch (Exception e) {
                     LOG.error("dbReset failed: " + e.toString(), e);
-                    tx.rollback();
+                    if (tx != null) {
+                        tx.rollback();
+                    }
                     throw new SQLException(e.toString());
                 }
             } finally {
@@ -218,17 +220,23 @@ public class CaptureOperationsModule {
                 LOG.info("EPCIS Capture Interface request succeeded.");
             } catch (SAXException e) {
                 LOG.error("EPCIS Capture Interface request failed: " + e.toString());
-                tx.rollback();
+                if (tx != null) {
+                    tx.rollback();
+                }
                 throw e;
             } catch (IOException e) {
                 LOG.error("EPCIS Capture Interface request failed: " + e.toString());
-                tx.rollback();
+                if (tx != null) {
+                    tx.rollback();
+                }
                 throw e;
             } catch (Exception e) {
                 // Hibernate throws RuntimeExceptions, so don't let them
                 // (or anything else) escape without clean up
                 LOG.error("EPCIS Capture Interface request failed: " + e.toString(), e);
-                tx.rollback();
+                if (tx != null) {
+                    tx.rollback();
+                }
                 throw new IOException(e.toString());
             }
         } finally {
@@ -257,8 +265,8 @@ public class CaptureOperationsModule {
             Node eventNode = events.item(i);
             String nodeName = eventNode.getNodeName();
 
-            if (nodeName.equals(Constants.OBJECT_EVENT) || nodeName.equals(Constants.AGGREGATION_EVENT)
-                    || nodeName.equals(Constants.QUANTITY_EVENT) || nodeName.equals(Constants.TRANSACTION_EVENT)) {
+            if (nodeName.equals(EpcisConstants.OBJECT_EVENT) || nodeName.equals(EpcisConstants.AGGREGATION_EVENT)
+                    || nodeName.equals(EpcisConstants.QUANTITY_EVENT) || nodeName.equals(EpcisConstants.TRANSACTION_EVENT)) {
                 LOG.debug("processing event " + i + ": '" + nodeName + "'.");
                 handleEvent(session, eventNode);
                 eventCount++;
@@ -284,7 +292,10 @@ public class CaptureOperationsModule {
      *             IOException If an error parsing the XML occurs.
      */
     private void handleEvent(Session session, final Node eventNode) throws SAXException, IOException {
-        if (eventNode != null && eventNode.getChildNodes().getLength() == 0) {
+        if (eventNode == null) {
+            // nothing to do
+            return;
+        } else if (eventNode.getChildNodes().getLength() == 0) {
             throw new SAXException("Event element '" + eventNode.getNodeName() + "' has no children elements.");
         }
         Node curEventNode = null;
@@ -357,7 +368,7 @@ public class CaptureOperationsModule {
             } else if (nodeName.equals("epcClass")) {
                 epcClassUri = curEventNode.getTextContent();
             } else if (nodeName.equals("quantity")) {
-                quantity = new Long(curEventNode.getTextContent());
+                quantity = Long.valueOf(curEventNode.getTextContent());
             } else if (nodeName.equals("parentID")) {
                 parentId = curEventNode.getTextContent();
             } else {
@@ -382,36 +393,38 @@ public class CaptureOperationsModule {
 
         String nodeName = eventNode.getNodeName();
         VocabularyElement bizStep = bizStepUri != null ? getOrInsertVocabularyElement(session,
-                Constants.BUSINESS_STEP_ID_VTYPE, String.valueOf(bizStepUri)) : null;
+                EpcisConstants.BUSINESS_STEP_ID, String.valueOf(bizStepUri)) : null;
         VocabularyElement disposition = dispositionUri != null ? getOrInsertVocabularyElement(session,
-                Constants.DISPOSITION_ID_VTYPE, String.valueOf(dispositionUri)) : null;
+                EpcisConstants.DISPOSITION_ID, String.valueOf(dispositionUri)) : null;
         VocabularyElement readPoint = readPointUri != null ? getOrInsertVocabularyElement(session,
-                Constants.READ_POINT_ID_VTYPE, String.valueOf(readPointUri)) : null;
+                EpcisConstants.READ_POINT_ID, String.valueOf(readPointUri)) : null;
         VocabularyElement bizLocation = bizLocationUri != null ? getOrInsertVocabularyElement(session,
-                Constants.BUSINESS_LOCATION_ID_VTYPE, String.valueOf(bizLocationUri)) : null;
+                EpcisConstants.BUSINESS_LOCATION_ID, String.valueOf(bizLocationUri)) : null;
         VocabularyElement epcClass = epcClassUri != null ? getOrInsertVocabularyElement(session,
-                Constants.EPC_CLASS_VTYPE, String.valueOf(epcClassUri)) : null;
+                EpcisConstants.EPC_CLASS, String.valueOf(epcClassUri)) : null;
 
         BaseEvent be;
-        if (nodeName.equals(Constants.AGGREGATION_EVENT)) {
+        if (nodeName.equals(EpcisConstants.AGGREGATION_EVENT)) {
             AggregationEvent ae = new AggregationEvent();
             ae.setParentId(parentId);
             ae.setChildEpcs(epcs);
             ae.setAction(Action.valueOf(action));
             be = ae;
-        } else if (nodeName.equals(Constants.OBJECT_EVENT)) {
+        } else if (nodeName.equals(EpcisConstants.OBJECT_EVENT)) {
             ObjectEvent oe = new ObjectEvent();
             oe.setAction(Action.valueOf(action));
             if (epcs != null && epcs.size() > 0) {
                 oe.setEpcList(epcs);
             }
             be = oe;
-        } else if (nodeName.equals(Constants.QUANTITY_EVENT)) {
+        } else if (nodeName.equals(EpcisConstants.QUANTITY_EVENT)) {
             QuantityEvent qe = new QuantityEvent();
             qe.setEpcClass((EPCClass) epcClass);
-            qe.setQuantity(quantity);
+            if (quantity != null) {
+                qe.setQuantity(quantity.longValue());
+            }
             be = qe;
-        } else if (nodeName.equals(Constants.TRANSACTION_EVENT)) {
+        } else if (nodeName.equals(EpcisConstants.TRANSACTION_EVENT)) {
             TransactionEvent te = new TransactionEvent();
             te.setParentId(parentId);
             te.setEpcList(epcs);
@@ -436,7 +449,6 @@ public class CaptureOperationsModule {
         }
 
         session.save(be);
-
     }
 
     /**
@@ -485,9 +497,9 @@ public class CaptureOperationsModule {
                 String bizTransTypeUri = curNode.getAttributes().item(0).getTextContent();
                 String bizTransUri = curNode.getTextContent();
                 BusinessTransactionId bizTrans = (BusinessTransactionId) getOrInsertVocabularyElement(session,
-                        Constants.BUSINESS_TRANSACTION_VTYPE, bizTransUri.toString());
+                        EpcisConstants.BUSINESS_TRANSACTION, bizTransUri.toString());
                 BusinessTransactionTypeId type = (BusinessTransactionTypeId) getOrInsertVocabularyElement(session,
-                        Constants.BUSINESS_TRANSACTION_TYPE_ID_VTYPE, bizTransTypeUri.toString());
+                        EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, bizTransTypeUri.toString());
 
                 Criteria c0 = session.createCriteria(BusinessTransaction.class);
                 c0.add(Restrictions.eq("bizTransaction", bizTrans));
@@ -530,7 +542,7 @@ public class CaptureOperationsModule {
      */
     public VocabularyElement getOrInsertVocabularyElement(Session session, String vocabularyType,
             String vocabularyElement) throws SAXException {
-        Class c = m.get(vocabularyType);
+        Class<?> c = vocClassMap.get(vocabularyType);
         Criteria c0 = session.createCriteria(c);
         c0.setCacheable(true);
         c0.add(Restrictions.eq("uri", vocabularyElement));
