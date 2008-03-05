@@ -46,6 +46,14 @@ public class QueryOperationsSession {
         this.connection = connection;
     }
 
+    /**
+     * Lazy instantiation of prepared statements: the PreparedStatement is
+     * created when it is first used by the application and is then cached here.
+     * 
+     * @param sql
+     * @return
+     * @throws SQLException
+     */
     public PreparedStatement getPreparedStatement(final String sql) throws SQLException {
         PreparedStatement ps = namedStatements.get(sql);
         if (ps == null) {

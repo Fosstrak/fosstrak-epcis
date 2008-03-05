@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -48,11 +47,11 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import org.accada.epcis.repository.QueryOperationsModule.EventType;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.soap.model.ActionType;
 import org.accada.epcis.soap.model.AggregationEventType;
+import org.accada.epcis.soap.model.AttributeType;
 import org.accada.epcis.soap.model.BusinessLocationType;
 import org.accada.epcis.soap.model.BusinessTransactionListType;
 import org.accada.epcis.soap.model.BusinessTransactionType;
@@ -70,6 +69,9 @@ import org.accada.epcis.soap.model.QueryTooLargeException;
 import org.accada.epcis.soap.model.ReadPointType;
 import org.accada.epcis.soap.model.SubscriptionControls;
 import org.accada.epcis.soap.model.TransactionEventType;
+import org.accada.epcis.soap.model.VocabularyElementListType;
+import org.accada.epcis.soap.model.VocabularyElementType;
+import org.accada.epcis.soap.model.VocabularyType;
 import org.accada.epcis.utils.TimeParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -100,10 +102,25 @@ public class QueryOperationsBackend {
 
     private static final String SQL_EXISTS_SUBSCRIPTION = "SELECT EXISTS (SELECT subscriptionid FROM subscription WHERE subscriptionid=?)";
 
-    public void runEventQuery(final QueryOperationsSession session, final SimpleEventQuery eventQuery,
-            final List<Object> eventList) throws SQLException,
-            ImplementationExceptionResponse, QueryTooLargeExceptionResponse {
-        EventType eventType = eventQuery.getEventType();
+    private static Map<String, String> vocTablenameMap;
+
+    static {
+        vocTablenameMap = new HashMap<String, String>(5);
+        vocTablenameMap.put(EpcisConstants.BUSINESS_STEP_ID, "voc_BizStep");
+        vocTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION, "voc_BizTrans");
+        vocTablenameMap.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition");
+        vocTablenameMap.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint");
+        vocTablenameMap.put(EpcisConstants.BUSINESS_LOCATION_ID, "voc_BizLoc");
+    }
+
+    protected static String getVocabularyTablename(String vocabularyType) {
+        return vocTablenameMap.get(vocabularyType);
+    }
+
+    public void runSimpleEventQuery(final QueryOperationsSession session, final SimpleEventQuerySql eventQuery,
+            final List<Object> eventList) throws SQLException, ImplementationExceptionResponse,
+            QueryTooLargeExceptionResponse {
+        String eventType = eventQuery.getEventType();
 
         // prepare and execute the main SQL SELECT query
         String sqlSelect = eventQuery.getSqlString();
@@ -122,27 +139,22 @@ public class QueryOperationsBackend {
         String selectExtensions = null;
         String selectEpcs = null;
         String selectBizTrans = null;
-        switch (eventType) {
-        case AggregationEvent:
+        if (EpcisConstants.AGGREGATION_EVENT.equals(eventType)) {
             selectExtensions = SQL_SELECT_AGGREGATIONEVENT_EXTENSIONS;
             selectEpcs = SQL_SELECT_AGGREGATIONEVENT_EPCS;
             selectBizTrans = SQL_SELECT_AGGREGATIONEVENT_BIZTRANS;
-            break;
-        case ObjectEvent:
+        } else if (EpcisConstants.OBJECT_EVENT.equals(eventType)) {
             selectExtensions = SQL_SELECT_OBJECTEVENT_EXTENSIONS;
             selectEpcs = SQL_SELECT_OBJECTEVENT_EPCS;
             selectBizTrans = SQL_SELECT_OBJECTEVENT_BIZTRANS;
-            break;
-        case QuantityEvent:
+        } else if (EpcisConstants.QUANTITY_EVENT.equals(eventType)) {
             selectExtensions = SQL_SELECT_QUANTITYEVENT_EXTENSIONS;
             selectEpcs = SQL_SELECT_QUANTITYEVENT_EPCS;
             selectBizTrans = SQL_SELECT_QUANTITYEVENT_BIZTRANS;
-            break;
-        case TransactionEvent:
+        } else if (EpcisConstants.TRANSACTION_EVENT.equals(eventType)) {
             selectExtensions = SQL_SELECT_TRANSACTIONEVENT_EXTENSIONS;
             selectEpcs = SQL_SELECT_TRANSACTIONEVENT_EPCS;
             selectBizTrans = SQL_SELECT_TRANSACTIONEVENT_BIZTRANS;
-            break;
         }
         PreparedStatement selectExtensionsStmt = session.getPreparedStatement(selectExtensions);
         PreparedStatement selectEpcsStmt = session.getPreparedStatement(selectEpcs);
@@ -176,11 +188,10 @@ public class QueryOperationsBackend {
                 LOG.debug("     param1 = " + eventId);
             }
             selectBizTransStmt.setInt(1, eventId);
-            BusinessTransactionListType bizTransList = getBizTransactionsFromResult(selectBizTransStmt.executeQuery());
+            BusinessTransactionListType bizTransList = readBizTransactionsFromResult(selectBizTransStmt.executeQuery());
 
             EPCISEventType event = null;
-            switch (eventType) {
-            case AggregationEvent:
+            if (EpcisConstants.AGGREGATION_EVENT.equals(eventType)) {
                 AggregationEventType aggrEvent = new AggregationEventType();
                 aggrEvent.setReadPoint(readPoint);
                 aggrEvent.setBizLocation(bizLocation);
@@ -195,17 +206,16 @@ public class QueryOperationsBackend {
                     LOG.debug("     param1 = " + eventId);
                 }
                 selectEpcsStmt.setInt(1, eventId);
-                aggrEvent.setChildEPCs(getEpcsFromResult(selectEpcsStmt.executeQuery()));
+                aggrEvent.setChildEPCs(readEpcsFromResult(selectEpcsStmt.executeQuery()));
                 // fetch and fill extensions
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("SQL: " + selectExtensions);
                     LOG.debug("     param1 = " + eventId);
                 }
                 selectExtensionsStmt.setInt(1, eventId);
-                fillExtensionsFromResult(selectExtensionsStmt.executeQuery(), aggrEvent.getAny());
+                readExtensionsFromResult(selectExtensionsStmt.executeQuery(), aggrEvent.getAny());
                 event = aggrEvent;
-                break;
-            case ObjectEvent:
+            } else if (EpcisConstants.OBJECT_EVENT.equals(eventType)) {
                 ObjectEventType objEvent = new ObjectEventType();
                 objEvent.setReadPoint(readPoint);
                 objEvent.setBizLocation(bizLocation);
@@ -219,17 +229,16 @@ public class QueryOperationsBackend {
                     LOG.debug("     param1 = " + eventId);
                 }
                 selectEpcsStmt.setInt(1, eventId);
-                objEvent.setEpcList(getEpcsFromResult(selectEpcsStmt.executeQuery()));
+                objEvent.setEpcList(readEpcsFromResult(selectEpcsStmt.executeQuery()));
                 // fetch and fill extensions
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("SQL: " + selectExtensions);
                     LOG.debug("     param1 = " + eventId);
                 }
                 selectExtensionsStmt.setInt(1, eventId);
-                fillExtensionsFromResult(selectExtensionsStmt.executeQuery(), objEvent.getAny());
+                readExtensionsFromResult(selectExtensionsStmt.executeQuery(), objEvent.getAny());
                 event = objEvent;
-                break;
-            case QuantityEvent:
+            } else if (EpcisConstants.QUANTITY_EVENT.equals(eventType)) {
                 QuantityEventType quantEvent = new QuantityEventType();
                 quantEvent.setReadPoint(readPoint);
                 quantEvent.setBizLocation(bizLocation);
@@ -244,10 +253,9 @@ public class QueryOperationsBackend {
                     LOG.debug("     param1 = " + eventId);
                 }
                 selectExtensionsStmt.setInt(1, eventId);
-                fillExtensionsFromResult(selectExtensionsStmt.executeQuery(), quantEvent.getAny());
+                readExtensionsFromResult(selectExtensionsStmt.executeQuery(), quantEvent.getAny());
                 event = quantEvent;
-                break;
-            case TransactionEvent:
+            } else if (EpcisConstants.TRANSACTION_EVENT.equals(eventType)) {
                 TransactionEventType transEvent = new TransactionEventType();
                 transEvent.setReadPoint(readPoint);
                 transEvent.setBizLocation(bizLocation);
@@ -262,16 +270,21 @@ public class QueryOperationsBackend {
                     LOG.debug("     param1 = " + eventId);
                 }
                 selectEpcsStmt.setInt(1, eventId);
-                transEvent.setEpcList(getEpcsFromResult(selectEpcsStmt.executeQuery()));
+                transEvent.setEpcList(readEpcsFromResult(selectEpcsStmt.executeQuery()));
                 // fetch and fill extensions
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("SQL: " + selectExtensions);
                     LOG.debug("     param1 = " + eventId);
                 }
                 selectExtensionsStmt.setInt(1, eventId);
-                fillExtensionsFromResult(selectExtensionsStmt.executeQuery(), transEvent.getAny());
+                readExtensionsFromResult(selectExtensionsStmt.executeQuery(), transEvent.getAny());
                 event = transEvent;
-                break;
+            } else {
+                String msg = "Invalid eventType: " + eventType;
+                LOG.error(msg);
+                ImplementationException ie = new ImplementationException();
+                ie.setReason(msg);
+                throw new ImplementationExceptionResponse(msg, ie);
             }
             event.setEventTime(timestampToXmlCalendar(eventTime));
             event.setRecordTime(timestampToXmlCalendar(recordTime));
@@ -289,6 +302,76 @@ public class QueryOperationsBackend {
             QueryTooLargeException e = new QueryTooLargeException();
             e.setReason(msg);
             throw new QueryTooLargeExceptionResponse(msg, e);
+        }
+    }
+
+    public void runMasterDataQuery(final QueryOperationsSession session, final MasterDataQuerySql mdQuery,
+            final List<VocabularyType> vocList) throws SQLException, ImplementationExceptionResponse,
+            QueryTooLargeExceptionResponse {
+
+        List<String> vocabularyTypes = mdQuery.getVocabularyTypes();
+        List<Object> sqlParams = mdQuery.getSqlParams();
+        int maxElementCount = mdQuery.getMaxElementCount();
+        boolean includeAttributes = mdQuery.getIncludeAttributes();
+        boolean includeChildren = mdQuery.getIncludeChildren();
+
+        for (String vocType : vocabularyTypes) {
+            String sqlSelect = mdQuery.getSqlForVocabulary(vocType);
+            PreparedStatement ps = session.getConnection().prepareStatement(sqlSelect);
+            LOG.debug("SQL: " + sqlSelect);
+            for (int i = 0; i < sqlParams.size(); i++) {
+                ps.setObject(i + 1, sqlParams.get(i));
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("     param" + i + " = " + sqlParams.get(i));
+                }
+            }
+            ResultSet rs = ps.executeQuery();
+
+            // fetch matching vocabulary element uris
+            List<String> vocElemUris = new ArrayList<String>();
+            int actVocElemCount = 0;
+            while (rs.next()) {
+                actVocElemCount++;
+                if (maxElementCount > -1 && actVocElemCount > maxElementCount) {
+                    // according to spec, this must result in a
+                    // QueryTooLargeException
+                    String msg = "The query returned more results than specified by 'maxElementCount'";
+                    LOG.info("USER ERROR: " + msg);
+                    QueryTooLargeException e = new QueryTooLargeException();
+                    e.setReason(msg);
+                    throw new QueryTooLargeExceptionResponse(msg, e);
+                }
+                vocElemUris.add(rs.getString(1));
+            }
+            rs.close();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Masterdata query returned " + actVocElemCount + " vocabularies (maxElementCount is "
+                        + maxElementCount + ")");
+            }
+
+            // populate the VocabularyElementList
+            VocabularyElementListType vocElems = new VocabularyElementListType();
+            for (String vocElemUri : vocElemUris) {
+                VocabularyElementType vocElem = new VocabularyElementType();
+                vocElem.setId(vocElemUri);
+                if (includeAttributes) {
+                    fetchAttributes(session, vocType, vocElemUri, mdQuery.getIncludedAttributeNames(),
+                            vocElem.getAttribute());
+                }
+                if (includeChildren) {
+                    IDListType children = fetchChildren(session, vocType, vocElemUri);
+                    vocElem.setChildren(children);
+                }
+                vocElems.getVocabularyElement().add(vocElem);
+            }
+
+            // add the vocabulary element to the vocabulary list
+            if (!vocElems.getVocabularyElement().isEmpty()) {
+                VocabularyType voc = new VocabularyType();
+                voc.setType(vocType);
+                voc.setVocabularyElementList(vocElems);
+                vocList.add(voc);
+            }
         }
     }
 
@@ -316,164 +399,48 @@ public class QueryOperationsBackend {
     }
 
     /**
-     * Retrieves all attributes for the given vocabulary name, filtered by the
-     * given attribute names.
-     * 
-     * @param vocTableName
-     *            The name of the vocabulary table in which to look for the
-     *            attributes.
-     * @param vocName
-     *            The name (URI) of the vocabulary for which the attributes
-     *            should be retrieved.
-     * @param filterAttrNames
-     *            A possibly empty list of attribute names which should filter
-     *            the retrieved attributes.
-     * @return The attributes, a mapping from attribute name to attribute value.
+     * @param session
+     * @param vocElemUri
+     * @param attribute
      * @throws SQLException
-     *             If an error accessing the database occurred.
      */
-    public Map<String, String> fetchAttributes(final QueryOperationsSession session, final String vocTableName,
-            final String vocName, final List<String> filterAttrNames) throws SQLException {
-        Map<String, String> attributes = new HashMap<String, String>();
-
-        List<String> queryArgs = new ArrayList<String>(filterAttrNames.size());
+    private void fetchAttributes(final QueryOperationsSession session, final String vocType, final String vocUri,
+            final List<String> filterAttrNames, final List<AttributeType> attributes) throws SQLException {
+        String vocTablename = vocTablenameMap.get(vocType);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT attribute, value FROM voc_").append(vocTableName).append("_attr");
-        sql.append(" AS attrTable WHERE attrTable.id=(SELECT id FROM ");
-        sql.append("voc_").append(vocTableName).append(" WHERE uri=?)");
-        queryArgs.add(vocName);
-        if (filterAttrNames.size() > 0) {
+        sql.append("SELECT attribute, value FROM ").append(vocTablename).append(" AS voc, ");
+        sql.append(vocTablename).append("_attr AS attr WHERE voc.id=attr.id AND voc.uri=?");
+        if (filterAttrNames != null && !filterAttrNames.isEmpty()) {
             // filter by attribute names
-            sql.append(" AND attribute IN (");
-            listOfStringToSql(filterAttrNames, sql, queryArgs);
-            sql.append(");");
-        } else {
-            sql.append(";");
-        }
-
-        String query = sql.toString();
-        LOG.debug("SQL: " + query);
-        PreparedStatement ps = session.getConnection().prepareStatement(query);
-        int i = 1;
-        for (String arg : queryArgs) {
-            ps.setString(i++, arg);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("     param" + i + " = " + arg);
+            sql.append(" AND attribute IN (?");
+            for (int i = 1; i < filterAttrNames.size(); i++) {
+                sql.append(",?");
             }
-        }
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            String attr = rs.getString("attribute");
-            String val = rs.getString("value");
-            attributes.put(attr, val);
-        }
-        return attributes;
-    }
-
-    /**
-     * Retrieves vocabularies filtered by the given arguments.
-     * 
-     * @param table
-     *            The name of the vocabulary table in which to look.
-     * @param filterVocNames
-     *            A possibly empty array of vocabulary names which filter the
-     *            returned vocabularies by name.
-     * @param filterVocNamesWd
-     *            A possibly empty array of vocabulary names which filter the
-     *            returned vocabularies by the name of their descendants.
-     * @param filterAttrs
-     *            A possibly empty mapping of attribute names to attribute
-     *            values which filter the returned vocabularies by their
-     *            attribute names and values.
-     * @param attrs
-     *            A possibly empty array of attribute names which filter the
-     *            returned vocabularies by their attribute names.
-     * @param maxElementCount
-     *            The maximum number of vocabularies that should be retrieved.
-     *            If the actual number of vacabularies exceeds this number, a
-     *            QueryTooLargeException is raised.
-     * @return A List of vocabularies (URI) filtered by the given arguments.
-     * @throws SQLException
-     *             If an error accessing the database occurred.
-     * @throws ImplementationException
-     *             If an error converting a String to an URI occurred.
-     * @throws QueryTooLargeException
-     *             If the actual number of returned vocabularies would exceed
-     *             the given maxElementCount.
-     */
-    public List<String> fetchVocabularies(final QueryOperationsSession session, final String table,
-            final List<String> filterVocNames, final List<String> filterVocNamesWd,
-            final Map<String, List<String>> filterAttrs, final List<String> attrs, final int maxElementCount)
-            throws SQLException, ImplementationExceptionResponse, QueryTooLargeExceptionResponse {
-        List<String> vocs = new ArrayList<String>();
-
-        StringBuilder sql = new StringBuilder();
-        List<String> queryArgs = new ArrayList<String>();
-        sql.append("SELECT DISTINCT uri FROM voc_").append(table).append(" AS vocTable");
-        // filter by attribute
-        if (attrs.size() > 0 || filterAttrs.size() > 0) {
-            sql.append(", voc_").append(table).append("_attr AS attrTable WHERE vocTable.id=attrTable.id");
-            if (attrs.size() > 0) {
-                // filter by attribute name
-                sql.append(" AND attrTable.attribute IN (");
-                listOfStringToSql(attrs, sql, queryArgs);
-                sql.append(")");
-            }
-            if (filterAttrs.size() > 0) {
-                // filter by attribute name & value
-                for (String attrname : filterAttrs.keySet()) {
-                    sql.append(" AND attrTable.attribute=?");
-                    queryArgs.add(attrname);
-                    sql.append(" AND attrTable.value IN (");
-                    listOfStringToSql(filterAttrs.get(attrname), sql, queryArgs);
-                    sql.append(")");
-                }
-            }
-        } else {
-            sql.append(" WHERE 1");
-        }
-        if (!filterVocNames.isEmpty()) {
-            // filter by voc name
-            sql.append(" AND vocTable.uri IN (");
-            listOfStringToSql(filterVocNames, sql, queryArgs);
             sql.append(")");
         }
-        if (!filterVocNamesWd.isEmpty()) {
-            sql.append(" AND (");
-            for (String uri : filterVocNamesWd) {
-                sql.append("vocTable.uri LIKE ? OR ");
-                queryArgs.add(uri + "%");
-            }
-            sql.append("0)");
+        PreparedStatement ps = session.getPreparedStatement(sql.toString());
+        ps.setString(1, vocUri);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SQL: " + sql.toString());
+            LOG.debug("     param1 = " + vocUri);
         }
-        sql.append(";");
+        if (filterAttrNames != null && !filterAttrNames.isEmpty()) {
+            for (int i = 0; i < filterAttrNames.size(); i++) {
+                ps.setString(i + 2, filterAttrNames.get(i));
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("     param" + i + 2 + " = " + filterAttrNames.get(i));
+                }
+            }
+        }
 
-        String query = sql.toString();
-        LOG.debug("SQL: " + query);
-        PreparedStatement ps = session.getConnection().prepareStatement(query);
-        int i = 1;
-        for (String arg : queryArgs) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("     param" + i + " = " + arg);
-            }
-            ps.setString(i++, arg);
-        }
         ResultSet rs = ps.executeQuery();
-        int count = 0;
         while (rs.next()) {
-            if (maxElementCount > -1 && count > maxElementCount) {
-                String msg = "Actual number of vocabulary elements exceeds specified 'maxElementCount'.";
-                LOG.info("USER ERROR: " + msg);
-                QueryTooLargeException qtle = new QueryTooLargeException();
-                qtle.setReason(msg);
-                qtle.setQueryName("SimpleMasterDataQuery");
-                throw new QueryTooLargeExceptionResponse(msg, qtle);
-            }
-            vocs.add(rs.getString("uri"));
-            count++;
+            AttributeType attr = new AttributeType();
+            attr.setId(rs.getString(1));
+            attr.getContent().add(rs.getString(2));
+            attributes.add(attr);
         }
-
-        return vocs;
+        rs.close();
     }
 
     /**
@@ -491,67 +458,24 @@ public class QueryOperationsBackend {
      * @throws ImplementationException
      *             If a String could not be converted into an URI.
      */
-    public IDListType fetchChildren(final QueryOperationsSession session, final String vocTableName, final String vocUri) throws SQLException, ImplementationExceptionResponse {
+    private IDListType fetchChildren(final QueryOperationsSession session, final String vocType, final String vocUri)
+            throws SQLException, ImplementationExceptionResponse {
         IDListType children = new IDListType();
+        String vocTablename = vocTablenameMap.get(vocType);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT DISTINCT uri FROM voc_").append(vocTableName).append(
-                " AS vocTable WHERE vocTable.uri LIKE ?;");
-        String query = sql.toString();
-        PreparedStatement ps = session.getConnection().prepareStatement(query);
-        String arg = vocUri + "_%";
+        sql.append("SELECT uri FROM ").append(vocTablename).append(" AS voc WHERE voc.uri LIKE ?");
+        PreparedStatement ps = session.getPreparedStatement(sql.toString());
+        String uri = vocUri + "_%";
         if (LOG.isDebugEnabled()) {
-            LOG.debug("SQL: " + query);
-            LOG.debug("     param1 = " + arg);
+            LOG.debug("SQL: " + sql.toString());
+            LOG.debug("     param1 = " + uri);
         }
-        ps.setString(1, arg);
+        ps.setString(1, uri);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             children.getId().add(rs.getString("uri"));
         }
         return (children.getId().isEmpty()) ? null : children;
-    }
-
-    /**
-     * Retrieves all vocabulary table names for the given vocabulary names.
-     * 
-     * @param uris
-     *            A possibly empty array of vocabulary names.
-     * @return A mapping from the table name to the vocabulary name.
-     * @throws SQLException
-     *             If an error accessing the database occurred.
-     * @throws ImplementationException
-     *             If an error converting a String to an URI occurred.
-     */
-    public Map<String, String> fetchVocabularyTableNames(final QueryOperationsSession session, final List<String> uris)
-            throws SQLException, ImplementationExceptionResponse {
-        Map<String, String> tableNames = new HashMap<String, String>();
-
-        List<String> queryArgs = new ArrayList<String>(uris.size());
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT table_name, uri FROM Vocabularies");
-        if (uris.size() > 0) {
-            sql.append(" WHERE uri IN (");
-            listOfStringToSql(uris, sql, queryArgs);
-            sql.append(")");
-        }
-        sql.append(";");
-        String query = sql.toString();
-        LOG.debug("SQL: " + query);
-        PreparedStatement ps = session.getConnection().prepareStatement(query);
-        int i = 1;
-        for (String arg : queryArgs) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("     param" + i + " = " + arg);
-            }
-            ps.setString(i++, arg);
-        }
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            String tableName = rs.getString("table_name");
-            String uri = rs.getString("uri");
-            tableNames.put(tableName, uri);
-        }
-        return tableNames;
     }
 
     /**
@@ -564,7 +488,7 @@ public class QueryOperationsBackend {
      * @throws SQLException
      *             If a database access error occurred.
      */
-    private BusinessTransactionListType getBizTransactionsFromResult(final ResultSet rs) throws SQLException,
+    private BusinessTransactionListType readBizTransactionsFromResult(final ResultSet rs) throws SQLException,
             ImplementationExceptionResponse {
         BusinessTransactionListType list = new BusinessTransactionListType();
         while (rs.next()) {
@@ -586,7 +510,7 @@ public class QueryOperationsBackend {
      * @throws SQLException
      *             If a database access error occurred.
      */
-    private EPCListType getEpcsFromResult(final ResultSet rs) throws SQLException {
+    private EPCListType readEpcsFromResult(final ResultSet rs) throws SQLException {
         EPCListType epcs = new EPCListType();
         while (rs.next()) {
             EPC epc = new EPC();
@@ -605,7 +529,7 @@ public class QueryOperationsBackend {
      * @throws SQLException
      *             If a database access error occurred.
      */
-    private void fillExtensionsFromResult(final ResultSet rs, final List extensions) throws SQLException {
+    private void readExtensionsFromResult(final ResultSet rs, final List<Object> extensions) throws SQLException {
         while (rs.next()) {
             String fieldname = rs.getString(1);
             String[] parts = fieldname.split("#");
@@ -680,11 +604,12 @@ public class QueryOperationsBackend {
                 String trigger = rs.getString("trigg");
 
                 if (trigger == null || trigger.length() == 0) {
-                    storedSubscription = new QuerySubscriptionScheduled(subscrId, params, dest, exportifempty,
-                            initrectime, new GregorianCalendar(), sched, queryName);
+                    storedSubscription = new QuerySubscriptionScheduled(subscrId, params, dest,
+                            Boolean.valueOf(exportifempty), initrectime, new GregorianCalendar(), sched, queryName);
                 } else {
-                    storedSubscription = new QuerySubscriptionTriggered(subscrId, params, dest, exportifempty,
-                            initrectime, new GregorianCalendar(), queryName, trigger, sched);
+                    storedSubscription = new QuerySubscriptionTriggered(subscrId, params, dest,
+                            Boolean.valueOf(exportifempty), initrectime, new GregorianCalendar(), queryName, trigger,
+                            sched);
                 }
                 subscribedMap.put(subscrId, storedSubscription);
             } catch (SQLException e) {
@@ -791,41 +716,6 @@ public class QueryOperationsBackend {
     }
 
     /**
-     * Appends the String values from the given <code>strings</code> List into
-     * an SQL IN (?,?,..) notation, intended to be used with PreparedStatement.
-     * The correct number of '?' will be added to the given SQL StringBuilder,
-     * and the String values from the <code>strings</code> List will be added
-     * to the <code>queryArgs</code> List.
-     * <p>
-     * TODO: This method is superfluous if the query arguments were directly
-     * appended to the <code>queryArgs</code> List and the correct number of
-     * '?' were appended to the SQL query in the end.
-     * 
-     * @param strings
-     *            A List of strings to be appended to the <code>queryArgs</code>
-     *            List.
-     * @param sql
-     *            The SQL query which will be appended with the appropriate
-     *            number of '?'.
-     * @param queryArgs
-     *            The <code>queryArgs</code> List to which the query
-     *            parameters will be appended to.
-     */
-    private void listOfStringToSql(final List<String> strings, final StringBuilder sql, final List<String> queryArgs) {
-        if (strings == null || strings.isEmpty() || sql == null || queryArgs == null) {
-            return;
-        }
-        Iterator<String> it = strings.iterator();
-        while (it.hasNext()) {
-            sql.append('?');
-            queryArgs.add(it.next());
-            if (it.hasNext()) {
-                sql.append(',');
-            }
-        }
-    }
-
-    /**
      * Creates a new XMLGregorianCalendar from the given java.sql.Timestamp.
      * 
      * @param time
@@ -850,88 +740,9 @@ public class QueryOperationsBackend {
     }
 
     /**
-     * Logs an SQL statement where the question marks are replaced with their
-     * actual parameter values.
-     * 
-     * @param sqlTemplate
-     *            The SQL query including the question marks.
-     * @param parameterValues
-     *            The parameter values to be substituted for the question marks.
-     */
-    private void logPreparedStatement(String sqlTemplate, List<?> parameterValues) {
-        if (sqlTemplate != null) {
-            String[] parts = sqlTemplate.split("\\?");
-            StringBuffer buf = new StringBuffer();
-            if (parts.length == parameterValues.size() || parts.length - 1 == parameterValues.size()) {
-                for (int i = 0; i < parameterValues.size(); i++) {
-                    buf.append(parts[i]);
-                    buf.append(parameterValues.get(i).toString());
-                }
-                if (parts.length - 1 == parameterValues.size()) {
-                    // we have one more part to append at the end
-                    buf.append(parts[parts.length - 1]);
-                }
-            } else {
-                // number of parameter values does not match number of question
-                // marks! will result in an SQL error when the query is
-                // executed! trace a note ...
-                LOG.trace("Number missmatch when trying to log a prepared statement: number of parameter values does not match number of question marks in the query string");
-            }
-            LOG.debug("SQL: " + buf.toString());
-        }
-    }
-
-    /**
-     * TODO: javadoc
-     * <p>
-     * From this class, the actual SQL query for an EPCIS event will be
-     * assembled. E.g. the following EventSqlParameter: columnName="eventTime",
-     * sqlOp=">=", sqlExpr="?" should translate into the following SQL query
-     * substring: " AND (eventTime >= ?)" and should be appended to the SQL
-     * event query base string.
-     * 
-     * @author Marco Steybe
-     */
-    public static class EventQueryParameter {
-        private String eventField;
-        private String comparator;
-        private Object value;
-
-        /**
-         * @param eventField
-         * @param comparator
-         * @param value
-         */
-        public EventQueryParameter(String eventField, String comparator, Object value) {
-            this.eventField = eventField;
-            this.comparator = comparator;
-            this.value = value;
-        }
-
-        /**
-         * @return the eventField
-         */
-        public String getEventField() {
-            return eventField;
-        }
-
-        /**
-         * @return the comparator
-         */
-        public String getComparator() {
-            return comparator;
-        }
-
-        /**
-         * @return the value
-         */
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    /**
      * Opens a new session for the database transaction.
+     * <p>
+     * TODO: we should use connection pooling and caching of PreparedStatements!
      * 
      * @param dataSource
      *            The DataSource object to retrieve the database connection

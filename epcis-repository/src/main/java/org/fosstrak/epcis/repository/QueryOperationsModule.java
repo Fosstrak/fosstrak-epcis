@@ -22,7 +22,6 @@ package org.accada.epcis.repository;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -34,15 +33,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.accada.epcis.repository.SimpleEventQuery.Operation;
+import org.accada.epcis.repository.SimpleEventQuery.OrderDirection;
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.InvalidURIExceptionResponse;
@@ -56,10 +53,8 @@ import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
 import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
 import org.accada.epcis.soap.model.ArrayOfString;
-import org.accada.epcis.soap.model.AttributeType;
 import org.accada.epcis.soap.model.DuplicateSubscriptionException;
 import org.accada.epcis.soap.model.EventListType;
-import org.accada.epcis.soap.model.IDListType;
 import org.accada.epcis.soap.model.ImplementationException;
 import org.accada.epcis.soap.model.ImplementationExceptionSeverity;
 import org.accada.epcis.soap.model.InvalidURIException;
@@ -76,10 +71,7 @@ import org.accada.epcis.soap.model.SubscribeNotPermittedException;
 import org.accada.epcis.soap.model.SubscriptionControls;
 import org.accada.epcis.soap.model.SubscriptionControlsException;
 import org.accada.epcis.soap.model.ValidationException;
-import org.accada.epcis.soap.model.VocabularyElementListType;
-import org.accada.epcis.soap.model.VocabularyElementType;
 import org.accada.epcis.soap.model.VocabularyListType;
-import org.accada.epcis.soap.model.VocabularyType;
 import org.accada.epcis.utils.TimeParser;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
@@ -115,31 +107,12 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     private static final String VDR_VERSION = "";
 
     /**
-     * Basic SQL query string for transaction events.
-     */
-    private static final String transactionEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT event_TransactionEvent.id, eventTime, recordTime, eventTimeZoneOffset, action, parentID, voc_BizStep.uri AS bizStep, voc_Disposition.uri AS disposition, voc_ReadPoint.uri AS readPoint, voc_BizLoc.uri AS bizLocation FROM event_TransactionEvent LEFT JOIN voc_BizStep ON event_TransactionEvent.bizStep = voc_BizStep.id LEFT JOIN voc_Disposition ON event_TransactionEvent.disposition = voc_Disposition.id LEFT JOIN voc_ReadPoint ON event_TransactionEvent.readPoint = voc_ReadPoint.id LEFT JOIN voc_BizLoc ON event_TransactionEvent.bizLocation = voc_BizLoc.id LEFT JOIN event_TransactionEvent_extensions ON event_TransactionEvent.id = event_TransactionEvent_extensions.event_id WHERE 1 ";
-
-    /**
-     * Basic SQL query string for quantity events.
-     */
-    private static final String quantityEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT event_QuantityEvent.id, eventTime, recordTime, eventTimeZoneOffset, voc_EPCClass.uri AS epcClass, quantity, voc_BizStep.uri AS bizStep, voc_Disposition.uri AS disposition, voc_ReadPoint.uri AS readPoint, voc_BizLoc.uri AS bizLocation FROM event_QuantityEvent LEFT JOIN voc_BizStep ON event_QuantityEvent.bizStep = voc_BizStep.id LEFT JOIN voc_Disposition ON event_QuantityEvent.disposition = voc_Disposition.id LEFT JOIN voc_ReadPoint ON event_QuantityEvent.readPoint = voc_ReadPoint.id LEFT JOIN voc_BizLoc ON event_QuantityEvent.bizLocation = voc_BizLoc.id LEFT JOIN voc_EPCClass ON event_QuantityEvent.epcClass = voc_EPCClass.id LEFT JOIN event_QuantityEvent_extensions ON event_QuantityEvent.id = event_QuantityEvent_extensions.event_id WHERE 1 ";
-
-    /**
-     * Basic SQL query string for aggregation events.
-     */
-    private static final String aggregationEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT event_AggregationEvent.id, eventTime, recordTime, eventTimeZoneOffset, parentID, action, voc_BizStep.uri AS bizStep, voc_Disposition.uri AS disposition, voc_ReadPoint.uri AS readPoint, voc_BizLoc.uri AS bizLocation FROM event_AggregationEvent LEFT JOIN voc_BizStep ON event_AggregationEvent.bizStep = voc_BizStep.id LEFT JOIN voc_Disposition ON event_AggregationEvent.disposition  = voc_Disposition.id LEFT JOIN voc_ReadPoint ON event_AggregationEvent.readPoint = voc_ReadPoint.id LEFT JOIN voc_BizLoc ON event_AggregationEvent.bizLocation = voc_BizLoc.id LEFT JOIN event_AggregationEvent_extensions ON event_AggregationEvent.id = event_AggregationEvent_extensions.event_id WHERE 1 ";
-
-    /**
-     * Basic SQL query string for object events.
-     */
-    private static final String objectEventQueryBase = "SELECT SQL_CALC_FOUND_ROWS DISTINCT event_ObjectEvent.id, eventTime, recordTime, eventTimeZoneOffset, action, voc_BizStep.uri AS bizStep, voc_Disposition.uri AS disposition, voc_ReadPoint.uri AS readPoint, voc_BizLoc.uri AS bizLocation FROM event_ObjectEvent LEFT JOIN voc_BizStep ON event_ObjectEvent.bizStep = voc_BizStep.id LEFT JOIN voc_Disposition ON event_ObjectEvent.disposition = voc_Disposition.id LEFT JOIN voc_ReadPoint ON event_ObjectEvent.readPoint = voc_ReadPoint.id LEFT JOIN voc_BizLoc ON event_ObjectEvent.bizLocation = voc_BizLoc.id LEFT JOIN event_ObjectEvent_extensions ON event_ObjectEvent.id = event_ObjectEvent_extensions.event_id WHERE 1";
-
-    /**
      * The names of all the implemented queries.
      */
-    private static final List<String> QUERYNAMES = new ArrayList<String>();
+    private static final List<String> QUERYNAMES;
 
     static {
+        QUERYNAMES = new ArrayList<String>(2);
         QUERYNAMES.add("SimpleEventQuery");
         QUERYNAMES.add("SimpleMasterDataQuery");
     }
@@ -168,13 +141,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
 
     private DataSource dataSource;
 
-    private Connection connection;
-
     private QueryOperationsBackend backend = new QueryOperationsBackend();
-
-    public enum EventType {
-        AggregationEvent, ObjectEvent, QuantityEvent, TransactionEvent
-    }
 
     /**
      * Create an SQL query string from the given query parameters.
@@ -231,12 +198,12 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws ImplementationException
      *             If an error in the implementation occurred.
      */
-    private List<SimpleEventQuery> constructSimpleEventQueries(final QueryParams queryParams) throws SQLException,
-            QueryParameterExceptionResponse, ImplementationExceptionResponse {
-        SimpleEventQuery aggrEventQuery = new SimpleEventQuery(EventType.AggregationEvent);
-        SimpleEventQuery objEventQuery = new SimpleEventQuery(EventType.ObjectEvent);
-        SimpleEventQuery quantEventQuery = new SimpleEventQuery(EventType.QuantityEvent);
-        SimpleEventQuery transEventQuery = new SimpleEventQuery(EventType.TransactionEvent);
+    private List<SimpleEventQuerySql> constructSimpleEventQueries(final QueryParams queryParams) throws SQLException,
+            QueryParameterExceptionResponse {
+        SimpleEventQuerySql aggrEventQuery = new SimpleEventQuerySql(EpcisConstants.AGGREGATION_EVENT);
+        SimpleEventQuerySql objEventQuery = new SimpleEventQuerySql(EpcisConstants.OBJECT_EVENT);
+        SimpleEventQuerySql quantEventQuery = new SimpleEventQuerySql(EpcisConstants.QUANTITY_EVENT);
+        SimpleEventQuerySql transEventQuery = new SimpleEventQuerySql(EpcisConstants.TRANSACTION_EVENT);
 
         boolean includeAggrEvents = true;
         boolean includeObjEvents = true;
@@ -244,7 +211,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
         boolean includeTransEvents = true;
 
         String orderBy = null;
-        String orderDirection = null;
+        OrderDirection orderDirection = null;
         int eventCountLimit = -1;
         int maxEventCount = -1;
 
@@ -259,13 +226,11 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             // check for null values
             if (paramName == null || "".equals(paramName)) {
                 String msg = "Missing name for a query parameter";
-                LOG.info("USER ERROR: " + msg);
-                throw new QueryParameterExceptionResponse(msg);
+                throw queryParameterException(msg, null);
             }
             if (paramValue == null) {
                 String msg = "Missing value for query parameter '" + paramName + "'";
-                LOG.info("USER ERROR: " + msg);
-                throw new QueryParameterExceptionResponse(msg);
+                throw queryParameterException(msg, null);
             }
             // check if the current query parameter has already been provided
             int index = Collections.binarySearch(sortedParamNames, paramName);
@@ -275,8 +240,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             } else {
                 // we have already handled this query parameter name - not ok
                 String msg = "Query parameter '" + paramName + "' provided more than once";
-                LOG.info("USER ERROR: " + msg);
-                throw new QueryParameterExceptionResponse(msg);
+                throw queryParameterException(msg, null);
             }
 
             if (LOG.isDebugEnabled()) {
@@ -285,45 +249,34 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             try {
                 if (paramName.equals("eventType")) {
                     // by default all event types will be included
-                    List<String> eventTypeStrings = parseAsArrayOfString(paramValue).getString();
-                    if (!eventTypeStrings.isEmpty()) {
+                    List<String> eventTypes = parseAsArrayOfString(paramValue).getString();
+                    if (!eventTypes.isEmpty()) {
                         // check if valid event types are provided
-                        List<EventType> eventTypes = new ArrayList<EventType>(eventTypeStrings.size());
-                        for (String eventTypeString : eventTypeStrings) {
-                            try {
-                                eventTypes.add(EventType.valueOf(eventTypeString));
-                            } catch (IllegalArgumentException e) {
-                                String msg = "Unsupported eventType: " + eventTypeString;
-                                LOG.info("USER ERROR: " + msg);
-                                QueryParameterException qpe = new QueryParameterException();
-                                qpe.setReason(msg);
-                                throw new QueryParameterExceptionResponse(msg, qpe);
-                            }
-                        }
+                        checkEventTypes(eventTypes);
 
                         // check for excluded event types
-                        if (!eventTypes.contains(EventType.AggregationEvent)) {
+                        if (!eventTypes.contains(EpcisConstants.AGGREGATION_EVENT)) {
                             includeAggrEvents = false;
                         }
-                        if (!eventTypes.contains(EventType.ObjectEvent)) {
+                        if (!eventTypes.contains(EpcisConstants.OBJECT_EVENT)) {
                             includeObjEvents = false;
                         }
-                        if (!eventTypes.contains(EventType.QuantityEvent)) {
+                        if (!eventTypes.contains(EpcisConstants.QUANTITY_EVENT)) {
                             includeQuantEvents = false;
                         }
-                        if (!eventTypes.contains(EventType.TransactionEvent)) {
+                        if (!eventTypes.contains(EpcisConstants.TRANSACTION_EVENT)) {
                             includeTransEvents = false;
                         }
                     }
                 } else if (paramName.equals("GE_eventTime") || paramName.equals("LT_eventTime")
                         || paramName.equals("GE_recordTime") || paramName.equals("LT_recordTime")) {
                     Timestamp ts = parseAsTimestamp(paramValue, paramName);
-                    String comparator = (paramName.startsWith("GE")) ? ">=" : "<";
+                    Operation op = Operation.valueOf(paramName.substring(0, 2));
                     String eventField = paramName.substring(3, paramName.length());
-                    aggrEventQuery.addEventQueryParam(eventField, comparator, ts);
-                    objEventQuery.addEventQueryParam(eventField, comparator, ts);
-                    quantEventQuery.addEventQueryParam(eventField, comparator, ts);
-                    transEventQuery.addEventQueryParam(eventField, comparator, ts);
+                    aggrEventQuery.addEventQueryParam(eventField, op, ts);
+                    objEventQuery.addEventQueryParam(eventField, op, ts);
+                    quantEventQuery.addEventQueryParam(eventField, op, ts);
+                    transEventQuery.addEventQueryParam(eventField, op, ts);
 
                 } else if (paramName.equals("EQ_action")) {
                     // QuantityEvents have no "action" field, thus exclude them
@@ -331,9 +284,9 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     if (!aos.getString().isEmpty()) {
                         checkActionValues(aos.getString());
-                        aggrEventQuery.addEventQueryParam("action", "IN", aos.getString());
-                        objEventQuery.addEventQueryParam("action", "IN", aos.getString());
-                        transEventQuery.addEventQueryParam("action", "IN", aos.getString());
+                        aggrEventQuery.addEventQueryParam("action", Operation.EQ, aos.getString());
+                        objEventQuery.addEventQueryParam("action", Operation.EQ, aos.getString());
+                        transEventQuery.addEventQueryParam("action", Operation.EQ, aos.getString());
                     }
 
                 } else if (paramName.equals("EQ_bizStep") || paramName.equals("EQ_disposition")
@@ -341,10 +294,10 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     if (!aos.getString().isEmpty()) {
                         String eventField = paramName.substring(3, paramName.length());
-                        aggrEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                        objEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                        quantEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                        transEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
+                        aggrEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                        objEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                        quantEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                        transEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
                     }
 
                 } else if (paramName.equals("WD_readPoint") || paramName.equals("WD_bizLocation")) {
@@ -355,10 +308,10 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                         // TODO: should???
                         CollectionUtils.transform(aos.getString(), new StringTransformer());
                         String eventField = paramName.substring(3, paramName.length());
-                        aggrEventQuery.addEventQueryParam(eventField, "LIKE", aos.getString());
-                        objEventQuery.addEventQueryParam(eventField, "LIKE", aos.getString());
-                        quantEventQuery.addEventQueryParam(eventField, "LIKE", aos.getString());
-                        transEventQuery.addEventQueryParam(eventField, "LIKE", aos.getString());
+                        aggrEventQuery.addEventQueryParam(eventField, Operation.WD, aos.getString());
+                        objEventQuery.addEventQueryParam(eventField, Operation.WD, aos.getString());
+                        quantEventQuery.addEventQueryParam(eventField, Operation.WD, aos.getString());
+                        transEventQuery.addEventQueryParam(eventField, Operation.WD, aos.getString());
                     }
 
                 } else if (paramName.startsWith("EQ_bizTransaction_")) {
@@ -366,14 +319,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     String bizTransType = paramName.substring(18);
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     if (!aos.getString().isEmpty()) {
-                        aggrEventQuery.addEventQueryParam("bizTransList.type", "=", aos.getString());
-                        objEventQuery.addEventQueryParam("bizTransList.type", "=", aos.getString());
-                        quantEventQuery.addEventQueryParam("bizTransList.type", "=", aos.getString());
-                        transEventQuery.addEventQueryParam("bizTransList.type", "=", aos.getString());
-                        aggrEventQuery.addEventQueryParam("bizTransList.bizTrans", "IN", aos.getString());
-                        objEventQuery.addEventQueryParam("bizTransList.bizTrans", "IN", aos.getString());
-                        quantEventQuery.addEventQueryParam("bizTransList.bizTrans", "IN", aos.getString());
-                        transEventQuery.addEventQueryParam("bizTransList.bizTrans", "IN", aos.getString());
+                        aggrEventQuery.addEventQueryParam("bizTransList.type", Operation.EQ, bizTransType);
+                        objEventQuery.addEventQueryParam("bizTransList.type", Operation.EQ, bizTransType);
+                        quantEventQuery.addEventQueryParam("bizTransList.type", Operation.EQ, bizTransType);
+                        transEventQuery.addEventQueryParam("bizTransList.type", Operation.EQ, bizTransType);
+                        aggrEventQuery.addEventQueryParam("bizTransList.bizTrans", Operation.EQ, aos.getString());
+                        objEventQuery.addEventQueryParam("bizTransList.bizTrans", Operation.EQ, aos.getString());
+                        quantEventQuery.addEventQueryParam("bizTransList.bizTrans", Operation.EQ, aos.getString());
+                        transEventQuery.addEventQueryParam("bizTransList.bizTrans", Operation.EQ, aos.getString());
                     }
 
                 } else if (paramName.equals("MATCH_epc") || paramName.equals("MATCH_anyEPC")) {
@@ -381,14 +334,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     includeQuantEvents = false;
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     if (!aos.getString().isEmpty()) {
-                        aggrEventQuery.addEventQueryParam("childEPCs", "LIKE", aos.getString());
-                        objEventQuery.addEventQueryParam("epcList", "LIKE", aos.getString());
-                        transEventQuery.addEventQueryParam("epcList", "LIKE", aos.getString());
+                        aggrEventQuery.addEventQueryParam("childEPCs", Operation.MATCH, aos.getString());
+                        objEventQuery.addEventQueryParam("epcList", Operation.MATCH, aos.getString());
+                        transEventQuery.addEventQueryParam("epcList", Operation.MATCH, aos.getString());
                         if (paramName.equals("MATCH_anyEPC")) {
-                            // for AggregationEvent and TransactionEvent also
-                            // look into "parentID" field
-                            aggrEventQuery.addEventQueryParam("parentID", "LIKE", aos.getString());
-                            transEventQuery.addEventQueryParam("parentID", "LIKE", aos.getString());
+                            // AggregationEvent and TransactionEvent need
+                            // special treatment ("parentID" field)
+                            aggrEventQuery.setIsAnyEpc(true);
+                            transEventQuery.setIsAnyEpc(true);
                         }
                     }
 
@@ -397,8 +350,8 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     includeObjEvents = false;
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     if (!aos.getString().isEmpty()) {
-                        aggrEventQuery.addEventQueryParam("parentID", "LIKE", aos.getString());
-                        transEventQuery.addEventQueryParam("parentID", "LIKE", aos.getString());
+                        aggrEventQuery.addEventQueryParam("parentID", Operation.MATCH, aos.getString());
+                        transEventQuery.addEventQueryParam("parentID", Operation.MATCH, aos.getString());
                     }
 
                 } else if (paramName.equals("MATCH_epcClass")) {
@@ -407,14 +360,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     includeTransEvents = false;
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     if (!aos.getString().isEmpty()) {
-                        quantEventQuery.addEventQueryParam("epcClass", "IN", aos.getString());
+                        quantEventQuery.addEventQueryParam("epcClass", Operation.MATCH, aos.getString());
                     }
 
                 } else if (paramName.endsWith("_quantity")) {
                     includeAggrEvents = false;
                     includeObjEvents = false;
                     includeTransEvents = false;
-                    String op = parseComparator(paramName);
+                    Operation op = Operation.valueOf(paramName.substring(0, paramName.indexOf('_')));
                     quantEventQuery.addEventQueryParam("quantity", op, parseAsInteger(paramValue));
 
                 } else if (paramName.startsWith("GT_") || paramName.startsWith("GE_") || paramName.startsWith("EQ_")
@@ -424,12 +377,9 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     String[] parts = fieldname.split("#");
                     if (parts.length != 2) {
                         String msg = "Invalid parameter " + paramName;
-                        LOG.info("USER ERROR: " + msg);
-                        QueryParameterException e = new QueryParameterException();
-                        e.setReason(msg);
-                        throw new QueryParameterExceptionResponse(msg, e);
+                        throw queryParameterException(msg, null);
                     }
-                    String op = parseComparator(paramName);
+                    Operation op = Operation.valueOf(paramName.substring(0, 2));
                     String eventField;
                     Object value;
                     try {
@@ -453,10 +403,10 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     objEventQuery.addEventQueryParam(eventField, op, value);
                     quantEventQuery.addEventQueryParam(eventField, op, value);
                     transEventQuery.addEventQueryParam(eventField, op, value);
-                    aggrEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
-                    objEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
-                    quantEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
-                    transEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
+                    aggrEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                    objEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                    quantEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                    transEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
 
                 } else if (paramName.startsWith("EXISTS_")) {
                     String fieldname = paramName.substring(7);
@@ -464,49 +414,46 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                         includeObjEvents = false;
                         includeQuantEvents = false;
                         includeTransEvents = false;
-                        aggrEventQuery.addEventQueryParam("childEPCs", "EXISTS", null);
+                        aggrEventQuery.addEventQueryParam("childEPCs", Operation.EXISTS, null);
                     } else if (fieldname.equals("epcList")) {
                         includeAggrEvents = false;
                         includeQuantEvents = false;
-                        objEventQuery.addEventQueryParam("epcList", "EXISTS", null);
-                        transEventQuery.addEventQueryParam("epcList", "EXISTS", null);
+                        objEventQuery.addEventQueryParam("epcList", Operation.EXISTS, null);
+                        transEventQuery.addEventQueryParam("epcList", Operation.EXISTS, null);
                     } else if (fieldname.equals("action")) {
                         includeQuantEvents = false;
-                        aggrEventQuery.addEventQueryParam("action", "EXISTS", null);
-                        objEventQuery.addEventQueryParam("action", "EXISTS", null);
-                        transEventQuery.addEventQueryParam("action", "EXISTS", null);
+                        aggrEventQuery.addEventQueryParam("action", Operation.EXISTS, null);
+                        objEventQuery.addEventQueryParam("action", Operation.EXISTS, null);
+                        transEventQuery.addEventQueryParam("action", Operation.EXISTS, null);
                     } else if (fieldname.equals("parentID")) {
                         includeObjEvents = false;
                         includeQuantEvents = false;
-                        aggrEventQuery.addEventQueryParam("parentID", "EXISTS", null);
-                        transEventQuery.addEventQueryParam("parentID", "EXISTS", null);
+                        aggrEventQuery.addEventQueryParam("parentID", Operation.EXISTS, null);
+                        transEventQuery.addEventQueryParam("parentID", Operation.EXISTS, null);
                     } else if (fieldname.equals("quantity") || fieldname.equals("epcClass")) {
                         includeAggrEvents = false;
                         includeObjEvents = false;
                         includeTransEvents = false;
-                        quantEventQuery.addEventQueryParam(fieldname, "EXISTS", null);
+                        quantEventQuery.addEventQueryParam(fieldname, Operation.EXISTS, null);
                     } else if (fieldname.equals("eventTime") || fieldname.equals("recordTime")
                             || fieldname.equals("eventTimeZoneOffset") || fieldname.equals("bizStep")
                             || fieldname.equals("disposition") || fieldname.equals("readPoint")
                             || fieldname.equals("bizLocation") || fieldname.equals("bizTransList")) {
-                        aggrEventQuery.addEventQueryParam(fieldname, "EXISTS", null);
-                        objEventQuery.addEventQueryParam(fieldname, "EXISTS", null);
-                        quantEventQuery.addEventQueryParam(fieldname, "EXISTS", null);
-                        transEventQuery.addEventQueryParam(fieldname, "EXISTS", null);
+                        aggrEventQuery.addEventQueryParam(fieldname, Operation.EXISTS, null);
+                        objEventQuery.addEventQueryParam(fieldname, Operation.EXISTS, null);
+                        quantEventQuery.addEventQueryParam(fieldname, Operation.EXISTS, null);
+                        transEventQuery.addEventQueryParam(fieldname, Operation.EXISTS, null);
                     } else {
                         // lets see if we have an extension fieldname
                         String[] parts = fieldname.split("#");
                         if (parts.length != 2) {
                             String msg = "Invalid parameter " + paramName;
-                            LOG.info("USER ERROR: " + msg);
-                            QueryParameterException e = new QueryParameterException();
-                            e.setReason(msg);
-                            throw new QueryParameterExceptionResponse(msg, e);
+                            throw queryParameterException(msg, null);
                         }
-                        aggrEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
-                        objEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
-                        quantEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
-                        transEventQuery.addEventQueryParam("extension.fieldname", "=", fieldname);
+                        aggrEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                        objEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                        quantEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                        transEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
                     }
 
                 } else if (paramName.startsWith("HASATTR_")) {
@@ -514,10 +461,10 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     String fieldname = paramName.substring(8);
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     String eventField = fieldname + ".attribute";
-                    aggrEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                    objEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                    quantEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                    transEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
+                    aggrEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                    objEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                    quantEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                    transEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
 
                 } else if (paramName.startsWith("EQATTR_")) {
                     String fieldname = paramName.substring(7);
@@ -526,27 +473,24 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     if (parts.length > 2) {
                         String msg = "Query parameter has invalid format: " + paramName
                                 + ". Expected: EQATTR_fieldname_attrname";
-                        LOG.info("USER ERROR: " + msg);
-                        QueryParameterException e = new QueryParameterException();
-                        e.setReason(msg);
-                        throw new QueryParameterExceptionResponse(msg, e);
+                        throw queryParameterException(msg, null);
                     } else if (parts.length == 2) {
                         fieldname = parts[0];
                         attrname = parts[1];
                     }
                     // restrict by attribute name
                     String eventField = fieldname + ".attribute";
-                    aggrEventQuery.addEventQueryParam(eventField, "=", attrname);
-                    objEventQuery.addEventQueryParam(eventField, "=", attrname);
-                    quantEventQuery.addEventQueryParam(eventField, "=", attrname);
-                    transEventQuery.addEventQueryParam(eventField, "=", attrname);
+                    aggrEventQuery.addEventQueryParam(eventField, Operation.EQ, attrname);
+                    objEventQuery.addEventQueryParam(eventField, Operation.EQ, attrname);
+                    quantEventQuery.addEventQueryParam(eventField, Operation.EQ, attrname);
+                    transEventQuery.addEventQueryParam(eventField, Operation.EQ, attrname);
                     // restrict by attribute value
                     ArrayOfString aos = parseAsArrayOfString(paramValue);
                     eventField = eventField + ".value";
-                    aggrEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                    objEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                    quantEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
-                    transEventQuery.addEventQueryParam(eventField, "IN", aos.getString());
+                    aggrEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                    objEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                    quantEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
+                    transEventQuery.addEventQueryParam(eventField, Operation.EQ, aos.getString());
 
                 } else if (paramName.equals("orderBy")) {
                     orderBy = parseAsString(paramValue);
@@ -554,81 +498,71 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                         String[] parts = orderBy.split("#");
                         if (parts.length != 2) {
                             String msg = "orderBy must be one of eventTime, recordTime, quantity, or an extension field";
-                            LOG.info("USER ERROR: " + msg);
-                            QueryParameterException e = new QueryParameterException();
-                            e.setReason(msg);
-                            throw new QueryParameterExceptionResponse(msg, e);
+                            throw queryParameterException(msg, null);
                         }
                     }
 
                 } else if (paramName.equals("orderDirection")) {
-                    orderDirection = parseAsString(paramValue);
-                    if (!"ASC".equals(orderDirection) && !"DESC".equals(orderDirection)) {
-                        String msg = "orderDirection must be one of ASC or DESC";
-                        LOG.info("USER ERROR: " + msg);
-                        QueryParameterException e = new QueryParameterException();
-                        e.setReason(msg);
-                    }
+                    orderDirection = OrderDirection.valueOf(parseAsString(paramValue));
 
                 } else if (paramName.equals("eventCountLimit")) {
-                    eventCountLimit = parseAsInteger(paramValue);
+                    eventCountLimit = parseAsInteger(paramValue).intValue();
 
                 } else if (paramName.equals("maxEventCount")) {
                     maxEventCount = parseAsInteger(paramValue).intValue();
 
                 } else {
                     String msg = "Unknown query parameter: " + paramName;
-                    LOG.info("USER ERROR: " + msg);
-                    QueryParameterException e = new QueryParameterException();
-                    e.setReason(msg);
-                    throw new QueryParameterExceptionResponse(msg, e);
+                    throw queryParameterException(msg, null);
                 }
             } catch (ClassCastException e) {
-                String msg = "The type of the value for query parameter '" + paramName + "': " + paramValue
-                        + " is invalid";
-                LOG.info("USER ERROR: " + msg);
-                LOG.debug(msg, e);
-                QueryParameterException qpe = new QueryParameterException();
-                qpe.setReason(msg);
-                throw new QueryParameterExceptionResponse(msg, qpe, e);
+                String msg = "Type of value invalid for query parameter '" + paramName + "': " + paramValue;
+                throw queryParameterException(msg, e);
+            } catch (IllegalArgumentException e) {
+                String msg = "Unparseable value for query parameter '" + paramName + "': " + paramValue;
+                throw queryParameterException(msg, e);
             }
         }
 
         // some more user input checks
         if (maxEventCount > -1 && eventCountLimit > -1) {
             String msg = "Paramters 'maxEventCount' and 'eventCountLimit' are mutually exclusive";
-            LOG.info("USER ERROR: " + msg);
-            QueryParameterException e = new QueryParameterException();
-            e.setReason(msg);
-            throw new QueryParameterExceptionResponse(msg, e);
+            throw queryParameterException(msg, null);
         }
         if (orderBy == null && eventCountLimit > -1) {
-            String msg = "eventCountLimit may only be used when 'orderBy' is specified";
-            LOG.info("USER ERROR: " + msg);
-            QueryParameterException e = new QueryParameterException();
-            e.setReason(msg);
-            throw new QueryParameterExceptionResponse(msg, e);
+            String msg = "'eventCountLimit' may only be used when 'orderBy' is specified";
+            throw queryParameterException(msg, null);
+        }
+        if (orderBy == null && orderDirection != null) {
+            String msg = "'orderDirection' may only be used when 'orderBy' is specified";
+            throw queryParameterException(msg, null);
         }
         if (orderBy != null) {
-            aggrEventQuery.addOrdering(orderBy, orderDirection);
-            objEventQuery.addOrdering(orderBy, orderDirection);
-            quantEventQuery.addOrdering(orderBy, orderDirection);
-            transEventQuery.addOrdering(orderBy, orderDirection);
+            aggrEventQuery.setOrderBy(orderBy);
+            objEventQuery.setOrderBy(orderBy);
+            quantEventQuery.setOrderBy(orderBy);
+            transEventQuery.setOrderBy(orderBy);
+            if (orderDirection != null) {
+                aggrEventQuery.setOrderDirection(orderDirection);
+                objEventQuery.setOrderDirection(orderDirection);
+                quantEventQuery.setOrderDirection(orderDirection);
+                transEventQuery.setOrderDirection(orderDirection);
+            }
         }
         if (eventCountLimit > -1) {
-            aggrEventQuery.addLimit(eventCountLimit);
-            objEventQuery.addLimit(eventCountLimit);
-            quantEventQuery.addLimit(eventCountLimit);
-            transEventQuery.addLimit(eventCountLimit);
+            aggrEventQuery.setLimit(eventCountLimit);
+            objEventQuery.setLimit(eventCountLimit);
+            quantEventQuery.setLimit(eventCountLimit);
+            transEventQuery.setLimit(eventCountLimit);
         }
         if (maxEventCount > -1) {
             aggrEventQuery.setMaxEventCount(maxEventCount);
-            objEventQuery.addLimit(maxEventCount + 1);
-            quantEventQuery.addLimit(maxEventCount + 1);
-            transEventQuery.addLimit(maxEventCount + 1);
+            objEventQuery.setMaxEventCount(maxEventCount);
+            quantEventQuery.setMaxEventCount(maxEventCount);
+            transEventQuery.setMaxEventCount(maxEventCount);
         }
 
-        List<SimpleEventQuery> eventQueries = new ArrayList<SimpleEventQuery>(4);
+        List<SimpleEventQuerySql> eventQueries = new ArrayList<SimpleEventQuerySql>(4);
         if (includeAggrEvents) {
             eventQueries.add(aggrEventQuery);
         }
@@ -645,21 +579,22 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     }
 
     /**
-     * @param paramName
-     * @return
+     * Checks if the given List contains valid event type strings, i.e.,
+     * AggregationEvent, ObjectEvent, QuantityEvent, or TransactionEvent
+     * 
+     * @param eventTypes
+     *            The List of Strings to check.
+     * @throws QueryParameterExceptionResponse
+     *             If one of the values in the given List is not one of the
+     *             valid event types.
      */
-    private String parseComparator(String paramName) {
-        String op = "=";
-        if (paramName.startsWith("GT_")) {
-            op = ">";
-        } else if (paramName.startsWith("GE_")) {
-            op = ">=";
-        } else if (paramName.startsWith("LE_")) {
-            op = "<=";
-        } else if (paramName.startsWith("LT_")) {
-            op = "<";
+    private void checkEventTypes(List<String> eventTypes) throws QueryParameterExceptionResponse {
+        for (String eventType : eventTypes) {
+            if (!EpcisConstants.EVENT_TYPES.contains(eventType)) {
+                String msg = "Unsupported eventType: " + eventType;
+                throw queryParameterException(msg, null);
+            }
         }
-        return op;
     }
 
     /**
@@ -737,10 +672,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 ts = TimeParser.parseAsTimestamp(date);
             } catch (ParseException e) {
                 String msg = "Unable to parse the value for query parameter '" + queryParamName + "' as date/time";
-                LOG.warn(msg, e);
-                QueryParameterException qpe = new QueryParameterException();
-                qpe.setReason(msg);
-                throw new QueryParameterExceptionResponse(msg, qpe, e);
+                throw queryParameterException(msg, e);
             }
         }
         return ts;
@@ -800,9 +732,6 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     /**
      * Runs a MasterDataQuery for the given QueryParam array and returns the
      * QueryResults.
-     * <p>
-     * TODO: apply refactoring similar to
-     * {@link constructSimpleEventQueries(QueryParams)}
      * 
      * @param queryParams
      *            The parameters for running the MasterDataQuery.
@@ -816,155 +745,140 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws QueryTooLargeException
      *             If the query is too large to be executed.
      */
-    private QueryResults createMasterDataQuery(final QueryOperationsSession session, final QueryParams queryParams)
-            throws SQLException, QueryParameterExceptionResponse, ImplementationExceptionResponse,
-            QueryTooLargeExceptionResponse {
+    private MasterDataQuerySql constructMasterDataQuery(final QueryParams queryParams)
+            throws QueryParameterExceptionResponse {
+        MasterDataQuerySql mdQuery = new MasterDataQuerySql();
 
-        // populate a sorted map with the given parameters
-        SortedMap<String, Object> params = new TreeMap<String, Object>();
+        // a sorted List of query parameter names - keeps track of the processed
+        // names in order to cope with duplicates
+        List<String> sortedParamNames = new ArrayList<String>();
+
+        Boolean includeAttributes = null;
+        Boolean includeChildren = null;
+        List<String> vocabularyTypes = null;
+        List<String> includedAttributeNames = null;
+
         for (QueryParam param : queryParams.getParam()) {
-            params.put(param.getName(), param.getValue());
-        }
+            String paramName = param.getName();
+            Object paramValue = param.getValue();
 
-        // check for parameter 'includeAttributes'
-        boolean includeAttributes = false;
-        try {
-            Object val = params.remove("includeAttributes");
-            includeAttributes = Boolean.parseBoolean(parseAsString(val));
-            // defaults to 'false' if an invalid value is provided!
-        } catch (NullPointerException e) {
-            String msg = "Invalid MasterDataQuery: missing required parameter 'includeAttributes' or invalid value provided";
-            LOG.info("USER ERROR: " + msg, e);
-            QueryParameterException qpe = new QueryParameterException();
-            qpe.setReason(msg);
-            throw new QueryParameterExceptionResponse(msg, qpe, e);
-        }
-
-        // check for parameter 'includeChildren'
-        boolean includeChildren = false;
-        try {
-            Object val = params.remove("includeChildren");
-            includeChildren = Boolean.parseBoolean(parseAsString(val));
-            // defaults to 'false' if an invalid value is provided!
-        } catch (NullPointerException e) {
-            String msg = "Invalid MasterDataQuery: missing required parameter 'includeChildren' or invalid value provided";
-            LOG.info("USER ERROR: " + msg);
-            QueryParameterException qpe = new QueryParameterException();
-            qpe.setReason(msg);
-            throw new QueryParameterExceptionResponse(msg, qpe, e);
-        }
-
-        // fetch vocabulary table names
-        List<String> uris = new ArrayList<String>();
-        if (params.containsKey("vocabularyName")) {
-            Object val = params.remove("vocabularyName");
-            uris = parseAsArrayOfString(val).getString();
-        }
-        Map<String, String> tableNames = backend.fetchVocabularyTableNames(session, uris);
-
-        // filter vocabularies by name
-        List<String> filterVocNames = new ArrayList<String>();
-        if (params.containsKey("EQ_name")) {
-            Object val = params.remove("EQ_name");
-            filterVocNames = parseAsArrayOfString(val).getString();
-        }
-
-        // filter vocabularies by name with descendants
-        List<String> filterVocNamesWd = new ArrayList<String>();
-        if (params.containsKey("WD_name")) {
-            Object val = params.remove("WD_name");
-            filterVocNamesWd = parseAsArrayOfString(val).getString();
-        }
-
-        // filter vocabularies by attribute name
-        List<String> filterVocAttrNames = new ArrayList<String>();
-        if (params.containsKey("HASATTR")) {
-            Object val = params.remove("HASATTR");
-            filterVocAttrNames = parseAsArrayOfString(val).getString();
-        }
-
-        // filter vocabularies by attribute value
-        Map<String, List<String>> filterAttrs = new HashMap<String, List<String>>();
-        for (String param : params.keySet()) {
-            if (param.startsWith("EQATTR_")) {
-                String attrname = param.substring(7);
-                Object val = params.remove(param);
-                List<String> values = parseAsArrayOfString(val).getString();
-                filterAttrs.put(attrname, values);
+            // check for null value
+            if (paramName == null || "".equals(paramName)) {
+                String msg = "Missing name for a query parameter";
+                throw queryParameterException(msg, null);
             }
-        }
+            if (paramValue == null) {
+                String msg = "Missing value for query parameter '" + paramName + "'";
+                throw queryParameterException(msg, null);
+            }
+            // check if the current query parameter has already been provided
+            int index = Collections.binarySearch(sortedParamNames, paramName);
+            if (index < 0) {
+                // we have not yet seen this query parameter name - ok
+                sortedParamNames.add(-index - 1, paramName);
+            } else {
+                // we have already handled this query parameter name - not ok
+                String msg = "Query parameter '" + paramName + "' provided more than once";
+                throw queryParameterException(msg, null);
+            }
 
-        // filter attributes by name
-        List<String> filterAttrNames = new ArrayList<String>();
-        if (params.containsKey("attributeNames") && includeAttributes) {
-            Object val = params.remove("attributeNames");
-            filterAttrNames = parseAsArrayOfString(val).getString();
-        }
+            try {
+                if (paramName.equals("includeAttributes")) {
+                    // defaults to 'false' if an invalid value is provided!
+                    includeAttributes = Boolean.valueOf(parseAsString(paramValue));
+                    mdQuery.setIncludeAttributes(includeAttributes.booleanValue());
 
-        // filter number of returned elements
-        int maxElementCount = -1;
-        if (params.containsKey("maxElementCount")) {
-            Object val = params.remove("maxElementCount");
-            maxElementCount = parseAsInteger(val).intValue();
-        }
+                } else if (paramName.equals("includeChildren")) {
+                    // defaults to 'false' if an invalid value is provided!
+                    includeChildren = Boolean.valueOf(parseAsString(paramValue));
+                    mdQuery.setIncludeChildren(includeChildren.booleanValue());
 
-        List<VocabularyType> vocList = new ArrayList<VocabularyType>();
-        // handle each vocabulary table
-        for (String vocTableName : tableNames.keySet()) {
-            List<VocabularyElementType> vocElemList = new ArrayList<VocabularyElementType>();
+                } else if (paramName.equals("maxElementCount")) {
+                    int maxElementCount = parseAsInteger(paramValue).intValue();
+                    mdQuery.setMaxElementCount(maxElementCount);
 
-            // fetch all vocabularies filtered by the given arguments
-            List<String> vocs = backend.fetchVocabularies(session, vocTableName, filterVocNames, filterVocNamesWd,
-                    filterAttrs, filterVocAttrNames, maxElementCount);
+                } else if (paramName.equals("vocabularyName")) {
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    vocabularyTypes = aos.getString();
 
-            // handle each vocabulary element
-            for (String voc : vocs) {
-                VocabularyElementType vocElem = new VocabularyElementType();
-                vocElem.setId(voc);
+                } else if (paramName.equals("attributeNames")) {
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    includedAttributeNames = aos.getString();
 
-                List<AttributeType> attrList = vocElem.getAttribute();
-                if (includeAttributes) {
+                } else if (paramName.equals("EQ_name")) {
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    mdQuery.setVocabularyEqNames(aos.getString());
 
-                    // fetch all attributes for current vocabulary element
-                    Map<String, String> attrMap = backend.fetchAttributes(session, vocTableName, voc.toString(),
-                            filterAttrNames);
+                } else if (paramName.equals("WD_name")) {
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    mdQuery.setVocabularyWdNames(aos.getString());
 
-                    // handle each attribute element
-                    for (String attrId : attrMap.keySet()) {
-                        AttributeType attr = new AttributeType();
-                        attr.setId(attrId);
-                        String attrValue = attrMap.get(attrId);
-                        attr.getContent().add(attrValue);
-                        attrList.add(attr);
-                    }
+                } else if (paramName.equals("HASATTR")) {
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    mdQuery.setAttributeNames(aos.getString());
+
+                } else if (paramName.startsWith("EQATTR_")) {
+                    String attrName = paramName.substring(7);
+                    ArrayOfString aos = parseAsArrayOfString(paramValue);
+                    mdQuery.addAttributeNameAndValues(attrName, aos.getString());
+
                 }
-
-                // fetch all children for current vocabulary element
-                IDListType idList = backend.fetchChildren(session, vocTableName, voc.toString());
-                vocElem.setChildren(idList);
-                vocElemList.add(vocElem);
-            }
-            if (!vocElemList.isEmpty()) {
-                VocabularyElementListType vocElems = new VocabularyElementListType();
-                vocElems.getVocabularyElement().addAll(vocElemList);
-                VocabularyType voc = new VocabularyType();
-                voc.setVocabularyElementList(vocElems);
-                voc.setType(tableNames.get(vocTableName));
-                vocList.add(voc);
+            } catch (ClassCastException e) {
+                String msg = "The type of the value for query parameter '" + paramName + "': " + paramValue
+                        + " is invalid";
+                throw queryParameterException(msg, e);
             }
         }
-        QueryResultsBody resultsBody = null;
-        if (!vocList.isEmpty()) {
-            VocabularyListType vocListType = new VocabularyListType();
-            vocListType.getVocabulary().addAll(vocList);
-            resultsBody = new QueryResultsBody();
-            resultsBody.setVocabularyList(vocListType);
+
+        // check for missing parameters
+        if (includeAttributes == null || includeChildren == null) {
+            String missing = (includeAttributes == null) ? " includeAttributes" : "";
+            missing += (includeChildren == null) ? " includeChildren" : "";
+            String msg = "Missing required masterdata query parameter(s):" + missing;
+            throw queryParameterException(msg, null);
+        }
+        if (includeAttributes.booleanValue() && includedAttributeNames != null) {
+            mdQuery.setIncludedAttributeNames(includedAttributeNames);
         }
 
-        QueryResults results = new QueryResults();
-        results.setQueryName("SimpleMasterDataQuery");
-        results.setResultsBody(resultsBody);
-        return results;
+        if (vocabularyTypes == null) {
+            // include all vocabularies
+            vocabularyTypes = EpcisConstants.VOCABULARY_TYPES;
+        }
+        mdQuery.setVocabularyTypes(vocabularyTypes);
+
+        return mdQuery;
+    }
+
+    /**
+     * Writes the given message and exception to the application's log file,
+     * creates a QueryParameterException from the given message, and returns a
+     * new QueryParameterExceptionResponse. Use this method to conveniently
+     * return a user error message back to the requesting service caller, e.g.:
+     * 
+     * <pre>
+     * String msg = &quot;unable to parse query parameter&quot;
+     * throw new queryParameterException(msg, null);
+     * </pre>
+     * 
+     * @param msg
+     *            A user error message.
+     * @param e
+     *            An internal exception - this exception will not be delivered
+     *            back to the service caller as it contains application specific
+     *            information. It will be used to print some details about the
+     *            user error to the log file (useful for debugging).
+     * @return A new QueryParameterExceptionResponse containing the given user
+     *         error message.
+     */
+    private QueryParameterExceptionResponse queryParameterException(String msg, Exception e) {
+        LOG.info("USER ERROR: " + msg);
+        if (LOG.isDebugEnabled() && e != null) {
+            LOG.debug("User error details: " + e.getMessage(), e);
+        }
+        QueryParameterException qpe = new QueryParameterException();
+        qpe.setReason(msg);
+        return new QueryParameterExceptionResponse(msg, qpe);
     }
 
     /**
@@ -981,11 +895,8 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
         for (String action : actions) {
             if (!(action.equalsIgnoreCase("ADD") || action.equalsIgnoreCase("OBSERVE") || action.equalsIgnoreCase("DELETE"))) {
                 String msg = "Invalid value for parameter EQ_action: " + action
-                        + ". Must be one of ADD, OBSERVE, or DELETE.";
-                LOG.info("USER ERROR: " + msg);
-                QueryParameterException qpe = new QueryParameterException();
-                qpe.setReason(msg);
-                throw new QueryParameterExceptionResponse(msg, qpe);
+                        + " - must be one of ADD, OBSERVE, or DELETE";
+                throw queryParameterException(msg, null);
             }
         }
     }
@@ -1011,35 +922,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      */
     private Map<String, QuerySubscriptionScheduled> loadSubscriptions(QueryOperationsSession session)
             throws ImplementationExceptionResponse, SQLException {
-        Map<String, QuerySubscriptionScheduled> subscriptions = (HashMap<String, QuerySubscriptionScheduled>) servletContext.getAttribute("subscribedMap");
+        LOG.debug("Retrieving subscriptions from application context");
+        Object subscribedMap = servletContext.getAttribute("subscribedMap");
+        Map<String, QuerySubscriptionScheduled> subscriptions = (HashMap<String, QuerySubscriptionScheduled>) subscribedMap;
         if (subscriptions == null) {
+            LOG.debug("Subscriptions not found - retrieving subscriptions from database");
             subscriptions = backend.fetchSubscriptions(session);
         }
         return subscriptions;
-    }
-
-    /**
-     * Creates a new XMLGregorianCalendar from the given java.sql.Timestamp.
-     * 
-     * @param time
-     *            The timestamp to convert.
-     * @return The XML calendar object representing the given timestamp.
-     * @throws ImplementationExceptionResponse
-     *             If an error occurred when parsing the given timestamp into a
-     *             calendar instance.
-     */
-    private XMLGregorianCalendar timestampToXmlCalendar(Timestamp time) throws ImplementationExceptionResponse {
-        try {
-            DatatypeFactory factory = DatatypeFactory.newInstance();
-            Calendar cal = TimeParser.convert(time);
-            return factory.newXMLGregorianCalendar((GregorianCalendar) cal);
-        } catch (DatatypeConfigurationException e) {
-            String msg = "Unable to instantiate an XML representation for a date/time datatype";
-            ImplementationException iex = new ImplementationException();
-            iex.setReason(msg);
-            iex.setSeverity(ImplementationExceptionSeverity.SEVERE);
-            throw new ImplementationExceptionResponse(msg, iex, e);
-        }
     }
 
     /**
@@ -1072,9 +962,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             // FIXME: filter by queryName!
             Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions(session);
             Set<String> temp = subscribedMap.keySet();
-            List list = new ArrayList();
-            list.addAll(temp);
-            return list;
+            return new ArrayList<String>(temp);
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "SQL error during query execution: " + e.getMessage();
@@ -1104,30 +992,26 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             LOG.debug("Invoking 'poll'");
             QueryOperationsSession session = backend.openSession(dataSource);
 
+            QueryResultsBody resultsBody = null;
             if (queryName.equals("SimpleEventQuery")) {
                 EventListType eventList = new EventListType();
-                List<SimpleEventQuery> eventQueries = constructSimpleEventQueries(queryParams);
+                List<SimpleEventQuerySql> eventQueries = constructSimpleEventQueries(queryParams);
                 // run queries sequentially
                 // TODO: might want to run them in parallel!
-                for (SimpleEventQuery eventQuery : eventQueries) {
-                    backend.runEventQuery(session, eventQuery,
+                for (SimpleEventQuerySql eventQuery : eventQueries) {
+                    backend.runSimpleEventQuery(session, eventQuery,
                             eventList.getObjectEventOrAggregationEventOrQuantityEvent());
                 }
 
-                QueryResultsBody resultsBody = new QueryResultsBody();
+                resultsBody = new QueryResultsBody();
                 resultsBody.setEventList(eventList);
-                QueryResults results = new QueryResults();
-                results.setResultsBody(resultsBody);
-                results.setQueryName(queryName);
-
-                LOG.info("poll request for '" + queryName + "' succeeded");
-                session.close();
-                return results;
             } else if (queryName.equals("SimpleMasterDataQuery")) {
-                QueryResults results = createMasterDataQuery(session, queryParams);
-                LOG.info("poll request for '" + queryName + "' succeeded");
-                session.close();
-                return results;
+                VocabularyListType vocList = new VocabularyListType();
+                MasterDataQuerySql mdQuery = constructMasterDataQuery(queryParams);
+                backend.runMasterDataQuery(session, mdQuery, vocList.getVocabulary());
+
+                resultsBody = new QueryResultsBody();
+                resultsBody.setVocabularyList(vocList);
             } else {
                 session.close();
                 String msg = "Unsupported query name '" + queryName + "' provided";
@@ -1136,6 +1020,13 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 e.setReason(msg);
                 throw new NoSuchNameExceptionResponse(msg, e);
             }
+            QueryResults results = new QueryResults();
+            results.setResultsBody(resultsBody);
+            results.setQueryName(queryName);
+
+            LOG.info("poll request for '" + queryName + "' succeeded");
+            session.close();
+            return results;
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "SQL error during query execution: " + e.getMessage();
@@ -1246,7 +1137,8 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 // Scheduled Query -> parse schedule
                 schedule = new Schedule(controls.getSchedule());
                 newSubscription = new QuerySubscriptionScheduled(subscriptionID, params, dest,
-                        controls.isReportIfEmpty(), initialRecordTime, initialRecordTime, schedule, queryName);
+                        Boolean.valueOf(controls.isReportIfEmpty()), initialRecordTime, initialRecordTime, schedule,
+                        queryName);
             } else {
                 // -> Trigger
                 // need to set schedule which says how often the trigger
@@ -1258,8 +1150,8 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 }
                 schedule = new Schedule(qSchedule);
                 QuerySubscriptionTriggered trigger = new QuerySubscriptionTriggered(subscriptionID, params, dest,
-                        controls.isReportIfEmpty(), initialRecordTime, initialRecordTime, queryName, triggerURI,
-                        schedule);
+                        Boolean.valueOf(controls.isReportIfEmpty()), initialRecordTime, initialRecordTime, queryName,
+                        triggerURI, schedule);
                 newSubscription = trigger;
             }
 
