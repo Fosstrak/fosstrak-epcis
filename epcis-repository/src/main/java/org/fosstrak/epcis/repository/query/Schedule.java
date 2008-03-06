@@ -127,14 +127,17 @@ public class Schedule implements Serializable {
 
         // check for invalid month/dayOfMonth combinations, e.g. 30.2., 31.4.
         if (!months.isEmpty()
-                && (months.first() == months.last() && months.first() == 1 && (daysOfMonth.first() == 30 || daysOfMonth.first() == 31))) {
+                && (months.first() == months.last() && months.first().intValue() == 1 && (daysOfMonth.first().intValue() == 30 || daysOfMonth.first().intValue() == 31))) {
             throw new SubscriptionControlsExceptionResponse(
                     "Invalid query schedule: impossible month/dayOfMonth combination, e.g. February 30.");
         }
-        if (!months.isEmpty() && daysOfMonth.first() == 31
-                && !months.contains(0) // months w. 31 days are always ok
-                && !months.contains(2) && !months.contains(4) && !months.contains(6) && !months.contains(7)
-                && !months.contains(9) && !months.contains(11)) {
+        if (!months.isEmpty()
+                && daysOfMonth.first().intValue() == 31
+                && !months.contains(Integer.valueOf(0)) // months w. 31 days are
+                // always ok
+                && !months.contains(Integer.valueOf(2)) && !months.contains(Integer.valueOf(4))
+                && !months.contains(Integer.valueOf(6)) && !months.contains(Integer.valueOf(7))
+                && !months.contains(Integer.valueOf(9)) && !months.contains(Integer.valueOf(11))) {
             throw new SubscriptionControlsExceptionResponse(
                     "Invalid query schedule: impossible month/dayOfMonth combination, e.g. April 31.");
         }
@@ -194,7 +197,7 @@ public class Schedule implements Serializable {
         // check if the month of the current time is valid, i.e. there is a
         // month value in the schedule equal to the month value of the current
         // time
-        while (!months.isEmpty() && !months.contains(nextSchedule.get(MONTH))) {
+        while (!months.isEmpty() && !months.contains(Integer.valueOf(nextSchedule.get(MONTH)))) {
             // no, month value of the current time is invalid
             // roll the month (set it to the next value)
             if (!setFieldToNextValidRoll(nextSchedule, MONTH, DAY_OF_MONTH)) {
@@ -227,17 +230,17 @@ public class Schedule implements Serializable {
      *             Almost any kind of error.
      */
     private boolean dayMadeValid(final GregorianCalendar nextSchedule) throws ImplementationExceptionResponse {
-        if (!daysOfMonth.contains(nextSchedule.get(DAY_OF_MONTH)) && !daysOfMonth.isEmpty()) {
+        if (!daysOfMonth.contains(Integer.valueOf(nextSchedule.get(DAY_OF_MONTH))) && !daysOfMonth.isEmpty()) {
             if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH, HOUR_OF_DAY)) {
                 return false;
             }
         }
 
         // Check and make this also a valid day of week.
-        while (!daysOfWeek.contains(nextSchedule.get(DAY_OF_WEEK)) && !daysOfWeek.isEmpty()) {
+        while (!daysOfWeek.contains(Integer.valueOf(nextSchedule.get(DAY_OF_WEEK))) && !daysOfWeek.isEmpty()) {
             if (!setFieldToNextValidRoll(nextSchedule, DAY_OF_MONTH, HOUR_OF_DAY)) {
                 return false;
-            } else if (!daysOfWeek.contains(nextSchedule.get(DAY_OF_WEEK))) {
+            } else if (!daysOfWeek.contains(Integer.valueOf(nextSchedule.get(DAY_OF_WEEK)))) {
                 dayMadeValid(nextSchedule);
             }
         }
@@ -268,7 +271,7 @@ public class Schedule implements Serializable {
      *             Almost any error.
      */
     private boolean hourMadeValid(final GregorianCalendar nextSchedule) throws ImplementationExceptionResponse {
-        if (!hours.contains(nextSchedule.get(HOUR_OF_DAY)) && !hours.isEmpty()) {
+        if (!hours.contains(Integer.valueOf(nextSchedule.get(HOUR_OF_DAY))) && !hours.isEmpty()) {
             if (!setFieldToNextValidRoll(nextSchedule, HOUR_OF_DAY, MINUTE)) {
                 return false;
             }
@@ -301,7 +304,7 @@ public class Schedule implements Serializable {
      *             Almost any error.
      */
     private boolean minuteMadeValid(final GregorianCalendar nextSchedule) throws ImplementationExceptionResponse {
-        if (!minutes.contains(nextSchedule.get(MINUTE)) && !minutes.isEmpty()) {
+        if (!minutes.contains(Integer.valueOf(nextSchedule.get(MINUTE))) && !minutes.isEmpty()) {
 
             if (!setFieldToNextValidRoll(nextSchedule, MINUTE, SECOND)) {
                 return false;
@@ -337,7 +340,7 @@ public class Schedule implements Serializable {
     private boolean secondMadeValid(final GregorianCalendar nextSchedule) throws ImplementationExceptionResponse {
         // check whether the second value of the current time is a valid
         // scheduled second
-        if (!seconds.isEmpty() && !seconds.contains(nextSchedule.get(SECOND))) {
+        if (!seconds.isEmpty() && !seconds.contains(Integer.valueOf(nextSchedule.get(SECOND)))) {
             // no current second is not scheduled
             // set is to the next scheduled second
             return setToNextScheduledValue(nextSchedule, SECOND);
@@ -391,7 +394,8 @@ public class Schedule implements Serializable {
      * @param cal
      *            Calendar to adjust.
      * @param field
-     *            Field to adjust. TODO: smallerField wouldn't be necessary.
+     *            Field to adjust.<br>
+     *            TODO: smallerField wouldn't be necessary.
      * @param smallerField
      *            Field from where on to minimize.
      * @return Returns whether the new value has been set and is valid.
@@ -428,7 +432,8 @@ public class Schedule implements Serializable {
             min = Math.max(values.first().intValue(), cal.getActualMinimum(field));
             if (min > cal.getActualMaximum(field)) {
                 min = cal.getActualMaximum(field);
-                if (!values.contains(min) || min < cal.getActualMinimum(field) || min > cal.getActualMaximum(field)) {
+                if (!values.contains(Integer.valueOf(min)) || min < cal.getActualMinimum(field)
+                        || min > cal.getActualMaximum(field)) {
                     return false;
                 }
             }
