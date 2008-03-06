@@ -40,8 +40,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RepositoryContextListener implements ServletContextListener {
 
-    private static final String LOG4J_CONFIG_LOCATION = "log4jConfigLocation";
-
     private static final Log LOG = LogFactory.getLog(RepositoryContextListener.class);
 
     /**
@@ -58,8 +56,10 @@ public class RepositoryContextListener implements ServletContextListener {
          * logging.properties is used to tell commons-logging to use LOG4J as
          * its underlying logging toolkit; log4j.properties is used to configure
          * LOG4J. To initialize LOG4J manually from LOG4J_CONFIG_LOCATION,
-         * un-comment the following code ...
+         * un-comment the following code (LOG4J_CONFIG_LOCATION =
+         * "log4jConfigLocation") ...
          */
+        // "log4jConfigLocation";
         // String path = ctx.getRealPath("/");
         // String log4jCfg = ctx.getInitParameter(LOG4J_CONFIG_LOCATION);
         // // initialize Log4j
@@ -73,9 +73,9 @@ public class RepositoryContextListener implements ServletContextListener {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Logging application context init-parameters:");
-            Enumeration<String> e = ctx.getInitParameterNames();
+            Enumeration<?> e = ctx.getInitParameterNames();
             while (e.hasMoreElements()) {
-                String param = e.nextElement();
+                String param = (String) e.nextElement();
                 LOG.debug(param + "=" + ctx.getInitParameter(param));
             }
         }
