@@ -40,8 +40,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.accada.epcis.repository.EpcisConstants;
 import org.accada.epcis.repository.EpcisQueryControlInterface;
-import org.accada.epcis.repository.query.SimpleEventQuery.Operation;
-import org.accada.epcis.repository.query.SimpleEventQuery.OrderDirection;
+import org.accada.epcis.repository.query.SimpleEventQueryDTO.Operation;
+import org.accada.epcis.repository.query.SimpleEventQueryDTO.OrderDirection;
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.InvalidURIExceptionResponse;
@@ -143,7 +143,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
 
     private DataSource dataSource;
 
-    private QueryOperationsBackend backend = new QueryOperationsBackend();
+    private QueryOperationsBackend backend = new QueryOperationsBackendSQL();
 
     /**
      * Create an SQL query string from the given query parameters.
@@ -200,12 +200,12 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws ImplementationException
      *             If an error in the implementation occurred.
      */
-    private List<SimpleEventQuerySql> constructSimpleEventQueries(final QueryParams queryParams) throws SQLException,
+    private List<SimpleEventQueryDTO> constructSimpleEventQueries(final QueryParams queryParams) throws SQLException,
             QueryParameterExceptionResponse {
-        SimpleEventQuerySql aggrEventQuery = new SimpleEventQuerySql(EpcisConstants.AGGREGATION_EVENT);
-        SimpleEventQuerySql objEventQuery = new SimpleEventQuerySql(EpcisConstants.OBJECT_EVENT);
-        SimpleEventQuerySql quantEventQuery = new SimpleEventQuerySql(EpcisConstants.QUANTITY_EVENT);
-        SimpleEventQuerySql transEventQuery = new SimpleEventQuerySql(EpcisConstants.TRANSACTION_EVENT);
+        SimpleEventQueryDTO aggrEventQuery = new SimpleEventQueryDTO(EpcisConstants.AGGREGATION_EVENT);
+        SimpleEventQueryDTO objEventQuery = new SimpleEventQueryDTO(EpcisConstants.OBJECT_EVENT);
+        SimpleEventQueryDTO quantEventQuery = new SimpleEventQueryDTO(EpcisConstants.QUANTITY_EVENT);
+        SimpleEventQueryDTO transEventQuery = new SimpleEventQueryDTO(EpcisConstants.TRANSACTION_EVENT);
 
         boolean includeAggrEvents = true;
         boolean includeObjEvents = true;
@@ -564,7 +564,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             transEventQuery.setMaxEventCount(maxEventCount);
         }
 
-        List<SimpleEventQuerySql> eventQueries = new ArrayList<SimpleEventQuerySql>(4);
+        List<SimpleEventQueryDTO> eventQueries = new ArrayList<SimpleEventQueryDTO>(4);
         if (includeAggrEvents) {
             eventQueries.add(aggrEventQuery);
         }
@@ -747,9 +747,9 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws QueryTooLargeException
      *             If the query is too large to be executed.
      */
-    private MasterDataQuerySql constructMasterDataQuery(final QueryParams queryParams)
+    private MasterDataQueryDTO constructMasterDataQuery(final QueryParams queryParams)
             throws QueryParameterExceptionResponse {
-        MasterDataQuerySql mdQuery = new MasterDataQuerySql();
+        MasterDataQueryDTO mdQuery = new MasterDataQueryDTO();
 
         // a sorted List of query parameter names - keeps track of the processed
         // names in order to cope with duplicates
@@ -922,6 +922,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws SQLException
      *             If a database error occurred.
      */
+    @SuppressWarnings("unchecked")
     private Map<String, QuerySubscriptionScheduled> loadSubscriptions(QueryOperationsSession session)
             throws ImplementationExceptionResponse, SQLException {
         LOG.debug("Retrieving subscriptions from application context");
@@ -997,10 +998,10 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             QueryResultsBody resultsBody = null;
             if (queryName.equals("SimpleEventQuery")) {
                 EventListType eventList = new EventListType();
-                List<SimpleEventQuerySql> eventQueries = constructSimpleEventQueries(queryParams);
+                List<SimpleEventQueryDTO> eventQueries = constructSimpleEventQueries(queryParams);
                 // run queries sequentially
                 // TODO: might want to run them in parallel!
-                for (SimpleEventQuerySql eventQuery : eventQueries) {
+                for (SimpleEventQueryDTO eventQuery : eventQueries) {
                     backend.runSimpleEventQuery(session, eventQuery,
                             eventList.getObjectEventOrAggregationEventOrQuantityEvent());
                 }
@@ -1009,7 +1010,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 resultsBody.setEventList(eventList);
             } else if (queryName.equals("SimpleMasterDataQuery")) {
                 VocabularyListType vocList = new VocabularyListType();
-                MasterDataQuerySql mdQuery = constructMasterDataQuery(queryParams);
+                MasterDataQueryDTO mdQuery = constructMasterDataQuery(queryParams);
                 backend.runMasterDataQuery(session, mdQuery, vocList.getVocabulary());
 
                 resultsBody = new QueryResultsBody();

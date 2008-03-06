@@ -48,7 +48,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO: javadoc
+ * This class redirects the calls received from the Web service stack to the
+ * underlying QueryOperationsModule and ensures that any uncaught exception is
+ * properly catched and wrapped into an ImplementationExceptionResponse.
  * 
  * @author Marco Steybe
  */
@@ -57,6 +59,9 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     private static final Log LOG = LogFactory.getLog(QueryOperationsWebService.class);
 
     private EpcisQueryControlInterface queryModule;
+
+    public QueryOperationsWebService() {
+    }
 
     public QueryOperationsWebService(EpcisQueryControlInterface queryModule) {
         this.queryModule = queryModule;
@@ -143,8 +148,8 @@ public class QueryOperationsWebService implements EPCISServicePortType {
             NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
         // log and wrap any error that is not one of the expected exceptions
         try {
-            queryModule.subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(), subscribe.getControls(),
-                    subscribe.getSubscriptionID());
+            queryModule.subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(),
+                    subscribe.getControls(), subscribe.getSubscriptionID());
             return new VoidHolder();
         } catch (DuplicateSubscriptionExceptionResponse e) {
             throw e;
@@ -183,8 +188,8 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     /**
      * @see org.accada.epcis.soap.EPCISServicePortType#unsubscribe(org.accada.epcis.soap.model.Unsubscribe)
      */
-    public VoidHolder unsubscribe(Unsubscribe unsubscribe) throws ImplementationExceptionResponse, SecurityExceptionResponse,
-            ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse {
+    public VoidHolder unsubscribe(Unsubscribe unsubscribe) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse {
         // log and wrap any error that is not one of the expected exceptions
         try {
             queryModule.unsubscribe(unsubscribe.getSubscriptionID());

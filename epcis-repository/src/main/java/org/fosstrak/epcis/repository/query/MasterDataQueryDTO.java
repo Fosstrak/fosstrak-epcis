@@ -30,7 +30,7 @@ import java.util.Map;
  * 
  * @author Marco Steybe
  */
-public class MasterDataQuery {
+public class MasterDataQueryDTO {
 
     private int maxElementCount = -1;
     private boolean includeAttributes = false;

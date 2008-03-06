@@ -20,12 +20,17 @@
 
 package org.accada.epcis.repository.query;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * TODO: javadoc
  * 
  * @author Marco Steybe
  */
-public abstract class SimpleEventQuery {
+public class SimpleEventQueryDTO {
+
+    private List<EventQueryParam> eventQueryParams;
 
     protected String eventType;
     private int maxEventCount = -1;
@@ -42,12 +47,14 @@ public abstract class SimpleEventQuery {
         EQ, LT, GT, LE, GE, HASATTR, EQATTR, MATCH, WD, EXISTS
     }
 
-    public SimpleEventQuery(String eventType) {
+    public SimpleEventQueryDTO(String eventType) {
         this.eventType = eventType;
         resetQuery();
     }
 
-    public abstract void addEventQueryParam(String eventField, Operation op, Object value);
+    public void addEventQueryParam(String eventField, Operation op, Object value) {
+        eventQueryParams.add(new EventQueryParam(eventField, op, value));
+    }
 
     public String getEventType() {
         return eventType;
@@ -59,6 +66,10 @@ public abstract class SimpleEventQuery {
 
     public int getMaxEventCount() {
         return maxEventCount;
+    }
+    
+    public List<EventQueryParam> getEventQueryParams() {
+        return eventQueryParams;
     }
 
     public String getOrderBy() {
@@ -94,10 +105,50 @@ public abstract class SimpleEventQuery {
     }
 
     public void resetQuery() {
+        eventQueryParams = new ArrayList<EventQueryParam>();
         maxEventCount = -1;
         limit = -1;
         orderBy = null;
         orderDirection = null;
         isAnyEpc = false;
+    }
+
+    public class EventQueryParam {
+        private String eventField;
+        private Operation op;
+        private Object value;
+
+        public EventQueryParam() {
+        }
+
+        public EventQueryParam(String eventField, Operation op, Object value) {
+            this.eventField = eventField;
+            this.op = op;
+            this.value = value;
+        }
+
+        public String getEventField() {
+            return eventField;
+        }
+
+        public void setEventField(String eventField) {
+            this.eventField = eventField;
+        }
+
+        public Operation getOp() {
+            return op;
+        }
+
+        public void setOp(Operation op) {
+            this.op = op;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
     }
 }
