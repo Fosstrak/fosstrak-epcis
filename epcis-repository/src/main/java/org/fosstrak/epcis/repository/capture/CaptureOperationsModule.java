@@ -67,6 +67,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -76,6 +77,11 @@ import org.xml.sax.SAXException;
 /**
  * CaptureOperationsModule implements the core capture operations. Converts XML
  * events delivered by HTTP POST into SQL and inserts them into the database.
+ * <p>
+ * TODO: the parsing of the xml inputstream should be done in the
+ * CaptureOperationsServlet; this class should implement EpcisCaptureInterface
+ * such that CaptureOperationsServlet can call its capture method and provide it
+ * with the parsed events.
  * 
  * @author David Gubler
  * @author Alain Remund
@@ -141,7 +147,8 @@ public class CaptureOperationsModule {
                 Transaction tx = null;
                 try {
                     tx = session.beginTransaction();
-                    Connection dbconnection = session.connection();
+                    SessionFactory sessionFactory = session.getSessionFactory();
+                    Connection dbconnection = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider().getConnection();
                     LOG.info("Running db reset script.");
                     Statement stmt = dbconnection.createStatement();
                     if (dbResetScript != null) {
@@ -247,7 +254,6 @@ public class CaptureOperationsModule {
             sessionFactory.getStatistics().logSummary();
             LOG.debug("DB connection closed.");
         }
-
     }
 
     /**
@@ -267,7 +273,8 @@ public class CaptureOperationsModule {
             String nodeName = eventNode.getNodeName();
 
             if (nodeName.equals(EpcisConstants.OBJECT_EVENT) || nodeName.equals(EpcisConstants.AGGREGATION_EVENT)
-                    || nodeName.equals(EpcisConstants.QUANTITY_EVENT) || nodeName.equals(EpcisConstants.TRANSACTION_EVENT)) {
+                    || nodeName.equals(EpcisConstants.QUANTITY_EVENT)
+                    || nodeName.equals(EpcisConstants.TRANSACTION_EVENT)) {
                 LOG.debug("processing event " + i + ": '" + nodeName + "'.");
                 handleEvent(session, eventNode);
                 eventCount++;
@@ -614,5 +621,4 @@ public class CaptureOperationsModule {
     public void setSchema(Schema schema) {
         this.schema = schema;
     }
-
 }
