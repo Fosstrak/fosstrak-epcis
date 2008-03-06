@@ -20,21 +20,17 @@
 
 package org.accada.epcis.repository.model;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 /**
  * A base event class that contains properties common to most events.
- * This is not intended to represent the EPCISEvent type described in section
- * 7 of the spec, but to provide convenient access to shared data elements.
+ * This extends the EPCISEvent type described in section
+ * 7 of the spec, providing convenient access to shared data elements.
  * @author Sean Wellington
  */
-public abstract class BaseEvent {
+public abstract class BaseEvent extends EPCISEvent {
 
 	private Long id;
-	private Timestamp eventTime;
-	private Timestamp recordTime;
-	private String eventTimeZoneOffset;
 	private BusinessStepId bizStep;
 	private DispositionId disposition;
 	private ReadPointId readPoint;
@@ -52,30 +48,6 @@ public abstract class BaseEvent {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Timestamp getEventTime() {
-		return eventTime;
-	}
-
-	public void setEventTime(Timestamp eventTime) {
-		this.eventTime = eventTime;
-	}
-
-	public Timestamp getRecordTime() {
-		return recordTime;
-	}
-
-	public void setRecordTime(Timestamp recordTime) {
-		this.recordTime = recordTime;
-	}
-
-	public String getEventTimeZoneOffset() {
-		return eventTimeZoneOffset;
-	}
-
-	public void setEventTimeZoneOffset(String eventTimeZoneOffset) {
-		this.eventTimeZoneOffset = eventTimeZoneOffset;
 	}
 
 	public BusinessStepId getBizStep() {
