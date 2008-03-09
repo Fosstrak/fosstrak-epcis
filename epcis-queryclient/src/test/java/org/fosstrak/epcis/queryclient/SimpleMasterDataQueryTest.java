@@ -40,13 +40,13 @@ import org.accada.epcis.utils.QueryResultsParser;
  */
 public class SimpleMasterDataQueryTest {
 
-    private static QueryControlClient client = new QueryControlClient();
+    private QueryControlClient client = new QueryControlClient();
 
     /**
      * Creates a simple EPCIS masterdata query, sends it to the EPCIS query
      * service for processing and prints the response to System.out.
      */
-    public static void testQuery() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
+    public void testQuery() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
             QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
         StringBuilder sb = new StringBuilder();
@@ -79,6 +79,7 @@ public class SimpleMasterDataQueryTest {
      *            nothing expected.
      */
     public static void main(String[] args) throws Exception {
-        testQuery();
+        SimpleMasterDataQueryTest test = new SimpleMasterDataQueryTest();
+        test.testQuery();
     }
 }
