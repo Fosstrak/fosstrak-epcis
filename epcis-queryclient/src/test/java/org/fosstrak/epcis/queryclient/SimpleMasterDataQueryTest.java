@@ -46,7 +46,7 @@ public class SimpleMasterDataQueryTest {
      * Creates a simple EPCIS masterdata query, sends it to the EPCIS query
      * service for processing and prints the response to System.out.
      */
-    public void testQuery() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
+    public void sendQuery() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
             QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
         StringBuilder sb = new StringBuilder();
@@ -80,6 +80,6 @@ public class SimpleMasterDataQueryTest {
      */
     public static void main(String[] args) throws Exception {
         SimpleMasterDataQueryTest test = new SimpleMasterDataQueryTest();
-        test.testQuery();
+        test.sendQuery();
     }
 }
