@@ -11,16 +11,9 @@
     <param-name>appConfigLocation</param-name>
     <param-value>WEB-INF/classes/application.properties</param-value>
   </context-param>
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>META-INF/applicationContext.xml</param-value>
-  </context-param>
 
   <listener>
     <listener-class>org.accada.epcis.repository.RepositoryContextListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
 
   <servlet>
@@ -31,7 +24,7 @@
       for processing of the query according to the SOAP/HTTP Binding for the
       Query Control Interface (EPCglobal EPCIS Specification Section 11.2).
     </description>
-    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <servlet-class>org.accada.epcis.repository.query.QueryInitServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
@@ -45,13 +38,6 @@
     <servlet-class>org.accada.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>
-  <!--
-  <servlet>
-    <servlet-name>epcisRepository</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  -->
 
   <servlet-mapping>
     <!-- The capture servlet will be available at http://{url:port}/{context-path}/capture -->

@@ -19,5 +19,4 @@
     url="jdbc:mysql://localhost:3306/${db.database}?autoReconnect=true">
   </Resource>
 
-  <WatchedResource>META-INF/application.properties</WatchedResource>
 </Context>

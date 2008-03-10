@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xsi:schemaLocation="
+      http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://cxf.apache.org/core
+      http://cxf.apache.org/schemas/core.xsd
+      http://cxf.apache.org/jaxws
+      http://cxf.apache.org/schemas/jaxws.xsd">
+
+  <!-- beans and configurations defined in the cxf jars -->
+  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+  <!-- post-processor which replaces placeholders like ${test} with values from property files -->
+  <bean id="dataPropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath:application.properties</value>
+      </list>
+    </property>
+  </bean>
+
+
+
+  <!-- =========================================================== -->
+  <!--  Database connection configuration                          -->
+  <!-- =========================================================== -->
+
+  <!-- data source configuration available via JNDI (in JEE environments) -->
+  <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean" scope="singleton">
+    <property name="jndiName" value="java:comp/env/jdbc/EPCISDB" />
+  </bean>
+  <!-- data source configuration (any environment) -->
+  <!--
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="${db.driver}"/>
+    <property name="url" value="${db.url}"/>
+    <property name="username" value="${db.username}"/>
+    <property name="password" value="${db.password}"/>
+  </bean>
+  -->
+
+  <!-- Hibernate session factory -->
+  <bean id="hibernateSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <!-- all Hibernate properties are configured in hibernate.cfg.xml -->
+    <property name="configLocation" value="classpath:hibernate.cfg.xml" />
+  </bean>
+
+
+
+  <!-- =========================================================== -->
+  <!--  Service layer definitions                                  -->
+  <!-- =========================================================== -->
+
+  <bean id="queryOperationsModule" class="org.accada.epcis.repository.query.QueryOperationsModule">
+    <property name="dataSource" ref="dataSource" />
+    <property name="serviceVersion" value="${service.version}" />
+    <property name="maxQueryRows" value="${maxQueryResultRows}" />
+    <property name="maxQueryTime" value="${maxQueryExecutionTime}" />
+    <property name="triggerConditionSeconds" value="${trigger.condition.check.sec}" />
+    <property name="triggerConditionMinutes" value="${trigger.condition.check.min}" />
+    <property name="servletContext">
+      <bean class="org.springframework.web.context.support.ServletContextFactoryBean" />
+    </property>
+  </bean>
+  <bean id="queryOperationsWebService" class="org.accada.epcis.repository.query.QueryOperationsWebService">
+    <constructor-arg><ref bean="queryOperationsModule" /></constructor-arg>
+  </bean>
+
+  <bean id="captureOperationsModule" class="org.accada.epcis.repository.capture.CaptureOperationsModule">
+    <property name="sessionFactory" ref="hibernateSessionFactory" />
+    <property name="insertMissingVoc" value="${insertMissingVoc}" />
+    <property name="dbResetAllowed" value="${dbResetAllowed}" />
+    <property name="dbResetScript" value="${dbResetScript}" />
+    <property name="epcisSchemaFile" value="${epcisSchemaFile}" />
+  </bean>
+  <!-- inject captureOperationsModule bean into servlet context, so the CaptureOperationsServlet can access it -->
+  <bean class="org.springframework.web.context.support.ServletContextAttributeExporter">
+    <property name="attributes">
+      <map>
+        <entry key="captureOperationsModule">
+          <ref bean="captureOperationsModule" />
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+
+
+  <!-- =========================================================== -->
+  <!--  CXF (Web service) configuration                            -->
+  <!-- =========================================================== -->
+
+  <!-- configure the Web service endpoint and it's implementing bean -->
+  <jaxws:endpoint id="EpcisQueryEnpoint" implementor="#queryOperationsWebService" address="/query" />
+
+  <!-- configure logging of SOAP messages -->
+  <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+  <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+
+  <cxf:bus>
+    <!-- <cxf:features><cxf:logging /></cxf:features> -->
+    <cxf:inInterceptors><ref bean="logInbound" /></cxf:inInterceptors>
+    <cxf:outInterceptors><ref bean="logOutbound" /></cxf:outInterceptors>
+    <cxf:inFaultInterceptors><ref bean="logOutbound" /></cxf:inFaultInterceptors>
+  </cxf:bus>
+
+</beans>
