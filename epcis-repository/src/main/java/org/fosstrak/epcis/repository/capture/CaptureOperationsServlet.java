@@ -33,14 +33,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.xml.sax.SAXException;
@@ -56,13 +52,12 @@ import org.xml.sax.SAXException;
  */
 public class CaptureOperationsServlet extends HttpServlet {
 
-    private static final long serialVersionUID = -2784063030245697695L;
+    private static final long serialVersionUID = -5765052834995535731L;
 
     private static final String APP_CONFIG_LOCATION = "appConfigLocation";
     private static final String PROP_INSERT_MISSING_VOC = "insertMissingVoc";
     private static final String PROP_DB_RESET_ALLOWED = "dbResetAllowed";
     private static final String PROP_DB_RESET_SCRIPT = "dbResetScript";
-    private static final String PROP_SERVLET_PATH = "servletPath";
     private static final String PROP_EPCIS_SCHEMA_FILE = "epcisSchemaFile";
 
     private static final Log LOG = LogFactory.getLog(CaptureOperationsServlet.class);
@@ -72,21 +67,33 @@ public class CaptureOperationsServlet extends HttpServlet {
     /**
      * {@inheritDoc}
      */
-    public void init() throws ServletException {
-        ServletConfig servletConfig = getServletConfig();
-        Properties props = loadApplicationProperties(servletConfig);
-        SessionFactory hibernateSessionFactory = initHibernate();
-        Schema epcisSchema = initEpcisSchema(props);
+    public void init() {
+        LOG.debug("Fetching capture operations module from servlet context ...");
+        CaptureOperationsModule captureOperationsModule = (CaptureOperationsModule) getServletContext().getAttribute(
+                "captureOperationsModule");
+        if (captureOperationsModule == null) {
+            LOG.debug("Capture operations module not found - initializing manually");
+            captureOperationsModule = new CaptureOperationsModule();
 
-        LOG.debug("Initializing capture operations module");
-        captureOperationsModule = new CaptureOperationsModule();
-        captureOperationsModule.setSessionFactory(hibernateSessionFactory);
-        captureOperationsModule.setInsertMissingVoc(Boolean.parseBoolean(props.getProperty(PROP_INSERT_MISSING_VOC,
-                "true")));
-        captureOperationsModule.setDbResetAllowed(Boolean.parseBoolean(props.getProperty(PROP_DB_RESET_ALLOWED, "false")));
-        captureOperationsModule.setDbResetScript(props.getProperty(PROP_SERVLET_PATH) + "WEB-INF/classes"
-                + props.getProperty(PROP_DB_RESET_SCRIPT));
-        captureOperationsModule.setSchema(epcisSchema);
+            ServletConfig servletConfig = getServletConfig();
+            Properties props;
+            if (servletConfig == null) {
+                props = loadApplicationProperties();
+            } else {
+                props = loadApplicationProperties(servletConfig);
+            }
+            SessionFactory hibernateSessionFactory = initHibernate();
+            captureOperationsModule.setSessionFactory(hibernateSessionFactory);
+            captureOperationsModule.setInsertMissingVoc(Boolean.parseBoolean(props.getProperty(PROP_INSERT_MISSING_VOC,
+                    "true")));
+            captureOperationsModule.setDbResetAllowed(Boolean.parseBoolean(props.getProperty(PROP_DB_RESET_ALLOWED,
+                    "false")));
+            captureOperationsModule.setDbResetScript(props.getProperty(PROP_DB_RESET_SCRIPT));
+            captureOperationsModule.setEpcisSchemaFile(props.getProperty(PROP_EPCIS_SCHEMA_FILE));
+        } else {
+            LOG.debug("Capture operations module found");
+        }
+        setCaptureOperationsModule(captureOperationsModule);
     }
 
     /**
@@ -112,56 +119,47 @@ public class CaptureOperationsServlet extends HttpServlet {
         } catch (IOException e) {
             LOG.error("Unable to load application properties from " + path + appConfigFile, e);
         }
-        properties.put(PROP_SERVLET_PATH, path);
+        return properties;
+    }
+
+    /**
+     * Loads the application properties from classpath and populates a
+     * java.util.Properties instance.
+     * 
+     * @param servletConfig
+     *            The ServletConfig used to locate the application property
+     *            file.
+     * @return The application properties.
+     */
+    private Properties loadApplicationProperties() {
+        // read application properties from classpath
+        String resource = "/application.properties";
+        InputStream is = this.getClass().getResourceAsStream(resource);
+        Properties properties = new Properties();
+        try {
+            properties.load(is);
+            is.close();
+            LOG.info("Loaded application properties from classpath:" + resource + " ("
+                    + this.getClass().getResource(resource) + ")");
+        } catch (IOException e) {
+            LOG.error("Unable to load application properties from classpath:" + resource + " ("
+                    + this.getClass().getResource(resource) + ")", e);
+        }
         return properties;
     }
 
     /**
      * Initializes Hibernate. Reads the configuration from hibernate.cfg.xml
-     * located in the classpath (WEB-INF/classes/)
+     * located on the classpath (WEB-INF/classes/)
      * 
      * @return The Hibernate SessionFactory.
      * @throws ServletException
      */
-    private SessionFactory initHibernate() throws ServletException {
-        try {
-            Configuration c = new Configuration();
-            c.configure(); // from WEB-INF/classes/hibernate.cfg.xml
-            return c.buildSessionFactory();
-        } catch (Exception e) {
-            String msg = "Unable to configure Hibernate: " + e.toString();
-            LOG.error(msg, e);
-            throw new ServletException(msg, e);
-        }
-    }
-
-    /**
-     * Initializes the EPCIS schema used for validating incoming capture
-     * requests. Loads the WSDL and XSD files from the classpath (the schema is
-     * bundled with epcis-commons.jar).
-     * 
-     * @return An instantiated schema validation object.
-     */
-    private Schema initEpcisSchema(Properties props) {
-        String xsdFile = props.getProperty(PROP_EPCIS_SCHEMA_FILE);
-        InputStream is = CaptureOperationsServlet.class.getResourceAsStream(xsdFile);
-        if (is != null) {
-            try {
-                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Source schemaSrc = new StreamSource(is);
-                schemaSrc.setSystemId(CaptureOperationsServlet.class.getResource(xsdFile).toString());
-                Schema schema = schemaFactory.newSchema(schemaSrc);
-                LOG.debug("EPCIS schema file initialized and loaded successfully");
-                return schema;
-            } catch (Exception e) {
-                LOG.warn("Unable to load or parse the EPCIS schema", e);
-            }
-        } else {
-            LOG.error("Unable to load the EPCIS schema file from classpath: cannot find resource "
-                    + PROP_EPCIS_SCHEMA_FILE);
-        }
-        LOG.warn("Schema validation will not be available!");
-        return null;
+    private SessionFactory initHibernate() throws HibernateException {
+        LOG.info("Manually initializing Hibernate");
+        Configuration c = new Configuration();
+        c.configure(); // from WEB-INF/classes/hibernate.cfg.xml
+        return c.buildSessionFactory();
     }
 
     /**
@@ -277,5 +275,9 @@ public class CaptureOperationsServlet extends HttpServlet {
             out.flush();
             out.close();
         }
+    }
+
+    public void setCaptureOperationsModule(CaptureOperationsModule captureOperationsModule) {
+        this.captureOperationsModule = captureOperationsModule;
     }
 }

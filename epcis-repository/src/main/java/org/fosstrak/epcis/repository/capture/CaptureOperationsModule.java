@@ -21,9 +21,10 @@
 package org.accada.epcis.repository.capture;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URL;
 import java.security.Principal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -35,11 +36,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.accada.epcis.repository.EpcisConstants;
@@ -107,6 +112,8 @@ public class CaptureOperationsModule {
      * The XSD schema which validates the incoming messages.
      */
     private Schema schema;
+    
+    private String epcisSchemaFile;
 
     /**
      * Whether we should insert new vocabulary or throw an error message.
@@ -128,6 +135,33 @@ public class CaptureOperationsModule {
      * Interface to the database.
      */
     private SessionFactory sessionFactory;
+
+    /**
+     * Initializes the EPCIS schema used for validating incoming capture
+     * requests. Loads the WSDL and XSD files from the classpath (the schema is
+     * bundled with epcis-commons.jar).
+     * 
+     * @return An instantiated schema validation object.
+     */
+    private Schema initEpcisSchema(String xsdFile) {
+        InputStream is = this.getClass().getResourceAsStream(xsdFile);
+        if (is != null) {
+            try {
+                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Source schemaSrc = new StreamSource(is);
+                schemaSrc.setSystemId(CaptureOperationsServlet.class.getResource(xsdFile).toString());
+                Schema schema = schemaFactory.newSchema(schemaSrc);
+                LOG.debug("EPCIS schema file initialized and loaded successfully");
+                return schema;
+            } catch (Exception e) {
+                LOG.warn("Unable to load or parse the EPCIS schema", e);
+            }
+        } else {
+            LOG.error("Unable to load the EPCIS schema file from classpath: cannot find resource " + xsdFile);
+        }
+        LOG.warn("Schema validation will not be available!");
+        return null;
+    }
 
     /**
      * Resets the database.
@@ -152,7 +186,7 @@ public class CaptureOperationsModule {
                     LOG.info("Running db reset script.");
                     Statement stmt = dbconnection.createStatement();
                     if (dbResetScript != null) {
-                        BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
+                        BufferedReader reader = new BufferedReader(new StringReader(dbResetScript));
                         String line;
                         while ((line = reader.readLine()) != null) {
                             stmt.addBatch(line);
@@ -598,12 +632,9 @@ public class CaptureOperationsModule {
         this.dbResetAllowed = dbResetAllowed;
     }
 
-    public String getDbResetScript() {
-        return dbResetScript;
-    }
-
     public void setDbResetScript(String dbResetScript) {
-        this.dbResetScript = dbResetScript;
+        URL url = this.getClass().getResource(dbResetScript);
+        this.dbResetScript = url.getPath();
     }
 
     public boolean isInsertMissingVoc() {
@@ -620,5 +651,15 @@ public class CaptureOperationsModule {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
+    }
+
+    public String getEpcisSchemaFile() {
+        return epcisSchemaFile;
+    }
+
+    public void setEpcisSchemaFile(String epcisSchemaFile) {
+        this.epcisSchemaFile = epcisSchemaFile;
+        Schema schema = initEpcisSchema(epcisSchemaFile);
+        setSchema(schema);
     }
 }
