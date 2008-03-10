@@ -102,13 +102,6 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     private static final String STD_VERSION = "1.0";
 
     /**
-     * The version of this service implementation. The empty string indicates
-     * that the implementation implements only standard functionality with no
-     * vendor extensions.
-     */
-    private static final String VDR_VERSION = "";
-
-    /**
      * The names of all the implemented queries.
      */
     private static final List<String> QUERYNAMES;
@@ -118,6 +111,13 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
         QUERYNAMES.add("SimpleEventQuery");
         QUERYNAMES.add("SimpleMasterDataQuery");
     }
+
+    /**
+     * The version of this service implementation. The empty string indicates
+     * that the implementation implements only standard functionality with no
+     * vendor extensions.
+     */
+    private String serviceVersion = "";
 
     /**
      * The maximum number of rows a query can return.
@@ -982,7 +982,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     public String getVendorVersion() throws SecurityExceptionResponse, ValidationExceptionResponse,
             ImplementationExceptionResponse {
         LOG.debug("Invoking 'getVendorVersion'");
-        return VDR_VERSION;
+        return serviceVersion;
     }
 
     /**
@@ -1304,11 +1304,26 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
         this.triggerConditionMinutes = triggerConditionMinutes;
     }
 
-    public ServletContext getServletContext() {
-        return servletContext;
-    }
-
+    /**
+     * @param servletContext
+     *            the servletContextservletContext to set
+     */
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
+    }
+
+    /**
+     * @return the serviceVersion
+     */
+    public String getServiceVersion() {
+        return serviceVersion;
+    }
+
+    /**
+     * @param serviceVersion
+     *            the serviceVersion to set
+     */
+    public void setServiceVersion(String serviceVersion) {
+        this.serviceVersion = serviceVersion;
     }
 }

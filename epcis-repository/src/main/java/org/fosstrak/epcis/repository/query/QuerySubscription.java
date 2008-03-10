@@ -296,6 +296,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             // send the query and get current time
             GregorianCalendar cal = new GregorianCalendar();
             result = epcisQueryService.poll(poll);
+            LOG.debug("Poll returned");
 
             // set new lastTimeExecuted (must be <= to time when query is
             // executed, otherwise we loose results)
@@ -311,6 +312,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
                 qtle.setQueryName(queryName);
                 qtle.setSubscriptionID(subscriptionID);
                 qtle.setReason(e.getMessage());
+                LOG.info("USER ERROR: " + qtle.getReason());
             }
             callbackQueryTooLargeException(qtle);
             return;
@@ -322,6 +324,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
                 ie.setQueryName(queryName);
                 ie.setReason(e.getMessage());
                 ie.setSubscriptionID(subscriptionID);
+                LOG.info("USER ERROR: " + ie.getReason());
             }
             callbackImplementationException(ie);
             return;
@@ -375,6 +378,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      *            The object to be sent back to the client.
      */
     private void callbackObject(final Object o) {
+        LOG.debug("Callback " + o);
         // serialize the response
         String data = null;
         try {
@@ -382,7 +386,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
             JAXBElement<?> item;
             if (o instanceof QueryResults) {
-                item = factory.createQueryTooLargeException((QueryTooLargeException) o);
+                item = factory.createQueryResults((QueryResults) o);
             } else if (o instanceof QueryTooLargeException) {
                 item = factory.createQueryTooLargeException((QueryTooLargeException) o);
             } else if (o instanceof ImplementationException) {
@@ -390,6 +394,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             } else {
                 item = (JAXBElement<?>) o;
             }
+            LOG.debug("Serializing " + item + " into XML");
             StringWriter writer = new StringWriter();
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");

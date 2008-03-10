@@ -38,14 +38,14 @@ import org.accada.epcis.soap.EPCISServicePortType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.logging.Log4jLogger;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 /**
- * TODO: javadoc
+ * TODO: javadoc ... this class is only required if you do not wire the
+ * application using spring! replace WEB-INF/web.xml with
+ * WEB-INF/non-spring-web.xml
  * <p>
  * TODO: read WS_SERVICE_ADDRESS and JNDI_DATASOURCE_NAME from properties!
  * 
@@ -53,21 +53,18 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
  */
 public class QueryInitServlet extends CXFNonSpringServlet {
 
-    private static final long serialVersionUID = 5711907120663766718L;
+    private static final long serialVersionUID = -5839101192038037389L;
 
     private static final String APP_CONFIG_LOCATION = "appConfigLocation";
     private static final String PROP_MAX_QUERY_ROWS = "maxQueryResultRows";
     private static final String PROP_MAX_QUERY_TIME = "maxQueryExecutionTime";
     private static final String PROP_TRIGGER_CHECK_SEC = "trigger.condition.check.sec";
     private static final String PROP_TRIGGER_CHECK_MIN = "trigger.condition.check.min";
+    private static final String PROP_SERVICE_VERSION = "service.version";
     private static final String JNDI_DATASOURCE_NAME = "java:comp/env/jdbc/EPCISDB";
     private static final String WS_SERVICE_ADDRESS = "/query";
 
     private static final Log LOG = LogFactory.getLog(QueryInitServlet.class);
-
-    static {
-        LogUtils.setLoggerClass(Log4jLogger.class);
-    }
 
     /**
      * {@inheritDoc}
@@ -99,6 +96,7 @@ public class QueryInitServlet extends CXFNonSpringServlet {
         module.setMaxQueryTime(Integer.parseInt(props.getProperty(PROP_MAX_QUERY_TIME)));
         module.setTriggerConditionMinutes(props.getProperty(PROP_TRIGGER_CHECK_MIN));
         module.setTriggerConditionSeconds(props.getProperty(PROP_TRIGGER_CHECK_SEC));
+        module.setServiceVersion(props.getProperty(PROP_SERVICE_VERSION));
         module.setDataSource(dataSource);
         module.setServletContext(servletConfig.getServletContext());
 
@@ -117,13 +115,21 @@ public class QueryInitServlet extends CXFNonSpringServlet {
      * @return The application properties.
      */
     private Properties loadApplicationProperties(ServletConfig servletConfig) {
-        // read application properties from servlet context
-        ServletContext ctx = servletConfig.getServletContext();
-        String path = ctx.getRealPath("/");
-        String appConfigFile = ctx.getInitParameter(APP_CONFIG_LOCATION);
         Properties properties = new Properties();
+
+        // read application.properties from classpath
+        String path = "/";
+        String appConfigFile = "application.properties";
+        InputStream is = QueryInitServlet.class.getResourceAsStream(path + appConfigFile);
+
         try {
-            InputStream is = new FileInputStream(path + appConfigFile);
+            if (is == null) {
+                // read properties from file specified in servlet context
+                ServletContext ctx = servletConfig.getServletContext();
+                path = ctx.getRealPath("/");
+                appConfigFile = ctx.getInitParameter(APP_CONFIG_LOCATION);
+                is = new FileInputStream(path + appConfigFile);
+            }
             properties.load(is);
             is.close();
             LOG.info("Loaded application properties from " + path + appConfigFile);
