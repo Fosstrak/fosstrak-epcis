@@ -66,11 +66,11 @@ public class CaptureOperationsBackendSQL implements CaptureOperationsBackend {
         VOCABTYPE_TABLENAME_MAP = new HashMap<String, String>();
         VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition");
         VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint");
-        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.EPC_CLASS, "voc_EPCClass");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.EPC_CLASS_ID, "voc_EPCClass");
         VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_LOCATION_ID, "voc_BizLoc");
         VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_STEP_ID, "voc_BizStep");
         VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, "voc_BizTransType");
-        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_TRANSACTION, "voc_BizTrans");
+        VOCABTYPE_TABLENAME_MAP.put(EpcisConstants.BUSINESS_TRANSACTION_ID, "voc_BizTrans");
     }
 
     /**
@@ -395,7 +395,7 @@ public class CaptureOperationsBackendSQL implements CaptureOperationsBackend {
     public Long insertBusinessTransaction(final CaptureOperationsSession session, final String bizTrans,
             final String bizTransType) throws SQLException {
 
-        final Long id = getOrInsertVocabularyElement(session, EpcisConstants.BUSINESS_TRANSACTION, bizTrans);
+        final Long id = getOrInsertVocabularyElement(session, EpcisConstants.BUSINESS_TRANSACTION_ID, bizTrans);
         final Long type = getOrInsertVocabularyElement(session, EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID,
                 bizTransType);
 

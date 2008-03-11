@@ -130,7 +130,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
 
         vocabularyTablenameMap = new HashMap<String, String>(5);
         vocabularyTablenameMap.put(EpcisConstants.BUSINESS_STEP_ID, "voc_BizStep");
-        vocabularyTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION, "voc_BizTrans");
+        vocabularyTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION_ID, "voc_BizTrans");
         vocabularyTablenameMap.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition");
         vocabularyTablenameMap.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint");
         vocabularyTablenameMap.put(EpcisConstants.BUSINESS_LOCATION_ID, "voc_BizLoc");

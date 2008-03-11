@@ -31,7 +31,7 @@ public class EPCClass extends VocabularyElement {
 
 	@Override
 	public String getVocabularyType() {
-		return EpcisConstants.EPC_CLASS;
+		return EpcisConstants.EPC_CLASS_ID;
 	}
 
 }

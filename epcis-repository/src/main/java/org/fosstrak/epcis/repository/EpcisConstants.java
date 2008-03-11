@@ -36,14 +36,14 @@ public final class EpcisConstants {
     public static final String BUSINESS_LOCATION_ID = "urn:epcglobal:epcis:vtype:BusinessLocation";
     public static final String BUSINESS_STEP_ID = "urn:epcglobal:epcis:vtype:BusinessStep";
     public static final String DISPOSITION_ID = "urn:epcglobal:epcis:vtype:Disposition";
-    public static final String BUSINESS_TRANSACTION = "urn:epcglobal:epcis:vtype:BusinessTransaction";
+    public static final String BUSINESS_TRANSACTION_ID = "urn:epcglobal:epcis:vtype:BusinessTransaction";
     public static final String BUSINESS_TRANSACTION_TYPE_ID = "urn:epcglobal:epcis:vtype:BusinessTransactionType";
-    public static final String EPC_CLASS = "urn:epcglobal:epcis:vtype:EPCClass";
+    public static final String EPC_CLASS_ID = "urn:epcglobal:epcis:vtype:EPCClass";
 
     // all vocabulary types in a list
     public static final List<String> VOCABULARY_TYPES = Arrays.asList(new String[] {
-            READ_POINT_ID, BUSINESS_LOCATION_ID, BUSINESS_STEP_ID, DISPOSITION_ID, BUSINESS_TRANSACTION,
-            BUSINESS_TRANSACTION_TYPE_ID, EPC_CLASS });
+            READ_POINT_ID, BUSINESS_LOCATION_ID, BUSINESS_STEP_ID, DISPOSITION_ID, BUSINESS_TRANSACTION_ID,
+            BUSINESS_TRANSACTION_TYPE_ID, EPC_CLASS_ID });
 
     // event types
     public static final String AGGREGATION_EVENT = "AggregationEvent";

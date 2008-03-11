@@ -31,7 +31,7 @@ public class BusinessTransactionId extends VocabularyElement {
 
 	@Override
 	public String getVocabularyType() {
-		return EpcisConstants.BUSINESS_TRANSACTION;
+		return EpcisConstants.BUSINESS_TRANSACTION_ID;
 	}
 
 }
