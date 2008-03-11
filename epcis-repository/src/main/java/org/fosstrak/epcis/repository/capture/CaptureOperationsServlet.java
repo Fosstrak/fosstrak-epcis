@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.accada.epcis.repository.InvalidFormatException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -235,12 +236,12 @@ public class CaptureOperationsServlet extends HttpServlet {
                     rsp.setStatus(HttpServletResponse.SC_OK);
                     out.println(msg);
                 } catch (SQLException e) {
-                    String msg = "An error involving the database occurred.";
+                    String msg = "An error involving the database occurred";
                     LOG.error(msg, e);
                     rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.println(msg);
                 } catch (IOException e) {
-                    String msg = "An unknown error occurred.";
+                    String msg = "An unexpected error occurred";
                     LOG.error(msg, e);
                     rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.println(msg);
@@ -261,12 +262,17 @@ public class CaptureOperationsServlet extends HttpServlet {
                 rsp.setStatus(HttpServletResponse.SC_OK);
                 out.println("Capture request succeeded.");
             } catch (SAXException e) {
-                String msg = "An error processing the XML document occurred.";
+                String msg = "An error processing the XML document occurred";
+                LOG.error(msg, e);
+                rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.println(msg);
+            } catch (InvalidFormatException e) {
+                String msg = "An error parsing the XML contents occurred";
                 LOG.error(msg, e);
                 rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.println(msg);
             } catch (final Exception e) {
-                String msg = "An unknown error occurred.";
+                String msg = "An unexpected error occurred";
                 LOG.error(msg, e);
                 rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.println(msg);
