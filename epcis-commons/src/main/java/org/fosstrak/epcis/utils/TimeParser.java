@@ -120,176 +120,181 @@ public final class TimeParser {
      *             If the date/time could not be parsed.
      */
     private static Calendar parse(final String text) throws ParseException {
-        String time = text;
-        if (time == null || time.length() == 0) {
-            throw new IllegalArgumentException("Date/Time string may not be null or empty.");
-        }
-        time = time.trim();
-        char sign;
-        int curPos;
-        if (time.startsWith("-")) {
-            sign = '-';
-            curPos = 1;
-        } else if (time.startsWith("+")) {
-            sign = '+';
-            curPos = 1;
-        } else {
-            sign = '+'; // no sign specified, implied '+'
-            curPos = 0;
-        }
-
-        int year, month, day, hour, min, sec, ms;
-        String tzID;
-        char delimiter;
-
-        // parse year
         try {
-            year = Integer.parseInt(time.substring(curPos, curPos + 4));
-        } catch (NumberFormatException e) {
-            throw new ParseException("Year (YYYY) has wrong format: " + e.getMessage(), curPos);
-        }
-        curPos += 4;
-        delimiter = '-';
-        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
-        }
-        curPos++;
-
-        // parse month
-        try {
-            month = Integer.parseInt(time.substring(curPos, curPos + 2));
-        } catch (NumberFormatException e) {
-            throw new ParseException("Month (MM) has wrong format: " + e.getMessage(), curPos);
-        }
-        curPos += 2;
-        delimiter = '-';
-        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
-        }
-        curPos++;
-
-        // parse day
-        try {
-            day = Integer.parseInt(time.substring(curPos, curPos + 2));
-        } catch (NumberFormatException e) {
-            throw new ParseException("Day (DD) has wrong format: " + e.getMessage(), curPos);
-        }
-        curPos += 2;
-        delimiter = 'T';
-        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
-        }
-        curPos++;
-
-        // parse hours
-        try {
-            hour = Integer.parseInt(time.substring(curPos, curPos + 2));
-        } catch (NumberFormatException e) {
-            throw new ParseException("Hour (hh) has wrong format: " + e.getMessage(), curPos);
-        }
-        curPos += 2;
-        delimiter = ':';
-        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
-        }
-        curPos++;
-
-        // parse minute
-        try {
-            min = Integer.parseInt(time.substring(curPos, curPos + 2));
-        } catch (NumberFormatException e) {
-            throw new ParseException("Minute (mm) has wrong format: " + e.getMessage(), curPos);
-        }
-        curPos += 2;
-        delimiter = ':';
-        if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
-            throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
-        }
-        curPos++;
-
-        // parse second
-        try {
-            sec = Integer.parseInt(time.substring(curPos, curPos + 2));
-        } catch (NumberFormatException e) {
-            throw new ParseException("Second (ss) has wrong format: " + e.getMessage(), curPos);
-        }
-        curPos += 2;
-
-        // parse millisecond
-        delimiter = '.';
-        if (curPos < time.length() && time.charAt(curPos) == delimiter) {
-            curPos++;
-            try {
-                // read all digits (number of digits unknown)
-                StringBuilder millis = new StringBuilder();
-                while (curPos < time.length() && isNumeric(time.charAt(curPos))) {
-                    millis.append(time.charAt(curPos));
-                    curPos++;
-                }
-                // convert to milliseconds (max 3 digits)
-                if (millis.length() == 1) {
-                    ms = 100 * Integer.parseInt(millis.toString());
-                } else if (millis.length() == 2) {
-                    ms = 10 * Integer.parseInt(millis.toString());
-                } else if (millis.length() >= 3) {
-                    ms = Integer.parseInt(millis.substring(0, 3));
-                    if (millis.length() > 3) {
-                        // round
-                        if (Integer.parseInt(String.valueOf(millis.charAt(3))) >= 5) {
-                            ms++;
-                        }
-                    }
-                } else {
-                    ms = 0;
-                }
-            } catch (NumberFormatException e) {
-                throw new ParseException("Millisecond (S) has wrong format: " + e.getMessage(), curPos);
+            String time = text;
+            if (time == null || time.length() == 0) {
+                throw new IllegalArgumentException("Date/Time string may not be null or empty.");
             }
-        } else {
-            ms = 0;
+            time = time.trim();
+            char sign;
+            int curPos;
+            if (time.startsWith("-")) {
+                sign = '-';
+                curPos = 1;
+            } else if (time.startsWith("+")) {
+                sign = '+';
+                curPos = 1;
+            } else {
+                sign = '+'; // no sign specified, implied '+'
+                curPos = 0;
+            }
+
+            int year, month, day, hour, min, sec, ms;
+            String tzID;
+            char delimiter;
+
+            // parse year
+            try {
+                year = Integer.parseInt(time.substring(curPos, curPos + 4));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Year (YYYY) has wrong format: " + e.getMessage(), curPos);
+            }
+            curPos += 4;
+            delimiter = '-';
+            if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
+                throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
+            }
+            curPos++;
+
+            // parse month
+            try {
+                month = Integer.parseInt(time.substring(curPos, curPos + 2));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Month (MM) has wrong format: " + e.getMessage(), curPos);
+            }
+            curPos += 2;
+            delimiter = '-';
+            if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
+                throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
+            }
+            curPos++;
+
+            // parse day
+            try {
+                day = Integer.parseInt(time.substring(curPos, curPos + 2));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Day (DD) has wrong format: " + e.getMessage(), curPos);
+            }
+            curPos += 2;
+            delimiter = 'T';
+            if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
+                throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
+            }
+            curPos++;
+
+            // parse hours
+            try {
+                hour = Integer.parseInt(time.substring(curPos, curPos + 2));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Hour (hh) has wrong format: " + e.getMessage(), curPos);
+            }
+            curPos += 2;
+            delimiter = ':';
+            if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
+                throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
+            }
+            curPos++;
+
+            // parse minute
+            try {
+                min = Integer.parseInt(time.substring(curPos, curPos + 2));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Minute (mm) has wrong format: " + e.getMessage(), curPos);
+            }
+            curPos += 2;
+            delimiter = ':';
+            if (curPos >= time.length() || time.charAt(curPos) != delimiter) {
+                throw new ParseException("expected delimiter '" + delimiter + "' at position " + curPos, curPos);
+            }
+            curPos++;
+
+            // parse second
+            try {
+                sec = Integer.parseInt(time.substring(curPos, curPos + 2));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Second (ss) has wrong format: " + e.getMessage(), curPos);
+            }
+            curPos += 2;
+
+            // parse millisecond
+            delimiter = '.';
+            if (curPos < time.length() && time.charAt(curPos) == delimiter) {
+                curPos++;
+                try {
+                    // read all digits (number of digits unknown)
+                    StringBuilder millis = new StringBuilder();
+                    while (curPos < time.length() && isNumeric(time.charAt(curPos))) {
+                        millis.append(time.charAt(curPos));
+                        curPos++;
+                    }
+                    // convert to milliseconds (max 3 digits)
+                    if (millis.length() == 1) {
+                        ms = 100 * Integer.parseInt(millis.toString());
+                    } else if (millis.length() == 2) {
+                        ms = 10 * Integer.parseInt(millis.toString());
+                    } else if (millis.length() >= 3) {
+                        ms = Integer.parseInt(millis.substring(0, 3));
+                        if (millis.length() > 3) {
+                            // round
+                            if (Integer.parseInt(String.valueOf(millis.charAt(3))) >= 5) {
+                                ms++;
+                            }
+                        }
+                    } else {
+                        ms = 0;
+                    }
+                } catch (NumberFormatException e) {
+                    throw new ParseException("Millisecond (S) has wrong format: " + e.getMessage(), curPos);
+                }
+            } else {
+                ms = 0;
+            }
+
+            // parse time zone designator (Z or +00:00 or -00:00)
+            if (curPos < time.length() && (time.charAt(curPos) == '+' || time.charAt(curPos) == '-')) {
+                // offset to UTC specified in the format +00:00/-00:00
+                tzID = "GMT" + time.substring(curPos);
+            } else if (curPos < time.length() && time.substring(curPos).equals("Z")) {
+                tzID = "UTC";
+            } else {
+                // throw new ParseException("invalid time zone designator",
+                // curPos);
+                // no time zone designator found, using default 'UTC'
+                tzID = "UTC";
+            }
+
+            TimeZone tz = TimeZone.getTimeZone(tzID);
+            // verify id of returned time zone (getTimeZone defaults to "UTC")
+            if (!tz.getID().equals(tzID)) {
+                throw new ParseException("invalid time zone '" + tzID + "'", curPos);
+            }
+
+            // initialize Calendar object
+            Calendar cal = GregorianCalendar.getInstance(tz);
+            cal.setLenient(false);
+            if (sign == '-' || year == 0) {
+                // not CE, need to set era (BCE) and adjust year
+                cal.set(Calendar.YEAR, year + 1);
+                cal.set(Calendar.ERA, GregorianCalendar.BC);
+            } else {
+                cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.ERA, GregorianCalendar.AD);
+            }
+            cal.set(Calendar.MONTH, month - 1); // month is 0-based
+            cal.set(Calendar.DAY_OF_MONTH, day);
+            cal.set(Calendar.HOUR_OF_DAY, hour);
+            cal.set(Calendar.MINUTE, min);
+            cal.set(Calendar.SECOND, sec);
+            cal.set(Calendar.MILLISECOND, ms);
+
+            // the following will trigger an IllegalArgumentException if any of
+            // the set values are illegal or out of range
+            cal.getTime();
+
+            return cal;
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new ParseException("date/time value has invalid format", -1);
         }
-
-        // parse time zone designator (Z or +00:00 or -00:00)
-        if (curPos < time.length() && (time.charAt(curPos) == '+' || time.charAt(curPos) == '-')) {
-            // offset to UTC specified in the format +00:00/-00:00
-            tzID = "GMT" + time.substring(curPos);
-        } else if (curPos < time.length() && time.substring(curPos).equals("Z")) {
-            tzID = "UTC";
-        } else {
-            // throw new ParseException("invalid time zone designator", curPos);
-            // no time zone designator found, using default 'UTC'
-            tzID = "UTC";
-        }
-
-        TimeZone tz = TimeZone.getTimeZone(tzID);
-        // verify id of returned time zone (getTimeZone defaults to "UTC")
-        if (!tz.getID().equals(tzID)) {
-            throw new ParseException("invalid time zone '" + tzID + "'", curPos);
-        }
-
-        // initialize Calendar object
-        Calendar cal = GregorianCalendar.getInstance(tz);
-        cal.setLenient(false);
-        if (sign == '-' || year == 0) {
-            // not CE, need to set era (BCE) and adjust year
-            cal.set(Calendar.YEAR, year + 1);
-            cal.set(Calendar.ERA, GregorianCalendar.BC);
-        } else {
-            cal.set(Calendar.YEAR, year);
-            cal.set(Calendar.ERA, GregorianCalendar.AD);
-        }
-        cal.set(Calendar.MONTH, month - 1); // month is 0-based
-        cal.set(Calendar.DAY_OF_MONTH, day);
-        cal.set(Calendar.HOUR_OF_DAY, hour);
-        cal.set(Calendar.MINUTE, min);
-        cal.set(Calendar.SECOND, sec);
-        cal.set(Calendar.MILLISECOND, ms);
-
-        // the following will trigger an IllegalArgumentException if any of
-        // the set values are illegal or out of range
-        cal.getTime();
-
-        return cal;
     }
 
     /**
