@@ -298,7 +298,7 @@ public class CaptureOperationsModule {
                 handleDocument(session, document);
                 tx.commit();
                 // return OK
-                LOG.info("EPCIS Capture Interface request succeeded.");
+                LOG.info("EPCIS Capture Interface request succeeded");
             } catch (SAXException e) {
                 LOG.error("EPCIS Capture Interface request failed: " + e.toString());
                 if (tx != null) {
@@ -325,7 +325,7 @@ public class CaptureOperationsModule {
                 session.close();
             }
             // sessionFactory.getStatistics().logSummary();
-            LOG.debug("DB connection closed.");
+            LOG.debug("DB connection closed");
         }
     }
 
