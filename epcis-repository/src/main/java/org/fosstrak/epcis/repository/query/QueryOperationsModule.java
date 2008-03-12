@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,7 @@ import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
 import org.accada.epcis.soap.model.ArrayOfString;
 import org.accada.epcis.soap.model.DuplicateSubscriptionException;
+import org.accada.epcis.soap.model.EPCISEventType;
 import org.accada.epcis.soap.model.EventListType;
 import org.accada.epcis.soap.model.ImplementationException;
 import org.accada.epcis.soap.model.ImplementationExceptionSeverity;
@@ -521,7 +523,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 String msg = "Type of value invalid for query parameter '" + paramName + "': " + paramValue;
                 throw queryParameterException(msg, e);
             } catch (IllegalArgumentException e) {
-                String msg = "Unparseable value for query parameter '" + paramName + "': " + paramValue;
+                String msg = "Unparseable value for query parameter '" + paramName + "'. " + e.getMessage();
                 throw queryParameterException(msg, e);
             }
         }
@@ -709,8 +711,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws ClassCastException
      *             If the given paramValue instance cannot be cast to either an
      *             ArrayOfString or Element class.
+     * @throws QueryParameterExceptionResponse
+     *             If the given value does not correspond to valid ArrayOfString
+     *             syntax, i.e., a list of matching
+     *             <code>&lt;string&gt;</code> <code>&lt;/string&gt;</code>
+     *             tags are expected.
      */
-    private ArrayOfString parseAsArrayOfString(Object queryParamValue) throws ClassCastException {
+    private ArrayOfString parseAsArrayOfString(Object queryParamValue) throws ClassCastException,
+            QueryParameterExceptionResponse {
         try {
             return (ArrayOfString) queryParamValue;
         } catch (ClassCastException e) {
@@ -719,9 +727,12 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             NodeList strings = elem.getChildNodes();
             ArrayOfString aos = new ArrayOfString();
             for (int i = 0; i < strings.getLength(); i++) {
-                if ("string".equals(strings.item(i).getNodeName())) {
+                if ("string".equalsIgnoreCase(strings.item(i).getNodeName())) {
                     String s = strings.item(i).getTextContent().trim();
                     aos.getString().add(s);
+                } else {
+                    String msg = "Invalid ArrayOfString syntax: matching <string> </string> tags expected";
+                    throw queryParameterException(msg, null);
                 }
             }
             if (LOG.isDebugEnabled()) {
@@ -874,9 +885,9 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      *         error message.
      */
     private QueryParameterExceptionResponse queryParameterException(String msg, Exception e) {
-        LOG.info("USER ERROR: " + msg);
-        if (LOG.isDebugEnabled() && e != null) {
-            LOG.debug("User error details: " + e.getMessage(), e);
+        LOG.info("QueryParameterException: " + msg);
+        if (LOG.isTraceEnabled() && e != null) {
+            LOG.trace("Exception details: " + e.getMessage(), e);
         }
         QueryParameterException qpe = new QueryParameterException();
         qpe.setReason(msg);
@@ -940,7 +951,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      */
     public List<String> getQueryNames() throws SecurityExceptionResponse, ValidationExceptionResponse,
             ImplementationExceptionResponse {
-        LOG.debug("Invoking 'getQueryNames'");
+        LOG.info("Invoking 'getQueryNames'");
         return QUERYNAMES;
     }
 
@@ -949,7 +960,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      */
     public String getStandardVersion() throws SecurityExceptionResponse, ValidationExceptionResponse,
             ImplementationExceptionResponse {
-        LOG.debug("Invoking 'getStandardVersion'");
+        LOG.info("Invoking 'getStandardVersion'");
         return STD_VERSION;
     }
 
@@ -959,13 +970,21 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     public List<String> getSubscriptionIDs(String queryName) throws NoSuchNameExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, ImplementationExceptionResponse {
         try {
-            LOG.debug("Invoking 'getSubscriptionIDs'");
-            QueryOperationsSession session = backend.openSession(dataSource);
+            LOG.info("Invoking 'getSubscriptionIDs'");
+            QueryOperationsSession session = null;
+            try {
+                session = backend.openSession(dataSource);
 
-            // FIXME: filter by queryName!
-            Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions(session);
-            Set<String> temp = subscribedMap.keySet();
-            return new ArrayList<String>(temp);
+                // TODO: filter by queryName?!
+                Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions(session);
+                Set<String> temp = subscribedMap.keySet();
+                return new ArrayList<String>(temp);
+            } finally {
+                if (session != null) {
+                    session.close();
+                }
+                LOG.debug("DB connection closed");
+            }
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "SQL error during query execution: " + e.getMessage();
@@ -981,7 +1000,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      */
     public String getVendorVersion() throws SecurityExceptionResponse, ValidationExceptionResponse,
             ImplementationExceptionResponse {
-        LOG.debug("Invoking 'getVendorVersion'");
+        LOG.info("Invoking 'getVendorVersion'");
         return serviceVersion;
     }
 
@@ -992,44 +1011,61 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             QueryParameterExceptionResponse, QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, ImplementationExceptionResponse {
         try {
-            LOG.debug("Invoking 'poll'");
-            QueryOperationsSession session = backend.openSession(dataSource);
+            LOG.info("Invoking 'poll'");
+            QueryOperationsSession session = null;
+            try {
+                session = backend.openSession(dataSource);
+                QueryResultsBody resultsBody = null;
+                if (queryName.equals("SimpleEventQuery")) {
+                    LOG.info("This is a SimpleEventQuery");
+                    EventListType eventList = new EventListType();
+                    List<SimpleEventQueryDTO> eventQueries = constructSimpleEventQueries(queryParams);
+                    // run queries sequentially
+                    // TODO: might want to run them in parallel!
+                    String orderBy = null;
+                    OrderDirection orderDirection = null;
+                    int limit = -1;
+                    for (SimpleEventQueryDTO eventQuery : eventQueries) {
+                        if (eventQuery.getOrderBy() != null) {
+                            orderBy = eventQuery.getOrderBy();
+                            orderDirection = eventQuery.getOrderDirection();
+                            limit = eventQuery.getLimit();
+                        }
+                        backend.runSimpleEventQuery(session, eventQuery,
+                                eventList.getObjectEventOrAggregationEventOrQuantityEvent());
+                    }
+                    eventList = checkOrdering(eventList, orderBy, orderDirection, limit);
 
-            QueryResultsBody resultsBody = null;
-            if (queryName.equals("SimpleEventQuery")) {
-                EventListType eventList = new EventListType();
-                List<SimpleEventQueryDTO> eventQueries = constructSimpleEventQueries(queryParams);
-                // run queries sequentially
-                // TODO: might want to run them in parallel!
-                for (SimpleEventQueryDTO eventQuery : eventQueries) {
-                    backend.runSimpleEventQuery(session, eventQuery,
-                            eventList.getObjectEventOrAggregationEventOrQuantityEvent());
+                    resultsBody = new QueryResultsBody();
+                    resultsBody.setEventList(eventList);
+                } else if (queryName.equals("SimpleMasterDataQuery")) {
+                    LOG.info("This is a SimpleMasterDataQuery");
+                    VocabularyListType vocList = new VocabularyListType();
+                    MasterDataQueryDTO mdQuery = constructMasterDataQuery(queryParams);
+                    backend.runMasterDataQuery(session, mdQuery, vocList.getVocabulary());
+
+                    resultsBody = new QueryResultsBody();
+                    resultsBody.setVocabularyList(vocList);
+                } else {
+                    session.close();
+                    String msg = "Unsupported query name '" + queryName + "' provided";
+                    LOG.info("NoSuchNameException: " + msg);
+                    NoSuchNameException e = new NoSuchNameException();
+                    e.setReason(msg);
+                    throw new NoSuchNameExceptionResponse(msg, e);
                 }
+                QueryResults results = new QueryResults();
+                results.setResultsBody(resultsBody);
+                results.setQueryName(queryName);
 
-                resultsBody = new QueryResultsBody();
-                resultsBody.setEventList(eventList);
-            } else if (queryName.equals("SimpleMasterDataQuery")) {
-                VocabularyListType vocList = new VocabularyListType();
-                MasterDataQueryDTO mdQuery = constructMasterDataQuery(queryParams);
-                backend.runMasterDataQuery(session, mdQuery, vocList.getVocabulary());
-
-                resultsBody = new QueryResultsBody();
-                resultsBody.setVocabularyList(vocList);
-            } else {
-                session.close();
-                String msg = "Unsupported query name '" + queryName + "' provided";
-                LOG.info("USER ERROR: " + msg);
-                NoSuchNameException e = new NoSuchNameException();
-                e.setReason(msg);
-                throw new NoSuchNameExceptionResponse(msg, e);
+                LOG.info("poll request for '" + queryName + "' succeeded");
+                return results;
+            } finally {
+                if (session != null) {
+                    session.close();
+                }
+                LOG.debug("DB connection closed");
             }
-            QueryResults results = new QueryResults();
-            results.setResultsBody(resultsBody);
-            results.setQueryName(queryName);
-
-            LOG.info("poll request for '" + queryName + "' succeeded");
-            session.close();
-            return results;
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "SQL error during query execution: " + e.getMessage();
@@ -1041,6 +1077,41 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     }
 
     /**
+     * @param eventList
+     * @param limit
+     * @param orderDirection
+     * @param orderBy
+     * @return
+     */
+    private EventListType checkOrdering(EventListType eventList, String orderBy, OrderDirection orderDirection,
+            int limit) {
+        if (orderBy == null) {
+            // no ordering specified
+            return eventList;
+        }
+        if ("quantity".equals(orderBy)) {
+            // order by quantity can only return QuantityEvents
+            return eventList;
+        }
+        int size = eventList.getObjectEventOrAggregationEventOrQuantityEvent().size();
+        if (limit > -1 && size == limit) {
+            // there was only a single event type to be ordered - this has been
+            // taken care of appropriately by the previous query
+            return eventList;
+        }
+        LOG.debug("Need to apply sorting across the different event types (sortBy=" + orderBy + ")");
+        boolean orderByEventTime = "eventTime".equals(orderBy);
+        Comparator<Object> comparator = new EventComparator(orderByEventTime, orderDirection);
+        Collections.sort(eventList.getObjectEventOrAggregationEventOrQuantityEvent(), comparator);
+        if (limit > -1 && size > limit) {
+            LOG.debug("Need to apply global limit to events (limit=" + limit + ")");
+            // clear everything beyond limit
+            eventList.getObjectEventOrAggregationEventOrQuantityEvent().subList(limit, size).clear();
+        }
+        return eventList;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void subscribe(String queryName, QueryParams params, String dest, SubscriptionControls controls,
@@ -1048,126 +1119,132 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             DuplicateSubscriptionExceptionResponse, QueryParameterExceptionResponse, QueryTooComplexExceptionResponse,
             SubscriptionControlsExceptionResponse, SubscribeNotPermittedExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse, ImplementationExceptionResponse {
-
         try {
-            LOG.debug("Invoking 'subscribe'");
-            QueryOperationsSession session = backend.openSession(dataSource);
-
-            String triggerURI = controls.getTrigger();
-            QuerySubscriptionScheduled newSubscription = null;
-            Schedule schedule = null;
-            GregorianCalendar initialRecordTime = controls.getInitialRecordTime().toGregorianCalendar();
-            if (initialRecordTime == null) {
-                initialRecordTime = new GregorianCalendar();
-            }
-
-            // a few input sanity checks
-
-            // dest may be null or empty. But we don't support pre-arranged
-            // destinations and throw an InvalidURIException according to the
-            // standard.
-            if (dest == null || dest.toString().equals("")) {
-                String msg = "Destination URI is empty. This implementation doesn't support pre-arranged destinations.";
-                LOG.info("USER ERROR: " + msg);
-                InvalidURIException e = new InvalidURIException();
-                e.setReason(msg);
-                throw new InvalidURIExceptionResponse(msg, e);
-            }
+            LOG.info("Invoking 'subscribe'");
+            QueryOperationsSession session = null;
             try {
-                new URL(dest.toString());
-            } catch (MalformedURLException ex) {
-                String msg = "Destination URI is invalid: " + ex.getMessage();
-                LOG.info("USER ERROR: " + msg);
-                InvalidURIException e = new InvalidURIException();
-                e.setReason(msg);
-                throw new InvalidURIExceptionResponse(msg, e, ex);
-            }
-
-            // check query name
-            if (!QUERYNAMES.contains(queryName)) {
-                String msg = "Illegal query name '" + queryName + "'";
-                LOG.info("USER ERROR: " + msg);
-                NoSuchNameException e = new NoSuchNameException();
-                e.setReason(msg);
-                throw new NoSuchNameExceptionResponse(msg, e);
-            }
-
-            // SimpleMasterDataQuery only valid for polling
-            if (queryName.equals("SimpleMasterDataQuery")) {
-                String msg = "Subscription not allowed for SimpleMasterDataQuery";
-                LOG.info("USER ERROR: " + msg);
-                SubscribeNotPermittedException e = new SubscribeNotPermittedException();
-                e.setReason(msg);
-                throw new SubscribeNotPermittedExceptionResponse(msg, e);
-            }
-
-            // subscriptionID mustn't be empty.
-            if (subscriptionID == null || subscriptionID.equals("")) {
-                String msg = "SubscriptionID is empty. Choose a valid subscriptionID";
-                LOG.info(msg);
-                ValidationException e = new ValidationException();
-                e.setReason(msg);
-                throw new ValidationExceptionResponse(msg, e);
-            }
-
-            // subscriptionID mustn't exist yet.
-            if (backend.fetchExistsSubscriptionId(session, subscriptionID)) {
-                String msg = "SubscriptionID '" + subscriptionID
-                        + "' already exists. Choose a different subscriptionID";
-                LOG.info("USER ERROR: " + msg);
-                DuplicateSubscriptionException e = new DuplicateSubscriptionException();
-                e.setReason(msg);
-                throw new DuplicateSubscriptionExceptionResponse(msg, e);
-            }
-
-            // trigger and schedule may no be used together, but one of them
-            // must be set
-            if (controls.getSchedule() != null && controls.getTrigger() != null) {
-                String msg = "Schedule and trigger mustn't be used together";
-                LOG.info("USER ERROR: " + msg);
-                SubscriptionControlsException e = new SubscriptionControlsException();
-                e.setReason(msg);
-                throw new SubscriptionControlsExceptionResponse(msg, e);
-            }
-            if (controls.getSchedule() == null && controls.getTrigger() == null) {
-                String msg = "Either schedule or trigger has to be set";
-                LOG.info("USER ERROR: " + msg);
-                SubscriptionControlsException e = new SubscriptionControlsException();
-                e.setReason(msg);
-                throw new SubscriptionControlsExceptionResponse(msg, e);
-            }
-            if (controls.getSchedule() != null) {
-                // Scheduled Query -> parse schedule
-                schedule = new Schedule(controls.getSchedule());
-                newSubscription = new QuerySubscriptionScheduled(subscriptionID, params, dest,
-                        Boolean.valueOf(controls.isReportIfEmpty()), initialRecordTime, initialRecordTime, schedule,
-                        queryName);
-            } else {
-                // -> Trigger
-                // need to set schedule which says how often the trigger
-                // condition is checked.
-                QuerySchedule qSchedule = new QuerySchedule();
-                qSchedule.setSecond(triggerConditionSeconds);
-                if (triggerConditionMinutes != null) {
-                    qSchedule.setMinute(triggerConditionMinutes);
+                session = backend.openSession(dataSource);
+                String triggerURI = controls.getTrigger();
+                QuerySubscriptionScheduled newSubscription = null;
+                Schedule schedule = null;
+                GregorianCalendar initialRecordTime = controls.getInitialRecordTime().toGregorianCalendar();
+                if (initialRecordTime == null) {
+                    initialRecordTime = new GregorianCalendar();
                 }
-                schedule = new Schedule(qSchedule);
-                QuerySubscriptionTriggered trigger = new QuerySubscriptionTriggered(subscriptionID, params, dest,
-                        Boolean.valueOf(controls.isReportIfEmpty()), initialRecordTime, initialRecordTime, queryName,
-                        triggerURI, schedule);
-                newSubscription = trigger;
+
+                // a few input sanity checks
+
+                // dest may be null or empty. But we don't support pre-arranged
+                // destinations and throw an InvalidURIException according to
+                // the
+                // standard.
+                if (dest == null || dest.toString().equals("")) {
+                    String msg = "Destination URI is empty. This implementation doesn't support pre-arranged destinations.";
+                    LOG.info("QueryParameterException: " + msg);
+                    InvalidURIException e = new InvalidURIException();
+                    e.setReason(msg);
+                    throw new InvalidURIExceptionResponse(msg, e);
+                }
+                try {
+                    new URL(dest.toString());
+                } catch (MalformedURLException ex) {
+                    String msg = "Destination URI is invalid: " + ex.getMessage();
+                    LOG.info("InvalidURIException: " + msg);
+                    InvalidURIException e = new InvalidURIException();
+                    e.setReason(msg);
+                    throw new InvalidURIExceptionResponse(msg, e, ex);
+                }
+
+                // check query name
+                if (!QUERYNAMES.contains(queryName)) {
+                    String msg = "Illegal query name '" + queryName + "'";
+                    LOG.info("NoSuchNameException: " + msg);
+                    NoSuchNameException e = new NoSuchNameException();
+                    e.setReason(msg);
+                    throw new NoSuchNameExceptionResponse(msg, e);
+                }
+
+                // SimpleMasterDataQuery only valid for polling
+                if (queryName.equals("SimpleMasterDataQuery")) {
+                    String msg = "Subscription not allowed for SimpleMasterDataQuery";
+                    LOG.info("SubscribeNotPermittedException: " + msg);
+                    SubscribeNotPermittedException e = new SubscribeNotPermittedException();
+                    e.setReason(msg);
+                    throw new SubscribeNotPermittedExceptionResponse(msg, e);
+                }
+
+                // subscriptionID cannot be empty
+                if (subscriptionID == null || subscriptionID.equals("")) {
+                    String msg = "SubscriptionID is empty. Choose a valid subscriptionID";
+                    LOG.info(msg);
+                    ValidationException e = new ValidationException();
+                    e.setReason(msg);
+                    throw new ValidationExceptionResponse(msg, e);
+                }
+
+                // check for already existing subscriptionID
+                if (backend.fetchExistsSubscriptionId(session, subscriptionID)) {
+                    String msg = "SubscriptionID '" + subscriptionID
+                            + "' already exists. Choose a different subscriptionID";
+                    LOG.info("DuplicateSubscriptionException: " + msg);
+                    DuplicateSubscriptionException e = new DuplicateSubscriptionException();
+                    e.setReason(msg);
+                    throw new DuplicateSubscriptionExceptionResponse(msg, e);
+                }
+
+                // trigger and schedule may no be used together, but one of them
+                // must be set
+                if (controls.getSchedule() != null && controls.getTrigger() != null) {
+                    String msg = "Schedule and trigger cannot be used together";
+                    LOG.info("SubscriptionControlsException: " + msg);
+                    SubscriptionControlsException e = new SubscriptionControlsException();
+                    e.setReason(msg);
+                    throw new SubscriptionControlsExceptionResponse(msg, e);
+                }
+                if (controls.getSchedule() == null && controls.getTrigger() == null) {
+                    String msg = "Either schedule or trigger has to be provided";
+                    LOG.info("SubscriptionControlsException: " + msg);
+                    SubscriptionControlsException e = new SubscriptionControlsException();
+                    e.setReason(msg);
+                    throw new SubscriptionControlsExceptionResponse(msg, e);
+                }
+                if (controls.getSchedule() != null) {
+                    // Scheduled Query -> parse schedule
+                    schedule = new Schedule(controls.getSchedule());
+                    newSubscription = new QuerySubscriptionScheduled(subscriptionID, params, dest,
+                            Boolean.valueOf(controls.isReportIfEmpty()), initialRecordTime, initialRecordTime,
+                            schedule, queryName);
+                } else {
+                    // -> Trigger
+                    // need to set schedule which says how often the trigger
+                    // condition is checked.
+                    QuerySchedule qSchedule = new QuerySchedule();
+                    qSchedule.setSecond(triggerConditionSeconds);
+                    if (triggerConditionMinutes != null) {
+                        qSchedule.setMinute(triggerConditionMinutes);
+                    }
+                    schedule = new Schedule(qSchedule);
+                    QuerySubscriptionTriggered trigger = new QuerySubscriptionTriggered(subscriptionID, params, dest,
+                            Boolean.valueOf(controls.isReportIfEmpty()), initialRecordTime, initialRecordTime,
+                            queryName, triggerURI, schedule);
+                    newSubscription = trigger;
+                }
+
+                // load subscriptions
+                Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions(session);
+
+                // store the Query to the database, the local hash map, and the
+                // application context
+                backend.storeSupscriptions(session, params, dest, subscriptionID, controls, triggerURI,
+                        newSubscription, queryName, schedule);
+                subscribedMap.put(subscriptionID, newSubscription);
+                saveSubscriptions(subscribedMap);
+            } finally {
+                if (session != null) {
+                    session.close();
+                }
+                LOG.debug("DB connection closed");
             }
-
-            // load subscriptions
-            Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions(session);
-
-            // store the Query to the database, the local hash map, and the
-            // application context
-            backend.storeSupscriptions(session, params, dest, subscriptionID, controls, triggerURI, newSubscription,
-                    queryName, schedule);
-            subscribedMap.put(subscriptionID, newSubscription);
-            saveSubscriptions(subscribedMap);
-            session.close();
         } catch (SQLException e) {
             String msg = "SQL error during query execution: " + e.getMessage();
             LOG.error(msg, e);
@@ -1183,27 +1260,34 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      */
     public void unsubscribe(String subscriptionID) throws NoSuchSubscriptionExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, ImplementationExceptionResponse {
-        LOG.debug("Invoking 'unsubscribe'");
         try {
-            QueryOperationsSession session = backend.openSession(dataSource);
-            Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions(session);
-            if (subscribedMap.containsKey(subscriptionID)) {
-                // remove subscription from local hash map
-                QuerySubscriptionScheduled toDelete = subscribedMap.get(subscriptionID);
-                toDelete.stopSubscription();
-                subscribedMap.remove(subscriptionID);
-                saveSubscriptions(subscribedMap);
+            LOG.info("Invoking 'unsubscribe'");
+            QueryOperationsSession session = null;
+            try {
+                session = backend.openSession(dataSource);
+                Map<String, QuerySubscriptionScheduled> subscribedMap = loadSubscriptions(session);
+                if (subscribedMap.containsKey(subscriptionID)) {
+                    // remove subscription from local hash map
+                    QuerySubscriptionScheduled toDelete = subscribedMap.get(subscriptionID);
+                    toDelete.stopSubscription();
+                    subscribedMap.remove(subscriptionID);
+                    saveSubscriptions(subscribedMap);
 
-                // delete subscription from database
-                backend.deleteSubscription(session, subscriptionID);
-            } else {
-                String msg = "There is no subscription with ID '" + subscriptionID + "'";
-                LOG.info("USER ERROR: " + msg);
-                NoSuchSubscriptionException e = new NoSuchSubscriptionException();
-                e.setReason(msg);
-                throw new NoSuchSubscriptionExceptionResponse(msg, e);
+                    // delete subscription from database
+                    backend.deleteSubscription(session, subscriptionID);
+                } else {
+                    String msg = "There is no subscription with ID '" + subscriptionID + "'";
+                    LOG.info("NoSuchSubscriptionException: " + msg);
+                    NoSuchSubscriptionException e = new NoSuchSubscriptionException();
+                    e.setReason(msg);
+                    throw new NoSuchSubscriptionExceptionResponse(msg, e);
+                }
+            } finally {
+                if (session != null) {
+                    session.close();
+                }
+                LOG.debug("DB connection closed");
             }
-            session.close();
         } catch (SQLException e) {
             ImplementationException iex = new ImplementationException();
             String msg = "SQL error during query execution: " + e.getMessage();
@@ -1324,6 +1408,50 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      *            the serviceVersion to set
      */
     public void setServiceVersion(String serviceVersion) {
+        if (!"".equals(serviceVersion)) {
+            // serviceVersion must be a valid URL
+            try {
+                new URL(serviceVersion);
+            } catch (MalformedURLException e) {
+                serviceVersion = "http://www.accada.org/epcis/" + serviceVersion;
+            }
+        }
         this.serviceVersion = serviceVersion;
+    }
+
+    /**
+     * Compares two EPCIS events according to their eventTime or recordTime.
+     * Careful: the objects to be compared are instances of EPCISEvent,
+     * otherwise a ClassCastException will be thrown.
+     * 
+     * @author Marco Steybe
+     */
+    public class EventComparator implements Comparator<Object> {
+        private boolean orderByEventTime = false;
+        private OrderDirection orderDirection = null;
+
+        public EventComparator(boolean orderByEventTime, OrderDirection orderDirection) {
+            this.orderByEventTime = orderByEventTime;
+            this.orderDirection = orderDirection;
+        }
+
+        public int compare(Object o1, Object o2) {
+            EPCISEventType event1 = (EPCISEventType) o1;
+            EPCISEventType event2 = (EPCISEventType) o2;
+            if (orderByEventTime) {
+                if (orderDirection == OrderDirection.ASC) {
+                    return event1.getEventTime().compare(event2.getEventTime());
+                } else {
+                    return event2.getEventTime().compare(event1.getEventTime());
+                }
+            } else {
+                // order by recordTime
+                if (orderDirection == OrderDirection.ASC) {
+                    return event1.getRecordTime().compare(event2.getRecordTime());
+                } else {
+                    return event2.getEventTime().compare(event1.getEventTime());
+                }
+            }
+        }
     }
 }
