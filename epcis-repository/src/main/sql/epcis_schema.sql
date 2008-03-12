@@ -127,6 +127,23 @@ CREATE TABLE `voc_EPCClass_attr` (
 
 
 -- ---------------------------------------------
+-- Non-Standard Masterdata Vocabularies
+-- ---------------------------------------------
+
+CREATE TABLE `voc_Any` (
+`id` bigint PRIMARY KEY auto_increment, -- id auto_increment
+`uri` varchar(1023) NOT NULL,
+`vtype` varchar(1023) NOT NULL
+);
+
+CREATE TABLE `voc_Any_attr` (
+`id` bigint NOT NULL REFERENCES `voc_Any`(`id`),
+`attribute` varchar(1023) NOT NULL,
+`value` varchar(1023) NOT NULL
+);
+
+
+-- ---------------------------------------------
 -- Business Transactions
 -- ---------------------------------------------
 

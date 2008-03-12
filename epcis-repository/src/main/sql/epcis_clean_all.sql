@@ -52,6 +52,8 @@ DELETE FROM `voc_EPCClass`;
 DELETE FROM `voc_EPCClass_attr`;
 DELETE FROM `voc_ReadPoint`;
 DELETE FROM `voc_ReadPoint_attr`;
+DELETE FROM `voc_Any`;
+DELETE FROM `voc_Any_attr`;
 DELETE FROM `Vocabularies`;
 
 COMMIT;

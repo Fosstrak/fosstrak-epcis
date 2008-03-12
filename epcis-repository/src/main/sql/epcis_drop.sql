@@ -47,4 +47,6 @@ drop table voc_EPCClass;
 drop table voc_EPCClass_attr;
 drop table voc_ReadPoint;
 drop table voc_ReadPoint_attr;
+drop table voc_Any;
+drop table voc_Any_attr;
 
