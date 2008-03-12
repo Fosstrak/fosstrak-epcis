@@ -69,6 +69,10 @@ public class RepositoryContextListener implements ServletContextListener {
         // PropertyConfigurator.configure(path + log4jCfg);
         // }
         // log = LogFactory.getLog(this.getClass());
+
+        // set a system property to configure CXF to use LOG4J
+        System.setProperty("org.apache.cxf.Logger", "org.apache.cxf.common.logging.Log4jLogger");
+
         LOG.info("Starting Accada EPCIS Repository application");
 
         if (LOG.isDebugEnabled()) {
