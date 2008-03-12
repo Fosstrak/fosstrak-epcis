@@ -130,10 +130,12 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
 
         vocabularyTablenameMap = new HashMap<String, String>(5);
         vocabularyTablenameMap.put(EpcisConstants.BUSINESS_STEP_ID, "voc_BizStep");
-        vocabularyTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION_ID, "voc_BizTrans");
-        vocabularyTablenameMap.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition");
-        vocabularyTablenameMap.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint");
         vocabularyTablenameMap.put(EpcisConstants.BUSINESS_LOCATION_ID, "voc_BizLoc");
+        vocabularyTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION_ID, "voc_BizTrans");
+        vocabularyTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, "voc_BizTransType");
+        vocabularyTablenameMap.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition");
+        vocabularyTablenameMap.put(EpcisConstants.EPC_CLASS_ID, "voc_EPCClass");
+        vocabularyTablenameMap.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint");
 
         vocabularyTypeMap = new HashMap<String, String>(7);
         vocabularyTypeMap.put("bizLocation", "bizLocation.uri");
@@ -191,7 +193,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
             Operation op = queryParam.getOp();
             Object value = queryParam.getValue();
 
-            // first check if we need to do any JOINs
+            // check if we need to do any JOINs
             if ("epcList".equals(eventField) || "childEPCs".equals(eventField) || "anyEPC".equals(eventField)) {
                 // we have a query on EPCs, so we need to join the appropriate
                 // "_EPCs" table
@@ -245,8 +247,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
             }
 
             // now check the provided event field, operation, and value and
-            // update
-            // the SQL strings accordingly
+            // update the SQL strings accordingly
             if (value == null && op == Operation.EXISTS) {
                 if (eventField.startsWith("epc") || eventField.startsWith("bizTransList")) {
                     // EXISTS-query already coped with by JOIN - nothing to do
@@ -266,11 +267,20 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                             sqlWhereClause.append(" AND (0");
                             for (Object paramValue : paramValues) {
                                 String strValue = (String) paramValue;
+
+                                // MATCH-params might be 'pure identity' EPC patterns
+                                if (op == Operation.MATCH && !eventField.startsWith("epcClass")) {
+                                    if (strValue.startsWith("urn:epc:idpat:")) {
+                                        strValue = strValue.replace("urn:epc:idpat:", "urn:epc:id:");
+                                    }
+                                }
+                                strValue = strValue.replaceAll("\\*", "%");
+
                                 sqlWhereClause.append(" OR ").append(eventField).append(" LIKE ?");
-                                sqlParams.add(strValue.replaceAll("\\*", "%"));
+                                sqlParams.add(strValue);
                                 if (seQuery.isAnyEpc() && "epc.epc".equals(eventField)) {
                                     sqlWhereClause.append(" OR parentID LIKE ?");
-                                    sqlParams.add(strValue.replaceAll("\\*", "%"));
+                                    sqlParams.add(strValue);
                                 }
                             }
                             sqlWhereClause.append(")");
@@ -287,15 +297,10 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                     }
                 } else {
                     // we have a single-value parameter, e.g. eventTime,
-                    // recordTime,
-                    // parentID
+                    // recordTime, parentID
                     String sqlOp = operationMap.get(op);
                     sqlWhereClause.append(" AND ").append(eventField).append(" ").append(sqlOp).append(" ?");
-                    if ("LIKE".equals(sqlOp)) {
-                        sqlParams.add(((String) value).replaceAll("\\*", "%"));
-                    } else {
-                        sqlParams.add(value);
-                    }
+                    sqlParams.add(value);
                 }
             }
         }
@@ -521,8 +526,14 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
         List<String> vocabularyWdNames = mdQuery.getVocabularyWdNames();
 
         boolean joinedAttribute = false;
-        String vocTablename = vocabularyTablenameMap.get(vocType);
+        String vocTablename = getVocabularyTablename(vocType);
         sqlSelectFrom.append(" ").append(vocTablename).append(",");
+        if ("voc_Any".equals(vocTablename)) {
+            // this is not a standard vocabulary, we need to restrict by vtype
+            // in the voc_Any table
+            sqlWhereClause.append(" AND voc_Any.vtype=?");
+            sqlParams.add(vocType);
+        }
 
         // filter by attribute names
         if (attributeNames != null && !attributeNames.isEmpty()) {
@@ -686,30 +697,32 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
      */
     private void fetchAttributes(final QueryOperationsSession session, final String vocType, final String vocUri,
             final List<String> filterAttrNames, final List<AttributeType> attributes) throws SQLException {
-        String vocTablename = vocabularyTablenameMap.get(vocType);
+        String vocTablename = getVocabularyTablename(vocType);
         StringBuilder sql = new StringBuilder();
+        List<Object> sqlParams = new ArrayList<Object>();
         sql.append("SELECT attribute, value FROM ").append(vocTablename).append(" AS voc, ");
         sql.append(vocTablename).append("_attr AS attr WHERE voc.id=attr.id AND voc.uri=?");
+        sqlParams.add(vocUri);
+        if ("voc_Any".equals(vocTablename)) {
+            sql.append(" AND voc.vtype=?");
+            sqlParams.add(vocType);
+        }
         if (filterAttrNames != null && !filterAttrNames.isEmpty()) {
             // filter by attribute names
             sql.append(" AND attribute IN (?");
+            sqlParams.add(filterAttrNames.get(0));
             for (int i = 1; i < filterAttrNames.size(); i++) {
                 sql.append(",?");
+                sqlParams.add(filterAttrNames.get(i));
             }
             sql.append(")");
         }
         PreparedStatement ps = session.getPreparedStatement(sql.toString());
-        ps.setString(1, vocUri);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SQL: " + sql.toString());
-            LOG.debug("     param1 = " + vocUri);
-        }
-        if (filterAttrNames != null && !filterAttrNames.isEmpty()) {
-            for (int i = 0; i < filterAttrNames.size(); i++) {
-                ps.setString(i + 2, filterAttrNames.get(i));
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("     param" + i + 2 + " = " + filterAttrNames.get(i));
-                }
+        LOG.debug("SQL: " + sql.toString());
+        for (int i = 0; i < sqlParams.size(); i++) {
+            ps.setObject(i + 1, sqlParams.get(i));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("     param" + i + " = " + sqlParams.get(i));
             }
         }
 
@@ -741,7 +754,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
     private IDListType fetchChildren(final QueryOperationsSession session, final String vocType, final String vocUri)
             throws SQLException, ImplementationExceptionResponse {
         IDListType children = new IDListType();
-        String vocTablename = vocabularyTablenameMap.get(vocType);
+        String vocTablename = getVocabularyTablename(vocType);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT uri FROM ").append(vocTablename).append(" AS voc WHERE voc.uri LIKE ?");
         PreparedStatement ps = session.getPreparedStatement(sql.toString());
@@ -1007,5 +1020,16 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
         Connection connection = dataSource.getConnection();
         LOG.debug("Database connection for session established");
         return new QueryOperationsSession(connection);
+    }
+
+    protected String getVocabularyTablename(String vocTypeId) {
+        if (vocTypeId == null || "".equals(vocTypeId)) {
+            return null;
+        }
+        String tablename = vocabularyTablenameMap.get(vocTypeId);
+        if (tablename == null) {
+            return "voc_Any";
+        }
+        return tablename;
     }
 }
