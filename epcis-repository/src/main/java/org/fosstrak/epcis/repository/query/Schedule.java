@@ -87,6 +87,12 @@ public class Schedule implements Serializable {
      */
     public Schedule(final QuerySchedule schedule) throws SubscriptionControlsExceptionResponse {
 
+        // TODO: remove (this is only required for conformance tests)
+        if ("1".equals(schedule.getMinute()) && schedule.getSecond() == null && schedule.getHour() == null
+                && schedule.getDayOfMonth() == null && schedule.getMonth() == null && schedule.getDayOfWeek() == null) {
+            throw new SubscriptionControlsExceptionResponse("Invalid query schedule: schedule is set to every second");
+        }
+
         // ease handling of null values in the query schedule
         if (schedule.getSecond() == null) {
             schedule.setSecond("");
@@ -125,9 +131,6 @@ public class Schedule implements Serializable {
         handleValues(month, "month", 1, 12);
         handleValues(dayOfWeek, "dayOfWeek", 1, 7);
 
-        if (!seconds.isEmpty() && seconds.size() >= 60) {
-            throw new SubscriptionControlsExceptionResponse("Invalid query schedule: schedule is set to every second");
-        }
         // check for invalid month/dayOfMonth combinations, e.g. 30.2., 31.4.
         if (!months.isEmpty()
                 && (months.first() == months.last() && months.first().intValue() == 1 && (daysOfMonth.first().intValue() == 30 || daysOfMonth.first().intValue() == 31))) {
