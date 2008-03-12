@@ -104,10 +104,7 @@
   <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
 
   <cxf:bus>
-    <!-- <cxf:features><cxf:logging /></cxf:features> -->
-    <cxf:inInterceptors><ref bean="logInbound" /></cxf:inInterceptors>
-    <cxf:outInterceptors><ref bean="logOutbound" /></cxf:outInterceptors>
-    <cxf:inFaultInterceptors><ref bean="logOutbound" /></cxf:inFaultInterceptors>
+    <cxf:features><cxf:logging /></cxf:features>
   </cxf:bus>
 
 </beans>
