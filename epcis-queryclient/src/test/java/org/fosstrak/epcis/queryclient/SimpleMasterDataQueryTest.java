@@ -35,18 +35,21 @@ import org.accada.epcis.utils.QueryResultsParser;
 /**
  * A simple test utility class for quickly testing masterdata queries against
  * the Accada EPCIS query module.
+ * <p>
+ * Note: keep the methods in this class static in order to prevent them from
+ * being executed when building the project with Maven.
  * 
  * @author Marco Steybe
  */
 public class SimpleMasterDataQueryTest {
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Creates a simple EPCIS masterdata query, sends it to the EPCIS query
      * service for processing and prints the response to System.out.
      */
-    public void sendQuery() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
+    public static void testPoll() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
             QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
         StringBuilder sb = new StringBuilder();
@@ -72,14 +75,7 @@ public class SimpleMasterDataQueryTest {
         QueryResultsParser.queryResultsToXml(results, System.out);
     }
 
-    /**
-     * Used to manually start this test.
-     * 
-     * @param args
-     *            nothing expected.
-     */
     public static void main(String[] args) throws Exception {
-        SimpleMasterDataQueryTest test = new SimpleMasterDataQueryTest();
-        test.sendQuery();
+        testPoll();
     }
 }

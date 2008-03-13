@@ -20,14 +20,25 @@
 
 package org.accada.epcis.queryclient;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.InvalidURIExceptionResponse;
 import org.accada.epcis.soap.NoSuchNameExceptionResponse;
+import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
 import org.accada.epcis.soap.QueryParameterExceptionResponse;
 import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.soap.SecurityExceptionResponse;
+import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
+import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
 import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.utils.QueryResultsParser;
@@ -35,18 +46,21 @@ import org.accada.epcis.utils.QueryResultsParser;
 /**
  * A simple test utility class for quickly testing event queries against the
  * Accada EPCIS query module.
+ * <p>
+ * Note: keep the methods in this class static in order to prevent them from
+ * being executed when building the project with Maven.
  * 
  * @author Marco Steybe
  */
 public class SimpleEventQueryTest {
 
-    private QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient();
 
     /**
      * Creates a simple EPCIS query, sends it to the EPCIS query service for
      * processing and prints the response to System.out.
      */
-    public void sendQuery() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
+    public static void testPoll() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
             QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
         StringBuilder sb = new StringBuilder();
@@ -77,14 +91,52 @@ public class SimpleEventQueryTest {
         QueryResultsParser.queryResultsToXml(results, System.out);
     }
 
-    /**
-     * Used to manually start this test.
-     * 
-     * @param args
-     *            nothing expected.
-     */
+    public static void testPollFromFile(String filename) throws ImplementationExceptionResponse,
+            QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse, NoSuchNameExceptionResponse, QueryParameterExceptionResponse, IOException {
+        InputStream is = new FileInputStream(filename);
+        client.poll(is);
+    }
+
+    public static void testSubscribeFromFile(String filename) throws IOException,
+            SubscribeNotPermittedExceptionResponse, DuplicateSubscriptionExceptionResponse,
+            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
+            InvalidURIExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
+            SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
+        InputStream is = new FileInputStream(filename);
+        client.subscribe(is);
+    }
+
+    public static void testUnsubscribeFromFile(String filename) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse, IOException {
+        InputStream is = new FileInputStream(filename);
+        client.unsubscribe(is);
+    }
+
+    private static List<String> listFileNames(String dirName, final String fileNameEndingFilter) {
+        List<String> fileNames = new ArrayList<String>();
+        File dir = new File(dirName);
+        if (dir.isDirectory()) {
+            for (File f : dir.listFiles(new FileFilter() {
+                public boolean accept(File file) {
+                    if (file.getName().endsWith(fileNameEndingFilter)) {
+                        return true;
+                    }
+                    return false;
+                }
+            })) {
+                fileNames.add(f.getPath());
+            }
+        }
+        return fileNames;
+    }
+
     public static void main(String[] args) throws Exception {
-        SimpleEventQueryTest test = new SimpleEventQueryTest();
-        test.sendQuery();
+        // testPoll();
+        List<String> xmlFiles = listFileNames("D:/test", ".xml");
+        for (String fileName : xmlFiles) {
+            System.out.println(fileName);
+            testPollFromFile(fileName);
+        }
     }
 }
