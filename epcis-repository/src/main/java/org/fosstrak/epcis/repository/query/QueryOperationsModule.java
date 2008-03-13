@@ -82,6 +82,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -727,12 +728,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             NodeList strings = elem.getChildNodes();
             ArrayOfString aos = new ArrayOfString();
             for (int i = 0; i < strings.getLength(); i++) {
-                if ("string".equalsIgnoreCase(strings.item(i).getNodeName())) {
-                    String s = strings.item(i).getTextContent().trim();
-                    aos.getString().add(s);
-                } else {
-                    String msg = "Invalid ArrayOfString syntax: matching <string> </string> tags expected";
-                    throw queryParameterException(msg, null);
+                if (strings.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                    if ("string".equalsIgnoreCase(strings.item(i).getNodeName())) {
+                        String s = strings.item(i).getTextContent().trim();
+                        aos.getString().add(s);
+                    } else {
+                        String msg = "Invalid ArrayOfString syntax: matching <string> </string> tags expected";
+                        throw queryParameterException(msg, null);
+                    }
                 }
             }
             if (LOG.isDebugEnabled()) {
