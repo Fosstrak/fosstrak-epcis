@@ -306,7 +306,7 @@ public class MasterDataQueryTest extends TestCase {
 
             fail("SubscribeNotPermittedException expected");
         } catch (SubscribeNotPermittedExceptionResponse e) {
-            assertEquals("Subscription not allowed for SimpleMasterDataQuery.", e.getMessage());
+            assertEquals("Subscription not allowed for SimpleMasterDataQuery", e.getMessage());
         }
     }
 }

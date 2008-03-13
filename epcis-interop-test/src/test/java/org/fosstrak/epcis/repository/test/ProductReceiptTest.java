@@ -49,6 +49,8 @@ public class ProductReceiptTest extends TestCase {
 
     /**
      * Test SE4.
+     * <p>
+     * FIXME: this should be a Subscribe, not a Poll!
      * 
      * @throws Exception
      *             Any exception, caught by the JUnit framework.
@@ -79,6 +81,8 @@ public class ProductReceiptTest extends TestCase {
 
     /**
      * Test SE6.
+     * <p>
+     * FIXME: this should be a Subscribe, not a Poll!
      * 
      * @throws Exception
      *             Any exception, caught by the JUnit framework.
@@ -99,6 +103,8 @@ public class ProductReceiptTest extends TestCase {
 
     /**
      * Test SE7.
+     * <p>
+     * FIXME: this should be a Subscribe, not a Poll!
      * 
      * @throws Exception
      *             Any exception, caught by the JUnit framework.

@@ -48,6 +48,8 @@ public class InventoryTrackingTest extends TestCase {
 
     /**
      * TEST SE8.
+     * <p>
+     * FIXME: this should be a Subscribe, not a Poll!
      * 
      * @throws Exception
      *             Any exception, caught by the JUnit framework.
@@ -67,6 +69,8 @@ public class InventoryTrackingTest extends TestCase {
 
     /**
      * TEST SE9.
+     * <p>
+     * FIXME: this should be a Subscribe, not a Poll!
      * 
      * @throws Exception
      *             Any exception, caught by the JUnit framework.

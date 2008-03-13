@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.accada.epcis.soap.model.QueryResults;
-import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.DifferenceConstants;

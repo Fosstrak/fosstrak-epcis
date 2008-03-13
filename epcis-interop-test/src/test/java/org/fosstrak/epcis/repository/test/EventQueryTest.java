@@ -312,7 +312,7 @@ public class EventQueryTest extends TestCase {
     }
 
     /**
-     * Tests the MATCH_childEPC attribute.
+     * Tests the MATCH_anyEPC attribute (old spec version: MATCH_childEPC).
      * 
      * @throws Exception
      *             Any exception, caught by the JUnit framework.
