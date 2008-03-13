@@ -49,6 +49,8 @@ DELETE FROM `voc_epcClass`;
 DELETE FROM `voc_epcClass_attr`;
 DELETE FROM `voc_readPoint`;
 DELETE FROM `voc_readPoint_attr`;
+DELETE FROM `voc_any`;
+DELETE FROM `voc_any_attr`;
 DELETE FROM `vocabularies`;
 -- The times given in the events are in UTC
 SET time_zone = '+00:00';
