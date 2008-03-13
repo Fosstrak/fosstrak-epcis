@@ -23,37 +23,54 @@ package org.accada.epcis.repository.query;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.Properties;
 import java.util.TimeZone;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 
 import org.accada.epcis.repository.EpcisQueryCallbackInterface;
 import org.accada.epcis.soap.EPCISServicePortType;
 import org.accada.epcis.soap.EPCglobalEPCISService;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.accada.epcis.soap.NoSuchNameExceptionResponse;
+import org.accada.epcis.soap.QueryParameterExceptionResponse;
+import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
+import org.accada.epcis.soap.SecurityExceptionResponse;
+import org.accada.epcis.soap.ValidationExceptionResponse;
+import org.accada.epcis.soap.model.EPCISQueryBodyType;
+import org.accada.epcis.soap.model.EPCISQueryDocumentType;
 import org.accada.epcis.soap.model.EventListType;
 import org.accada.epcis.soap.model.ImplementationException;
 import org.accada.epcis.soap.model.ObjectFactory;
@@ -64,9 +81,6 @@ import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.soap.model.QueryTooLargeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusFactory;
-import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
 
 /**
  * Implements a subscription to a query. Created upon using subscribe() on the
@@ -78,48 +92,24 @@ import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
  */
 public class QuerySubscription implements EpcisQueryCallbackInterface, Serializable {
 
-    /**
-     * Generated ID for serialization. Adapt if you change this class in a
-     * backwards incompatible way.
-     */
-    private static final long serialVersionUID = 6070009773771605029L;
+    private static final long serialVersionUID = -6935359945494756105L;
 
     private static final Log LOG = LogFactory.getLog(QuerySubscription.class);
 
-    /**
-     * SubscriptionID.
-     */
+    // the parameters from the subscribed query
     protected String subscriptionID;
-
-    /**
-     * Destination URI to send results to.
-     */
     protected String dest;
-
-    /**
-     * Initial record time.
-     */
     protected GregorianCalendar initialRecordTime;
-
-    /**
-     * Whether to send results if nothing new available.
-     */
     protected Boolean reportIfEmpty;
-
-    /**
-     * queryName.
-     */
     protected String queryName;
-
-    /**
-     * Query parameters.
-     */
     private QueryParams queryParams;
+    private GregorianCalendar lastTimeExecuted;
 
     /**
-     * Last time the query got executed. Used to restrict results to new ones.
+     * Whether to trust a certificate whose certificate chain cannot be
+     * validated when delivering results via Query Callback Interface.
      */
-    private GregorianCalendar lastTimeExecuted;
+    private Boolean trustAllCertificates;
 
     /**
      * Constructor to be used when recreating from storage.
@@ -144,8 +134,6 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
             final GregorianCalendar lastTimeExecuted, final String queryName) {
         LOG.debug("Constructing Query Subscription with ID '" + subscriptionID + "'");
-        setUpBus();
-
         this.queryParams = queryParams;
         this.subscriptionID = subscriptionID;
         this.dest = dest;
@@ -153,22 +141,11 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         this.reportIfEmpty = reportIfEmpty;
         this.queryName = queryName;
         this.lastTimeExecuted = lastTimeExecuted;
+        this.trustAllCertificates = trustAllCertificates();
 
         // update/add GE_recordTime restriction to query params (we only need to
         // return results not previously returned!)
         updateRecordTime(queryParams, initialRecordTime);
-    }
-
-    private void setUpBus() {
-        Bus bus = CXFBusFactory.getDefaultBus();
-        ClientOnlyHTTPTransportFactory httpTransport = new ClientOnlyHTTPTransportFactory();
-        httpTransport.setBus(bus);
-        List<String> transportIds = Arrays.asList(new String[] {
-                "http://schemas.xmlsoap.org/wsdl/soap/http", "http://schemas.xmlsoap.org/soap/http",
-                "http://www.w3.org/2003/05/soap/bindings/HTTP/", "http://schemas.xmlsoap.org/wsdl/http/",
-                "http://cxf.apache.org/transports/http/configuration", "http://cxf.apache.org/bindings/xformat", });
-        httpTransport.setTransportIds(transportIds);
-        httpTransport.registerWithBindingManager();
     }
 
     /**
@@ -176,7 +153,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      * correctly re-initialize the subscriptions, especially the
      * lastTimeExecuted field, after a context restart.
      * <p>
-     * TODO: This is a backend method: move this method to the
+     * TODO: This is a back-end method: move this method to the
      * QueryOperationsBackend and delegate to it (thus we would need a reference
      * to the QueryOperationsBackend in this class).
      * 
@@ -199,17 +176,14 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             String time = ts.toString();
             stmt.setString(1, time);
             LOG.debug("       query param 1: " + time);
-
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             ObjectOutput out = new ObjectOutputStream(outStream);
             out.writeObject(queryParams);
             ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
             stmt.setBinaryStream(2, inStream, inStream.available());
             LOG.debug("       query param 2: [" + inStream.available() + " bytes]");
-
             stmt.setString(3, subscriptionID);
             LOG.debug("       query param 3: " + subscriptionID);
-
             stmt.executeUpdate();
 
             // close the database connection
@@ -261,16 +235,11 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
 
     /**
      * Runs the query assigned to this subscription. Advances lastTimeExecuted.
-     * <p>
-     * TODO: Currently we 'poll' a query using an ordinary Web service request
-     * that goes all the way through both the client-side Web service stack and
-     * the server-side Web service stack. It would be more efficient and more
-     * sensible if we could avoid these stacks and perform a local call.
      */
     public void executeQuery() {
         if (LOG.isDebugEnabled()) {
             LOG.debug("--------------------------------------------");
-            LOG.debug("Executing subscribed query '" + subscriptionID + "' which has " + queryParams.getParam().size()
+            LOG.debug("Executing subscribed query '" + subscriptionID + "' with " + queryParams.getParam().size()
                     + " parameters:");
             for (QueryParam p : queryParams.getParam()) {
                 LOG.debug(" param name:  " + p.getName());
@@ -289,14 +258,10 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         poll.setParams(queryParams);
         QueryResults result = null;
         try {
-            // initialize the query service
-            EPCglobalEPCISService s = new EPCglobalEPCISService();
-            EPCISServicePortType epcisQueryService = s.getEPCglobalEPCISServicePort();
-
-            // send the query and get current time
+            // get current time and send the query
             GregorianCalendar cal = new GregorianCalendar();
-            result = epcisQueryService.poll(poll);
-            LOG.debug("Poll returned");
+            result = executePoll(poll);
+            LOG.debug("Subscribed query '" + subscriptionID + "' has been executed");
 
             // set new lastTimeExecuted (must be <= to time when query is
             // executed, otherwise we loose results)
@@ -329,8 +294,14 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             callbackImplementationException(ie);
             return;
         } catch (Exception e) {
-            String msg = "An error retrieving the EPCIS query service occurred: " + e.getMessage();
-            LOG.error(msg, e);
+            String msg = "An unexpected error occurred while executing a subscribed query";
+            LOG.error(msg + ": " + e.getMessage(), e);
+            // send exception back to client
+            ImplementationException ie = new ImplementationException();
+            ie.setQueryName(queryName);
+            ie.setReason(msg);
+            ie.setSubscriptionID(subscriptionID);
+            callbackImplementationException(ie);
             return;
         }
         result.setSubscriptionID(subscriptionID);
@@ -340,7 +311,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         boolean isEmpty = false;
         isEmpty = (eventList == null) ? true : eventList.getObjectEventOrAggregationEventOrQuantityEvent().isEmpty();
         if (!reportIfEmpty.booleanValue() && isEmpty) {
-            LOG.debug("Query returned no results, nothing to report.");
+            LOG.debug("Subscribed query '" + subscriptionID + "' returned no results, nothing to report.");
             return;
         }
 
@@ -348,6 +319,28 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
 
         // update query params with new lastTimeExecuted
         updateRecordTime(queryParams, lastTimeExecuted);
+    }
+
+    /**
+     * Poll a query using local transport.
+     */
+    protected QueryResults executePoll(Poll poll) throws ImplementationExceptionResponse,
+            QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse, SecurityExceptionResponse,
+            ValidationExceptionResponse, NoSuchNameExceptionResponse, QueryParameterExceptionResponse {
+        // we use CXF's local transport feature here
+        EPCglobalEPCISService service = new EPCglobalEPCISService();
+        QName portName = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePortLocal");
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://query");
+        EPCISServicePortType servicePort = service.getPort(portName, EPCISServicePortType.class);
+
+        // the same using CXF API
+        // JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        // factory.setAddress("local://query");
+        // factory.setServiceClass(EPCISServicePortType.class);
+        // EPCISServicePortType servicePort = (EPCISServicePortType)
+        // factory.create();
+
+        return servicePort.poll(poll);
     }
 
     /**
@@ -372,28 +365,47 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
     }
 
     /**
-     * Serializes and sends the given object back to the client.
+     * Serializes and sends the given object back to the client. The Object must
+     * be an instance of QueryResults, QueryTooLargeException, or
+     * ImplementationException.
      * 
      * @param o
-     *            The object to be sent back to the client.
+     *            The object to be sent back to the client. An instance of
+     *            QueryResults, QueryTooLargeException, or
+     *            ImplementationException.
      */
     private void callbackObject(final Object o) {
-        LOG.debug("Callback " + o);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Callback " + o + " at " + new Date());
+        }
+        // create the EPCIS document
+        EPCISQueryDocumentType epcisDoc = new EPCISQueryDocumentType();
+        epcisDoc.setSchemaVersion(BigDecimal.valueOf(1.0));
+        try {
+            DatatypeFactory dataFactory = DatatypeFactory.newInstance();
+            XMLGregorianCalendar now = dataFactory.newXMLGregorianCalendar(new GregorianCalendar());
+            epcisDoc.setCreationDate(now);
+        } catch (DatatypeConfigurationException e) {
+            // oh well - don't care about setting the creation date
+        }
+        EPCISQueryBodyType epcisBody = new EPCISQueryBodyType();
+        if (o instanceof QueryResults) {
+            epcisBody.setQueryResults((QueryResults) o);
+        } else if (o instanceof QueryTooLargeException) {
+            epcisBody.setQueryTooLargeException((QueryTooLargeException) o);
+        } else if (o instanceof ImplementationException) {
+            epcisBody.setImplementationException((ImplementationException) o);
+        } else {
+            epcisBody = null;
+        }
+        epcisDoc.setEPCISBody(epcisBody);
+
         // serialize the response
         String data = null;
         try {
-            ObjectFactory factory = new ObjectFactory();
+            ObjectFactory objectFactory = new ObjectFactory();
             JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
-            JAXBElement<?> item;
-            if (o instanceof QueryResults) {
-                item = factory.createQueryResults((QueryResults) o);
-            } else if (o instanceof QueryTooLargeException) {
-                item = factory.createQueryTooLargeException((QueryTooLargeException) o);
-            } else if (o instanceof ImplementationException) {
-                item = factory.createImplementationException((ImplementationException) o);
-            } else {
-                item = (JAXBElement<?>) o;
-            }
+            JAXBElement<EPCISQueryDocumentType> item = objectFactory.createEPCISQueryDocument(epcisDoc);
             LOG.debug("Serializing " + item + " into XML");
             StringWriter writer = new StringWriter();
             Marshaller marshaller = context.createMarshaller();
@@ -403,12 +415,18 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         } catch (JAXBException e) {
             String msg = "An error serializing contents occurred: " + e.getMessage();
             LOG.error(msg, e);
+            return;
         }
 
+        // set up connection and send data to given destination
         try {
-            // set up connection and send data to given destination
             URL serviceUrl = new URL(dest.toString());
-            LOG.debug("Sending results of subscribed query with ID '" + subscriptionID + "' to '" + serviceUrl + "'.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Sending results of subscribed query '" + subscriptionID + "' to '" + serviceUrl + "'");
+                if (data.length() < 100 * 1024) {
+                    LOG.debug("Sending data: " + data);
+                }
+            }
             int responseCode = sendData(serviceUrl, data);
             LOG.debug("Response " + responseCode);
         } catch (IOException e) {
@@ -420,8 +438,6 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
 
     /**
      * Sends the given data String to the specified URL.
-     * <p>
-     * TODO: some http/https error handling would be nice!
      * 
      * @param url
      *            The URL to send the data to.
@@ -433,19 +449,16 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      */
     private int sendData(final URL url, final String data) throws IOException {
         data.concat("\n");
-        /*
-         * Setup the connection. The URL.openConnection() method returns an
-         * instance of javax.net.ssl.HttpURLConnection, which extends
-         * java.net.HttpURLConnection, if the https protocol is used in the URL.
-         * Therefore we support both the HTTP and HTTPS binding of the query
-         * callback interface.
-         */
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        HttpURLConnection connection;
+        if ("https".equalsIgnoreCase(url.getProtocol()) && trustAllCertificates.booleanValue()) {
+            connection = getAllTrustingConnection(url);
+        } else {
+            connection = getConnection(url);
+        }
         connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-type", "text/plain");
+        connection.setRequestProperty("Content-type", "text/xml");
         connection.setRequestProperty("Content-length", "" + data.length());
-        // connection.setInstanceFollowRedirects(false);
-        // connection.setDoInput(true);
         connection.setDoOutput(true);
 
         // encode data
@@ -455,18 +468,96 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
 
         // send data
         OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-        LOG.debug("Sending data: " + data);
         out.write(data);
         out.flush();
 
-        // get response
-        // connection.getInputStream();
+        // get response code
         int responseCode = connection.getResponseCode();
 
-        // disconnect
+        // disconnect and return
         connection.disconnect();
-
         return responseCode;
+    }
+
+    /**
+     * Opens a connection to the given URL.
+     * <p>
+     * The URL.openConnection() method returns an instance of
+     * javax.net.ssl.HttpsURLConnection, which extends
+     * java.net.HttpURLConnection, if the HTTPS protocol is used in the URL.
+     * Thus, we support both the HTTP and HTTPS binding of the query callback
+     * interface.
+     * <p>
+     * Note: By default, accessing an HTTPS URL using the URL class results in
+     * an exception if the destination's certificate chain cannot be validated.
+     * In this case you can manually import the destination's certificate into
+     * the Java runtime's trust store, or, if you want to disable the validation
+     * of certificates for testing purposes, use
+     * {@link getAllTrustingConnection(URL)}.
+     * 
+     * @param url
+     *            The URL on which a connection will be opened.
+     * @return A HttpURLConnection connection object.
+     * @throws IOException
+     *             If an I/O error occurred.
+     */
+    private HttpURLConnection getConnection(URL url) throws IOException {
+        return (HttpURLConnection) url.openConnection();
+    }
+
+    /**
+     * Retrieves an "all-trusting" HTTP URL connection object, by disabling the
+     * validation of certificates and overriding the default trust manager with
+     * one that trusts all certificates.
+     * 
+     * @param url
+     *            The URL on which a connection will be opened.
+     * @return A HttpURLConnection connection object.
+     * @throws IOException
+     *             If an I/O error occurred.
+     */
+    private HttpURLConnection getAllTrustingConnection(URL url) throws IOException {
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+        } };
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
+            LOG.error("Unable to install the all-trusting trust manager", e);
+        }
+        return getConnection(url);
+    }
+
+    /**
+     * @return Whether to trust a certificate whose certificate chain cannot be
+     *         validated when delivering results via Query Callback Interface.
+     */
+    private Boolean trustAllCertificates() {
+        // read application properties from classpath
+        String resource = "/application.properties";
+        InputStream is = this.getClass().getResourceAsStream(resource);
+        Properties properties = new Properties();
+        try {
+            properties.load(is);
+            is.close();
+        } catch (IOException e) {
+            LOG.error("Unable to load application properties from classpath:" + resource + " ("
+                    + this.getClass().getResource(resource) + ")", e);
+        }
+        return Boolean.valueOf(properties.getProperty("trustAllCertificates", "false"));
     }
 
     /**

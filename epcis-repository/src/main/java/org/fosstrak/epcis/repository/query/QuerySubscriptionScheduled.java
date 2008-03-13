@@ -43,12 +43,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class QuerySubscriptionScheduled extends QuerySubscription implements NotificationListener, Serializable {
 
-    private static final Log LOG = LogFactory.getLog(QuerySubscriptionScheduled.class);
+    private static final long serialVersionUID = -5073503857856387167L;
 
-    /**
-     * Generated unique ID for serialization.
-     */
-    private static final long serialVersionUID = -2922511476030412610L;
+    private static final Log LOG = LogFactory.getLog(QuerySubscriptionScheduled.class);
 
     /**
      * Schedule indicating when subscription query is to be executed.
@@ -143,25 +140,33 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
             LOG.error("The timer stating the next scheduled query execution time is null!");
             return;
         }
+        Timer timer = (Timer) pHandback;
 
         if (!doItAgain.booleanValue()) {
-            ((Timer) pHandback).stop();
+            timer.stop();
         } else {
-            try {
-                // execute the query
-                executeQuery();
+            // execute the query and determine next scheduled execution time
+            executeQuery();
+            setNextScheduledExecutionTime(timer);
+        }
+    }
 
-                // determine next scheduled execution time
-                Date nextSchedule = schedule.nextScheduledTime().getTime();
-                LOG.debug("Next scheduled time for the subscribed query is '" + nextSchedule + "'.");
-                ((Timer) pHandback).addNotification("SubscriptionSchedule", "Please do the query", (Timer) pHandback,
-                        nextSchedule);
-
-            } catch (ImplementationExceptionResponse e) {
-                String msg = "The next scheduled date for the subscribed query with ID '" + getSubscriptionID()
-                        + "' cannot be evaluated: " + e.getMessage();
-                LOG.error(msg, e);
-            }
+    /**
+     * Determines the next scheduled execution time for this subscribed query.
+     * 
+     * @param timer
+     *            The Timer to set the next scheduled time.
+     * @throws IllegalArgumentException
+     */
+    protected void setNextScheduledExecutionTime(final Timer timer) throws IllegalArgumentException {
+        try {
+            Date nextSchedule = schedule.nextScheduledTime().getTime();
+            LOG.debug("Next scheduled time for the subscribed query is '" + nextSchedule + "'.");
+            timer.addNotification("SubscriptionSchedule", "Please do the query", timer, nextSchedule);
+        } catch (ImplementationExceptionResponse e) {
+            String msg = "The next scheduled date for the subscribed query with ID '" + getSubscriptionID()
+                    + "' cannot be evaluated: " + e.getMessage();
+            LOG.error(msg, e);
         }
     }
 

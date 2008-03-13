@@ -20,14 +20,11 @@
 
 package org.accada.epcis.repository.query;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.management.Notification;
 import javax.management.timer.Timer;
 
-import org.accada.epcis.soap.EPCISServicePortType;
-import org.accada.epcis.soap.EPCglobalEPCISService;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.model.ArrayOfString;
 import org.accada.epcis.soap.model.Poll;
@@ -47,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
 
-    private static final long serialVersionUID = 1108013137860201366L;
+    private static final long serialVersionUID = 658402150914797471L;
 
     private static final Log LOG = LogFactory.getLog(QuerySubscriptionTriggered.class);
 
@@ -75,8 +72,10 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
             LOG.error("The timer stating the next scheduled query execution time is null!");
             return;
         }
+        Timer timer = (Timer) pHandback;
+        
         if (!doItAgain.booleanValue()) {
-            ((Timer) pHandback).stop();
+            timer.stop();
         } else {
             try {
                 LOG.debug("Checking trigger condition ...");
@@ -97,15 +96,11 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
                 param.setValue(initialRecordTime);
                 params.getParam().add(param);
 
-                // initialize the query service
-                EPCglobalEPCISService s = new EPCglobalEPCISService();
-                EPCISServicePortType epcisQueryService = s.getEPCglobalEPCISServicePort();
-
                 // send the query
                 Poll poll = new Poll();
                 poll.setParams(params);
                 poll.setQueryName(queryName);
-                QueryResults results = epcisQueryService.poll(poll);
+                QueryResults results = executePoll(poll);
                 if (results.getResultsBody().getEventList() != null) {
                     LOG.debug("Trigger condition fulfilled!");
                     LOG.debug("Executing subscribed query associated with trigger event ...");
@@ -119,18 +114,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
             }
 
             // determine next scheduled execution time
-            Date nextSchedule;
-            try {
-                nextSchedule = schedule.nextScheduledTime().getTime();
-                LOG.debug("Next scheduled time for the subscribed query with subscriptionID '" + subscriptionID
-                        + "' is '" + nextSchedule + "'.");
-                ((Timer) pHandback).addNotification("SubscriptionSchedule", "Please do the query", (Timer) pHandback,
-                        nextSchedule);
-            } catch (ImplementationExceptionResponse e) {
-                String msg = "Next scheduled time for the subscribed query with ID '" + getSubscriptionID()
-                        + "' cannot be evaluated: " + e.getMessage();
-                LOG.error(msg, e);
-            }
+            setNextScheduledExecutionTime(timer);
         }
     }
 }
