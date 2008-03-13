@@ -21,9 +21,10 @@
 package org.accada.epcis.repository.capture;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -82,7 +83,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.engine.SessionFactoryImplementor;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -125,8 +125,6 @@ public class CaptureOperationsModule {
      */
     private Schema schema;
 
-    private String epcisSchemaFile;
-
     /**
      * Whether we should insert new vocabulary or throw an error message.
      */
@@ -141,7 +139,7 @@ public class CaptureOperationsModule {
      * The name of the SQL script used to clean and refill the database with
      * test data.
      */
-    private String dbResetScript = null;
+    private File dbResetScript = null;
 
     /**
      * Interface to the database.
@@ -193,14 +191,14 @@ public class CaptureOperationsModule {
                 Transaction tx = null;
                 try {
                     tx = session.beginTransaction();
-                    SessionFactory sessionFactory = session.getSessionFactory();
-                    Connection dbconnection = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider().getConnection();
-                    LOG.info("Running db reset script.");
-                    Statement stmt = dbconnection.createStatement();
-                    if (dbResetScript != null) {
-                        BufferedReader reader = new BufferedReader(new StringReader(dbResetScript));
-                        String line;
-                        while ((line = reader.readLine()) != null) {
+                    Connection connection = session.connection();
+                    LOG.info("Running db reset script from file " + dbResetScript);
+                    Statement stmt = connection.createStatement();
+                    BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (!line.startsWith("--")) {
+                            LOG.debug("SQL: " + line);
                             stmt.addBatch(line);
                         }
                     }
@@ -859,7 +857,7 @@ public class CaptureOperationsModule {
 
     public void setDbResetScript(String dbResetScript) {
         URL url = this.getClass().getResource(dbResetScript);
-        this.dbResetScript = url.getPath();
+        this.dbResetScript = new File(url.getFile());
     }
 
     public boolean isInsertMissingVoc() {
@@ -878,12 +876,7 @@ public class CaptureOperationsModule {
         this.schema = schema;
     }
 
-    public String getEpcisSchemaFile() {
-        return epcisSchemaFile;
-    }
-
     public void setEpcisSchemaFile(String epcisSchemaFile) {
-        this.epcisSchemaFile = epcisSchemaFile;
         Schema schema = initEpcisSchema(epcisSchemaFile);
         setSchema(schema);
     }
