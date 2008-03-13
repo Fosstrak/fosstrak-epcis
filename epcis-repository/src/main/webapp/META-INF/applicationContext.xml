@@ -96,13 +96,22 @@
   <!--  CXF (Web service) configuration                            -->
   <!-- =========================================================== -->
 
-  <!-- configure the Web service endpoint and it's implementing bean -->
+  <!-- publish the Web service endpoint and it's implementing bean -->
   <jaxws:endpoint id="EpcisQueryEnpoint" implementor="#queryOperationsWebService" address="/query" />
+  <jaxws:endpoint id="EpcisQueryLocalEnpoint" implementor="#queryOperationsWebService" address="local://query" />
+  
+  <!-- register local transport -->
+  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+    <property name="transportIds">
+      <list>
+        <value>http://cxf.apache.org/transports/local</value>
+        <value>http://schemas.xmlsoap.org/soap/http</value>
+        <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+      </list>
+    </property>
+  </bean>
 
   <!-- configure logging of SOAP messages -->
-  <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
-  <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-
   <cxf:bus>
     <cxf:features><cxf:logging /></cxf:features>
   </cxf:bus>
