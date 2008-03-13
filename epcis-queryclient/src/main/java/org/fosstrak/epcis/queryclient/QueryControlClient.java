@@ -443,6 +443,34 @@ public class QueryControlClient implements QueryControlInterface {
     }
 
     /**
+     * Parses the XML from the given input stream as an Unsubscribe object and
+     * unsubscribes the specified subscription ID from the repository.
+     * 
+     * @param unsubscribeIs
+     * @throws ImplementationExceptionResponse
+     * @throws SecurityExceptionResponse
+     * @throws ValidationExceptionResponse
+     * @throws NoSuchSubscriptionExceptionResponse
+     * @throws IOException
+     */
+    public void unsubscribe(final InputStream unsubscribeIs) throws ImplementationExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse, IOException {
+        try {
+            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            JAXBElement<Unsubscribe> elem = (JAXBElement<Unsubscribe>) unmarshaller.unmarshal(unsubscribeIs);
+            Unsubscribe unsubscribe = elem.getValue();
+            unsubscribe(unsubscribe.getSubscriptionID());
+        } catch (JAXBException e) {
+            // wrap JAXBException into IOException to keep the interface
+            // JAXB-free
+            IOException ioe = new IOException(e.getMessage());
+            ioe.setStackTrace(e.getStackTrace());
+            throw ioe;
+        }
+    }
+
+    /**
      * @return The URL String at which the Query Operations Module listens.
      */
     public String getEndpointAddress() {
