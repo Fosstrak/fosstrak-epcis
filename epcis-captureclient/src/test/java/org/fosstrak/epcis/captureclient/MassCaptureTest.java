@@ -26,8 +26,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.accada.epcis.captureclient.CaptureClient;
-
 /**
  * Test which sends 1000 events to the capture interface and checks if HTTP
  * status code 200 OK returns.
@@ -52,32 +50,33 @@ public class MassCaptureTest {
         StringBuilder sb = new StringBuilder();
         String epc = "urn:epc:id:sgtin:1.1." + epcSerialNr;
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-        sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\" xmlns:hls=\"http://schema.hls.com/extension\" creationDate=\"2007-12-14T00:00:00Z\" schemaVersion=\"1.0\">");
+        sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\"");
+        sb.append(" creationDate=\"").append(time).append("\" schemaVersion=\"1.0\">");
         sb.append("<EPCISBody>");
-        sb.append("  <EventList>");
-        sb.append("    <ObjectEvent>");
-        sb.append("      <eventTime>").append(time).append("</eventTime>");
-        sb.append("      <eventTimeZoneOffset>").append(tz).append("</eventTimeZoneOffset>");
-        sb.append("      <epcList>");
-        sb.append("         <epc>").append(epc).append("</epc>");
-        sb.append("      </epcList>");
-        sb.append("      <action>ADD</action>");
-        sb.append("      <bizStep>urn:epcglobal:hls:bizstep:testing</bizStep>");
-        sb.append("      <readPoint>");
-        sb.append("          <id>urn:epcglobal:fmcg:loc:1.1</id>");
-        sb.append("      </readPoint>");
-        sb.append("      <bizLocation>");
-        sb.append("          <id>urn:epcglobal:fmcg:loc:1.1</id>");
-        sb.append("      </bizLocation>");
-        sb.append("   </ObjectEvent>");
-        sb.append("  </EventList>");
+        sb.append("<EventList>");
+        sb.append("<ObjectEvent>");
+        sb.append("<eventTime>").append(time).append("</eventTime>");
+        sb.append("<eventTimeZoneOffset>").append(tz).append("</eventTimeZoneOffset>");
+        sb.append("<epcList>");
+        sb.append("<epc>").append(epc).append("</epc>");
+        sb.append("</epcList>");
+        sb.append("<action>ADD</action>");
+        sb.append("<bizStep>urn:accada:demo:bizstep:testing</bizStep>");
+        sb.append("<readPoint>");
+        sb.append("<id>urn:accada:demo:fmcg:loc:1.1</id>");
+        sb.append("</readPoint>");
+        sb.append("<bizLocation>");
+        sb.append("<id>urn:accada:demo:fmcg:loc:1.1</id>");
+        sb.append("</bizLocation>");
+        sb.append("</ObjectEvent>");
+        sb.append("</EventList>");
         sb.append("</EPCISBody>");
         sb.append("</epcis:EPCISDocument>");
         int status = client.capture(sb.toString());
         if (status == 200) {
-            System.out.println("ObjectEvent with EPC '" + epc + "' stored successfully.");
+            System.out.println("EPCIS Event with EPC '" + epc + "' stored successfully.");
         } else {
-            System.err.println("Error storing ObjectEvent with EPC '" + epc + "' (HTTP status code " + status + ").");
+            System.err.println("Error storing EPCIS Event with EPC '" + epc + "' (HTTP status code " + status + ").");
         }
     }
 
@@ -159,10 +158,6 @@ public class MassCaptureTest {
         return buf.toString();
     }
 
-    /**
-     * @param args
-     * @throws IOException
-     */
     public static void main(final String[] args) throws IOException {
         for (int epcSerialNr = 0; epcSerialNr < 1000; epcSerialNr++) {
             testCaptureRequest(epcSerialNr);

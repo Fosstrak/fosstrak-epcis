@@ -20,11 +20,19 @@
 
 package org.accada.epcis.captureclient;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * A simple test utility class for sending a capture request to the Accada EPCIS
- * capture interface and bootstrapping the capture module.
+ * A simple test utility class for sending a single or multiple capture
+ * request(s) to the Accada EPCIS capture interface and bootstrapping the
+ * capture module.
+ * <p>
+ * Note: keep the methods in this class static in order to prevent them from
+ * being executed when building the project with Maven.
  * 
  * @author Marco Steybe
  */
@@ -65,13 +73,45 @@ public class SimpleCaptureTest {
         System.out.println(client.capture(sb.toString()));
     }
 
-    /**
-     * Used to manually start this test.
-     * 
-     * @param args
-     *            nothing expected.
-     */
+    public static boolean testCaptureFromFile(String filename) throws IOException {
+        System.out.println(filename);
+        InputStream is = new FileInputStream(filename);
+        int responseCode = client.capture(is);
+        if (responseCode == 200) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean testCaptureFromDir(String dirname) throws IOException {
+        // capture all xml files in the given folder
+        File dir = new File(dirname);
+        boolean allOk = true;
+        if (dir.isDirectory()) {
+            for (File f : dir.listFiles(new FileFilter() {
+                public boolean accept(File file) {
+                    if (file.getName().endsWith(".xml")) {
+                        return true;
+                    }
+                    return false;
+                }
+            })) {
+                boolean ok = testCaptureFromFile(f.getPath());
+                if (!ok) {
+                    allOk = false;
+                }
+            }
+        }
+        return allOk;
+    }
+
     public static void main(String[] args) throws Exception {
-        testCapture();
+        // test.testCapture();
+        boolean ok = testCaptureFromDir("D:/test");
+        if (ok) {
+            System.out.println("Capture of all events successful");
+        } else {
+            System.out.println("Capture of at least one event failed");
+        }
     }
 }
