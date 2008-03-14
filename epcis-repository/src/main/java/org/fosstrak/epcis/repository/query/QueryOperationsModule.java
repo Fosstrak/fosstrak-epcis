@@ -108,7 +108,6 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * The names of all the implemented queries.
      */
     private static final List<String> QUERYNAMES;
-
     static {
         QUERYNAMES = new ArrayList<String>(2);
         QUERYNAMES.add("SimpleEventQuery");
@@ -132,21 +131,13 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      */
     private int maxQueryTime;
 
-    /**
-     * The seconds to wait to check a trigger condition.
-     */
+    // time to wait for checking trigger conditions
     private String triggerConditionSeconds;
-
-    /**
-     * The minutes to wait to check a trigger condition.
-     */
-    private String triggerConditionMinutes = null;
+    private String triggerConditionMinutes;
 
     private ServletContext servletContext;
-
     private DataSource dataSource;
-
-    private QueryOperationsBackend backend = new QueryOperationsBackendSQL();
+    private QueryOperationsBackend backend;
 
     /**
      * Create an SQL query string from the given query parameters.
@@ -1420,6 +1411,20 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             }
         }
         this.serviceVersion = serviceVersion;
+    }
+
+    /**
+     * @return the backend
+     */
+    public QueryOperationsBackend getBackend() {
+        return backend;
+    }
+
+    /**
+     * @param backend the backend to set
+     */
+    public void setBackend(QueryOperationsBackend backend) {
+        this.backend = backend;
     }
 
     /**

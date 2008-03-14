@@ -92,7 +92,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class QuerySubscription implements EpcisQueryCallbackInterface, Serializable {
 
-    private static final long serialVersionUID = -6935359945494756105L;
+    private static final long serialVersionUID = -3066828914403000033L;
 
     private static final Log LOG = LogFactory.getLog(QuerySubscription.class);
 
@@ -105,11 +105,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
     private QueryParams queryParams;
     private GregorianCalendar lastTimeExecuted;
 
-    /**
-     * Whether to trust a certificate whose certificate chain cannot be
-     * validated when delivering results via Query Callback Interface.
-     */
-    private Boolean trustAllCertificates;
+    private Properties properties;
 
     /**
      * Constructor to be used when recreating from storage.
@@ -141,7 +137,6 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         this.reportIfEmpty = reportIfEmpty;
         this.queryName = queryName;
         this.lastTimeExecuted = lastTimeExecuted;
-        this.trustAllCertificates = trustAllCertificates();
 
         // update/add GE_recordTime restriction to query params (we only need to
         // return results not previously returned!)
@@ -161,11 +156,11 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      *            The new lastTimeExecuted.
      */
     private void updateSubscription(final GregorianCalendar lastTimeExecuted) {
+        String jndiName = getProperties().getProperty("jndi.datasource.name", "java:comp/env/jdbc/EPCISDB");
         try {
             // open a database connection
-            Context initContext = new InitialContext();
-            Context env = (Context) initContext.lookup("java:comp/env");
-            DataSource db = (DataSource) env.lookup("jdbc/EPCISDB");
+            Context ctx = new InitialContext();
+            DataSource db = (DataSource) ctx.lookup(jndiName);
             Connection dbconnection = db.getConnection();
 
             // update the subscription in the database
@@ -195,7 +190,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             String msg = "Unable to update the subscription in the database: " + e.getMessage();
             LOG.error(msg, e);
         } catch (NamingException e) {
-            String msg = "Unable to read configuration, check META-INF/context.xml for Resource 'jdbc/EPCISDB'.";
+            String msg = "Unable to find JNDI data source with name " + jndiName;
             LOG.error(msg, e);
         }
     }
@@ -330,7 +325,13 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         // we use CXF's local transport feature here
         EPCglobalEPCISService service = new EPCglobalEPCISService();
         QName portName = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePortLocal");
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://query");
+        String queryAddress = getProperties().getProperty("ws.query.address", "query");
+        if (queryAddress.startsWith("/")) {
+            queryAddress = "local:/".concat(queryAddress);
+        } else {
+            queryAddress = "local://".concat(queryAddress);
+        }
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", queryAddress);
         EPCISServicePortType servicePort = service.getPort(portName, EPCISServicePortType.class);
 
         // the same using CXF API
@@ -451,7 +452,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         data.concat("\n");
 
         HttpURLConnection connection;
-        if ("https".equalsIgnoreCase(url.getProtocol()) && trustAllCertificates.booleanValue()) {
+        if ("https".equalsIgnoreCase(url.getProtocol()) && trustAllCertificates()) {
             connection = getAllTrustingConnection(url);
         } else {
             connection = getConnection(url);
@@ -545,19 +546,32 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      * @return Whether to trust a certificate whose certificate chain cannot be
      *         validated when delivering results via Query Callback Interface.
      */
-    private Boolean trustAllCertificates() {
-        // read application properties from classpath
-        String resource = "/application.properties";
-        InputStream is = this.getClass().getResourceAsStream(resource);
-        Properties properties = new Properties();
-        try {
-            properties.load(is);
-            is.close();
-        } catch (IOException e) {
-            LOG.error("Unable to load application properties from classpath:" + resource + " ("
-                    + this.getClass().getResource(resource) + ")", e);
+    private boolean trustAllCertificates() {
+        Properties properties = getProperties();
+        return Boolean.parseBoolean(properties.getProperty("trustAllCertificates", "false"));
+    }
+
+    /**
+     * Loads the application's properties file from the class path if it has not
+     * already done so.
+     * 
+     * @return A populated Properties instance.
+     */
+    private Properties getProperties() {
+        if (properties == null) {
+            // read application properties from classpath
+            String resource = "/application.properties";
+            InputStream is = this.getClass().getResourceAsStream(resource);
+            properties = new Properties();
+            try {
+                properties.load(is);
+                is.close();
+            } catch (IOException e) {
+                LOG.error("Unable to load application properties from classpath:" + resource + " ("
+                        + this.getClass().getResource(resource) + ")", e);
+            }
         }
-        return Boolean.valueOf(properties.getProperty("trustAllCertificates", "false"));
+        return properties;
     }
 
     /**

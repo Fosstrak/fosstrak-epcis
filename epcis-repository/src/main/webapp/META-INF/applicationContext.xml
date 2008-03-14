@@ -67,6 +67,9 @@
     <property name="servletContext">
       <bean class="org.springframework.web.context.support.ServletContextFactoryBean" />
     </property>
+    <property name="backend">
+      <bean class="org.accada.epcis.repository.query.QueryOperationsBackendSQL" />
+    </property>
   </bean>
   <bean id="queryOperationsWebService" class="org.accada.epcis.repository.query.QueryOperationsWebService">
     <constructor-arg><ref bean="queryOperationsModule" /></constructor-arg>

@@ -43,11 +43,14 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 /**
- * TODO: javadoc ... this class is only required if you do not wire the
- * application using spring! replace WEB-INF/web.xml with
- * WEB-INF/non-spring-web.xml
+ * This HttpServlet is used to initialize the QueryOperationsModule. It will
+ * read the application's properties file from the class path, read the data
+ * source from a JNDI name, and load the CXF Web service bus in order to set up
+ * the QueryOperationsModule with the required values.
  * <p>
- * TODO: read WS_SERVICE_ADDRESS and JNDI_DATASOURCE_NAME from properties!
+ * Note: this servlet is only required if you do not wire the application with
+ * Spring! To use this servlet, and bypass Spring, replace
+ * <code>WEB-INF/web.xml</code> with <code>WEB-INF/non-spring-web.xml</code>.
  * 
  * @author Marco Steybe
  */
@@ -61,10 +64,12 @@ public class QueryInitServlet extends CXFNonSpringServlet {
     private static final String PROP_TRIGGER_CHECK_SEC = "trigger.condition.check.sec";
     private static final String PROP_TRIGGER_CHECK_MIN = "trigger.condition.check.min";
     private static final String PROP_SERVICE_VERSION = "service.version";
-    private static final String JNDI_DATASOURCE_NAME = "java:comp/env/jdbc/EPCISDB";
-    private static final String WS_SERVICE_ADDRESS = "/query";
+    private static final String PROP_JNDI_DATASOURCE_NAME = "jndi.datasource.name";
+    private static final String PROP_WS_QUERY_ADDRESS = "ws.query.address";
 
     private static final Log LOG = LogFactory.getLog(QueryInitServlet.class);
+
+    private Properties properties;
 
     /**
      * {@inheritDoc}
@@ -82,23 +87,26 @@ public class QueryInitServlet extends CXFNonSpringServlet {
         }
         EPCISServicePortType service = setupQueryOperationsModule(servletConfig);
 
-        LOG.debug("Publishing query operations module service at " + WS_SERVICE_ADDRESS);
-        Endpoint.publish(WS_SERVICE_ADDRESS, service);
+        String queryAddress = properties.getProperty(PROP_WS_QUERY_ADDRESS);
+        LOG.debug("Publishing query operations module service at " + queryAddress);
+        Endpoint.publish(queryAddress, service);
     }
 
     private EPCISServicePortType setupQueryOperationsModule(ServletConfig servletConfig) {
-        Properties props = loadApplicationProperties(servletConfig);
-        DataSource dataSource = loadDataSource();
+        loadApplicationProperties(servletConfig);
+        String jndiName = properties.getProperty(PROP_JNDI_DATASOURCE_NAME);
+        DataSource dataSource = loadDataSource(jndiName);
 
         LOG.debug("Initializing query operations module");
         QueryOperationsModule module = new QueryOperationsModule();
-        module.setMaxQueryRows(Integer.parseInt(props.getProperty(PROP_MAX_QUERY_ROWS)));
-        module.setMaxQueryTime(Integer.parseInt(props.getProperty(PROP_MAX_QUERY_TIME)));
-        module.setTriggerConditionMinutes(props.getProperty(PROP_TRIGGER_CHECK_MIN));
-        module.setTriggerConditionSeconds(props.getProperty(PROP_TRIGGER_CHECK_SEC));
-        module.setServiceVersion(props.getProperty(PROP_SERVICE_VERSION));
+        module.setMaxQueryRows(Integer.parseInt(properties.getProperty(PROP_MAX_QUERY_ROWS)));
+        module.setMaxQueryTime(Integer.parseInt(properties.getProperty(PROP_MAX_QUERY_TIME)));
+        module.setTriggerConditionMinutes(properties.getProperty(PROP_TRIGGER_CHECK_MIN));
+        module.setTriggerConditionSeconds(properties.getProperty(PROP_TRIGGER_CHECK_SEC));
+        module.setServiceVersion(properties.getProperty(PROP_SERVICE_VERSION));
         module.setDataSource(dataSource);
         module.setServletContext(servletConfig.getServletContext());
+        module.setBackend(new QueryOperationsBackendSQL());
 
         LOG.debug("Initializing query operations web service");
         QueryOperationsWebService service = new QueryOperationsWebService(module);
@@ -106,16 +114,15 @@ public class QueryInitServlet extends CXFNonSpringServlet {
     }
 
     /**
-     * Loads the application properties and populates a java.util.Properties
+     * Loads the application property file and populates a java.util.Properties
      * instance.
      * 
      * @param servletConfig
      *            The ServletConfig used to locate the application property
      *            file.
-     * @return The application properties.
      */
-    private Properties loadApplicationProperties(ServletConfig servletConfig) {
-        Properties properties = new Properties();
+    private void loadApplicationProperties(ServletConfig servletConfig) {
+        properties = new Properties();
 
         // read application.properties from classpath
         String path = "/";
@@ -136,22 +143,24 @@ public class QueryInitServlet extends CXFNonSpringServlet {
         } catch (IOException e) {
             LOG.error("Unable to load application properties from " + path + appConfigFile, e);
         }
-        return properties;
     }
 
     /**
      * Loads the data source from the application context via JNDI.
      * 
+     * @param jndiName
+     *            The name of the JNDI data source holding the connection to the
+     *            database.
      * @return The application DataSource instance.
      */
-    private DataSource loadDataSource() {
+    private DataSource loadDataSource(String jndiName) {
         DataSource dataSource = null;
         try {
             Context ctx = new InitialContext();
-            dataSource = (DataSource) ctx.lookup(JNDI_DATASOURCE_NAME);
-            LOG.info("Loaded data source via JNDI from " + JNDI_DATASOURCE_NAME);
+            dataSource = (DataSource) ctx.lookup(jndiName);
+            LOG.info("Loaded data source via JNDI from " + jndiName);
         } catch (NamingException e) {
-            LOG.error("Unable to load data source via JNDI from " + JNDI_DATASOURCE_NAME, e);
+            LOG.error("Unable to load data source via JNDI from " + jndiName, e);
         }
         return dataSource;
     }
