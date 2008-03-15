@@ -20,9 +20,10 @@
 
 package org.accada.epcis.repository.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
 import junit.framework.TestCase;
 
@@ -75,9 +76,9 @@ public class CallbackRecordTimeTest extends TestCase {
         assertNotNull(resp1);
 
         // parse and compare response
-        InputStream is = new ByteArrayInputStream(resp1.getBytes());
-        QueryResults actResults = QueryResultsParser.parseResults(is);
-        is.close();
+        Reader r = new StringReader(resp1);
+        QueryResults actResults = QueryResultsParser.parseQueryDocResults(r);
+        r.close();
         query = "Test-EPCIS10-SE66-Response-1-2-QueryResults.xml";
         fis = new FileInputStream(PATH + "responses/" + query);
         QueryResults expResults = QueryResultsParser.parseResults(fis);
@@ -104,9 +105,9 @@ public class CallbackRecordTimeTest extends TestCase {
         assertNotNull(resp2);
 
         // parse and compare response
-        is = new ByteArrayInputStream(resp2.getBytes());
-        actResults = QueryResultsParser.parseResults(is);
-        is.close();
+        r = new StringReader(resp1);
+        actResults = QueryResultsParser.parseQueryDocResults(r);
+        r.close();
         query = "Test-EPCIS10-SE66-Response-1-3-QueryResults.xml";
         fis = new FileInputStream(PATH + "responses/" + query);
         expResults = QueryResultsParser.parseResults(fis);
