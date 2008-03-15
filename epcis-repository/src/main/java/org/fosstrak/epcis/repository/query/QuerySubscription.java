@@ -427,19 +427,34 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             try {
                 responseCode = sendData(serviceUrl, data);
             } catch (Exception e) {
-                // wait 2 seconds and try again
+                LOG.warn("Unable to send results of subscribed query '" + subscriptionID + "' to '" + serviceUrl
+                        + "', retrying in 3 sec ...");
+                // wait 3 seconds and try again
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e1) {
                     // never mind
                 }
-                responseCode = sendData(serviceUrl, data);
+                try {
+                    responseCode = sendData(serviceUrl, data);
+                } catch (Exception e2) {
+                    LOG.warn("Unable to send results of subscribed query '" + subscriptionID + "' to '" + serviceUrl
+                            + "', retrying in 3 sec ...");
+                    // wait 3 seconds and try again
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e1) {
+                        // never mind
+                    }
+                    responseCode = sendData(serviceUrl, data);
+                }
             }
             LOG.debug("Response " + responseCode);
         } catch (IOException e) {
-            String msg = "An error opening a connection to '" + dest
-                    + "' or serializing and sending contents occurred: " + e.getMessage();
+            String msg = "Unable to send results of subscribed query '" + subscriptionID + "' to '" + dest
+                    + "': " + e.getMessage();
             LOG.error(msg, e);
+            return;
         }
     }
 
