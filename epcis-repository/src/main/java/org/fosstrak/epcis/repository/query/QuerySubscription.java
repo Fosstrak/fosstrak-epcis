@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -402,17 +403,9 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         epcisDoc.setEPCISBody(epcisBody);
 
         // serialize the response
-        String data = null;
+        String data;
         try {
-            ObjectFactory objectFactory = new ObjectFactory();
-            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
-            JAXBElement<EPCISQueryDocumentType> item = objectFactory.createEPCISQueryDocument(epcisDoc);
-            LOG.debug("Serializing " + item + " into XML");
-            StringWriter writer = new StringWriter();
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-            marshaller.marshal(item, writer);
-            data = writer.toString();
+            data = marshalQueryDoc(epcisDoc);
         } catch (JAXBException e) {
             String msg = "An error serializing contents occurred: " + e.getMessage();
             LOG.error(msg, e);
@@ -424,17 +417,50 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             URL serviceUrl = new URL(dest.toString());
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Sending results of subscribed query '" + subscriptionID + "' to '" + serviceUrl + "'");
-                if (data.length() < 100 * 1024) {
-                    LOG.debug("Sending data: " + data);
+                if (data.length() < 10 * 1024) {
+                    LOG.debug("Sending data:\n" + data);
+                } else {
+                    LOG.debug("Sending data: [" + data.length() + " bytes]");
                 }
             }
-            int responseCode = sendData(serviceUrl, data);
+            int responseCode;
+            try {
+                responseCode = sendData(serviceUrl, data);
+            } catch (Exception e) {
+                // wait 2 seconds and try again
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e1) {
+                    // never mind
+                }
+                responseCode = sendData(serviceUrl, data);
+            }
             LOG.debug("Response " + responseCode);
         } catch (IOException e) {
             String msg = "An error opening a connection to '" + dest
                     + "' or serializing and sending contents occurred: " + e.getMessage();
             LOG.error(msg, e);
         }
+    }
+
+    /**
+     * Marshals the given EPCIS query document into it's XML representation.
+     * 
+     * @param epcisDoc
+     *            The EPCISQueryDocumentType to marshal.
+     * @return The marshaled EPCISQueryDocumentType XML String.
+     */
+    private String marshalQueryDoc(EPCISQueryDocumentType epcisDoc) throws JAXBException {
+        ObjectFactory objectFactory = new ObjectFactory();
+        JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+        JAXBElement<EPCISQueryDocumentType> item = objectFactory.createEPCISQueryDocument(epcisDoc);
+        LOG.debug("Serializing " + item + " into XML");
+        StringWriter writer = new StringWriter();
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.marshal(item, writer);
+        return writer.toString();
     }
 
     /**
@@ -449,28 +475,23 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      *             If a communication error occurred.
      */
     private int sendData(final URL url, final String data) throws IOException {
-        data.concat("\n");
-
         HttpURLConnection connection;
-        if ("https".equalsIgnoreCase(url.getProtocol()) && trustAllCertificates()) {
+        if ("HTTPS".equalsIgnoreCase(url.getProtocol()) && trustAllCertificates()) {
             connection = getAllTrustingConnection(url);
         } else {
             connection = getConnection(url);
         }
         connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-type", "text/xml");
-        connection.setRequestProperty("Content-length", "" + data.length());
+        connection.setRequestProperty("content-type", "text/xml");
+        connection.setRequestProperty("content-length", "" + data.length());
         connection.setDoOutput(true);
-
-        // encode data
-        // CharBuffer buf = CharBuffer.wrap(data);
-        // Charset charset = Charset.forName("UTF-8");
-        // CharsetEncoder encoder = charset.newEncoder();
+        connection.setDoInput(true);
 
         // send data
-        OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+        Writer out = new OutputStreamWriter(connection.getOutputStream());
         out.write(data);
         out.flush();
+        out.close();
 
         // get response code
         int responseCode = connection.getResponseCode();
