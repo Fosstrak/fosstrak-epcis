@@ -23,6 +23,7 @@ package org.accada.epcis.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
@@ -34,6 +35,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.accada.epcis.soap.model.EPCISQueryDocumentType;
 import org.accada.epcis.soap.model.ObjectFactory;
 import org.accada.epcis.soap.model.QueryResults;
 import org.w3c.dom.Document;
@@ -75,6 +77,33 @@ public final class QueryResultsParser {
             // unmarshaller.setSchema(null);
             JAXBElement<QueryResults> results = (JAXBElement<QueryResults>) unmarshaller.unmarshal(xml);
             return results.getValue();
+        } catch (JAXBException e) {
+            // wrap JAXBException into IOException to keep the interface
+            // JAXB-free
+            IOException ioe = new IOException(e.getMessage());
+            ioe.setStackTrace(e.getStackTrace());
+            throw ioe;
+        }
+    }
+
+    /**
+     * A helper method to parse and convert the XML representation of an EPCIS
+     * query document into an QueryResults object.
+     * 
+     * @param xml
+     *            The Reader containing the XML representation of an
+     *            EPCISQueryDocumentType object.
+     * @return The parsed QueryResults object.
+     * @throws IOException
+     *             If an error de-serializing the InputStream occurred.
+     */
+    public static QueryResults parseQueryDocResults(final Reader r) throws IOException {
+        // de-serialize the XML
+        try {
+            JAXBContext context = JAXBContext.newInstance(EPCISQueryDocumentType.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            JAXBElement<EPCISQueryDocumentType> results = (JAXBElement<EPCISQueryDocumentType>) unmarshaller.unmarshal(r);
+            return results.getValue().getEPCISBody().getQueryResults();
         } catch (JAXBException e) {
             // wrap JAXBException into IOException to keep the interface
             // JAXB-free
