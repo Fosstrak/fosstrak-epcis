@@ -1,35 +1,47 @@
 <document>
-  <properties>
-    <title>Changes epcis-captureclient</title>
-  </properties>
-  <body>
-    <release version="0.2.3" date="2007-12-14">
-      <action dev="steybem" type="fix" issue="1845531">
-        Corrected serialization of time values into XML.
-      </action>
-      <action dev="steybem" type="update">
-        Display time values in ISO8601 format.
-      </action>
-      <action dev="steybem" type="add">
-        Added field for setting eventTimeZoneOffset in capture client GUI and
-        adjusted example event.
-      </action>
-    </release>
-    <release version="0.2.2" date="2007-08-31">
-      <action dev="steybem" type="update">
-        Changed access method for invoking EPCIS capture interface in
-        CaptureClient. The capture interface expects an XML document
-        conforming to the EPCISDocument in the payload of the HTTP POST
-        request.
-      </action>
-      <action dev="steybem" type="update">
-        Changed return type of capture method in CaptureClient. It will
-        now return the HTTP response code (received from the EPCIS
-        repository) instead of the message given in payload of the HTTP
-        response. The CaptureClientGui will display an appropriate success
-        or fail message.
-      </action>
-    </release>
-    <release version="0.2.0" date="2007-04-27" description="first release" />
-  </body>
+    <properties>
+        <title>Changes epcis-captureclient</title>
+    </properties>
+    <body>
+        <release version="0.3.0" date="2008-03-??"
+            description="Minor release">
+            <action dev="steybem" type="add">
+                Added some utility classes for quickly sending capture
+                requests to an EPCIS repository.
+            </action>
+        </release>
+        <release version="0.2.3" date="2007-12-14"
+            description="Bug fix release">
+            <action dev="steybem" type="fix" issue="1845531">
+                Corrected serialization of time values into XML.
+            </action>
+            <action dev="steybem" type="update">
+                Display time values in ISO8601 format.
+            </action>
+            <action dev="steybem" type="add">
+                Added field for setting eventTimeZoneOffset in capture
+                client GUI and adjusted example event.
+            </action>
+        </release>
+        <release version="0.2.2" date="2007-08-31"
+            description="Bug fix release">
+            <action dev="steybem" type="update">
+                Changed access method for invoking EPCIS capture
+                interface in CaptureClient. The capture interface
+                expects an XML document conforming to the EPCISDocument
+                in the payload of the HTTP POST request.
+            </action>
+            <action dev="steybem" type="update">
+                Changed return type of capture method in CaptureClient.
+                It will now return the HTTP response code (received from
+                the EPCIS repository) instead of the message given in
+                payload of the HTTP response. The CaptureClientGui will
+                display an appropriate success or fail message.
+            </action>
+        </release>
+        <release version="0.2.0" date="2007-04-27"
+            description="Initial release">
+            <action type="add">Initial code release.</action>
+        </release>
+    </body>
 </document>
