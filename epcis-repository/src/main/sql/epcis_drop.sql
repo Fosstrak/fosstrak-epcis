@@ -17,7 +17,6 @@
 -- Boston, MA  02110-1301  USA
 
 drop table BizTransaction;
-drop table Vocabularies;
 drop table event_AggregationEvent;
 drop table event_AggregationEvent_EPCs;
 drop table event_AggregationEvent_bizTrans;

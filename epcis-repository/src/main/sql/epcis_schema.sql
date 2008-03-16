@@ -19,18 +19,6 @@
 
 -- This is the EPCIS database schema file for the creation of the
 -- tables in MySQL. Note: this schema is MySQL specific!
---
--- CAVEATS: 
--- bigint(20) replaced by bigint, only difference is display length not specified.
--- datetime replaced by timestamp (SQL standard, any caveats?).
--- enum('ADD','OBSERVE','DELETE') replaced with
---   varchar(8) CHECK (action IN ('ADD','OBSERVE','DELETE'))
--- rechecked action type with new standard -> ok.
--- Vocabularies: All uris are now UNIQUE.
--- BizTransactions have now a defined type.
--- All identifiers are double quoted and therefore case sensitive:
---   Use double quotes in queries as well.
--- MySql specific: auto_increment
 
 
 BEGIN;
@@ -41,12 +29,6 @@ SET storage_engine=INNODB;
 -- ---------------------------------------------
 -- Vocabularies
 -- ---------------------------------------------
-
-CREATE TABLE `Vocabularies` (  -- maps vocabulary tpyes to their table names
-`id` bigint PRIMARY KEY auto_increment,
-`uri` varchar(1023) NOT NULL,  -- uri of vocabulary Type
-`table_name` varchar(128) NOT NULL
-);
 
 CREATE TABLE `voc_BizLoc` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment

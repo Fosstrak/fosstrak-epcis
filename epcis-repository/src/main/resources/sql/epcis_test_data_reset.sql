@@ -51,7 +51,6 @@ DELETE FROM `voc_readPoint`;
 DELETE FROM `voc_readPoint_attr`;
 DELETE FROM `voc_any`;
 DELETE FROM `voc_any_attr`;
-DELETE FROM `vocabularies`;
 -- The times given in the events are in UTC
 SET time_zone = '+00:00';
 -- ----------------------------------------------------
@@ -71,7 +70,6 @@ INSERT INTO `event_transactionevent_epcs` VALUES (41,'urn:epc:id:sgtin:0614141.1
 -- ----------------------------------------------------
 -- Fill the test master data into the database
 -- ----------------------------------------------------
-INSERT INTO `vocabularies` (`id`, `uri`, `table_name`) VALUES (1, 'urn:epcglobal:epcis:vtype:BusinessStep','BizStep'), (2, 'urn:epcglobal:epcis:vtype:BusinessTransaction','BizTrans'), (3, 'urn:epcglobal:epcis:vtype:Disposition','Disposition'), (4, 'urn:epcglobal:epcis:vtype:ReadPoint','ReadPoint'), (5, 'urn:epcglobal:epcis:vtype:BusinessLocation','BizLoc');
 INSERT INTO `voc_bizloc` (`id`, `uri`) VALUES (22, 'urn:epcglobal:fmcg:loc:0614141073467'), (23, 'urn:epcglobal:fmcg:loc:0614141073468'), (24, 'urn:epcglobal:fmcg:loc:0614141073469'), (25, 'urn:epcglobal:fmcg:loc:0614141073467.1'), (26, 'urn:epcglobal:fmcg:loc:0614141073468.1'), (27, 'urn:epcglobal:fmcg:loc:0614141073468.2'), (28, 'urn:epcglobal:fmcg:loc:0614141073468.3'), (29, 'urn:epcglobal:fmcg:loc:0614141073469.1'), (30, 'urn:epcglobal:fmcg:loc:0614141073469.2');
 INSERT INTO `voc_bizloc_attr` (`id`,`attribute`,`value`) VALUES (22, 'urn:epcglobal:fmcg:mda:gln', '0614141073467'), (25, 'urn:epcglobal:fmcg:mda:sslt', '208'), (25, 'urn:epcglobal:fmcg:mda:sslta', '422'), (22, 'urn:epcglobal:fmcg:mda:gln', '0614141073467'), (23, 'urn:epcglobal:fmcg:mda:gln', '0614141073468'), (26, 'urn:epcglobal:fmcg:mda:gln', '0614141073468'), (26, 'urn:epcglobal:fmcg:mda:sslt', '209'), (27, 'urn:epcglobal:fmcg:mda:gln', '0614141073468'), (27, 'urn:epcglobal:fmcg:mda:sslt', '299'), (27, 'urn:epcglobal:fmcg:mda:sslta', '422'), (28, 'urn:epcglobal:fmcg:mda:gln', '0614141073468'), (28, 'urn:epcglobal:fmcg:mda:sslt', '210'), (24, 'urn:epcglobal:fmcg:mda:gln', '0614141073469'), (29, 'urn:epcglobal:fmcg:mda:gln', '0614141073469'), (29, 'urn:epcglobal:fmcg:mda:sslt', '209'), (30, 'urn:epcglobal:fmcg:mda:gln', '0614141073469'), (30, 'urn:epcglobal:fmcg:mda:sslt', '201');
 INSERT INTO `voc_bizstep` (`id`, `uri`) VALUES (21, 'urn:epcglobal:hls:bizstep:commissioning'), (22, 'urn:epcglobal:hls:bizstep:casetopalletaggregation'), (23, 'urn:epcglobal:fmcg:bizstep:receiving'), (24, 'urn:epcglobal:fmcg:bizstep:picking'), (25, 'urn:epcglobal:fmcg:bizstep:shipping');
