@@ -1,24 +1,51 @@
 <document>
-  <properties>
-    <title>Changes epcis-queryclient</title>
-  </properties>
-  <body>
-    <release version="0.2.3" date="2007-12-14">
-      <action dev="steybem" type="fix" issue="1845531">
-        Corrected parsing of time values from repository response.
-      </action>
-      <action dev="steybem" type="update">
-        Display time values in ISO8601 format.
-      </action>
-      <action dev="steybem" type="add">
-        Display error message when no event type is selected in GUI.
-      </action>
-    </release>
-    <release version="0.2.1" date="2007-08-10">
-      <action dev="rodunerc" type="fix">
-        axis-wsdl4j was not properly included in Webstart application.
-      </action>
-    </release>
-    <release version="0.2.0" date="2007-04-27" description="first release" />
-  </body>
+    <properties>
+        <title>Changes epcis-queryclient</title>
+    </properties>
+    <body>
+        <release version="0.3.0" date="2008-03-??"
+            description="Feature release">
+            <action dev="steybem" type="add">
+                Replaced the Web service framework Apache Axis 1 with
+                Apache CXF.
+            </action>
+            <action dev="steybem" type="add">
+                Introduced a JAXB data binding to map Web service
+                requests and responses to Java beans.
+            </action>
+            <action dev="steybem" type="add">
+                Added some utility classes for quickly sending query
+                requests to an EPCIS repository.
+            </action>
+            <action dev="steybem" type="update">
+                Configured QueryClientGui to reuse functionality
+                provided by QueryControlClient.
+            </action>
+        </release>
+        <release version="0.2.2" date="2007-08-31"
+            description="Bug fix release">
+            <action dev="steybem" type="fix" issue="1845531">
+                Corrected parsing of time values from repository
+                response.
+            </action>
+            <action dev="steybem" type="update">
+                Display time values in ISO8601 format.
+            </action>
+            <action dev="steybem" type="add">
+                Display error message when no event type is selected in
+                GUI.
+            </action>
+        </release>
+        <release version="0.2.1" date="2007-08-10"
+            description="Bug fix release">
+            <action dev="rodunerc" type="fix">
+                axis-wsdl4j was not properly included in Webstart
+                application.
+            </action>
+        </release>
+        <release version="0.2.0" date="2007-04-27"
+            description="Initial release">
+            <action type="add">Initial code release.</action>
+        </release>
+    </body>
 </document>
