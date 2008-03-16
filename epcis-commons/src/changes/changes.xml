@@ -1,8 +1,44 @@
 <document>
-  <properties>
-    <title>Changes epcis-commons</title>
-  </properties>
-  <body>
-    <release version="0.2.0" date="2007-04-27" description="first release" />
-  </body>
+    <properties>
+        <title>Changes epcis-commons</title>
+    </properties>
+    <body>
+        <release version="0.3.0" date="2008-03-??"
+            description="Feature release">
+            <action dev="steybem" type="add">
+                Added utility class for parsing and printing
+                QueryResults.
+            </action>
+            <action dev="steybem" type="add">
+                Added EPCIS WSDL and schema files required by both
+                epcis-queryclient and epcis-repository.
+            </action>
+            <action dev="steybem" type="update">
+                Replaced Axis-generated Web service stubs with
+                CXF-generated Java beans.
+            </action>
+            <action dev="steybem" type="fix">
+                Fixed TimeParser to catch any exceptions caused by
+                invalid input and wrap them into
+                QueryParameterExceptions.
+            </action>
+        </release>
+        <release version="0.2.3" date="2007-12-14"
+            description="Bug fix release">
+            <action dev="steybem" type="add">
+                Added test case for TimeParser.
+            </action>
+            <action dev="steybem" type="fix" issue="1845531">
+                Corrected serialization of time values into XML.
+            </action>
+            <action dev="steybem" type="fix" issue="1789784">
+                Fixed parsing of event time when time value does not
+                have exactly three digits for millisecond.
+            </action>
+        </release>
+        <release version="0.2.0" date="2007-04-27"
+            description="Initial release">
+            <action type="add">Initial code release.</action>
+        </release>
+    </body>
 </document>
