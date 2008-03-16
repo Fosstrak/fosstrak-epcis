@@ -1,71 +1,228 @@
 <document>
-  <properties>
-    <title>Changes epcis-repository</title>
-  </properties>
-  <body>
-    <release version="0.2.4" date="2007-12-21">
-      <action dev="steybem" type="update">
-        Added indexes to several database tables for improved performance.
-      </action>
-      <action dev="steybem" type="update">
-        Replaced JDBC Statements with PreparedStatements for improved performance.
-      </action>
-      <action dev="steybem" type="add">
-        Added LoggableStatement which can be used to provide cleaner log entries
-        for SQL queries.
-      </action>
-    </release>
-    <release version="0.2.3" date="2007-12-14">
-      <action dev="steybem" type="fix" issue="1789785" due-to="Sean Wellington">
-        Made CaptureOperationsModule more thread-safe and made sure that database
-        resources are released under all circumstances.
-      </action>
-      <action dev="steybem" type="add" due-to="Sean Wellington">
-        Extracted Tomcat-specific initialization logic from CaptureOperationsModule
-        into a new class CaptureOperationsServlet, such that CaptureOperationsModule
-        can be used in other application servers.
-      </action>
-      <action dev="steybem" type="fix" issue="1844046">
-        MATCH_anyEPC query did not match against URIs in the parentID field of
-        Transaction- and AggregationEvents.
-      </action>
-      <action dev="steybem" type="fix" issue="1844041">
-        parentID field of TransactionEvents was ignored in
-        CaptureOperationsModule.
-      </action>
-      <action dev="steybem" type="fix" issue="1789796">
-        Fixed storing and retrieving of time values to/from repository. Time
-        zone offset does not need to be subtracted/added from event time or
-        record time.
-      </action>
-      <action dev="steybem" type="fix">
-        Fixed QuerySchedule to correctly handle leap years.
-      </action>
-    </release>
-    <release version="0.2.2" date="2007-08-31">
-      <action dev="steybem" type="fix" issue="1781884">
-        HTTP Capture Interface in 0.2.1 was not EPCIS compliant. Fixed 
-        capture operation which now expects the EPCISDocument as payload
-        in the HTTP POST request.
-      </action>
-      <action dev="steybem" type="fix" issue="1781885">
-        Fixed Null pointer exception.
-      </action>
-    </release>
-    <release version="0.2.1" date="2007-08-10">
-      <action dev="steybem" type="fix" issue="1725569">
-        Scheduled queries were not restored properly after a service restart.
-      </action>
-      <action dev="roduner" type="update">
-        Changed demo database to make all examples shown in Query Client work.
-      </action>
-      <action dev="steybem" type="update">
-        Changed build environment: Added profiles (dev, prod) to the build
-        environment with specific settings for a development and a
-        productive environment (you can activate a profile by adding e.g.
-        "-Denv=dev" to your mvn build command).
-      </action>
-    </release>
-    <release version="0.2.0" date="2007-04-27" description="first release" />
-  </body>
+    <properties>
+        <title>Changes epcis-repository</title>
+    </properties>
+    <body>
+        <release version="0.3.0" date="2008-03-??"
+            description="Feature release: improved performance and interoperability, and certified EPCIS specification conformance">
+            <!-- general changes -->
+            <action dev="steybem" type="add">
+                Introduced Spring IoC container for bean wiring and
+                application initialization.
+            </action>
+            <action dev="steybem" type="add">
+                Introduced interfaces wherever reasonable (program to an
+                interface, not an implementation), and improved
+                extensibility and interoperability through application
+                layering.
+            </action>
+            <action dev="steybem" type="add">
+                Added a context listener which performs the
+                initialization work (e.g., initializing the logging
+                subsystem) when the application is deployed.
+            </action>
+            <action dev="steybem" type="add">
+                Added support for storing custom, non-standard
+                vocabulary fields.
+            </action>
+            <action dev="steybem" type="update">
+                Improved and centralized all configuration parameters in
+                a consistent application.properties file.
+            </action>
+            <action dev="steybem" type="update">
+                Use StringBuilder instead of StringBuffer or string
+                concatenation wherever reasonable, for improved
+                performance.
+            </action>
+            <action dev="steybem" type="update">
+                Use the commons-logging API as a wrapper for Log4J for
+                all the log statements.
+            </action>
+            <action dev="steybem" type="update">
+                Added database indexes wherever reasonable for improved
+                performance.
+            </action>
+            <action dev="steybem" type="remove">
+                Removed EPCIS WSDL and schema files - they will now be
+                provided by epcis-commons and will be available on the
+                classpath.
+            </action>
+            <action dev="steybem" type="remove">
+                Removed 'vocabularies' table from the database schema -
+                the mapping of vocabulary names to the corresponding
+                database table is now handled in the code.
+            </action>
+            <!-- changes to query interface -->
+            <action dev="steybem" type="add">
+                Query Interface: replaced the Web service framework
+                Apache Axis 1 with Apache CXF which prevents many
+                problems and avoids many workarounds implied by Axis,
+                and improves performance.
+            </action>
+            <action dev="steybem" type="add">
+                Query Interface: introduced a JAXB data binding to map
+                Web service requests and responses to Java beans.
+            </action>
+            <action dev="steybem" type="add">
+                Query Interface: added support for HTTPS binding for
+                query callback interface.
+            </action>
+            <action dev="steybem" type="add">
+                Query Interface: added support for querying custom,
+                non-standard vocabulary fields.
+            </action>
+            <action dev="steybem" type="add">
+                Query Interface: added a servlet to perform the
+                initialization work for the QueryOperationsModule in
+                cases where Spring cannot be used.
+            </action>
+            <action dev="steybem" type="add">
+                Query Interface: added support for database transactions
+                - queries which modify the database (e.g., add
+                vocabularies) either succeed or fail in their entirety.
+            </action>
+            <action dev="steybem" type="update">
+                Query Interface: standing query results are returned
+                within an EPCISQueryDocument whose EPCISBody contains
+                the response payload XML, as specified in the EPCIS
+                standard.
+            </action>
+            <action dev="steybem" type="update">
+                Query Interface: callback of results for standing
+                queries is retried (up to 3 times) if the destination
+                cannot be reached or in cases of network problems.
+            </action>
+            <action dev="steybem" type="update">
+                Query Interface: improved handling of
+                children-relationships for masterdata vocabularies.
+            </action>
+            <action dev="steybem" type="fix">
+                Query Interface: throw QueryParameterException for any
+                invalid user-provided query parameter values.
+            </action>
+            <action dev="steybem" type="fix">
+                Query Interface: fixed issues with not releasing
+                database connections which prevented sessions from being
+                closed under certain conditions and crashed the entire
+                repository.
+            </action>
+            <action dev="steybem" type="fix">
+                Query Interface: 'getVendorVersion' must return a valid
+                URI-formated value.
+            </action>
+            <action dev="steybem" type="fix">
+                Query Interface: ordering of events according to the
+                'orderBy' and 'orderDirection' query parameters must be
+                global across all events.
+            </action>
+            <action dev="steybem" type="fix">
+                Query Interface: restriction of events according to
+                'eventCountLimit' must be global across all events.
+            </action>
+            <!-- changes to capture interface -->
+            <action dev="steybem" type="add">
+                Capture Interface: added initialization logic to the
+                CaptureOperationsServlet in cases where Spring cannot be
+                used.
+            </action>
+            <action dev="steybem" type="add" due-to="Sean Wellington">
+                Capture Interface: introduced Hibernate which replaces
+                the JDBC statements for persisting events to the
+                database, adds an additional database abstraction layer,
+                and thus allows for the possibility of integrating other
+                (non-MySQL) data stores.
+            </action>
+            <action dev="steybem" type="add" due-to="Sean Wellington">
+                Capture Interface: added support for database
+                transactions - requests either succeed or fail in their
+                entirety.
+            </action>
+            <action dev="steybem" type="update"
+                due-to="Sean Wellington">
+                Set the "defaultAutoCommit" property of the database
+                connection pool to false.
+            </action>
+            <action dev="steybem" type="update">
+                Capture Interface: check value of the
+                'eventTimeZoneOffset' field to match the expected
+                pattern.
+            </action>
+            <action dev="steybem" type="update">
+                Capture Interface: check elements in the 'epcList',
+                'childEPCs', and 'parentID' fields to match the pure
+                identity URI pattern as defined in EPCglobal Tag Data
+                Standard 1.3.1.
+            </action>
+            <action dev="steybem" type="fix">
+                Capture Interface: return HTTP status code different
+                from 200 for any invalid user-provided input (e.g.,
+                invalid XML schema, invalid XML values).
+            </action>
+        </release>
+        <release version="0.2.3" date="2007-12-14"
+            description="Bug fix release">
+            <action dev="steybem" type="fix" issue="1789785"
+                due-to="Sean Wellington">
+                Made CaptureOperationsModule more thread-safe and made
+                sure that database resources are released under all
+                circumstances.
+            </action>
+            <action dev="steybem" type="add" due-to="Sean Wellington">
+                Extracted Tomcat-specific initialization logic from
+                CaptureOperationsModule into a new class
+                CaptureOperationsServlet, such that
+                CaptureOperationsModule can be used in other application
+                servers.
+            </action>
+            <action dev="steybem" type="fix" issue="1844046">
+                MATCH_anyEPC query did not match against URIs in the
+                parentID field of Transaction- and AggregationEvents.
+            </action>
+            <action dev="steybem" type="fix" issue="1844041">
+                parentID field of TransactionEvents was ignored in
+                CaptureOperationsModule.
+            </action>
+            <action dev="steybem" type="fix" issue="1789796">
+                Fixed storing and retrieving of time values to/from
+                repository. Time zone offset does not need to be
+                subtracted/added from event time or record time.
+            </action>
+            <action dev="steybem" type="fix">
+                Fixed QuerySchedule to correctly handle leap years.
+            </action>
+        </release>
+        <release version="0.2.2" date="2007-08-31"
+            description="Bug fix release">
+            <action dev="steybem" type="fix" issue="1781884">
+                HTTP Capture Interface in 0.2.1 was not EPCIS compliant.
+                Fixed capture operation which now expects the
+                EPCISDocument as payload in the HTTP POST request.
+            </action>
+            <action dev="steybem" type="fix" issue="1781885">
+                Fixed Null pointer exception.
+            </action>
+        </release>
+        <release version="0.2.1" date="2007-08-10"
+            description="Bug fix release">
+            <action dev="steybem" type="fix" issue="1725569">
+                Scheduled queries were not restored properly after a
+                service restart.
+            </action>
+            <action dev="roduner" type="update">
+                Changed demo database to make all examples shown in
+                Query Client work.
+            </action>
+            <action dev="steybem" type="update">
+                Changed build environment: Added profiles (dev, prod) to
+                the build environment with specific settings for a
+                development and a productive environment (you can
+                activate a profile by adding e.g. "-Denv=dev" to your
+                mvn build command).
+            </action>
+        </release>
+        <release version="0.2.0" date="2007-04-27"
+            description="Initial release">
+            <action type="add">Initial code release.</action>
+        </release>
+    </body>
 </document>
