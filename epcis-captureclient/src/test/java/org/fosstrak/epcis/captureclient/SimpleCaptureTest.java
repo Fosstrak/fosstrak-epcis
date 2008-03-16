@@ -38,13 +38,11 @@ import java.io.InputStream;
  */
 public class SimpleCaptureTest {
 
-    private static CaptureClient client = new CaptureClient();
-
     /**
      * Creates a simple EPCIS query, sends it to the EPCIS query service for
      * processing and prints the response to System.out.
      */
-    public static void testCapture() throws IOException {
+    public static boolean capture(String captureUrl) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("<epcis:EPCISDocument xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" creationDate=\"2008-03-06T11:42:15.016+01:00\" schemaVersion=\"1.0\">");
@@ -70,11 +68,18 @@ public class SimpleCaptureTest {
         sb.append("</EPCISBody>");
         sb.append("</epcis:EPCISDocument>");
 
-        System.out.println(client.capture(sb.toString()));
+        CaptureClient client = new CaptureClient(captureUrl);
+        int responseCode = client.capture(sb.toString());
+        if (responseCode == 200) {
+            return true;
+        }
+        return false;
     }
 
-    public static boolean testCaptureFromFile(String filename) throws IOException {
-        System.out.println(filename);
+    public static boolean captureFromFile(String filename, String captureUrl) throws IOException {
+        CaptureClient client = new CaptureClient(captureUrl);
+        System.out.println("capturing file: " + filename);
+        System.out.println("capturing url: " + client.getCaptureUrl());
         InputStream is = new FileInputStream(filename);
         int responseCode = client.capture(is);
         if (responseCode == 200) {
@@ -83,7 +88,7 @@ public class SimpleCaptureTest {
         return false;
     }
 
-    public static boolean testCaptureFromDir(String dirname) throws IOException {
+    public static boolean captureFromDir(String dirname, String captureUrl) throws IOException {
         // capture all xml files in the given folder
         File dir = new File(dirname);
         boolean allOk = true;
@@ -96,7 +101,7 @@ public class SimpleCaptureTest {
                     return false;
                 }
             })) {
-                boolean ok = testCaptureFromFile(f.getPath());
+                boolean ok = captureFromFile(f.getPath(), captureUrl);
                 if (!ok) {
                     allOk = false;
                 }
@@ -106,8 +111,10 @@ public class SimpleCaptureTest {
     }
 
     public static void main(String[] args) throws Exception {
-        // test.testCapture();
-        boolean ok = testCaptureFromDir("D:/test");
+        String captureUrl = null;
+        // capture(captureUrl);
+        // boolean ok = captureFromFile("D:/test/test.xml", captureUrl);
+        boolean ok = captureFromDir("D:/test/events", captureUrl);
         if (ok) {
             System.out.println("Capture of all events successful");
         } else {
