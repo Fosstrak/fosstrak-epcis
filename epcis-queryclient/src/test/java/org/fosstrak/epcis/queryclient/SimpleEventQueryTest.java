@@ -29,6 +29,10 @@ import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.soap.SecurityExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
+import org.accada.epcis.soap.model.ArrayOfString;
+import org.accada.epcis.soap.model.Poll;
+import org.accada.epcis.soap.model.QueryParam;
+import org.accada.epcis.soap.model.QueryParams;
 import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.utils.QueryResultsParser;
 
@@ -49,7 +53,7 @@ public class SimpleEventQueryTest {
      * Creates a simple EPCIS query, sends it to the EPCIS query service for
      * processing and prints the response to System.out.
      */
-    public static void testPoll() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
+    public static void poll() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
             QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
         StringBuilder sb = new StringBuilder();
@@ -80,7 +84,42 @@ public class SimpleEventQueryTest {
         QueryResultsParser.queryResultsToXml(results, System.out);
     }
 
+    /**
+     * Creates a simple EPCIS query, sends it to the EPCIS query service for
+     * processing and prints the response to System.out.
+     */
+    public static void pollWithApi() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
+            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
+            QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
+     // construct the query parameters
+        QueryParam queryParam1 = new QueryParam();
+        queryParam1.setName("eventType");
+        ArrayOfString queryParamValue1 = new ArrayOfString();
+        queryParamValue1.getString().add("ObjectEvent");
+        queryParam1.setValue(queryParamValue1);
+
+        QueryParam queryParam2 = new QueryParam();
+        queryParam2.setName("MATCH_epc");
+        ArrayOfString queryParamValue2 = new ArrayOfString();
+        queryParamValue2.getString().add("urn:epc:id:sgtin:1.1.0");
+        queryParam2.setValue(queryParamValue2);
+
+        // add the query parameters to the list of parameters
+        QueryParams queryParams = new QueryParams();
+        queryParams.getParam().add(queryParam1);
+        queryParams.getParam().add(queryParam2);
+
+        // create the Poll object
+        Poll poll = new Poll();
+        poll.setQueryName("SimpleEventQuery");
+        poll.setParams(queryParams);
+
+        QueryResults results = client.poll(poll);
+        QueryResultsParser.queryResultsToXml(results, System.out);
+    }
+
     public static void main(String[] args) throws Exception {
-        testPoll();
+        // poll();
+        pollWithApi();
     }
 }
