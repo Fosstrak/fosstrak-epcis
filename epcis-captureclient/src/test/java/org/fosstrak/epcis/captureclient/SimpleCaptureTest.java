@@ -25,22 +25,38 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.GregorianCalendar;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.accada.epcis.soap.model.ActionType;
+import org.accada.epcis.soap.model.BusinessLocationType;
+import org.accada.epcis.soap.model.EPC;
+import org.accada.epcis.soap.model.EPCISBodyType;
+import org.accada.epcis.soap.model.EPCISDocumentType;
+import org.accada.epcis.soap.model.EPCListType;
+import org.accada.epcis.soap.model.EventListType;
+import org.accada.epcis.soap.model.ObjectEventType;
+import org.accada.epcis.soap.model.ReadPointType;
 
 /**
  * A simple test utility class for sending a single or multiple capture
  * request(s) to the Accada EPCIS capture interface and bootstrapping the
  * capture module.
- * <p>
- * Note: keep the methods in this class static in order to prevent them from
- * being executed when building the project with Maven.
  * 
  * @author Marco Steybe
  */
 public class SimpleCaptureTest {
 
     /**
-     * Creates a simple EPCIS query, sends it to the EPCIS query service for
-     * processing and prints the response to System.out.
+     * Constructs a simple EPCIS event XML String, sends it to the EPCIS
+     * repository at the specified URL String, and returns the response from the
+     * repository.
      */
     public static boolean capture(String captureUrl) throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -70,6 +86,79 @@ public class SimpleCaptureTest {
 
         CaptureClient client = new CaptureClient(captureUrl);
         int responseCode = client.capture(sb.toString());
+        if (responseCode == 200) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Constructs a simple EPCIS event XML using the API objects from the EPCIS
+     * schema, sends it to the repository at the specified URL String, and
+     * returns the response from the repository.
+     */
+    public static boolean captureWithApi(String captureUrl) throws IOException, JAXBException {
+        ObjectEventType objEvent = new ObjectEventType();
+
+        // get the current time and set the eventTime
+        XMLGregorianCalendar now = null;
+        try {
+            DatatypeFactory dataFactory = DatatypeFactory.newInstance();
+            now = dataFactory.newXMLGregorianCalendar(new GregorianCalendar());
+            objEvent.setEventTime(now);
+        } catch (DatatypeConfigurationException e) {
+            e.printStackTrace();
+        }
+
+        // get the current time zone and set the eventTimeZoneOffset
+        if (now != null) {
+            int timezone = now.getTimezone();
+            int h = Math.abs(timezone / 60);
+            int m = Math.abs(timezone % 60);
+            DecimalFormat format = new DecimalFormat("00");
+            String sign = (timezone < 0) ? "-" : "+";
+            objEvent.setEventTimeZoneOffset(sign + format.format(h) + ":" + format.format(m));
+        }
+
+        // set EPCs
+        EPC epc = new EPC();
+        epc.setValue("urn:epc:id:sgtin:0057000.123780.7788");
+        EPCListType epcList = new EPCListType();
+        epcList.getEpc().add(epc);
+        objEvent.setEpcList(epcList);
+
+        // set action
+        objEvent.setAction(ActionType.ADD);
+
+        // set bizStep
+        objEvent.setBizStep("urn:accada:demo:bizstep:fmcg:production");
+
+        // set disposition
+        objEvent.setDisposition("urn:accada:demo:disp:fmcg:pendingQA");
+
+        // set readPoint
+        ReadPointType readPoint = new ReadPointType();
+        readPoint.setId("urn:accada:demo:fmcg:ssl:0037000.00729.210,432");
+        objEvent.setReadPoint(readPoint);
+
+        // set bizLocation
+        BusinessLocationType bizLocation = new BusinessLocationType();
+        bizLocation.setId("urn:accada:demo:fmcg:ssl:0037000.00729.210");
+        objEvent.setBizLocation(bizLocation);
+
+        // create the EPCISDocument containing the ObjectEvent
+        EPCISDocumentType epcisDoc = new EPCISDocumentType();
+        EPCISBodyType epcisBody = new EPCISBodyType();
+        EventListType eventList = new EventListType();
+        eventList.getObjectEventOrAggregationEventOrQuantityEvent().add(objEvent);
+        epcisBody.setEventList(eventList);
+        epcisDoc.setEPCISBody(epcisBody);
+        epcisDoc.setSchemaVersion(new BigDecimal("1.0"));
+        epcisDoc.setCreationDate(now);
+
+        // send the EPCISDocument to the repository using the CaptureClient
+        CaptureClient client = new CaptureClient(captureUrl);
+        int responseCode = client.capture(epcisDoc);
         if (responseCode == 200) {
             return true;
         }
@@ -111,10 +200,11 @@ public class SimpleCaptureTest {
     }
 
     public static void main(String[] args) throws Exception {
-        String captureUrl = null;
-        // capture(captureUrl);
+        String captureUrl = null; // use default
+        boolean ok = captureWithApi(captureUrl);
+        // boolean ok = capture(captureUrl);
         // boolean ok = captureFromFile("D:/test/test.xml", captureUrl);
-        boolean ok = captureFromDir("D:/test/events", captureUrl);
+        // boolean ok = captureFromDir("D:/test/events", captureUrl);
         if (ok) {
             System.out.println("Capture of all events successful");
         } else {

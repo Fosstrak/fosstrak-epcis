@@ -24,9 +24,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Properties;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import org.accada.epcis.soap.model.EPCISDocumentType;
+import org.accada.epcis.soap.model.ObjectFactory;
 
 /**
  * This client provides access to the repository's Capture Operations Module
@@ -35,10 +44,9 @@ import java.util.Properties;
  * 
  * @author Marco Steybe
  */
-public class CaptureClient implements CaptureInterface {
+public class CaptureClient {
 
     private static final String PROPERTY_FILE = "/captureclient.properties";
-
     private static final String PROPERTY_CAPTURE_URL = "default.url";
 
     /**
@@ -84,21 +92,56 @@ public class CaptureClient implements CaptureInterface {
     }
 
     /**
-     * {@inheritDoc}
+     * Send the XML available from the given InputStream to the repository for
+     * capturing.
      * 
-     * @see org.accada.epcis.captureclient.CaptureInterface#capture(java.io.InputStream)
+     * @param xmlStream
+     *            A stream providing an EPCISDocument which contains a list of
+     *            events inside the EPCISBody element.
+     * @return The HTTP response code from the repository.
+     * @throws IOException
+     *             If an error sending the document occurred.
      */
     public int capture(final InputStream xmlStream) throws IOException {
         return doPost(xmlStream, "text/xml");
     }
 
     /**
-     * {@inheritDoc}
+     * Send the given XML String to the repository for capturing.
      * 
-     * @see org.accada.epcis.captureclient.CaptureInterface#capture(java.lang.String)
+     * @param eventXml
+     *            The XML String consisting of an EPCISDocument which in turn
+     *            contains a list of events inside the EPCISBody element.
+     * @return The HTTP response code from the repository.
+     * @throws IOException
+     *             If an error sending the document occurred.
      */
     public int capture(final String eventXml) throws IOException {
         return doPost(eventXml, "text/xml");
+    }
+
+    /**
+     * Send the given EPCISDocumentType to the repository for capturing.
+     * 
+     * @param epcisDoc
+     *            The EPCISDocument containing a list of events inside the
+     *            EPCISBody element.
+     * @return The HTTP response code from the repository.
+     * @throws IOException
+     *             If an error sending the document occurred.
+     * @throws JAXBException
+     *             If an error serializing the given document into XML occurred.
+     */
+    public int capture(final EPCISDocumentType epcisDoc) throws IOException, JAXBException {
+        StringWriter writer = new StringWriter();
+        ObjectFactory objectFactory = new ObjectFactory();
+        JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+        JAXBElement<EPCISDocumentType> item = objectFactory.createEPCISDocument(epcisDoc);
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.marshal(item, writer);
+        return capture(writer.toString());
     }
 
     /**
@@ -120,11 +163,11 @@ public class CaptureClient implements CaptureInterface {
      * Opens a connection to the capture module.
      * 
      * @param contentType
-     * @return
+     *            The HTTP content-type, e.g., <code>text/xml</code>
+     * @return The HTTP connection object.
      * @throws IOException
      */
-    private HttpURLConnection openPostConnection(final String contentType) throws IOException {
-        // the url where the capture interface listens
+    private HttpURLConnection getConnection(final String contentType) throws IOException {
         URL serviceUrl = new URL(captureUrl);
         HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
         connection.setRequestProperty("content-type", contentType);
@@ -145,7 +188,7 @@ public class CaptureClient implements CaptureInterface {
      *             If an error on the HTTP layer occurred.
      */
     private int doPost(final String data, final String contentType) throws IOException {
-        HttpURLConnection connection = openPostConnection(contentType);
+        HttpURLConnection connection = getConnection(contentType);
         // write the data
         OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
         wr.write(data);
@@ -161,12 +204,12 @@ public class CaptureClient implements CaptureInterface {
      * 
      * @param data
      *            The data to send.
-     * @return The HTTP response message
+     * @return The HTTP response message from the repository.
      * @throws IOException
      *             If an error on the HTTP layer occurred.
      */
     private int doPost(final InputStream data, final String contentType) throws IOException {
-        HttpURLConnection connection = openPostConnection(contentType);
+        HttpURLConnection connection = getConnection(contentType);
         // read from input and write to output
         OutputStream os = connection.getOutputStream();
         int b;
