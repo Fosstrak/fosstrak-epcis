@@ -39,6 +39,14 @@ import org.accada.epcis.soap.model.SubscriptionControlsException;
  */
 public class ScheduleTest extends TestCase {
 
+    static {
+        // provide the catalina.base property which is not available when the
+        // application is not deployed, i.e., when running tests
+        if (System.getenv("CATALINA_HOME") != null) {
+            System.setProperty("catalina.base", System.getenv("CATALINA_HOME"));
+        }
+    }
+
     /**
      * Test for next scheduled year.
      * 
