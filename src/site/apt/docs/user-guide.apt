@@ -10,36 +10,36 @@ User Guide
 
 * Contents
 
-   [[1]] {{{#About%20this%20Guide}About this Guide}}
+   [[1]] {{{#About this Guide}About this Guide}}
 
-   [[2]] {{{#Getting%20Started}Getting Started}}
+   [[1]] {{{#Getting Started}Getting Started}}
 
-         [[i]] {{{#Setting%20up%20your%20own%20Repository}Setting up your own Repository}}
+         [[i]] {{{#Setting up your own Repository}Setting up your own Repository}}
 
-         [[i]] {{{#Using%20the%20Capture%20Client%20to%20send%20Events%20to%20a%20Repository}Using the Capture Client to send Events to a Repository}}
+         [[i]] {{{#Using the Capture Client to send Events to a Repository}Using the Capture Client to send Events to a Repository}}
 
-         [[i]] {{{#Using%20the%20Query%20Client%20to%20browse%20a%20Repository}Using the Query Client to browse a Repository}}
+         [[i]] {{{#Using the Query Client to browse a Repository}Using the Query Client to browse a Repository}}
 
-   [[3]] {{{#Interacting%20with%20a%20Repository}Interacting with a Repository}}
+   [[1]] {{{#Interacting with a Repository}Interacting with a Repository}}
 
-         [[i]] {{{#How%20to%20Capture%20EPCIS%20Events}How to Capture EPCIS events}}
+         [[i]] {{{#How to Capture EPCIS Events}How to Capture EPCIS Events}}
 
-         [[i]] {{{#How%20to%20Query%20an%20EPCIS%20Repository}How to Query an EPCIS repository}}
+         [[i]] {{{#How to Query an EPCIS Repository}How to Query an EPCIS Repository}}
 
-         [[i]] {{{#How%20to%20Use%20a%20Query%20Schedule}How to Use a Query Schedule}}
+         [[i]] {{{#How to Use a Query Schedule}How to Use a Query Schedule}}
 
-         [[i]] {{{#How%20to%20Subscribe%20a%20Scheduled%20Query}How to Subscribe a Scheduled Query}}
+         [[i]] {{{#How to Subscribe a Scheduled Query}How to Subscribe a Scheduled Query}}
 
-         [[i]] {{{#How%20to%20Subscribe%20a%20Triggered%20Query}How to Subscribe a Triggered Query}}
+         [[i]] {{{#How to Subscribe a Triggered Query}How to Subscribe a Triggered Query}}
 
-         [[i]] {{{#How%20to%20Use%20the%20Query%20Callback%20Interface}How to Use the Query Callback Interface}}
+         [[i]] {{{#How to Use the Query Callback Interface}How to Use the Query Callback Interface}}
 
-   [[4]] {{{#Runtime%20Configuration%20of%20your%20EPCIS%20Repository}Runtime Configuration of your EPCIS Repository}}
+   [[1]] {{{#Runtime Configuration of your EPCIS Repository}Runtime Configuration of your EPCIS Repository}}
 
 
 * {About this Guide}
 
-  This User Guide is intended to help users in getting started with the Accada
+  This user guide is intended to help users in getting started with the Accada
   EPCIS repository application. The guide outlines the steps to follow in order
   to set up your own EPCIS repository, and describes the configuration parameters
   and features of the application.
@@ -52,9 +52,12 @@ User Guide
   to incorporate Accada's EPCIS implementation into your own project, continue
   reading.
 
+  If you cannot find your answer here, feel free to ask the
+  {{{mailto:accada-epcis-user@lists.sourceforge.net}Accada EPCIS user mailing list}}.
+
 * {Getting Started}
 
-  This section of the User Guide includes a step-by-step tutorial describing
+  This section of the user guide includes a step-by-step tutorial describing
   how to set up your own EPCIS repository and describes how to use the client
   applications to send EPCIS capture and query requests to your own repository.
 
@@ -194,7 +197,7 @@ java -jar epcis-captureclient-<version>.jar
 
    If you intend to use our capture client library in your own Java
    project, you should refer to the
-   {{{architecture.html#EPCIS%20Capture%20Client}architecture description}}.
+   {{{architecture.html#EPCIS Capture Client}architecture description}}.
 
 
 ** {Using the Query Client to browse a Repository}

@@ -3,200 +3,154 @@
               -------------------
               Marco Steybe, Andrea Groessbauer
               -------------------
-              03/06/2007
+              03/17/2008
               -------------------
 
 Developer Guide
 
 * Contents
 
-   [[1]] {{{#About}About this Guide}}
+   [[1]] {{{#About this Guide}About this Guide}}
 
-   [[1]] {{{#Getting}Getting Started}}
+   [[1]] {{{#Getting%20Started}Getting Started}}
 
-   [[1]] {{{#Project}Project Layout}}
+         [[i]] {{{#Setting up the Development Environment}Setting up the Development Environment}}
 
-   [[1]] {{{#Using}Using Maven}}
+         [[i]] {{{#Getting the Source Code}Getting the Source Code}}
 
-   [[1]] {{{#Configuring}Configuring Accada EPCIS Repository}}
+         [[i]] {{{#Setting up Eclipse}Setting up Eclipse}}
 
+         [[i]] {{{#Building and Deploying the Project}Building and Deploying the Project}}
 
-* {About} this Guide
+   [[1]] {{{#Project Layout}Project Layout}}
 
-  This guide is intended for developers who wish to work on Accada's EPCIS
-  Repository implementation. It outlines the steps to follow for setting up
-  the development environment and helps developers to find their way through
-  the code.
+         [[i]] {{{#Project Modules}Project Modules}}
 
+         [[i]] {{{#Directory Layout}Directory Layout}}
 
-* {Getting} Started
+   [[1]] {{{#Other Features}Other Features}}
 
-  This section describes the setup of the development environment we use when
-  working on Accada's EPCIS project.
+         [[i]] {{{#Build Profiles}Build Profiles}}
 
-** SVN Checkout
-
-   First thing you need to do is checking out the code from the SVN repository.
-   See {{{../source-repository.html}Source Repository}} on how to access the
-   sources.
-
-** Installing Tomcat
-
-   We use {{{http://tomcat.apache.org/download-60.cgi}Apache Tomcat 6.x}} as
-   the Web container for running Accada's EPCIS Repository. After installation
-   it is important to check that you have the <<<CATALINA_HOME>>> environment
-   variable set to the Tomcat root installation directory and that your
-   <<<JAVA_HOME>>> environment variable points to a valid 1.5 JRE directory.
-   
-   The important notes here are the following two directories:
-   
-   * <<<$CATALINA_HOME/webapps>>> - the place where the application will be
-     deployed
-   
-   * <<<$CATALINA_HOME/logs>>> - the place where the logfile for our application
-     will be kept
-
-** Installing MySQL
-
-  See the section on MySQL database setup in the {{{developer-guide.html#MySQL}User Guide}}.
-
-** Installing Maven
-
-   We use {{{http://maven.apache.org/}Maven 2}} as our build tool.
-   After installation you need to have the <<<M2_HOME>>> environment variable
-   set to your Maven installation directory.
+         [[i]] {{{#Generating the Project Website}Generating the Project Website}}
 
 
-* {Project} Layout
+* {About this Guide}
 
-  This section helps developers to find their way through the code.
+  This developer guide is intended for people who wish to work on Accada's
+  EPCIS repository implementation and contribute to the project. It outlines
+  the steps to follow for setting up the development environment and helps
+  developers to find their way through the code.
 
-** Project Modules
+  If you just want to set up your own EPCIS repository for use in your own
+  project, you should follow the {{{user-guide.html}User Guide}}. Generally,
+  it is advisable if you first read the {{{user-guide.html}User Guide}} before
+  continuing with the developer guide.
 
-   Accada's EPCIS project is a multimodule project. Currently, it includes five
-   modules which are aggregated in and inherit from the base <<<epcis>>> module:
+  If you cannot find your answer here, feel free to ask the
+  {{{mailto:accada-epcis-developer@lists.sourceforge.net}Accada EPCIS developer mailing list}}.
 
-   * <<epcis-commons>>
 
-     This module contains the common functionality (such as parsers) as well as
-     the Axis generated code (which is used both by the <epcis-repository> and the
-     <epcis-queryclient> modules).
+* {Getting Started}
 
-   * <<epcis-captureclient>>
+  This section of the developer guide includes a description on how to set up
+  the development environment for the project.
+  describes the setup of the development environment we use when
+  working on the project.
 
-     This module consists of a Capture Client GUI and a simple Capture Client
-     which sends EPC events (XML) through HTTP POST requests to the EPCIS
-     Capture Interface.
 
-   * <<epcis-queryclient>>
+** {Setting up the Development Environment}
 
-     This module consists of a Query Client GUI, the Query Callback Client and
-     the Query Control Client, which send queries to the EPCIS Query Interface
-     using SOAP (Axis).
+   Make sure you have the following prerequisites installed:
 
-   * <<epcis-repository>>
+   [[1]] {{{http://java.sun.com/javase/downloads}JDK}} version 5.0 or higher.
+   It will be used to compile the Java sources. Also check that the
+   <<<JAVA_HOME>>> environment variable points to your Java <<<bin>>> directory.
 
-     This module contains the actual implementation of the EPCIS Repository.
+   [[1]] {{{http://tomcat.apache.org}Apache Tomcat}} servlet container version
+   5.5 or higher. It will be used to deploy and run the EPCIS repository web
+   application. Also check that the <<<CATALINA_HOME>>> environment variable
+   points to your Tomcat installation directory.
 
-   * <<epcis-interop-test>>
+   [[1]] {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL server}}
+   version 5.0 or higher. It will be used by the EPCIS repository to store
+   event data.
 
-     This module contains interoperability tests to test compliance with
-     EPCglobal's standard.
+   [[1]] {{{http://maven.apache.org/}Maven 2}}. It will be used for building
+   and configuring the project and for deploying the application. Also check
+   that the <<<M2_HOME>>> environment variable points to your Maven
+   installation directory and make sure that you are familiar with the Maven
+   build tool.
 
-   []
-  
-** Directory Layout
-  
-   We use the standard Maven directory layout as follows:
+** {Getting the Source Code}
+
+   First thing you need to do is checking out the sourcecode from the SVN
+   repository. See {{{../source-repository.html}Source Repository}} on how to
+   access the SVN sources. In the following we will use the <<<EPCIS_HOME>>>
+   variable to refer to the location where you checked out the sources.
+
+** {Setting up Eclipse}
+
+   If you intend to use the Eclipse IDE to work on the project, consider the
+   following guidelines:
+
+   [[1]] Eclipse needs to know the path to your local Maven repository. Run the
+   following command to automatically set up the class path variable
+   <<<M2_REPO>>> accordingly:
 
 ---------------------------------------------------------------------------
-|
-+-- pom.xml                             -> top-level POM file
-|
-+-- LICENSE.txt, README.txt
-|
-+-- src/
-|   |
-|   +-- config/                         -> top-level configuration files, like checkstyle configs
-|   |
-|   `-- site/                           -> project documentation
-|
-+-- epcis-captureclient/
-|   ¦
-|   '
-|
-+-- epcis-commons/
-|   ¦
-|   '
-|
-+-- epcis-interop-test/
-|   ¦
-|   '
-|
-+-- epcis-queryclient/
-|   ¦
-|   '
-|
-+-- epcis-repository/
-|   |
-|   +-- pom.xml                                    -> module POM file
-|   |
-|   `-- src/
-|       |
-|       +-- main/
-|       |   |
-|       |   +-- java/                              -> java source files
-|       |   |
-|       |   +-- resources/                         -> wsdl and xsd schema files
-|       |   |
-|       |   +-- sql/                               -> database scripts
-|       |   |
-|       |   `-- webapp/
-|       |       |
-|       |       +-- META-INF/
-|       |       |   |
-|       |       |   +-- application.properties     -> application properties
-|       |       |   |
-|       |       |   +-- context.xml                -> tomcat context properties
-|       |       |   |
-|       |       |   `-- log4j.properties           -> log4j properties
-|       |       |
-|       |       `-- WEB-INF/
-|       |           |
-|       |           +-- server-config.wsdd         -> axis web service deployment descriptor
-|       |           |
-|       |           `-- web.xml                    -> tomcat deployment descriptor
-|       |
-|       +-- site/                                  -> module documentation
-|       |
-|       `-- test/
-|           |
-|           `-- java/                              -> java unit test source files
-|
-`-- target/                                        -> generated contents
+mvn eclipse:add-maven-repo -Declipse.workspace=<path-to-your-eclipse-workspace>
 ---------------------------------------------------------------------------
 
+   If you use a Eclipse WTP, you should also add the <<<-Dwtpversion=1.5>>>
+   switch and specify the WTP version you use.
 
-* {Using} Maven
+   [[1]] In order to generate the <<<.project>>> and <<<.classpath>>> files
+   used by Eclipse, run the following command from the <<<EPCIS_HOME>>>
+   directory:
 
-  Using Maven as our build tool has several advantages (such as the easy integration
-  of handy plugins). We use the Tomcat plugin for deployment, the Eclipse plugin for
-  generating the Eclipse project, and a handfull of reporting plugins.
+---------------------------------------------------------------------------
+mvn eclipse:eclipse -DdownloadSources
+---------------------------------------------------------------------------
 
-** Building
+   If you do not want to download all the sources, ignore the
+   <<<-DdownloadSources>>> switch.
 
-   For building the sources, it is sufficient to run the following command:
+   [[1]] Form inside Eclipse, import all the sub-modules: go to <File> >
+   <Import> > <Existing Projects into Workspace> and select all four projects
+   available there.
+
+   [[1]] In Eclipse, import the code formatter stylesheet: go to <Window> >
+   <Preferences...>, navigate to the branch <Java> > <Code Style> >
+   <Formatter>, and import the file from
+   <<<EPCIS_HOME/src/config/epcis_codeformatter.xml>>>. Now either set the
+   EPCIS code style profile active for your entire workspace, or, go to the
+   preferences of each individual EPCIS project (<Project> > <Properties>) and
+   set the active code style profile to <EPCIS>. Prior to committing code to
+   SVN hit <<<CTRL+SHIRT+F>>> to format the code according to the Accada EPCIS
+   code style.
+
+** {Building and Deploying the Project}
+
+   The first time you work on the project you need to get all the dependencies
+   and install them into your local Maven repository. The following command
+   will do all that for you:
+
+---------------------------------------------------------------------------
+mvn install
+---------------------------------------------------------------------------
+
+   Building the project is straight forward:
 
 ---------------------------------------------------------------------------
 mvn compile
 ---------------------------------------------------------------------------
 
-** Deployment
-
-   For deploying/undeploying the repository to/from Tomcat, we use the Maven Tomcat
-   plugin. This plugin communicates with the Tomcat Manager. You therefore need
-   to specify the username and password to access your Tomcat's Manager application
-   by adding the following block to your <<<$M2_HOME/conf/settings.xml>>> file:
+   In order to deploy and undeploy the application to and from Tomcat, we use
+   the Maven Tomcat plugin. This plugin communicates with the Tomcat Manager
+   and thus needs to know the username and password to access the Manager
+   application. Add the following block to your <<<M2_HOME/conf/settings.xml>>>
+   file and specify the correct username and password:
 
 ---------------------------------------------------------------------------
 <server>
@@ -206,10 +160,10 @@ mvn compile
 </server>
 ---------------------------------------------------------------------------
 
-   You can use the the following commands deploy or undeploy the EPCIS repository.
-   Make sure you run these commands from the <<<epcis-repository>>> directory.
-   Otherwise, Maven will fail as the tomcat-plugin is only available to the
-   epcis-repository module.
+   Now, you can use the the following commands to deploy or undeploy the
+   application. Make sure you run these commands from the
+   <<<EPCIS_HOME/epcis-repository>>> directory because the maven-tomcat-plugin
+   is only available to the epcis-repository submodule.
 
 ---------------------------------------------------------------------------
 mvn tomcat:deploy
@@ -217,60 +171,161 @@ mvn tomcat:deploy
 mvn tomcat:undeploy
 ---------------------------------------------------------------------------
 
-** Eclipse Integration
-
-   In order to work on the Accada EPCIS Repository using Eclipse, follow these
-   instructions:
-
-   [[1]] Eclipse needs to know the path to the local maven repository. Execute
-         the following command to automatically set up the corresponding classpath
-         variable <<<M2_REPO>>> accordingly:
-
----------------------------------------------------------------------------
-mvn -Declipse.workspace=<path-to-eclipse-workspace> eclipse:add-maven-repo
----------------------------------------------------------------------------
-
-   [[1]] In order to generate the <<<.project>>> and <<<.classpath>>> files used by
-         Eclipse, execute the following command from the directory containing
-         the Accada EPCIS source code:
-
----------------------------------------------------------------------------
-mvn -Dwtpversion=1.0 eclipse:eclipse
----------------------------------------------------------------------------
-
-         Make sure you indicate the correct version of the Web Tools Project
-         (WTP) you use in your Eclipse installation. <<<wtpversion=1.0>>> will
-         work fine with WTP 1.5.x and even works well for Eclipse without WTP.
-
-   [[1]] Inside Eclipse, import all the sub-modules (from the menu bar, select
-         File > Import > Existing Projects into Workspace).
-
-** Site Generation
-
-   The main web site (containing this documentation) can be generated by using the following command:
-
----------------------------------------------------------------------------
-mvn site -N
----------------------------------------------------------------------------
-
-   In order to generate all module reports and to test the whole site navigation
-   before a live deploy, you can execute the following command which will
-   generate the web site under the given directory:
-
----------------------------------------------------------------------------
-mvn site:stage -DstagingDirectory=d:\testsite
----------------------------------------------------------------------------
-
-** Generation of Binaries
-
-   The following command will generate the binaries for the modules, i.e.,
-   it will generate assemblies for the epcis-captureclient and
-   epcis-queryclient modules and it will generate a WAR file for the
-   epcis-repository module.
+   You can also manually deploy the application by placing the WAR file
+   directly into Tomcat's <<<webapps>>> directory. To get the WAR file, run
+   the following command and grab it from
+   <<<EPCIS_HOME/epcis-repository/target>>>
 
 ---------------------------------------------------------------------------
 mvn package
 ---------------------------------------------------------------------------
 
+   []
 
-[]
+   Now you are ready to go and start working on the project.
+
+
+
+* {Project Layout}
+
+  This section helps developers to find their way through the code.
+
+** {Project Modules}
+
+   Accada's EPCIS project is a multimodule project. Currently, it includes five
+   modules which are aggregated in and inherit from the base <<<epcis>>> module:
+
+   * <<epcis-commons>>
+
+     This module contains the common functionality (such as parsers) as well as
+     the CXF generated JAXB data binding of the EPCIS schema (which is used by
+     the <epcis-repository>, the <epcis-queryclient>, and the
+     <epcis-captureclient> modules).
+
+   * <<epcis-captureclient>>
+
+     This module consists of a capture client GUI and a simple capture client
+     API library which can be used to send EPCIS events to an EPCIS repository.
+
+   * <<epcis-queryclient>>
+
+     This module consists of a query client GUI, a query callback client, and a
+     query control client which can be used to send queries to an EPCIS
+     repository.
+
+   * <<epcis-repository>>
+
+     This module contains the actual implementation of the bindings defined in
+     the EPCIS specification.
+
+   * <<epcis-interop-test>>
+
+     This module contains tests to check interoperability compliance with
+     EPCglobal's standard.
+
+
+
+** {Directory Layout}
+
+   We use the standard Maven directory layout for all the modules:
+
+---------------------------------------------------------------------------
++- pom.xml                             -> top-level POM file
++- LICENSE.txt, README.txt
+|
++- src/
+|   +- config/                         -> top-level configuration files, e.g., checkstyle configs
+|   +- main/
+|   |   +- assembly/                   -> assembly descriptor for generating the source distribution
+|   |   `- filters/                    -> filter properties for the build profiles
+|   `- site/                           -> project documentation
+|
++- epcis-captureclient/
++- epcis-commons/
++- epcis-interop-test/
++- epcis-queryclient/
+|
++- epcis-repository/
+|   +- pom.xml                                    -> module POM file
+|   `- src/
+|       +- main/
+|       |   +- assembly/                          -> assembly descriptor for the binary distribution
+|       |   +- java/                              -> Java source files
+|       |   +- resources/                         -> class path resources, e.g., properties files
+|       |   +- sql/                               -> database scripts
+|       |   `- webapp/
+|       |       +- META-INF/                      -> webapp context configurations
+|       |       `- WEB-INF/                       -> deployment descriptor
+|       |
+|       +- site/                                  -> module documentation
+|       `- test/                                  -> Test resources and source files
+|
+`- target/                                        -> generated contents
+---------------------------------------------------------------------------
+
+
+
+
+* {Other Features}
+
+** {Build Profiles}
+
+   An introduction to build profiles is given in the
+   {{http://maven.apache.org/guides/introduction/introduction-to-profiles.html}Maven documentation}}.
+   We currently use two different build profiles, the <env-dev> and <env-prod>
+   profiles. The build properties for the two profiles are given in the
+   <<<dev.properties>>> and <<<prod.properties>>> file, respectively, located
+   at <<<EPCIS_HOME/src/main/filters>>>.
+
+   By default the <prod> profile is activated. A different profile can be
+   activated by either on the command line by specifying a profile
+   explicitly using the <<<-P>>> switch, or by providing a property named
+   <<<env>>> with the corresponding value. The following examples show the two
+   possibilities for activating the <env-dev> profile on the command line:
+
+---------------------------------------------------------------------------
+mvn compile -Penv-dev
+
+mvn compile -Denv=dev
+---------------------------------------------------------------------------
+
+   A developer may also want to activate the developement profile permanently by
+   specifying an <<<activeProfile>>> element in his local <<<settings.xml>>>
+   file. That way, he can also override the properties from the development
+   environment without touching the <<<dev.properties>>> file. The following
+   gives an example of the <<<activeProfile>>> element:
+
+---------------------------------------------------------------------------
+<profiles>
+  <profile>
+    <id>env-dev</id>
+    <properties>
+      <db.username>myname</db.username>
+      <db.password>mysecret</db.password>
+      <db.database>mydb</db.database>
+    </properties>
+  </profile>
+</profiles>
+
+<activeProfiles>
+  <activeProfile>env-dev</activeProfile>
+</activeProfiles>
+---------------------------------------------------------------------------
+
+
+** {Generating the Project Website}
+
+   The main web site (including this documentation) can be generated by using
+   the following command:
+
+---------------------------------------------------------------------------
+mvn site -N
+---------------------------------------------------------------------------
+
+   In order to generate all module reports and to test the whole site
+   navigation before a live deploy, you can execute the following command which
+   will generate the web site in the given directory:
+
+---------------------------------------------------------------------------
+mvn site:stage -DstagingDirectory=d:\testsite
+---------------------------------------------------------------------------
