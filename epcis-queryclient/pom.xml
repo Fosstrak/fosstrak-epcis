@@ -104,8 +104,8 @@
           <workDirectory>${project.build.directory}/site/webstart</workDirectory>
           <dependencies>
             <!--
-               Exclude everything that is not absulutely necessary in order
-               to keep the footprint low and the download quick.
+               Exclude everything that is not absulutely necessary in order to
+               keep the footprint as small and the download as quick as possible.
             -->
             <excludes>
               <exclude>javax.mail:mail</exclude>
