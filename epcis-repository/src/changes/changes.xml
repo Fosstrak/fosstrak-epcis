@@ -119,6 +119,10 @@
                 Query Interface: restriction of events according to
                 'eventCountLimit' must be global across all events.
             </action>
+            <action dev="steybem" type="fix" issue="1876336">
+                Query Interface: query returns events out of specified
+                time frame.
+            </action>
             <!-- changes to capture interface -->
             <action dev="steybem" type="add">
                 Capture Interface: added initialization logic to the
