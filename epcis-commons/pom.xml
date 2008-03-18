@@ -45,7 +45,6 @@
       <version>[3.8,4)</version>
       <scope>test</scope>
     </dependency>
-
     <!-- dependencies required by CeltiXFire (CXF) -->
     <dependency>
       <groupId>org.apache.cxf</groupId>
@@ -166,7 +165,7 @@
     </dependency>
   </dependencies>
 
-  
+
   <!-- =========================================================== -->
   <!-- Build settings                                              -->
   <!-- =========================================================== -->
@@ -224,47 +223,21 @@
   </build>
 
 
-
   <!-- =========================================================== -->
-  <!-- Repositories                                                   -->
+  <!-- Repositories                                                -->
   <!-- =========================================================== -->
 
   <repositories>
-    <repository>
-      <!-- e.g. for cxf -->
-      <id>apache-incubating</id>
-      <name>Apache Incubating Repository</name>
-      <url>http://people.apache.org/repo/m2-incubating-repository</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <!-- e.g. for jaxb -->
-      <id>java.net</id>
-      <name>java.net Maven Repository</name>
-      <url>http://download.java.net/maven/1</url>
-      <layout>legacy</layout>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
+    <!-- inherited from parent pom -->
   </repositories>
   <pluginRepositories>
     <pluginRepository>
-      <!-- e.g. for cxf-codegen-plugin -->
+      <!-- for getting the cxf-codegen-plugin libraries -->
       <id>apache-plugin-incubating</id>
       <name>Apache Plugin Incubating Repository</name>
       <url>http://people.apache.org/repo/m2-incubating-repository</url>
     </pluginRepository>
   </pluginRepositories>
-
 
 
   <!-- =========================================================== -->

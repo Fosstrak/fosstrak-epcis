@@ -73,6 +73,7 @@
       <artifactId>cxf-rt-transports-local</artifactId>
       <version>2.0.4-incubator</version>
       <exclusions>
+        <!-- the following dependencies are already provided by epcis-commons -->
         <exclusion>
           <groupId>org.apache.cxf</groupId>
           <artifactId>cxf-api</artifactId>
@@ -129,10 +130,8 @@
         -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>tomcat-maven-plugin</artifactId>
-        <version>1.0-alpha-1</version>
         <configuration>
           <server>tomcat-manager</server>
-          <url>http://localhost:8080/manager</url>
         </configuration>
       </plugin>
       <plugin>
@@ -188,21 +187,11 @@
   <!-- =========================================================== -->
 
   <repositories>
-    <!--
-      JARs provided by Sun fall under Sun's Binary License which disallows
-      them from being distributed from Maven's central repository. Therefore
-      we need to specify where such libraries (e.g. JTA) can be downloaded.
-    -->
-    <repository>
-      <id>sun</id>
-      <name>Sun Maven 2 Repository</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
+    <!-- inherited from parent pom -->
   </repositories>
   <pluginRepositories>
     <!--
-      For Maven plugins provided by Codehaus which are not yet in Maven's core
-      set of plugins, e.g. tomcat-maven-plugin
+      for getting the tomcat-maven-plugin libraries
     -->
     <pluginRepository>
       <id>Codehaus Maven Repository</id>

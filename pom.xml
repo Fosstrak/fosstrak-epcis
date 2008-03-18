@@ -46,6 +46,7 @@
       </modules>
     </profile>
     <profile>
+      <!-- in order to trigger this profile, specify "-Denv=test" on command line -->
       <id>env-dev</id>
       <activation>
         <property>
@@ -54,29 +55,12 @@
         </property>
       </activation>
       <properties>
-        <!--
-            consider moving these properties to an external properties file, e.g. 
-            src/main/filters/dev.properties, and add a filter element to the <build>
-            element below:
-            <filters>
-              <filter>src/main/filters/dev.properties</filter>
-            </filters>
-            see http://maven.apache.org/guides/getting-started/index.html#how_do_i_filter_resource_files
-            
-            a developer may want to activate this profile permanently by specifying
-            <activeProfile>env-dev</activeProfile> in the activeProfiles element of
-            his local settings.xml. additionally he might want to override values
-            for some of these parameters there
-        -->
-        <url.capture>http://127.0.0.1:8080/epcis-repository-${project.version}/capture</url.capture>
-        <url.query>http://127.0.0.1:8080/epcis-repository-${project.version}/services/EPCglobalEPCISService</url.query>
-        <db.database>epcis</db.database>
-        <db.username>epcis</db.username>
-        <db.password>epcis</db.password>
-        <db.reset.allowed>true</db.reset.allowed>
+        <!-- this file must be available from the child poms, therefore include a ".." -->
+        <filter.file>../src/main/filters/dev.properties</filter.file>
       </properties>
     </profile>
     <profile>
+      <!-- this profile is activated by default -->
       <id>env-prod</id>
       <activation>
         <property>
@@ -86,12 +70,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <url.capture>http://demo.accada.org/epcis/capture</url.capture>
-        <url.query>http://demo.accada.org/epcis/query</url.query>
-        <db.database>epcis</db.database>
-        <db.username>epcis</db.username>
-        <db.password>epcis</db.password>
-        <db.reset.allowed>false</db.reset.allowed>
+        <filter.file>../src/main/filters/prod.properties</filter.file>
       </properties>
     </profile>
   </profiles>
@@ -103,18 +82,41 @@
 
   <repositories>
     <repository>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
       <id>accada-repository</id>
       <name>Accada repository</name>
       <url>http://maven-repository.accada.org/releases</url>
       <layout>default</layout>
+    </repository>
+    <!--
+      JARs provided by Sun fall under Sun's Binary License which disallows
+      them from being distributed from Maven's central repository. Therefore
+      we need to specify where such libraries can be downloaded. See
+      http://maven.apache.org/guides/mini/guide-coping-with-sun-jars.html
+    -->
+    <repository>
+      <!-- for getting the jta libraries -->
+      <id>sun-maven2</id>
+      <name>Sun Maven 2 Repository</name>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+    <repository>
+      <!-- for getting the jaxb libraries -->
+      <id>sun-maven1</id>
+      <name>java.net Maven Repository</name>
+      <url>http://download.java.net/maven/1</url>
+      <layout>legacy</layout>
+    </repository>
+    <repository>
+      <!-- for getting the cxf libraries -->
+      <id>apache-incubating</id>
+      <name>Apache Incubating Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
@@ -124,6 +126,9 @@
   <!-- =========================================================== -->
 
   <build>
+    <filters>
+      <filter>${filter.file}</filter>
+    </filters>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -172,7 +177,7 @@
           <artifactId>maven-site-plugin</artifactId>
           <!-- Lock to this version in order to prevent generating corrupted
                menu structures for sub-modules when running site:site from the
-               parent module. See http://jira.codehaus.org/browse/MSITE-279 for
+               parent module. See http://jira.codehaus.org/browse/MSITE-270 for
                details on this issue. -->
           <version>2.0-beta-5</version>
           <configuration>
@@ -196,6 +201,7 @@
                <!-- these tests require special setup, see FAQ -->
               <exclude>**/ImplementationErrorTest.java</exclude>
               <exclude>**/QueryTooComplexTest.java</exclude>
+              <exclude>**/QueryPerformanceTest.java</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -228,7 +234,8 @@
     <site>
       <id>accada-website</id>
       <name>Accada website</name>
-      <url>sftp://www.accada.org/local/home/accadaweb/public_html/epcis</url>
+      <url>file:///C:/Temp/epcis-site</url>
+      <!-- <url>sftp://www.accada.org/local/home/accadaweb/public_html/epcis</url> -->
     </site>
   </distributionManagement>
   <issueManagement>
@@ -283,7 +290,6 @@
         <configuration>
           <linkXref>true</linkXref>
           <sourceEncoding>utf-8</sourceEncoding>
-          <minimumTokens>100</minimumTokens>
           <targetJdk>1.5</targetJdk>
           <excludes>
             <exclude>**/*Test.java</exclude>
@@ -291,16 +297,6 @@
           </excludes>
         </configuration>
       </plugin>
-      <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <configuration>
-          <threshold>Low</threshold>
-          <effort>Default</effort>
-        </configuration>
-      </plugin>
-      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javancss-maven-plugin</artifactId>
@@ -349,17 +345,23 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-    <developer>
-      <id>andreagr</id>
+  </developers>
+  <contributors>
+    <!-- the following people contributed to the project, but are not active anymore -->
+    <contributor>
+      <name>Sean Wellington</name>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </contributor>
+    <contributor>
       <name>Andrea Groessbauer</name>
       <email>andreagr@student.ethz.ch</email>
       <roles>
         <role>developer</role>
       </roles>
       <timezone>+1</timezone>
-    </developer>
-  </developers>
-  <contributors>
+    </contributor>
     <contributor>
       <name>Alain Remund</name>
       <email>remunda@student.ethz.ch</email>

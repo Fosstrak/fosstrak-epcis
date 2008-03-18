@@ -95,7 +95,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-maven2-plugin</artifactId>
@@ -145,7 +144,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>dbunit-maven-plugin</artifactId>
@@ -190,7 +188,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
