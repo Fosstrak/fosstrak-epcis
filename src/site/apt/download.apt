@@ -1,24 +1,24 @@
               -------------------
               Download
               -------------------
-              Marco Steybe
+              Christof Roduner
               -------------------
-              03/06/2007
+              03/19/2008
               -------------------
 
 
 Download
 
-  The current version of Accada EPCIS is 0.2.3.
+  The current version of Accada EPCIS is 0.3.0.
 
 * Accada EPCIS Repository 
 
 *--------+----------+
          | Binaries |
 *--------+----------+
- EPCIS Repository 0.2.3 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-repository/0.2.3/epcis-repository-0.2.3-bin-with-dependencies.zip}epcis-repository-0.2.3-bin-with-dependencies.zip}}
+ EPCIS Repository 0.3.0 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-repository/0.3.0/epcis-repository-0.3.0-bin-with-dependencies.zip}epcis-repository-0.3.0-bin-with-dependencies.zip}}
 *--------+----------+
- EPCIS Repository 0.2.3 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-repository/0.2.3/epcis-repository-0.2.3-bin-with-dependencies.tar.gz}epcis-repository-0.2.3-bin-with-dependencies.tar.gz}}
+ EPCIS Repository 0.3.0 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-repository/0.3.0/epcis-repository-0.3.0-bin-with-dependencies.tar.gz}epcis-repository-0.3.0-bin-with-dependencies.tar.gz}}
 *--------+----------+
 
 
@@ -27,9 +27,9 @@ Download
 *--------+----------+
          | Binaries |
 *--------+----------+
- EPCIS Capture Client 0.2.3 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-captureclient/0.2.3/epcis-captureclient-0.2.3-bin-with-dependencies.zip}epcis-captureclient-0.2.3-bin-with-dependencies.zip}}
+ EPCIS Capture Client 0.3.0 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-captureclient/0.3.0/epcis-captureclient-0.3.0-bin-with-dependencies.zip}epcis-captureclient-0.3.0-bin-with-dependencies.zip}}
 *--------+----------+
- EPCIS Capture Client 0.2.3 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-captureclient/0.2.3/epcis-captureclient-0.2.3-bin-with-dependencies.tar.gz}epcis-captureclient-0.2.3-bin-with-dependencies.tar.gz}}
+ EPCIS Capture Client 0.3.0 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-captureclient/0.3.0/epcis-captureclient-0.3.0-bin-with-dependencies.tar.gz}epcis-captureclient-0.3.0-bin-with-dependencies.tar.gz}}
 *--------+----------+
 
 
@@ -38,9 +38,9 @@ Download
 *--------+----------+
          | Binaries |
 *--------+----------+
- EPCIS Query Client 0.2.3 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-queryclient/0.2.3/epcis-queryclient-0.2.3-bin-with-dependencies.zip}epcis-queryclient-0.2.3-bin-with-dependencies.zip}}
+ EPCIS Query Client 0.3.0 with dependencies (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-queryclient/0.3.0/epcis-queryclient-0.3.0-bin-with-dependencies.zip}epcis-queryclient-0.3.0-bin-with-dependencies.zip}}
 *--------+----------+
- EPCIS Query Client 0.2.3 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-queryclient/0.2.3/epcis-queryclient-0.2.3-bin-with-dependencies.tar.gz}epcis-queryclient-0.2.3-bin-with-dependencies.tar.gz}}
+ EPCIS Query Client 0.3.0 with dependencies (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis-queryclient/0.3.0/epcis-queryclient-0.3.0-bin-with-dependencies.tar.gz}epcis-queryclient-0.3.0-bin-with-dependencies.tar.gz}}
 *--------+----------+
 
 
@@ -49,9 +49,9 @@ Download
 *--------+----------+
          | Sources  |
 *--------+----------+
- EPCIS Source 0.2.3 (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/0.2.3/epcis-0.2.3-src.zip}epcis-0.2.3-src.zip}}
+ EPCIS Source 0.3.0 (zip) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/0.3.0/epcis-0.3.0-src.zip}epcis-0.3.0-src.zip}}
 *--------+----------+
- EPCIS Source 0.2.3 (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/0.2.3/epcis-0.2.3-src.tar.gz}epcis-0.2.3-src.tar.gz}}
+ EPCIS Source 0.3.0 (tar.gz) | {{{http://maven-repository.accada.org/releases/org/accada/epcis/epcis/0.3.0/epcis-0.3.0-src.tar.gz}epcis-0.3.0-src.tar.gz}}
 *--------+----------+
 
 
