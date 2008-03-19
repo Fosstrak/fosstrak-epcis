@@ -22,6 +22,11 @@ package org.accada.epcis.queryclient;
 
 import java.io.IOException;
 
+import org.accada.epcis.model.ArrayOfString;
+import org.accada.epcis.model.Poll;
+import org.accada.epcis.model.QueryParam;
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.QueryResults;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.NoSuchNameExceptionResponse;
 import org.accada.epcis.soap.QueryParameterExceptionResponse;
@@ -29,11 +34,6 @@ import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.soap.SecurityExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
-import org.accada.epcis.soap.model.ArrayOfString;
-import org.accada.epcis.soap.model.Poll;
-import org.accada.epcis.soap.model.QueryParam;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**
@@ -91,7 +91,7 @@ public class SimpleEventQueryTest {
     public static void pollWithApi() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
             QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
-     // construct the query parameters
+        // construct the query parameters
         QueryParam queryParam1 = new QueryParam();
         queryParam1.setName("eventType");
         ArrayOfString queryParamValue1 = new ArrayOfString();

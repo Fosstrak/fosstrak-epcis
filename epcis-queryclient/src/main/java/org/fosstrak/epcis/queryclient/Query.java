@@ -23,7 +23,7 @@ package org.accada.epcis.queryclient;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.accada.epcis.soap.model.QueryParam;
+import org.accada.epcis.model.QueryParam;
 
 /**
  * Implements an example query object for the EPCIS Query Interface Client.

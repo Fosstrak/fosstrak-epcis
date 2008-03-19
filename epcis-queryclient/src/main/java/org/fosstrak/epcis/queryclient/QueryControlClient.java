@@ -41,6 +41,14 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.accada.epcis.model.EmptyParms;
+import org.accada.epcis.model.GetSubscriptionIDs;
+import org.accada.epcis.model.Poll;
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.QueryResults;
+import org.accada.epcis.model.Subscribe;
+import org.accada.epcis.model.SubscriptionControls;
+import org.accada.epcis.model.Unsubscribe;
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.EPCISServicePortType;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
@@ -54,14 +62,6 @@ import org.accada.epcis.soap.SecurityExceptionResponse;
 import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
 import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
-import org.accada.epcis.soap.model.EmptyParms;
-import org.accada.epcis.soap.model.GetSubscriptionIDs;
-import org.accada.epcis.soap.model.Poll;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.QueryResults;
-import org.accada.epcis.soap.model.Subscribe;
-import org.accada.epcis.soap.model.SubscriptionControls;
-import org.accada.epcis.soap.model.Unsubscribe;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
@@ -77,13 +77,10 @@ public class QueryControlClient implements QueryControlInterface {
 
     private static final String PROPERTY_FILE = "/queryclient.properties";
     private static final String PROP_QUERY_URL = "default.url";
-    private static final String PROP_WSDL_LOCATION = "wsdlLocation";
     private static final String DEFAULT_QUERY_URL = "http://demo.accada.org/epcis/query";
 
     private static final QName SERVICE = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISService");
     private static final QName PORT = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePort");
-
-    private URL wsdlLocation;
 
     /**
      * The URL String at which the Query Operations Module listens.
@@ -117,8 +114,6 @@ public class QueryControlClient implements QueryControlInterface {
     private void configureService(final String queryUrl) {
         if (queryUrl == null) {
             Properties props = loadProperties();
-            wsdlLocation = getClass().getResource(
-                    props.getProperty(PROP_WSDL_LOCATION, "wsdl/EPCglobal-epcis-query-1_0.wsdl"));
             endpointAddress = props.getProperty(PROP_QUERY_URL, DEFAULT_QUERY_URL);
         } else {
             endpointAddress = queryUrl;
@@ -238,7 +233,7 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#poll(org.accada.epcis.soap.model.Poll)
+     * @see org.accada.epcis.queryclient.QueryControlInterface#poll(org.accada.epcis.model.Poll)
      */
     public QueryResults poll(final Poll poll) throws ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
             QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
@@ -319,7 +314,7 @@ public class QueryControlClient implements QueryControlInterface {
             QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse, NoSuchNameExceptionResponse, QueryParameterExceptionResponse, IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             // setting schema to null will turn XML validation off
             // unmarshaller.setSchema(null);
@@ -416,7 +411,7 @@ public class QueryControlClient implements QueryControlInterface {
             NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse,
             IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             JAXBElement<Subscribe> elem = (JAXBElement<Subscribe>) unmarshaller.unmarshal(query);
             Subscribe subscribe = elem.getValue();
@@ -456,7 +451,7 @@ public class QueryControlClient implements QueryControlInterface {
     public void unsubscribe(final InputStream unsubscribeIs) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse, IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             JAXBElement<Unsubscribe> elem = (JAXBElement<Unsubscribe>) unmarshaller.unmarshal(unsubscribeIs);
             Unsubscribe unsubscribe = elem.getValue();

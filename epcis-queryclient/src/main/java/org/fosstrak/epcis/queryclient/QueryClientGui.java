@@ -57,11 +57,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.xml.datatype.DatatypeFactory;
 
-import org.accada.epcis.soap.model.ArrayOfString;
-import org.accada.epcis.soap.model.QueryParam;
-import org.accada.epcis.soap.model.QuerySchedule;
-import org.accada.epcis.soap.model.Subscribe;
-import org.accada.epcis.soap.model.SubscriptionControls;
+import org.accada.epcis.model.ArrayOfString;
+import org.accada.epcis.model.QueryParam;
+import org.accada.epcis.model.QuerySchedule;
+import org.accada.epcis.model.Subscribe;
+import org.accada.epcis.model.SubscriptionControls;
 import org.accada.epcis.utils.TimeParser;
 
 /**

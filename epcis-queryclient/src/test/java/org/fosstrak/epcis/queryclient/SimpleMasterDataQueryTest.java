@@ -22,6 +22,7 @@ package org.accada.epcis.queryclient;
 
 import java.io.IOException;
 
+import org.accada.epcis.model.QueryResults;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.NoSuchNameExceptionResponse;
 import org.accada.epcis.soap.QueryParameterExceptionResponse;
@@ -29,7 +30,6 @@ import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.soap.SecurityExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
-import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.utils.QueryResultsParser;
 
 /**

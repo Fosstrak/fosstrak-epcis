@@ -37,21 +37,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.xml.bind.JAXBElement;
 
-import org.accada.epcis.soap.model.AggregationEventType;
-import org.accada.epcis.soap.model.ArrayOfString;
-import org.accada.epcis.soap.model.BusinessTransactionType;
-import org.accada.epcis.soap.model.EPC;
-import org.accada.epcis.soap.model.EPCISEventType;
-import org.accada.epcis.soap.model.GetSubscriptionIDs;
-import org.accada.epcis.soap.model.ObjectEventType;
-import org.accada.epcis.soap.model.Poll;
-import org.accada.epcis.soap.model.QuantityEventType;
-import org.accada.epcis.soap.model.QueryParam;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.QueryResults;
-import org.accada.epcis.soap.model.Subscribe;
-import org.accada.epcis.soap.model.TransactionEventType;
-import org.accada.epcis.soap.model.Unsubscribe;
+import org.accada.epcis.model.AggregationEventType;
+import org.accada.epcis.model.ArrayOfString;
+import org.accada.epcis.model.BusinessTransactionType;
+import org.accada.epcis.model.EPC;
+import org.accada.epcis.model.EPCISEventType;
+import org.accada.epcis.model.GetSubscriptionIDs;
+import org.accada.epcis.model.ObjectEventType;
+import org.accada.epcis.model.Poll;
+import org.accada.epcis.model.QuantityEventType;
+import org.accada.epcis.model.QueryParam;
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.QueryResults;
+import org.accada.epcis.model.Subscribe;
+import org.accada.epcis.model.TransactionEventType;
+import org.accada.epcis.model.Unsubscribe;
 import org.accada.epcis.utils.TimeParser;
 
 /**

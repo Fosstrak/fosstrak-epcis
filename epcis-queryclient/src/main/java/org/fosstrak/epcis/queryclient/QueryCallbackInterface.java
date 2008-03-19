@@ -20,9 +20,9 @@
 
 package org.accada.epcis.queryclient;
 
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.QueryResults;
-import org.accada.epcis.soap.model.QueryTooLargeException;
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.QueryResults;
+import org.accada.epcis.model.QueryTooLargeException;
 
 /**
  * @author Marco Steybe
