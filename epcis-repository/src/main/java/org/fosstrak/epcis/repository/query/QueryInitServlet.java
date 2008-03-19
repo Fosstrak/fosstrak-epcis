@@ -65,7 +65,6 @@ public class QueryInitServlet extends CXFNonSpringServlet {
     private static final String PROP_TRIGGER_CHECK_MIN = "trigger.condition.check.min";
     private static final String PROP_SERVICE_VERSION = "service.version";
     private static final String PROP_JNDI_DATASOURCE_NAME = "jndi.datasource.name";
-    private static final String PROP_WS_QUERY_ADDRESS = "ws.query.address";
 
     private static final Log LOG = LogFactory.getLog(QueryInitServlet.class);
 
@@ -87,9 +86,8 @@ public class QueryInitServlet extends CXFNonSpringServlet {
         }
         EPCISServicePortType service = setupQueryOperationsModule(servletConfig);
 
-        String queryAddress = properties.getProperty(PROP_WS_QUERY_ADDRESS);
-        LOG.debug("Publishing query operations module service at " + queryAddress);
-        Endpoint.publish(queryAddress, service);
+        LOG.debug("Publishing query operations module service at /query");
+        Endpoint.publish("/query", service);
     }
 
     private EPCISServicePortType setupQueryOperationsModule(ServletConfig servletConfig) {

@@ -326,13 +326,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
         // we use CXF's local transport feature here
         EPCglobalEPCISService service = new EPCglobalEPCISService();
         QName portName = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePortLocal");
-        String queryAddress = getProperties().getProperty("ws.query.address", "query");
-        if (queryAddress.startsWith("/")) {
-            queryAddress = "local:/".concat(queryAddress);
-        } else {
-            queryAddress = "local://".concat(queryAddress);
-        }
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", queryAddress);
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://query");
         EPCISServicePortType servicePort = service.getPort(portName, EPCISServicePortType.class);
 
         // the same using CXF API
