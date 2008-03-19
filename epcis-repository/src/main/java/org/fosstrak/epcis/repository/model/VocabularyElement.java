@@ -25,55 +25,55 @@ import static org.accada.epcis.repository.Utils.hc;
 
 /**
  * A base class for vocabulary elements as described in section 6 of the spec.
+ * 
  * @author Sean Wellington
  */
 public abstract class VocabularyElement {
 
-	private Long id;
-	
-	private String uri;
-	
-	/**
-	 * The database id of this vocabulary element.
-	 */
-	public Long getId() {
-		return id;
-	}
+    private Long id;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    private String uri;
 
-	/**
-	 * The URI representation of this vocabulary element.
-	 */
-	public String getUri() {
-		return uri;
-	}
+    /**
+     * The database id of this vocabulary element.
+     */
+    public Long getId() {
+        return id;
+    }
 
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	@Override
-	public int hashCode() {
-		return hc(uri);
-	}
-	
-	@Override 
-	public boolean equals(Object o) {
-		if (o instanceof VocabularyElement) {
-			VocabularyElement that = (VocabularyElement)o;
-			return eq(this.uri, that.uri);
-		}
-		else {
-			return false;
-		}
-	}
-	
-	/**
-	 * The formal name of the vocabulary to which this element belongs.
-	 */
-	public abstract String getVocabularyType();
-	
+    /**
+     * The URI representation of this vocabulary element.
+     */
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    @Override
+    public int hashCode() {
+        return hc(uri);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof VocabularyElement) {
+            VocabularyElement that = (VocabularyElement) o;
+            return eq(this.uri, that.uri);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * The formal name of the vocabulary to which this element belongs.
+     */
+    public abstract String getVocabularyType();
+
 }

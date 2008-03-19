@@ -28,8 +28,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.accada.epcis.model.BusinessTransactionType;
 import org.accada.epcis.repository.model.EventFieldExtension;
-import org.accada.epcis.soap.model.BusinessTransactionType;
 
 /**
  * The CaptureOperationsBackend provides the persistence functionality required

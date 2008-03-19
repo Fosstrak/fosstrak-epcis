@@ -25,12 +25,11 @@ import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
-import org.accada.epcis.repository.query.Schedule;
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.QuerySchedule;
+import org.accada.epcis.model.SubscriptionControlsException;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.QuerySchedule;
-import org.accada.epcis.soap.model.SubscriptionControlsException;
 
 /**
  * Tests for class Schedule.
@@ -84,7 +83,8 @@ public class ScheduleTest extends TestCase {
      * @throws SubscriptionControlsException
      *             If an error in the schedule occurred.
      */
-    public void testNextScheduledHalfHour() throws ImplementationExceptionResponse, SubscriptionControlsExceptionResponse {
+    public void testNextScheduledHalfHour() throws ImplementationExceptionResponse,
+            SubscriptionControlsExceptionResponse {
         // scheduled time is every half an hour
         // always at the top and the bottom of every hour
         QuerySchedule qs = new QuerySchedule();
@@ -122,7 +122,8 @@ public class ScheduleTest extends TestCase {
      * @throws SubscriptionControlsException
      *             If an error in the schedule occurred.
      */
-    public void testNextScheduledDayOfWeek() throws ImplementationExceptionResponse, SubscriptionControlsExceptionResponse {
+    public void testNextScheduledDayOfWeek() throws ImplementationExceptionResponse,
+            SubscriptionControlsExceptionResponse {
         // scheduled time is every July, at a Thursday, 17:15.59
         QuerySchedule qs = new QuerySchedule();
         qs.setMonth("7");
@@ -152,7 +153,8 @@ public class ScheduleTest extends TestCase {
      * @throws SubscriptionControlsException
      *             If an error in the schedule occurred.
      */
-    public void testNextScheduledLeapYear() throws ImplementationExceptionResponse, SubscriptionControlsExceptionResponse {
+    public void testNextScheduledLeapYear() throws ImplementationExceptionResponse,
+            SubscriptionControlsExceptionResponse {
         // scheduled time is 29.2. 23:00.00 -> must be a leap year
         QuerySchedule qs = new QuerySchedule();
         qs.setMonth("2");
@@ -206,7 +208,8 @@ public class ScheduleTest extends TestCase {
      * @throws SubscriptionControlsException
      *             If an error in the schedule occurred.
      */
-    public void testComplexNextScheduledTime() throws ImplementationExceptionResponse, SubscriptionControlsExceptionResponse {
+    public void testComplexNextScheduledTime() throws ImplementationExceptionResponse,
+            SubscriptionControlsExceptionResponse {
         // scheduled time is 1., 10., 20., or 30. of a month,
         // at 07-11, 13-17, or 20 hours, 50.30 minutes
         QuerySchedule qs = new QuerySchedule();
@@ -269,7 +272,8 @@ public class ScheduleTest extends TestCase {
      * @throws SubscriptionControlsException
      *             If an error in the schedule occurred.
      */
-    public void testLeapYearDayOfWeekNextScheduledTime() throws ImplementationExceptionResponse, SubscriptionControlsExceptionResponse {
+    public void testLeapYearDayOfWeekNextScheduledTime() throws ImplementationExceptionResponse,
+            SubscriptionControlsExceptionResponse {
 
         QuerySchedule qs = new QuerySchedule();
         qs.setSecond("30");

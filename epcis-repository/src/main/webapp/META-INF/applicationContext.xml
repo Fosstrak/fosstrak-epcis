@@ -100,8 +100,8 @@
   <!-- =========================================================== -->
 
   <!-- publish the Web service endpoint and it's implementing bean -->
-  <jaxws:endpoint id="EpcisQueryEnpoint" implementor="#queryOperationsWebService" address="/query" />
-  <jaxws:endpoint id="EpcisQueryLocalEnpoint" implementor="#queryOperationsWebService" address="local://query" />
+  <jaxws:endpoint id="EpcisQueryEndpoint" implementor="#queryOperationsWebService" address="/query" />
+  <jaxws:endpoint id="EpcisQueryLocalEndpoint" implementor="#queryOperationsWebService" address="local://query" />
   
   <!-- register local transport -->
   <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">

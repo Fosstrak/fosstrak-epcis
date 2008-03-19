@@ -39,6 +39,27 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.accada.epcis.model.ArrayOfString;
+import org.accada.epcis.model.DuplicateSubscriptionException;
+import org.accada.epcis.model.EPCISEventType;
+import org.accada.epcis.model.EventListType;
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.ImplementationExceptionSeverity;
+import org.accada.epcis.model.InvalidURIException;
+import org.accada.epcis.model.NoSuchNameException;
+import org.accada.epcis.model.NoSuchSubscriptionException;
+import org.accada.epcis.model.QueryParam;
+import org.accada.epcis.model.QueryParameterException;
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.QueryResults;
+import org.accada.epcis.model.QueryResultsBody;
+import org.accada.epcis.model.QuerySchedule;
+import org.accada.epcis.model.QueryTooLargeException;
+import org.accada.epcis.model.SubscribeNotPermittedException;
+import org.accada.epcis.model.SubscriptionControls;
+import org.accada.epcis.model.SubscriptionControlsException;
+import org.accada.epcis.model.ValidationException;
+import org.accada.epcis.model.VocabularyListType;
 import org.accada.epcis.repository.EpcisConstants;
 import org.accada.epcis.repository.EpcisQueryControlInterface;
 import org.accada.epcis.repository.query.SimpleEventQueryDTO.Operation;
@@ -55,27 +76,6 @@ import org.accada.epcis.soap.SecurityExceptionResponse;
 import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
 import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
-import org.accada.epcis.soap.model.ArrayOfString;
-import org.accada.epcis.soap.model.DuplicateSubscriptionException;
-import org.accada.epcis.soap.model.EPCISEventType;
-import org.accada.epcis.soap.model.EventListType;
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.ImplementationExceptionSeverity;
-import org.accada.epcis.soap.model.InvalidURIException;
-import org.accada.epcis.soap.model.NoSuchNameException;
-import org.accada.epcis.soap.model.NoSuchSubscriptionException;
-import org.accada.epcis.soap.model.QueryParam;
-import org.accada.epcis.soap.model.QueryParameterException;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.QueryResults;
-import org.accada.epcis.soap.model.QueryResultsBody;
-import org.accada.epcis.soap.model.QuerySchedule;
-import org.accada.epcis.soap.model.QueryTooLargeException;
-import org.accada.epcis.soap.model.SubscribeNotPermittedException;
-import org.accada.epcis.soap.model.SubscriptionControls;
-import org.accada.epcis.soap.model.SubscriptionControlsException;
-import org.accada.epcis.soap.model.ValidationException;
-import org.accada.epcis.soap.model.VocabularyListType;
 import org.accada.epcis.utils.TimeParser;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
@@ -1421,7 +1421,8 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
     }
 
     /**
-     * @param backend the backend to set
+     * @param backend
+     *            the backend to set
      */
     public void setBackend(QueryOperationsBackend backend) {
         this.backend = backend;

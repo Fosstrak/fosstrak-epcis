@@ -26,11 +26,11 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.SubscriptionControls;
+import org.accada.epcis.model.VocabularyType;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.SubscriptionControls;
-import org.accada.epcis.soap.model.VocabularyType;
 
 /**
  * The QueryOperationsBackend provides the persistence functionality required by

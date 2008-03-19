@@ -22,29 +22,29 @@ package org.accada.epcis.repository.model;
 
 /**
  * A quantity event as defined in section 7.2.11 of the spec.
+ * 
  * @author Sean Wellington
  */
 public class QuantityEvent extends BaseEvent {
 
-	private EPCClass epcClass;
-	
-	private long quantity;
+    private EPCClass epcClass;
 
-	public EPCClass getEpcClass() {
-		return epcClass;
-	}
+    private long quantity;
 
-	public void setEpcClass(EPCClass epcClass) {
-		this.epcClass = epcClass;
-	}
+    public EPCClass getEpcClass() {
+        return epcClass;
+    }
 
-	public long getQuantity() {
-		return quantity;
-	}
+    public void setEpcClass(EPCClass epcClass) {
+        this.epcClass = epcClass;
+    }
 
-	public void setQuantity(long quantity) {
-		this.quantity = quantity;
-	}
+    public long getQuantity() {
+        return quantity;
+    }
 
-	
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
+    }
+
 }

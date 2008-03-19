@@ -23,80 +23,80 @@ package org.accada.epcis.repository.model;
 import java.util.List;
 
 /**
- * A base event class that contains properties common to most events.
- * This extends the EPCISEvent type described in section
- * 7 of the spec, providing convenient access to shared data elements.
+ * A base event class that contains properties common to most events. This
+ * extends the EPCISEvent type described in section 7 of the spec, providing
+ * convenient access to shared data elements.
+ * 
  * @author Sean Wellington
  */
 public abstract class BaseEvent extends EPCISEvent {
 
-	private Long id;
-	private BusinessStepId bizStep;
-	private DispositionId disposition;
-	private ReadPointId readPoint;
-	private BusinessLocationId bizLocation;
-	private List<BusinessTransaction> bizTransList;
-	private List<EventFieldExtension> extensions;
+    private Long id;
+    private BusinessStepId bizStep;
+    private DispositionId disposition;
+    private ReadPointId readPoint;
+    private BusinessLocationId bizLocation;
+    private List<BusinessTransaction> bizTransList;
+    private List<EventFieldExtension> extensions;
 
-	public BaseEvent() {
-		super();
-	}
+    public BaseEvent() {
+        super();
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public BusinessStepId getBizStep() {
-		return bizStep;
-	}
+    public BusinessStepId getBizStep() {
+        return bizStep;
+    }
 
-	public void setBizStep(BusinessStepId bizStep) {
-		this.bizStep = bizStep;
-	}
+    public void setBizStep(BusinessStepId bizStep) {
+        this.bizStep = bizStep;
+    }
 
-	public DispositionId getDisposition() {
-		return disposition;
-	}
+    public DispositionId getDisposition() {
+        return disposition;
+    }
 
-	public void setDisposition(DispositionId disposition) {
-		this.disposition = disposition;
-	}
+    public void setDisposition(DispositionId disposition) {
+        this.disposition = disposition;
+    }
 
-	public ReadPointId getReadPoint() {
-		return readPoint;
-	}
+    public ReadPointId getReadPoint() {
+        return readPoint;
+    }
 
-	public void setReadPoint(ReadPointId readPoint) {
-		this.readPoint = readPoint;
-	}
+    public void setReadPoint(ReadPointId readPoint) {
+        this.readPoint = readPoint;
+    }
 
-	public BusinessLocationId getBizLocation() {
-		return bizLocation;
-	}
+    public BusinessLocationId getBizLocation() {
+        return bizLocation;
+    }
 
-	public void setBizLocation(BusinessLocationId bizLocation) {
-		this.bizLocation = bizLocation;
-	}
+    public void setBizLocation(BusinessLocationId bizLocation) {
+        this.bizLocation = bizLocation;
+    }
 
-	public List<BusinessTransaction> getBizTransList() {
-		return bizTransList;
-	}
+    public List<BusinessTransaction> getBizTransList() {
+        return bizTransList;
+    }
 
-	public void setBizTransList(List<BusinessTransaction> bizTransList) {
-		this.bizTransList = bizTransList;
-	}
+    public void setBizTransList(List<BusinessTransaction> bizTransList) {
+        this.bizTransList = bizTransList;
+    }
 
-	public List<EventFieldExtension> getExtensions() {
-		return extensions;
-	}
+    public List<EventFieldExtension> getExtensions() {
+        return extensions;
+    }
 
-	public void setExtensions(List<EventFieldExtension> extensions) {
-		this.extensions = extensions;
-	}
+    public void setExtensions(List<EventFieldExtension> extensions) {
+        this.extensions = extensions;
+    }
 
-	
 }

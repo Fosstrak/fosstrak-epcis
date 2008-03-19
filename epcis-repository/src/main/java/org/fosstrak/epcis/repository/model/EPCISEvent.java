@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 
 /**
  * An EPCISEvent as defined in section 7.2.8 of the spec.
+ * 
  * @author Marco Steybe
  */
 public abstract class EPCISEvent {

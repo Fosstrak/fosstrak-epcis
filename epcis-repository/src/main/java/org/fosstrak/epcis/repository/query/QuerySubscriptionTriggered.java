@@ -25,12 +25,12 @@ import java.util.GregorianCalendar;
 import javax.management.Notification;
 import javax.management.timer.Timer;
 
+import org.accada.epcis.model.ArrayOfString;
+import org.accada.epcis.model.Poll;
+import org.accada.epcis.model.QueryParam;
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.QueryResults;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
-import org.accada.epcis.soap.model.ArrayOfString;
-import org.accada.epcis.soap.model.Poll;
-import org.accada.epcis.soap.model.QueryParam;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.QueryResults;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,7 +73,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
             return;
         }
         Timer timer = (Timer) pHandback;
-        
+
         if (!doItAgain.booleanValue()) {
             timer.stop();
         } else {

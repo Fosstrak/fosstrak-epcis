@@ -25,13 +25,14 @@ import org.accada.epcis.repository.EpcisConstants;
 /**
  * A vocabulary type for representing business location identifiers, per section
  * 7.2.3 of the spec.
+ * 
  * @author Sean Wellington
  */
 public class BusinessLocationId extends VocabularyElement {
 
-	@Override
-	public String getVocabularyType() {
-		return EpcisConstants.BUSINESS_LOCATION_ID;
-	}
+    @Override
+    public String getVocabularyType() {
+        return EpcisConstants.BUSINESS_LOCATION_ID;
+    }
 
 }

@@ -47,34 +47,34 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.accada.epcis.model.ActionType;
+import org.accada.epcis.model.AggregationEventType;
+import org.accada.epcis.model.AttributeType;
+import org.accada.epcis.model.BusinessLocationType;
+import org.accada.epcis.model.BusinessTransactionListType;
+import org.accada.epcis.model.BusinessTransactionType;
+import org.accada.epcis.model.EPC;
+import org.accada.epcis.model.EPCISEventType;
+import org.accada.epcis.model.EPCListType;
+import org.accada.epcis.model.IDListType;
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.ImplementationExceptionSeverity;
+import org.accada.epcis.model.ObjectEventType;
+import org.accada.epcis.model.QuantityEventType;
+import org.accada.epcis.model.QueryParam;
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.QueryTooLargeException;
+import org.accada.epcis.model.ReadPointType;
+import org.accada.epcis.model.SubscriptionControls;
+import org.accada.epcis.model.TransactionEventType;
+import org.accada.epcis.model.VocabularyElementListType;
+import org.accada.epcis.model.VocabularyElementType;
+import org.accada.epcis.model.VocabularyType;
 import org.accada.epcis.repository.EpcisConstants;
 import org.accada.epcis.repository.query.SimpleEventQueryDTO.EventQueryParam;
 import org.accada.epcis.repository.query.SimpleEventQueryDTO.Operation;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
-import org.accada.epcis.soap.model.ActionType;
-import org.accada.epcis.soap.model.AggregationEventType;
-import org.accada.epcis.soap.model.AttributeType;
-import org.accada.epcis.soap.model.BusinessLocationType;
-import org.accada.epcis.soap.model.BusinessTransactionListType;
-import org.accada.epcis.soap.model.BusinessTransactionType;
-import org.accada.epcis.soap.model.EPC;
-import org.accada.epcis.soap.model.EPCISEventType;
-import org.accada.epcis.soap.model.EPCListType;
-import org.accada.epcis.soap.model.IDListType;
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.ImplementationExceptionSeverity;
-import org.accada.epcis.soap.model.ObjectEventType;
-import org.accada.epcis.soap.model.QuantityEventType;
-import org.accada.epcis.soap.model.QueryParam;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.QueryTooLargeException;
-import org.accada.epcis.soap.model.ReadPointType;
-import org.accada.epcis.soap.model.SubscriptionControls;
-import org.accada.epcis.soap.model.TransactionEventType;
-import org.accada.epcis.soap.model.VocabularyElementListType;
-import org.accada.epcis.soap.model.VocabularyElementType;
-import org.accada.epcis.soap.model.VocabularyType;
 import org.accada.epcis.utils.TimeParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -268,7 +268,8 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                             for (Object paramValue : paramValues) {
                                 String strValue = (String) paramValue;
 
-                                // MATCH-params might be 'pure identity' EPC patterns
+                                // MATCH-params might be 'pure identity' EPC
+                                // patterns
                                 if (op == Operation.MATCH && !eventField.startsWith("epcClass")) {
                                     if (strValue.startsWith("urn:epc:idpat:")) {
                                         strValue = strValue.replace("urn:epc:idpat:", "urn:epc:id:");

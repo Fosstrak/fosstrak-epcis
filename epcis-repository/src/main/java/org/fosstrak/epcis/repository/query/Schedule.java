@@ -33,11 +33,11 @@ import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.QuerySchedule;
+import org.accada.epcis.model.SubscriptionControlsException;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
 import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.QuerySchedule;
-import org.accada.epcis.soap.model.SubscriptionControlsException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

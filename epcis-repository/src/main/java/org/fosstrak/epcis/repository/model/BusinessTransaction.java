@@ -25,54 +25,54 @@ import static org.accada.epcis.repository.Utils.hc;
 
 /**
  * A business transaction as defined in section 7.2.6 of the spec.
+ * 
  * @author Sean Wellington
  */
 public class BusinessTransaction {
-	
-	private Long id;
 
-	private BusinessTransactionId bizTransaction;
-	
-	private BusinessTransactionTypeId type;
-	
-	public Long getId() {
-		return id;
-	}
+    private Long id;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    private BusinessTransactionId bizTransaction;
 
-	public BusinessTransactionId getBizTransaction() {
-		return bizTransaction;
-	}
+    private BusinessTransactionTypeId type;
 
-	public void setBizTransaction(BusinessTransactionId bizTrans) {
-		this.bizTransaction = bizTrans;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public BusinessTransactionTypeId getType() {
-		return type;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setType(BusinessTransactionTypeId type) {
-		this.type = type;
-	}
-	
-	@Override
-	public int hashCode() {
-		return hc(bizTransaction) ^ hc(type);
-	}
+    public BusinessTransactionId getBizTransaction() {
+        return bizTransaction;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof BusinessTransaction) {
-			BusinessTransaction that = (BusinessTransaction)o;
-			return eq(this.bizTransaction, that.bizTransaction) && eq(this.type, that.type);
-		}
-		else {
-			return false;
-		}
-	}
+    public void setBizTransaction(BusinessTransactionId bizTrans) {
+        this.bizTransaction = bizTrans;
+    }
+
+    public BusinessTransactionTypeId getType() {
+        return type;
+    }
+
+    public void setType(BusinessTransactionTypeId type) {
+        this.type = type;
+    }
+
+    @Override
+    public int hashCode() {
+        return hc(bizTransaction) ^ hc(type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof BusinessTransaction) {
+            BusinessTransaction that = (BusinessTransaction) o;
+            return eq(this.bizTransaction, that.bizTransaction) && eq(this.type, that.type);
+        } else {
+            return false;
+        }
+    }
 
 }

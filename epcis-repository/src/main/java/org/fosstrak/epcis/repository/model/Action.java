@@ -22,10 +22,9 @@ package org.accada.epcis.repository.model;
 
 /**
  * Action types for events, per section 7.2.2 of the spec.
+ * 
  * @author Sean Wellington
  */
 public enum Action {
-	ADD,
-	DELETE,
-	OBSERVE
+    ADD, DELETE, OBSERVE
 }

@@ -36,9 +36,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.accada.epcis.model.BusinessTransactionType;
 import org.accada.epcis.repository.EpcisConstants;
 import org.accada.epcis.repository.model.EventFieldExtension;
-import org.accada.epcis.soap.model.BusinessTransactionType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

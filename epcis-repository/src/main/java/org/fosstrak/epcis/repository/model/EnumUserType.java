@@ -12,26 +12,25 @@ import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
 
 /**
- * Support for mapping Java enumerated types through Hibernate. See 
+ * Support for mapping Java enumerated types through Hibernate. See
  * http://www.hibernate.org/272.html for more information and discussion.
+ * 
  * @author Gavin King
  */
 public class EnumUserType implements EnhancedUserType, ParameterizedType {
-    
+
     private Class<Enum> enumClass;
 
     public void setParameterValues(Properties parameters) {
         String enumClassName = parameters.getProperty("enumClassName");
         try {
             enumClass = (Class<Enum>) Class.forName(enumClassName);
-        }
-        catch (ClassNotFoundException cnfe) {
+        } catch (ClassNotFoundException cnfe) {
             throw new HibernateException("Enum class not found", cnfe);
         }
     }
 
-    public Object assemble(Serializable cached, Object owner) 
-    throws HibernateException {
+    public Object assemble(Serializable cached, Object owner) throws HibernateException {
         return cached;
     }
 
@@ -44,7 +43,7 @@ public class EnumUserType implements EnhancedUserType, ParameterizedType {
     }
 
     public boolean equals(Object x, Object y) throws HibernateException {
-        return x==y;
+        return x == y;
     }
 
     public int hashCode(Object x) throws HibernateException {
@@ -55,24 +54,20 @@ public class EnumUserType implements EnhancedUserType, ParameterizedType {
         return false;
     }
 
-    public Object nullSafeGet(ResultSet rs, String[] names, Object owner) 
-    throws HibernateException, SQLException {
-        String name = rs.getString( names[0] );
+    public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws HibernateException, SQLException {
+        String name = rs.getString(names[0]);
         return rs.wasNull() ? null : Enum.valueOf(enumClass, name);
     }
 
-    public void nullSafeSet(PreparedStatement st, Object value, int index) 
-    throws HibernateException, SQLException {
-        if (value==null) {
+    public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException, SQLException {
+        if (value == null) {
             st.setNull(index, Types.VARCHAR);
-        }
-        else {
-            st.setString( index, ( (Enum) value ).name() ); 
+        } else {
+            st.setString(index, ((Enum) value).name());
         }
     }
 
-    public Object replace(Object original, Object target, Object owner) 
-    throws HibernateException {
+    public Object replace(Object original, Object target, Object owner) throws HibernateException {
         return original;
     }
 
@@ -89,11 +84,11 @@ public class EnumUserType implements EnhancedUserType, ParameterizedType {
     }
 
     public String objectToSQLString(Object value) {
-        return '\'' + ( (Enum) value ).name() + '\'';
+        return '\'' + ((Enum) value).name() + '\'';
     }
 
     public String toXMLString(Object value) {
-        return ( (Enum) value ).name();
+        return ((Enum) value).name();
     }
 
 }

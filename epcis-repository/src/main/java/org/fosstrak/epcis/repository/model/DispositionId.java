@@ -23,15 +23,16 @@ package org.accada.epcis.repository.model;
 import org.accada.epcis.repository.EpcisConstants;
 
 /**
- * A vocabulary type for representing disposition identifiers, per section
- * 7.2.5 of the spec.
+ * A vocabulary type for representing disposition identifiers, per section 7.2.5
+ * of the spec.
+ * 
  * @author Sean Wellington
  */
 public class DispositionId extends VocabularyElement {
 
-	@Override
-	public String getVocabularyType() {
-		return EpcisConstants.DISPOSITION_ID;
-	}
+    @Override
+    public String getVocabularyType() {
+        return EpcisConstants.DISPOSITION_ID;
+    }
 
 }

@@ -24,33 +24,39 @@ import java.util.List;
 
 /**
  * A aggregation event as defined in section 7.2.10 of the spec.
+ * 
  * @author Sean Wellington
  */
 public class AggregationEvent extends BaseEvent {
 
-	private String parentId;
+    private String parentId;
 
-	private List<String> childEpcs;
+    private List<String> childEpcs;
 
-	private Action action;
+    private Action action;
 
-	public Action getAction() {
-		return action;
-	}
-	public void setAction(Action action) {
-		this.action = action;
-	}
-	public List<String> getChildEpcs() {
-		return childEpcs;
-	}
-	public void setChildEpcs(List<String> childEpcs) {
-		this.childEpcs = childEpcs;
-	}
-	public String getParentId() {
-		return parentId;
-	}
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-	
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public List<String> getChildEpcs() {
+        return childEpcs;
+    }
+
+    public void setChildEpcs(List<String> childEpcs) {
+        this.childEpcs = childEpcs;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
 }

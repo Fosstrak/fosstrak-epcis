@@ -20,6 +20,16 @@
 
 package org.accada.epcis.repository.query;
 
+import org.accada.epcis.model.ArrayOfString;
+import org.accada.epcis.model.EmptyParms;
+import org.accada.epcis.model.GetSubscriptionIDs;
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.ImplementationExceptionSeverity;
+import org.accada.epcis.model.Poll;
+import org.accada.epcis.model.QueryResults;
+import org.accada.epcis.model.Subscribe;
+import org.accada.epcis.model.Unsubscribe;
+import org.accada.epcis.model.VoidHolder;
 import org.accada.epcis.repository.EpcisQueryControlInterface;
 import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.accada.epcis.soap.EPCISServicePortType;
@@ -34,16 +44,6 @@ import org.accada.epcis.soap.SecurityExceptionResponse;
 import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
 import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
-import org.accada.epcis.soap.model.ArrayOfString;
-import org.accada.epcis.soap.model.EmptyParms;
-import org.accada.epcis.soap.model.GetSubscriptionIDs;
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.ImplementationExceptionSeverity;
-import org.accada.epcis.soap.model.Poll;
-import org.accada.epcis.soap.model.QueryResults;
-import org.accada.epcis.soap.model.Subscribe;
-import org.accada.epcis.soap.model.Unsubscribe;
-import org.accada.epcis.soap.model.VoidHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,7 +68,7 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     }
 
     /**
-     * @see org.accada.epcis.soap.EPCISServicePortType#getQueryNames(org.accada.epcis.soap.model.EmptyParms)
+     * @see org.accada.epcis.soap.EPCISServicePortType#getQueryNames(org.accada.epcis.model.EmptyParms)
      */
     public ArrayOfString getQueryNames(EmptyParms empty) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse {
@@ -78,7 +78,7 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     }
 
     /**
-     * @see org.accada.epcis.soap.EPCISServicePortType#getStandardVersion(org.accada.epcis.soap.model.EmptyParms)
+     * @see org.accada.epcis.soap.EPCISServicePortType#getStandardVersion(org.accada.epcis.model.EmptyParms)
      */
     public String getStandardVersion(EmptyParms empty) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse {
@@ -86,7 +86,7 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     }
 
     /**
-     * @see org.accada.epcis.soap.EPCISServicePortType#getSubscriptionIDs(org.accada.epcis.soap.model.GetSubscriptionIDs)
+     * @see org.accada.epcis.soap.EPCISServicePortType#getSubscriptionIDs(org.accada.epcis.model.GetSubscriptionIDs)
      */
     public ArrayOfString getSubscriptionIDs(GetSubscriptionIDs req) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse {
@@ -96,7 +96,7 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     }
 
     /**
-     * @see org.accada.epcis.soap.EPCISServicePortType#getVendorVersion(org.accada.epcis.soap.model.EmptyParms)
+     * @see org.accada.epcis.soap.EPCISServicePortType#getVendorVersion(org.accada.epcis.model.EmptyParms)
      */
     public String getVendorVersion(EmptyParms empty) throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse {
@@ -104,7 +104,7 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     }
 
     /**
-     * @see org.accada.epcis.soap.EPCISServicePortType#poll(org.accada.epcis.soap.model.Poll)
+     * @see org.accada.epcis.soap.EPCISServicePortType#poll(org.accada.epcis.model.Poll)
      */
     public QueryResults poll(Poll poll) throws ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
             QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
@@ -140,7 +140,7 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     }
 
     /**
-     * @see org.accada.epcis.soap.EPCISServicePortType#subscribe(org.accada.epcis.soap.model.Subscribe)
+     * @see org.accada.epcis.soap.EPCISServicePortType#subscribe(org.accada.epcis.model.Subscribe)
      */
     public VoidHolder subscribe(Subscribe subscribe) throws DuplicateSubscriptionExceptionResponse,
             ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
@@ -186,7 +186,7 @@ public class QueryOperationsWebService implements EPCISServicePortType {
     }
 
     /**
-     * @see org.accada.epcis.soap.EPCISServicePortType#unsubscribe(org.accada.epcis.soap.model.Unsubscribe)
+     * @see org.accada.epcis.soap.EPCISServicePortType#unsubscribe(org.accada.epcis.model.Unsubscribe)
      */
     public VoidHolder unsubscribe(Unsubscribe unsubscribe) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse {

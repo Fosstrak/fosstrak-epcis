@@ -23,15 +23,16 @@ package org.accada.epcis.repository.model;
 import org.accada.epcis.repository.EpcisConstants;
 
 /**
- * A vocabulary type for representing EPC classes, per section
- * 7.2.7 of the spec.
+ * A vocabulary type for representing EPC classes, per section 7.2.7 of the
+ * spec.
+ * 
  * @author Sean Wellington
  */
 public class EPCClass extends VocabularyElement {
 
-	@Override
-	public String getVocabularyType() {
-		return EpcisConstants.EPC_CLASS_ID;
-	}
+    @Override
+    public String getVocabularyType() {
+        return EpcisConstants.EPC_CLASS_ID;
+    }
 
 }

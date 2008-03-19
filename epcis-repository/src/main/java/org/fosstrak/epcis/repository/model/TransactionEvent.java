@@ -24,38 +24,39 @@ import java.util.List;
 
 /**
  * A transaction event as defined in section 7.2.12 of the spec.
+ * 
  * @author Sean Wellington
  */
 public class TransactionEvent extends BaseEvent {
 
-	private String parentId;
-	
-	private List<String> epcList;
-	
-	private Action action;
+    private String parentId;
 
-	public Action getAction() {
-		return action;
-	}
+    private List<String> epcList;
 
-	public void setAction(Action action) {
-		this.action = action;
-	}
+    private Action action;
 
-	public List<String> getEpcList() {
-		return epcList;
-	}
+    public Action getAction() {
+        return action;
+    }
 
-	public void setEpcList(List<String> epcList) {
-		this.epcList = epcList;
-	}
+    public void setAction(Action action) {
+        this.action = action;
+    }
 
-	public String getParentId() {
-		return parentId;
-	}
+    public List<String> getEpcList() {
+        return epcList;
+    }
 
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-	
+    public void setEpcList(List<String> epcList) {
+        this.epcList = epcList;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
 }

@@ -60,6 +60,16 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.accada.epcis.model.EPCISQueryBodyType;
+import org.accada.epcis.model.EPCISQueryDocumentType;
+import org.accada.epcis.model.EventListType;
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.ObjectFactory;
+import org.accada.epcis.model.Poll;
+import org.accada.epcis.model.QueryParam;
+import org.accada.epcis.model.QueryParams;
+import org.accada.epcis.model.QueryResults;
+import org.accada.epcis.model.QueryTooLargeException;
 import org.accada.epcis.repository.EpcisQueryCallbackInterface;
 import org.accada.epcis.soap.EPCISServicePortType;
 import org.accada.epcis.soap.EPCglobalEPCISService;
@@ -70,16 +80,6 @@ import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
 import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
 import org.accada.epcis.soap.SecurityExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
-import org.accada.epcis.soap.model.EPCISQueryBodyType;
-import org.accada.epcis.soap.model.EPCISQueryDocumentType;
-import org.accada.epcis.soap.model.EventListType;
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.ObjectFactory;
-import org.accada.epcis.soap.model.Poll;
-import org.accada.epcis.soap.model.QueryParam;
-import org.accada.epcis.soap.model.QueryParams;
-import org.accada.epcis.soap.model.QueryResults;
-import org.accada.epcis.soap.model.QueryTooLargeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -451,8 +451,8 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             }
             LOG.debug("Response " + responseCode);
         } catch (IOException e) {
-            String msg = "Unable to send results of subscribed query '" + subscriptionID + "' to '" + dest
-                    + "': " + e.getMessage();
+            String msg = "Unable to send results of subscribed query '" + subscriptionID + "' to '" + dest + "': "
+                    + e.getMessage();
             LOG.error(msg, e);
             return;
         }
@@ -467,7 +467,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      */
     private String marshalQueryDoc(EPCISQueryDocumentType epcisDoc) throws JAXBException {
         ObjectFactory objectFactory = new ObjectFactory();
-        JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+        JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
         JAXBElement<EPCISQueryDocumentType> item = objectFactory.createEPCISQueryDocument(epcisDoc);
         LOG.debug("Serializing " + item + " into XML");
         StringWriter writer = new StringWriter();

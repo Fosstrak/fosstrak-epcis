@@ -60,8 +60,7 @@ public class EventFieldExtension {
      * @param value
      *            The value of the event field.
      */
-    public EventFieldExtension(final String prefix, final String namespace,
-            final String localname, final String value) {
+    public EventFieldExtension(final String prefix, final String namespace, final String localname, final String value) {
         this.localname = localname;
         this.prefix = prefix;
         this.namespace = namespace;
@@ -91,20 +90,20 @@ public class EventFieldExtension {
             }
         }
     }
-    
+
     public EventFieldExtension() {
-    	super();
+        super();
     }
-    
+
     public Long getId() {
-		return id;
-	}
+        return id;
+    }
 
     public void setId(Long id) {
-		this.id = id;
-	}
+        this.id = id;
+    }
 
-	/**
+    /**
      * @return The date value of the event field extension.
      */
     public Timestamp getDateValue() {
@@ -167,40 +166,40 @@ public class EventFieldExtension {
         return valueColumnName;
     }
 
-	public void setDateValue(Timestamp dateValue) {
-		this.dateValue = dateValue;
-	}
+    public void setDateValue(Timestamp dateValue) {
+        this.dateValue = dateValue;
+    }
 
-	public void setFieldname(String fieldname) {
-		this.fieldname = fieldname;
-	}
+    public void setFieldname(String fieldname) {
+        this.fieldname = fieldname;
+    }
 
-	public void setFloatValue(Float floatValue) {
-		this.floatValue = floatValue;
-	}
+    public void setFloatValue(Float floatValue) {
+        this.floatValue = floatValue;
+    }
 
-	public void setIntValue(Integer intValue) {
-		this.intValue = intValue;
-	}
+    public void setIntValue(Integer intValue) {
+        this.intValue = intValue;
+    }
 
-	public void setLocalname(String localname) {
-		this.localname = localname;
-	}
+    public void setLocalname(String localname) {
+        this.localname = localname;
+    }
 
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
 
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
 
-	public void setStrValue(String strValue) {
-		this.strValue = strValue;
-	}
+    public void setStrValue(String strValue) {
+        this.strValue = strValue;
+    }
 
-	public void setValueColumnName(String valueColumnName) {
-		this.valueColumnName = valueColumnName;
-	}
+    public void setValueColumnName(String valueColumnName) {
+        this.valueColumnName = valueColumnName;
+    }
 
 }

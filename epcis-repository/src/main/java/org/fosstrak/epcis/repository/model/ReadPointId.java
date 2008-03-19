@@ -23,16 +23,16 @@ package org.accada.epcis.repository.model;
 import org.accada.epcis.repository.EpcisConstants;
 
 /**
- * A vocabulary type for representing read point identifiers, per section
- * 7.2.3 of the spec.
+ * A vocabulary type for representing read point identifiers, per section 7.2.3
+ * of the spec.
+ * 
  * @author Sean Wellington
  */
 public class ReadPointId extends VocabularyElement {
 
-	@Override
-	public String getVocabularyType() {
-		return EpcisConstants.READ_POINT_ID;
-	}
+    @Override
+    public String getVocabularyType() {
+        return EpcisConstants.READ_POINT_ID;
+    }
 
-	
 }

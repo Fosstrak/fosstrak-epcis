@@ -67,7 +67,7 @@ public class SimpleEventQueryDTO {
     public int getMaxEventCount() {
         return maxEventCount;
     }
-    
+
     public List<EventQueryParam> getEventQueryParams() {
         return eventQueryParams;
     }

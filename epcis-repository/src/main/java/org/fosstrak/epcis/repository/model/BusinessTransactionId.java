@@ -23,15 +23,16 @@ package org.accada.epcis.repository.model;
 import org.accada.epcis.repository.EpcisConstants;
 
 /**
- * A vocabulary type for representing business transaction identifiers, per section
- * 7.2.6.2 of the spec.
+ * A vocabulary type for representing business transaction identifiers, per
+ * section 7.2.6.2 of the spec.
+ * 
  * @author Sean Wellington
  */
 public class BusinessTransactionId extends VocabularyElement {
 
-	@Override
-	public String getVocabularyType() {
-		return EpcisConstants.BUSINESS_TRANSACTION_ID;
-	}
+    @Override
+    public String getVocabularyType() {
+        return EpcisConstants.BUSINESS_TRANSACTION_ID;
+    }
 
 }

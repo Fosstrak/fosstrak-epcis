@@ -28,9 +28,9 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.timer.Timer;
 
+import org.accada.epcis.model.ImplementationException;
+import org.accada.epcis.model.QueryParams;
 import org.accada.epcis.soap.ImplementationExceptionResponse;
-import org.accada.epcis.soap.model.ImplementationException;
-import org.accada.epcis.soap.model.QueryParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

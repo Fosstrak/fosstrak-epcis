@@ -24,28 +24,29 @@ import java.util.List;
 
 /**
  * An object event as defined in section 7.2.9 of the spec.
+ * 
  * @author Sean Wellington
  */
 public class ObjectEvent extends BaseEvent {
 
-	private List<String> epcList;
-	
-	private Action action;
-	
-	public List<String> getEpcList() {
-		return epcList;
-	}
+    private List<String> epcList;
 
-	public void setEpcList(List<String> epcList) {
-		this.epcList = epcList;
-	}
+    private Action action;
 
-	public Action getAction() {
-		return action;
-	}
+    public List<String> getEpcList() {
+        return epcList;
+    }
 
-	public void setAction(Action action) {
-		this.action = action;
-	}
+    public void setEpcList(List<String> epcList) {
+        this.epcList = epcList;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
 
 }
