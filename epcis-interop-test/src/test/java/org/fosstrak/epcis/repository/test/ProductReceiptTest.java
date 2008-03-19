@@ -25,9 +25,9 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.model.QueryResults;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soap.NoSuchNameExceptionResponse;
-import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.utils.QueryResultsComparator;
 import org.accada.epcis.utils.QueryResultsParser;
 

@@ -25,8 +25,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.model.QueryResults;
 import org.accada.epcis.queryclient.QueryControlClient;
-import org.accada.epcis.soap.model.QueryResults;
 
 /**
  * Runs some sample queries against a given state of a database including 1000

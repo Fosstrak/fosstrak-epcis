@@ -27,9 +27,9 @@ import java.io.StringReader;
 
 import junit.framework.TestCase;
 
+import org.accada.epcis.model.QueryResults;
 import org.accada.epcis.queryclient.QueryControlClient;
 import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
-import org.accada.epcis.soap.model.QueryResults;
 import org.accada.epcis.utils.QueryCallbackListener;
 import org.accada.epcis.utils.QueryResultsComparator;
 import org.accada.epcis.utils.QueryResultsParser;
