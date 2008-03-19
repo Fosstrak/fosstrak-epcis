@@ -196,7 +196,7 @@
         <!--
            This plugin generates the webstart app, the template for the
            jnlp file is taken from src/jnlp/template.vm.
-           The plugin will be executed during the install phase, otherwise
+           The plugin will be executed during the deploy phase, otherwise
            an error will occur!
         -->
         <groupId>org.codehaus.mojo</groupId>

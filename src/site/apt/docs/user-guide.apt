@@ -640,7 +640,7 @@ String response = listener.fetchResponse();
 # application.properties - various properties (loaded at runtime)
 
 # the version of this service, as exposed by getVendorVersion (must be valid URI)
-service.version=http://www.accada.org/epcis/${project.name}-${project.version}
+service.version=http://www.accada.org/epcis/epcis-repository-<version>
 
 # maximum number of result rows allowed for a single query before a
 # QueryTooLarge exception is raised
@@ -660,7 +660,7 @@ trigger.condition.check.sec=0,20,40
 trigger.condition.check.min=
 
 # whether to allow resetting the database via a HTTP POST 'dbReset' parameter
-dbResetAllowed=true
+dbResetAllowed=false
 dbResetScript=/sql/epcis_test_data_reset.sql
 
 # the location of the EPCglobal EPCIS schema
@@ -668,7 +668,7 @@ epcisSchemaFile=/wsdl/EPCglobal-epcis-1_0.xsd
 
 # whether to trust a certificate whose certificate chain cannot be validated
 # when delivering results via Query Callback Interface
-trustAllCertificates=true
+trustAllCertificates=false
 
 # the name of the JNDI data source holding the connection to the database
 jndi.datasource.name=java:comp/env/jdbc/EPCISDB
