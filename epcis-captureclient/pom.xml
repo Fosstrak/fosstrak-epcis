@@ -80,7 +80,7 @@
         <!--
            This plugin generates the webstart app, the template for the
            jnlp file is taken from src/jnlp/template.vm.
-           The plugin will be executed during the install phase, otherwise
+           The plugin will be executed during the deploy phase, otherwise
            an error will occur!
         -->
         <groupId>org.codehaus.mojo</groupId>
@@ -95,6 +95,18 @@
         </executions>
         <configuration>
           <workDirectory>${project.build.directory}/site/webstart</workDirectory>
+          <dependencies>
+            <!--
+               Exclude everything that is not absulutely necessary in order to
+               keep the footprint as small and the download as quick as possible.
+            -->
+            <excludes>
+              <exclude>com.sun.xml.bind:jaxb-impl</exclude>
+              <exclude>javax.xml.bind:jaxb-api</exclude>
+              <exclude>javax.xml.bind:jsr173_api</exclude>
+              <exclude>javax.activation:activation</exclude>
+            </excludes>
+          </dependencies>
           <jnlp>
             <outputFile>epcis-captureclient.jnlp</outputFile>
             <mainClass>org.accada.epcis.captureclient.CaptureClientGui</mainClass>
