@@ -589,14 +589,22 @@ client.unsubscribe(queryId);
 
    After subscribing a query, the EPCIS repository will deliver results of
    query executions through the Query Callback Interface. The query results
-   will be deliverd as HTTP POST request to the URL specified by the <<<dest>>>
+   will be deliverd as HTTP POST requests to the URL specified by the <<<dest>>>
    parameter in the query subscription. It is the client's responsibility to
    listen for the response at the given URL.
 
-   The <<<QueryCallbackListener>>> class of the <<<epcis-commons.jar>>> library
-   implements a very simplistic HTTP server. It listens for requests to a given
-   URL, catches any incoming POST data, and delivers it to an application upon
-   request. The listener can be used as follows:
+   If you want to have a look at the query result responses without coding
+   anything, you could use a TCP monitor tool, such as
+   {{{http://ws.apache.org/commons/tcpmon/}Apache TCPMon}}}. This tool can be
+   configured as a listener for a given port and allows you to monitor the
+   messages passing by this port.
+
+   If you need to have access to the query results from whithin your code, you
+   can take advantage of the <<<QueryCallbackListener>>> class from the
+   <<<epcis-commons.jar>>> library. This class implements a very simplistic
+   HTTP server which listens for requests to a given URL. It catches any
+   incoming POST data and delivers it to an application upon request. The
+   listener can be used as follows:
 
 +----------------------------------------------------------------------------+
 QueryCallbackListener listener = QueryCallbackListener.getInstance();
@@ -615,7 +623,6 @@ String response = listener.fetchResponse();
 
    In this code, the <<<wait()>>> method waits until either the listener
    receives a response or the specified <<<timeout>>> has elapsed.
-
 
 
 
@@ -705,7 +712,7 @@ ws.query.address=/query
     password="epcis"
     driverClassName="com.mysql.jdbc.Driver"
     defaultAutoCommit="false"
-    url="jdbc:mysql://localhost:3306/epcis1?autoReconnect=true">
+    url="jdbc:mysql://localhost:3306/epcis?autoReconnect=true">
   </Resource>
 
 </Context>
