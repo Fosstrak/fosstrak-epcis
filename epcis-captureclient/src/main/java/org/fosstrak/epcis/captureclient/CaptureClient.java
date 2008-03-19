@@ -34,8 +34,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.accada.epcis.soap.model.EPCISDocumentType;
-import org.accada.epcis.soap.model.ObjectFactory;
+import org.accada.epcis.model.EPCISDocumentType;
+import org.accada.epcis.model.ObjectFactory;
 
 /**
  * This client provides access to the repository's Capture Operations Module
@@ -135,7 +135,7 @@ public class CaptureClient {
     public int capture(final EPCISDocumentType epcisDoc) throws IOException, JAXBException {
         StringWriter writer = new StringWriter();
         ObjectFactory objectFactory = new ObjectFactory();
-        JAXBContext context = JAXBContext.newInstance("org.accada.epcis.soap.model");
+        JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
         JAXBElement<EPCISDocumentType> item = objectFactory.createEPCISDocument(epcisDoc);
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");

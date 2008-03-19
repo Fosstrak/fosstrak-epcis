@@ -34,15 +34,15 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.accada.epcis.soap.model.ActionType;
-import org.accada.epcis.soap.model.BusinessLocationType;
-import org.accada.epcis.soap.model.EPC;
-import org.accada.epcis.soap.model.EPCISBodyType;
-import org.accada.epcis.soap.model.EPCISDocumentType;
-import org.accada.epcis.soap.model.EPCListType;
-import org.accada.epcis.soap.model.EventListType;
-import org.accada.epcis.soap.model.ObjectEventType;
-import org.accada.epcis.soap.model.ReadPointType;
+import org.accada.epcis.model.ActionType;
+import org.accada.epcis.model.BusinessLocationType;
+import org.accada.epcis.model.EPC;
+import org.accada.epcis.model.EPCISBodyType;
+import org.accada.epcis.model.EPCISDocumentType;
+import org.accada.epcis.model.EPCListType;
+import org.accada.epcis.model.EventListType;
+import org.accada.epcis.model.ObjectEventType;
+import org.accada.epcis.model.ReadPointType;
 
 /**
  * A simple test utility class for sending a single or multiple capture
