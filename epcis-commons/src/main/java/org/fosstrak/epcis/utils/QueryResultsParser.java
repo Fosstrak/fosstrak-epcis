@@ -35,9 +35,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.accada.epcis.soap.model.EPCISQueryDocumentType;
-import org.accada.epcis.soap.model.ObjectFactory;
-import org.accada.epcis.soap.model.QueryResults;
+import org.accada.epcis.model.EPCISQueryDocumentType;
+import org.accada.epcis.model.ObjectFactory;
+import org.accada.epcis.model.QueryResults;
 import org.w3c.dom.Document;
 
 /**
