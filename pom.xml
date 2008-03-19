@@ -44,6 +44,9 @@
       <modules>
         <module>epcis-interop-test</module>
       </modules>
+      <properties>
+        <filter.file>../src/main/filters/dev.properties</filter.file>
+      </properties>
     </profile>
     <profile>
       <!-- in order to trigger this profile, specify "-Denv=test" on command line -->
