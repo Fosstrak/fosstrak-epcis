@@ -55,7 +55,7 @@ Welcome to the Accada EPCIS Project
   []
 
   The figure below gives an overview of the Accada EPCIS Implementation. For more
-  information refer to the {{{docs/architecture.html}architecture section}}.
+  information refer to the {{{docs/architecture-guide.html}Architecture Guide}}.
 
 [images/epcis_architecture.png] Accada EPCIS Implementation
 

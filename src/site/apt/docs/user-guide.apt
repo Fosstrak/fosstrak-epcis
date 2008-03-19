@@ -3,7 +3,7 @@
               -------------------
               Marco Steybe, Andrea Groessbauer, Christof Roduner
               -------------------
-              03/17/2008
+              03/19/2008
               -------------------
 
 User Guide
@@ -39,10 +39,10 @@ User Guide
 
 * {About this Guide}
 
-  This user guide is intended to help users in getting started with the Accada
+  This user guide is intended to help people in getting started with the Accada
   EPCIS repository application. The guide outlines the steps to follow in order
-  to set up your own EPCIS repository, and describes the configuration parameters
-  and features of the application.
+  to set up your own EPCIS repository, and describes how to interact with such
+  a repository.
 
   If you just want to see Accada's EPCIS repository in action and explore its
   features and functionalities, you might want to try our Query and/or Capture
@@ -71,16 +71,16 @@ User Guide
    servlet container (version 5.5 or higher) running. It will be used to deploy
    and run the EPCIS repository web application.
 
-   [[2]] {{{../download.html}Download}} the <Accada EPCIS repository>
+   [[1]] {{{../download.html}Download}} the <Accada EPCIS repository>
    distribution and place the WAR file contained in the archive in your
    Tomcat's <webapps> directory. After restarting Tomcat, the WAR file will be
    exploded.
 
-   [[3]] Make sure you have have a {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL server}}
+   [[1]] Make sure you have have a {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL server}}
    (version 5.0 or higher) running. It will be used by the EPCIS repository
    to store event data.
 
-   [[4]] Setup a {MySQL} database for the EPCIS repository to use.
+   [[1]] Setup a {MySQL} database for the EPCIS repository to use.
  
    Log into the MySQL Command Line Client as <root> and perform the following
    steps:
@@ -92,29 +92,29 @@ User Guide
 mysql> CREATE DATABASE epcis;
 -----------------------------
 
-     [[b]] Create a user that is allowed access to the newly created database
+     [[a]] Create a user that is allowed access to the newly created database
      (in this example, we'll use the user name <epcis> and password <epcis>).
 
 --------------------------------------------------------------------------------------
 mysql> GRANT SELECT, INSERT, UPDATE, DELETE ON epcis.* TO epcis IDENTIFIED BY 'epcis';
 --------------------------------------------------------------------------------------
 
-     [[c]] Create the database schema by running the setup script contained
-     in the archive you downloaded. (Make sure you're connected to the newly
+     [[a]] Create the database schema by running the setup script contained
+     in the archive you downloaded. (Make sure you are connected to the newly
      created database before running the script.)
 
 ----------------------------------------------------------
 mysql> USE epcis;
-mysql> source <path-to-unpacked-download>/epcis_schema.sql
+mysql> SOURCE <path-to-unpacked-download>/epcis_schema.sql
 ----------------------------------------------------------
 
-     [[d]] Optionally populate the repository with some sample data.
+     [[a]] Optionally populate the repository with some sample data.
 
 -------------------------------------------------------------
-mysql> source <path-to-unpacked-download>/epcis_demo_data.sql
+mysql> SOURCE <path-to-unpacked-download>/epcis_demo_data.sql
 -------------------------------------------------------------
 
-   [[5]] Configure the repository to connect to the newly created database.
+   [[1]] Configure the repository to connect to the newly created database.
 
    In a default installation of Tomcat, the database connection settings can be
    found in <<<$TOMCAT_HOME/conf/Catalina/localhost/epcis-repository-\<version\>.xml>>>.
@@ -136,16 +136,15 @@ mysql> source <path-to-unpacked-download>/epcis_demo_data.sql
    If you used the default user name, password and database name from the
    examples above, then you don't need to reconfigure anything here. If,
    however, you used different values, you need to stop Tomcat, change the
-   values in <<<$TOMCAT_HOME/conf/Catalina/localhost/epcis-repository-\<version\>.xml>>>
-   and restart Tomcat.
+   values and restart Tomcat.
 
-   [[6]] Check if the application is running.
+   [[1]] Check if the application is running.
 
    In a default installation of Tomcat, the capture interface will now be
    available at <<<http://localhost:8080/epcis-repository-\<version\>/capture>>>,
-   while the query interface will be available at
+   whereas the query interface will be available at
    <<<http://localhost:8080/epcis-repository-\<version\>/query>>>.
-   
+
    Point your browser to the capture URL. You should see a short information
    page similar to this:
 
@@ -157,7 +156,7 @@ conforming to the EPCISDocument schema.
 For further information refer to the xml schema files or check the Example
 in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.
 -----------------------------------------------------------------------------
-   
+
    To also check if the query interface is set up correctly, point your browser
    to the query address and append a <<<?wsdl>>> to the URL. The WSDL file of
    the query service should now show up and be displayed in your browser.
@@ -165,9 +164,9 @@ in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.
    Proceed to the next sections to test your repository installation using one
    of our client applications.
 
-   [[7]] Check the application's log file in case of problems.
+   [[1]] Check the application's log file in case of problems.
 
-   The application's log file is kept in <<<$TOMCAT_HOME/logs/epcis-repository.log>>>.
+   The application's log file is kept in <<<TOMCAT_HOME/logs/epcis-repository.log>>>.
    In case of problems with your own EPCIS repository instance, this is the
    first place to look for information about errors or specific exceptions
    thrown by the application.
@@ -176,41 +175,41 @@ in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.
 
    [[1]] {{{download.html}Download}} the capture client binaries.
 
-   [[2]] Run the executable JAR file contained in the archive you downloaded.
+   [[1]] Run the executable JAR file contained in the archive you downloaded.
    This will launch the Accada EPCIS Capture Client. 
 
 -------------------------------------------
 java -jar epcis-captureclient-<version>.jar
 -------------------------------------------
 
-   [[3]] In the GUI, you need to specify the URL of the EPCIS repository you
+   [[1]] In the GUI, you need to specify the URL of the EPCIS repository you
    want to connect to. You can either use your local repository instance
    (e.g., <<<http://localhost:8080/epcis-repository-\<version\>/capture>>>>) or
-   our public repository (<<<http://demo.accada.org/epcis/capture>>>). You can
-   now fill in event data and submit the EPCIS event to the repository for
-   capturing.
+   our public repository (<<<http://demo.accada.org/epcis/capture>>>), or any
+   other EPCIS repository. You can now fill in the EPCIS event data and submit
+   the EPCIS capture request by clicking "Generate event".
 
-   Now you can fill in the event data in the GUI and send the capture request
-   by clicking "Generate event". In order to see if the event was actually
-   captured, either check your database or use the query client to query for
-   the event.
+   []
 
-   If you intend to use our capture client library in your own Java
+   If you intend to use our capture client API library in your own Java
    project, you should refer to the
-   {{{architecture.html#EPCIS Capture Client}architecture description}}.
+   "{{{#How to Capture EPCIS Events}How to Capture EPCIS Events}}" section
+   below.
 
 
 ** {Using the Query Client to browse a Repository}
 
-   {{{download.html}Download}} the query client binaries and follow the same
-   steps as above.
+   [[1]] {{{download.html}Download}} the query client binaries and follow the
+   same steps as above. You can now fill in the query parameters in the GUI and
+   submit the request to the repository by clicking "Run query". The results of
+   the query will be displayed in a separate window.
 
-   Now you can fill in the query parameters in the GUI and send the request by
-   clicking "Run query". The results of the query will be displayed in a new
-   window.
+   []
 
-   If you intend to use our query client library in your own Java project,
-   refer to the {{{#Basic}basic features}} section below.
+   If you intend to use our query client API library in your own Java project,
+   you should refer to the
+   {{{#How to Query an EPCIS Repository}How to Query an EPCIS Repository}}
+   section below.
 
 
 
@@ -218,15 +217,16 @@ java -jar epcis-captureclient-<version>.jar
 * {Interacting with a Repository}
 
   This section shows how to use the basic features of Accada's EPCIS
-  implementation, i.e. how to send EPCIS events to the capture interface and
+  implementation, i.e., how to send EPCIS events to the capture interface and
   how to create an EPCIS query for retrieving information from the repository.
 
 ** {How to Capture EPCIS Events}
 
    In order to capture EPC data you need to wrap the data into XML conforming
    to the EPCIS XML schema for event types. This EPCIS event must then be sent
-   as payload in an HTTP POST request to the repository's capture interface. An
-   example event, an ObjectEvent, rendered into XML might look like this:
+   as the payload in an HTTP POST request to the repository's capture
+   interface. An example event, an ObjectEvent, serialized into XML might look
+   as follows:
 
 ---------------------------------------------------------------------------
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -264,8 +264,9 @@ java -jar epcis-captureclient-<version>.jar
 ---------------------------------------------------------------------------
 
   In order to submit this EPCIS event to the repository you may take advantage
-  of our capture client which sends the event to the repository using an HTTP
-  POST request. The following Java code snippet shows how to do that:
+  of <<<CaptureClient>>> class available from the <<<epcis-captureclient.jar>>>
+  file. The capture client sends the EPCIS event to the repository using an
+  HTTP POST request. The following Java code snippet shows how to do that:
 
 ---------------------------------------------------------------------------
 // get the capture client and capture the event
@@ -282,9 +283,10 @@ if (httpResponseCode != 200) {
   were any problems.
 
   The event object required by the <<<CaptureClient>>>'s <<<capture>>> method
-  can either be an XML String, an InputStream providing the XML as a stream of
-  bytes, or an instance of an EPCISDocumentType. The following code snippet
-  demonstrates how to use the API to create an EPCISDocumentType:
+  can either be an XML <<<String>>>, an <<<InputStream>>> providing the XML as
+  a stream of bytes, or an instance of <<<EPCISDocumentType>>>. The following
+  code snippet demonstrates how to use the API to create an
+  <<<EPCISDocumentType>>> instance:
 
 ---------------------------------------------------------------------------
 ObjectEventType objEvent = new ObjectEventType();
@@ -377,8 +379,8 @@ epcisDoc.setCreationDate(now);
 
    This XML query must be wrapped into a SOAP request prior to sending it to
    the repository's query interface. A Java code snippet which uses the
-   <<<QueryControlClient>>> class from the epcis-queryclient library to send
-   the query to the repository looks as follows:
+   <<<QueryControlClient>>> class from the <<<epcis-queryclient.jar>>> library
+   to send the query to the repository looks as follows:
 
 ---------------------------------------------------------------------------
 // get the query client and poll the query
@@ -394,9 +396,9 @@ results.getResultsBody(); // etc.
   <<<QueryControlClient>>> class can be used to inspect the query results.
 
   The query object required by the <<<QueryControlClient>>>'s <<<poll>>> method
-  can either be an XML String, an InputStream providing the XML as a stream of
-  bytes, or an instance of a Poll object. The following code snippet
-  demonstrates how to use the API to create a Poll object:
+  can either be an XML <<<String>>>, an <<<InputStream>>> providing the XML as
+  a stream of bytes, or an instance of <<<Poll>>>. The following code snippet
+  demonstrates how to use the API to create a <<<Poll>>> instance:
 
 ---------------------------------------------------------------------------
 // construct the query parameters
@@ -428,10 +430,10 @@ poll.setParams(queryParams);
 ** {How to Use a Query Schedule}
 
    The EPCIS repository offers standing queries that are run every once in a
-   while. In order to subscribe to such a query, the client must submit the
-   query definition along with a query schedule to the repository. Because the
-   use of a <<<QuerySchedule>>> is somewhat tricky, we describe it here and
-   provide some quick examples.
+   while. In order to subscribe such a query, the client must submit the query
+   definition along with a query schedule to the repository. Because the use of
+   a <<<QuerySchedule>>> is somewhat tricky, we describe it here and provide
+   some quick examples.
 
    A <<<QuerySchedule>>> contains different fields for different time units. If
    such a field is set, the query will be executed whenever time reaches the
@@ -448,10 +450,10 @@ poll.setParams(queryParams);
 
      []
 
-     A query associated with this schedule will run once per hour,
-     at the top of the hour. (The <<<hour>>> field is omitted, meaning to run
-     the query every hour, and the <<<second>>> and <<<minute>>> fields are set
-     to 0, meaning to run the query at the top of every hour.)
+     A query associated with this schedule will run once per hour, at the top
+     of the hour (the <<<hour>>> field is omitted, meaning to run the query
+     every hour, and the <<<second>>> and <<<minute>>> fields are set to 0,
+     meaning to run the query at the top of every hour).
 
    * Example Schedule 2
 
@@ -463,10 +465,9 @@ poll.setParams(queryParams);
 
      []
 
-     A query associated with this schedule will be executed once per hour,
-     at the top of the hour, but only on weekdays (days 1 through 5 in a week).
+     A query associated with this schedule will be executed once per hour, at
+     the top of the hour, but only on weekdays (days 1 through 5 in a week).
 
-   []
 
 
 ** {How to Subscribe a Scheduled Query}
@@ -511,9 +512,6 @@ poll.setParams(queryParams);
    This scheduled query can now be subscribed to the repository as follows:
 
 ---------------------------------------------------------------------------
-// read the query
-InputStream query = ...
-
 // get the query client and subscribe the query
 String queryUrl = "http://localhost:8080/epcis-repository-[version]/query";
 QueryControlClient client = new QueryControlClient(queryUrl);
@@ -523,7 +521,13 @@ client.subscribe(query);
    The results of the query once it is executed are delivered via the query
    callback interface (see below).
 
-   To unsubscribe the query do the following:
+   The query object required by the <<<subscribe>>> method of the
+   <<<QueryControlClient>>> class must be either an XML <<<String>>>, an
+   <<<InputStream>>> providing the XML as a stream of bytes, or an instance of
+   <<<Subscribe>>>.
+
+   To unsubscribe the query simply provide the query's subscription ID to the
+   <<<unsubscribe>>> method of the <<<QueryControlClient>>> class:
 
 ---------------------------------------------------------------------------
 // the id of the subscribed query
@@ -534,7 +538,8 @@ client.unsubscribe(queryId);
    Note: If no new data is available since the last execution of a subscribed
    query, the repository will either send an empty result list back to the
    client or will not send anything at all. The desired behaviour can be
-   configured with the <<<reportIfEmpty>>> flag.
+   configured with the <<<reportIfEmpty>>> flag (see the EPCIS specification
+   for details).
 
 
 ** {How to Subscribe a Triggered Query}
@@ -547,8 +552,8 @@ client.unsubscribe(queryId);
    trigger fires, and the query associated with the trigger will be executed.
    
    The schedule which determines in what time intervals to check for the trigger
-   condition can be configured in the repository's application.properties file,
-   see the next section.
+   condition can be configured in the repository's <<<application.properties>>>
+   file, see the next section.
 
    A query subscription with a trigger could look as follows:
 
@@ -588,8 +593,8 @@ client.unsubscribe(queryId);
    parameter in the query subscription. It is the client's responsibility to
    listen for the response at the given URL.
 
-   The <<<QueryCallbackListener>>> class of the epcis-commons library
-   implements a very simple HTTP server. It listens for requests to a given
+   The <<<QueryCallbackListener>>> class of the <<<epcis-commons.jar>>> library
+   implements a very simplistic HTTP server. It listens for requests to a given
    URL, catches any incoming POST data, and delivers it to an application upon
    request. The listener can be used as follows:
 
@@ -616,17 +621,17 @@ String response = listener.fetchResponse();
 
 * {Runtime Configuration of your EPCIS Repository}
 
-  In this section, we describe the properties you may use to configure Accada's
+  In this section, we describe the properties you can use to configure Accada's
   EPCIS repository implementation.
 
   Basically there are three coniguration files relevant to the user of the
-  application: <<<application.properties>>>, <<context.xml>>, and
-  <<log4j.properties>>
+  application: <<<application.properties>>>, <<<context.xml>>>, and
+  <<<log4j.properties>>>
 
   ** <<application.properties>>
 
   The <<<application.properties>>> file is located in the application's class
-  path at <<<$TOMCAT_HOME/webapps/epcis-repository-\<version\>/WEB-INF/classes>>>.
+  path at <<<TOMCAT_HOME/webapps/epcis-repository-\<version\>/WEB-INF/classes>>>.
   It contains the basic configuration directives that control the repository's
   basic behaviour when processing queries and events. The file is reproduced
   here:
@@ -706,21 +711,22 @@ ws.query.address=/query
 </Context>
 ---------------------------------------------------------------------------
 
-  This file is located at <<<$TOMCAT_HOME/webapps/epcis-repository-\<version\>/META-INF/>>>,
-  but as introduced before, once your application has been deployed, Tomcat
-  reads these configuration settings from the file at
+  This file is located at
+  <<<TOMCAT_HOME/webapps/epcis-repository-\<version\>/META-INF/>>>, but as
+  indicated before, once your application has been deployed, Tomcat reads these
+  configuration settings from the file at
   <<<conf/Catalina/localhost/epcis-repository-\<version\>.xml>>>.
 
   ** <<log4j.properties>>
 
   This file is also located in the application's class path at
-  <<<$TOMCAT_HOME/webapps/epcis-repository-\<version\>/WEB-INF/classes>>>.
+  <<<TOMCAT_HOME/webapps/epcis-repository-\<version\>/WEB-INF/classes>>>.
   The properties defined here affect the logging behaviour of the application.
-  The log file will be written to <<<$TOMCAT_HOME/logs/epcis-repository.log>>>
+  The log file will be written to <<<TOMCAT_HOME/logs/epcis-repository.log>>>
   and by default only include log statements of level INFO and higher. To get
-  more detailed information written to the log file, e.g., incoming soap
-  requests, uncomment the corresponding entries in the file as reproduced
-  below:
+  more detailed information written to the log file, e.g., the contents of
+  incoming soap requests, uncomment the corresponding entries in the file as
+  reproduced below:
 
 ---------------------------------------------------------------------------
 # LOG4J configuration

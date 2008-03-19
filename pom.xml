@@ -234,8 +234,7 @@
     <site>
       <id>accada-website</id>
       <name>Accada website</name>
-      <url>file:///C:/Temp/epcis-site</url>
-      <!-- <url>sftp://www.accada.org/local/home/accadaweb/public_html/epcis</url> -->
+      <url>sftp://www.accada.org/local/home/accadaweb/public_html/epcis</url>
     </site>
   </distributionManagement>
   <issueManagement>
@@ -337,17 +336,29 @@
   </licenses>
   <developers>
     <developer>
+      <id>roduner</id>
+      <name>Christof Roduner</name>
+      <email>roduner@inf.ethz.ch</email>
+      <url>http://people.inf.ethz.ch/rodunerc</url>
+      <organization>ETH Zurich</organization>
+      <roles>
+        <role>project coordinator</role>
+        <role>project lead</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
       <id>steybem</id>
       <name>Marco Steybe</name>
       <email>steybem@student.ethz.ch</email>
       <roles>
+        <role>architect</role>
         <role>developer</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
   </developers>
   <contributors>
-    <!-- the following people contributed to the project, but are not active anymore -->
     <contributor>
       <name>Sean Wellington</name>
       <roles>

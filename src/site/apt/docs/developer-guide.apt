@@ -3,7 +3,7 @@
               -------------------
               Marco Steybe, Andrea Groessbauer
               -------------------
-              03/17/2008
+              03/19/2008
               -------------------
 
 Developer Guide
@@ -12,7 +12,7 @@ Developer Guide
 
    [[1]] {{{#About this Guide}About this Guide}}
 
-   [[1]] {{{#Getting%20Started}Getting Started}}
+   [[1]] {{{#Getting Started}Getting Started}}
 
          [[i]] {{{#Setting up the Development Environment}Setting up the Development Environment}}
 
@@ -53,10 +53,10 @@ Developer Guide
 
 * {Getting Started}
 
-  This section of the developer guide includes a description on how to set up
-  the development environment for the project.
-  describes the setup of the development environment we use when
-  working on the project.
+  This section of the developer guide describes the first steps for getting
+  started with the project. It includes a description on how to set up the
+  development environment, how to obtain the sources, and how to build and
+  deploy the application.
 
 
 ** {Setting up the Development Environment}
@@ -64,8 +64,8 @@ Developer Guide
    Make sure you have the following prerequisites installed:
 
    [[1]] {{{http://java.sun.com/javase/downloads}JDK}} version 5.0 or higher.
-   It will be used to compile the Java sources. Also check that the
-   <<<JAVA_HOME>>> environment variable points to your Java <<<bin>>> directory.
+   Also check that the <<<JAVA_HOME>>> environment variable points to your Java
+   <<<bin>>> directory.
 
    [[1]] {{{http://tomcat.apache.org}Apache Tomcat}} servlet container version
    5.5 or higher. It will be used to deploy and run the EPCIS repository web
@@ -86,23 +86,23 @@ Developer Guide
 
    First thing you need to do is checking out the sourcecode from the SVN
    repository. See {{{../source-repository.html}Source Repository}} on how to
-   access the SVN sources. In the following we will use the <<<EPCIS_HOME>>>
+   access the SVN repository. In the following we will use the <<<EPCIS_HOME>>>
    variable to refer to the location where you checked out the sources.
 
 ** {Setting up Eclipse}
 
-   If you intend to use the Eclipse IDE to work on the project, consider the
-   following guidelines:
+   If you intend to use the Eclipse IDE to work on the project, you should
+   consider the following guidelines:
 
    [[1]] Eclipse needs to know the path to your local Maven repository. Run the
    following command to automatically set up the class path variable
-   <<<M2_REPO>>> accordingly:
+   <<<M2_REPO>>> for your Eclipse workspace:
 
 ---------------------------------------------------------------------------
 mvn eclipse:add-maven-repo -Declipse.workspace=<path-to-your-eclipse-workspace>
 ---------------------------------------------------------------------------
 
-   If you use a Eclipse WTP, you should also add the <<<-Dwtpversion=1.5>>>
+   If you use an Eclipse WTP, you should also add the <<<-Dwtpversion=1.5>>>
    switch and specify the WTP version you use.
 
    [[1]] In order to generate the <<<.project>>> and <<<.classpath>>> files
@@ -124,7 +124,7 @@ mvn eclipse:eclipse -DdownloadSources
    <Preferences...>, navigate to the branch <Java> > <Code Style> >
    <Formatter>, and import the file from
    <<<EPCIS_HOME/src/config/epcis_codeformatter.xml>>>. Now either set the
-   EPCIS code style profile active for your entire workspace, or, go to the
+   EPCIS code style profile active for your entire workspace, or go to the
    preferences of each individual EPCIS project (<Project> > <Properties>) and
    set the active code style profile to <EPCIS>. Prior to committing code to
    SVN hit <<<CTRL+SHIRT+F>>> to format the code according to the Accada EPCIS
@@ -160,10 +160,10 @@ mvn compile
 </server>
 ---------------------------------------------------------------------------
 
-   Now, you can use the the following commands to deploy or undeploy the
+   Now, you can use the following commands to deploy or undeploy the
    application. Make sure you run these commands from the
    <<<EPCIS_HOME/epcis-repository>>> directory because the maven-tomcat-plugin
-   is only available to the epcis-repository submodule.
+   is only available to the epcis-repository sub-module.
 
 ---------------------------------------------------------------------------
 mvn tomcat:deploy
@@ -172,9 +172,8 @@ mvn tomcat:undeploy
 ---------------------------------------------------------------------------
 
    You can also manually deploy the application by placing the WAR file
-   directly into Tomcat's <<<webapps>>> directory. To get the WAR file, run
-   the following command and grab it from
-   <<<EPCIS_HOME/epcis-repository/target>>>
+   directly into Tomcat's <<<webapps>>> directory. Run the following command
+   and grab the WAR file from <<<EPCIS_HOME/epcis-repository/target>>>
 
 ---------------------------------------------------------------------------
 mvn package
@@ -193,14 +192,14 @@ mvn package
 ** {Project Modules}
 
    Accada's EPCIS project is a multimodule project. Currently, it includes five
-   modules which are aggregated in and inherit from the base <<<epcis>>> module:
+   modules which inherit from the base epcis-module:
 
    * <<epcis-commons>>
 
      This module contains the common functionality (such as parsers) as well as
-     the CXF generated JAXB data binding of the EPCIS schema (which is used by
-     the <epcis-repository>, the <epcis-queryclient>, and the
-     <epcis-captureclient> modules).
+     the JAXB data binding of the EPCIS schema (which is used by the
+     <epcis-repository>, the <epcis-queryclient>, and the <epcis-captureclient>
+     modules).
 
    * <<epcis-captureclient>>
 
@@ -210,7 +209,7 @@ mvn package
    * <<epcis-queryclient>>
 
      This module consists of a query client GUI, a query callback client, and a
-     query control client which can be used to send queries to an EPCIS
+     query control client API which can be used to send queries to an EPCIS
      repository.
 
    * <<epcis-repository>>
@@ -220,8 +219,8 @@ mvn package
 
    * <<epcis-interop-test>>
 
-     This module contains tests to check interoperability compliance with
-     EPCglobal's standard.
+     This module contains tests to check interoperability compliance with the
+     EPICS standard.
 
 
 
@@ -272,16 +271,16 @@ mvn package
 
    An introduction to build profiles is given in the
    {{http://maven.apache.org/guides/introduction/introduction-to-profiles.html}Maven documentation}}.
-   We currently use two different build profiles, the <env-dev> and <env-prod>
-   profiles. The build properties for the two profiles are given in the
-   <<<dev.properties>>> and <<<prod.properties>>> file, respectively, located
-   at <<<EPCIS_HOME/src/main/filters>>>.
+   We currently use two different build profiles, called <env-dev> and
+   <env-prod>. The build properties for the two profiles are given in the
+   <<<dev.properties>>> and <<<prod.properties>>> file, respectively. They are
+   located at <<<EPCIS_HOME/src/main/filters>>>.
 
-   By default the <prod> profile is activated. A different profile can be
-   activated by either on the command line by specifying a profile
-   explicitly using the <<<-P>>> switch, or by providing a property named
-   <<<env>>> with the corresponding value. The following examples show the two
-   possibilities for activating the <env-dev> profile on the command line:
+   By default the <env-prod> profile is activated. A different profile can be
+   activated on the command line by specifying a profile explicitly using the
+   <<<-P>>> switch, or by providing a property named <<<env>>> with the
+   corresponding value. The following examples show the two possibilities for
+   building the project using the <env-dev> profile:
 
 ---------------------------------------------------------------------------
 mvn compile -Penv-dev
@@ -289,11 +288,12 @@ mvn compile -Penv-dev
 mvn compile -Denv=dev
 ---------------------------------------------------------------------------
 
-   A developer may also want to activate the developement profile permanently by
-   specifying an <<<activeProfile>>> element in his local <<<settings.xml>>>
-   file. That way, he can also override the properties from the development
-   environment without touching the <<<dev.properties>>> file. The following
-   gives an example of the <<<activeProfile>>> element:
+   A developer can activate the developement profile permanently by specifying
+   an <<<activeProfile>>> element in his local <<<settings.xml>>> file. That
+   way, he can also override properties from the development environment
+   without touching the <<<dev.properties>>> file. The following is an example
+   excerpt from the <<<settings.xml>>> file which shows how to permanently
+   activate the <env-dev> profile:
 
 ---------------------------------------------------------------------------
 <profiles>
@@ -324,7 +324,7 @@ mvn site -N
 
    In order to generate all module reports and to test the whole site
    navigation before a live deploy, you can execute the following command which
-   will generate the web site in the given directory:
+   will generate the web site in the specified directory:
 
 ---------------------------------------------------------------------------
 mvn site:stage -DstagingDirectory=d:\testsite
