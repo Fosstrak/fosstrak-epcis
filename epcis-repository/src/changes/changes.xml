@@ -3,8 +3,8 @@
         <title>Changes epcis-repository</title>
     </properties>
     <body>
-        <release version="0.3.0" date="2008-03-??"
-            description="Feature release: improved performance and interoperability, and certified EPCIS specification conformance">
+        <release version="0.3.0" date="2008-03-20"
+            description="Feature release: improved performance and interoperability">
             <!-- general changes -->
             <action dev="steybem" type="add">
                 Introduced Spring IoC container for bean wiring and
