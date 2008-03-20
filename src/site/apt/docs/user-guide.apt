@@ -360,7 +360,7 @@ epcisDoc.setCreationDate(now);
    The Accada EPCIS repository implements the SOAP/HTTP binding for the query
    interface, thus, you need to send queries inside a valid SOAP request to the
    repository. A sample query asking for <<<ObjectEvents>>> having an EPC equal to
-   <<<urn:epc:id:sgtin:1.1.0>> looks as follows:
+   <<<urn:epc:id:sgtin:1.1.0>>> looks as follows:
 
 ---------------------------------------------------------------------------
 <epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
