@@ -7638,34 +7638,4 @@
       <value>DockDoor1</value>
     </row>
   </table>
-  <table name="vocabularies">
-    <column>id</column>
-    <column>uri</column>
-    <column>table_name</column>
-    <row>
-      <value>1</value>
-      <value>urn:epcglobal:epcis:vtype:BusinessStep</value>
-      <value>BizStep</value>
-    </row>
-    <row>
-      <value>2</value>
-      <value>urn:epcglobal:epcis:vtype:BusinessTransaction</value>
-      <value>BizTrans</value>
-    </row>
-    <row>
-      <value>3</value>
-      <value>urn:epcglobal:epcis:vtype:Disposition</value>
-      <value>Disposition</value>
-    </row>
-    <row>
-      <value>4</value>
-      <value>urn:epcglobal:epcis:vtype:ReadPoint</value>
-      <value>ReadPoint</value>
-    </row>
-    <row>
-      <value>5</value>
-      <value>urn:epcglobal:epcis:vtype:BusinessLocation</value>
-      <value>BizLoc</value>
-    </row>
-  </table>
 </dataset>
