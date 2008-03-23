@@ -64,7 +64,11 @@ import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.accada.epcis.soap.ValidationExceptionResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 /**
  * This query client makes calls against the EPCIS query control interface and
@@ -135,6 +139,13 @@ public class QueryControlClient implements QueryControlInterface {
         Service service = Service.create(SERVICE);
         service.addPort(PORT, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
         servicePort = service.getPort(PORT, EPCISServicePortType.class);
+
+        // turn off chunked transfer encoding
+        Client client = ClientProxy.getClient(servicePort);
+        HTTPConduit httpConduit = (HTTPConduit) client.getConduit();
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setAllowChunking(false);
+        httpConduit.setClient(httpClientPolicy);
 
         /*
          * For instantiating a client proxy object using reflection (CXF simple
