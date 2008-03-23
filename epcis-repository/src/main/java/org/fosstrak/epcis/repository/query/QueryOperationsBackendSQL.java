@@ -105,10 +105,10 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
     private static final String SQL_SELECT_QUANTITYEVENT_BIZTRANS = "SELECT bizTrans.uri AS bizTrans, bizTransType.uri AS bizTransType FROM event_QuantityEvent_bizTrans AS eventBizTrans JOIN BizTransaction ON eventBizTrans.bizTrans_id=BizTransaction.id JOIN voc_BizTrans AS bizTrans ON BizTransaction.bizTrans=bizTrans.id JOIN voc_BizTransType AS bizTransType ON BizTransaction.type=bizTransType.id WHERE eventBizTrans.event_id=?";
     private static final String SQL_SELECT_TRANSACTIONEVENT_BIZTRANS = "SELECT bizTrans.uri AS bizTrans, bizTransType.uri AS bizTransType FROM event_TransactionEvent_bizTrans AS eventBizTrans JOIN BizTransaction ON eventBizTrans.bizTrans_id=BizTransaction.id JOIN voc_BizTrans AS bizTrans ON BizTransaction.bizTrans=bizTrans.id JOIN voc_BizTransType AS bizTransType ON BizTransaction.type=bizTransType.id WHERE eventBizTrans.event_id=?";
 
-    private static final String SQL_SELECT_AGGREGATIONEVENT_EPCS = "SELECT epc FROM event_AggregationEvent_epcs WHERE event_id=?";
-    private static final String SQL_SELECT_OBJECTEVENT_EPCS = "SELECT epc FROM event_ObjectEvent_epcs WHERE event_id=?";
-    private static final String SQL_SELECT_QUANTITYEVENT_EPCS = "SELECT epc FROM event_QuantityEvent_epcs WHERE event_id=?";
-    private static final String SQL_SELECT_TRANSACTIONEVENT_EPCS = "SELECT epc FROM event_TransactionEvent_epcs WHERE event_id=?";
+    private static final String SQL_SELECT_AGGREGATIONEVENT_EPCS = "SELECT epc FROM event_AggregationEvent_EPCs WHERE event_id=?";
+    private static final String SQL_SELECT_OBJECTEVENT_EPCS = "SELECT epc FROM event_ObjectEvent_EPCs WHERE event_id=?";
+    private static final String SQL_SELECT_QUANTITYEVENT_EPCS = "SELECT epc FROM event_QuantityEvent_EPCs WHERE event_id=?";
+    private static final String SQL_SELECT_TRANSACTIONEVENT_EPCS = "SELECT epc FROM event_TransactionEvent_EPCs WHERE event_id=?";
 
     private static final String SQL_EXISTS_SUBSCRIPTION = "SELECT EXISTS (SELECT subscriptionid FROM subscription WHERE subscriptionid=?)";
 
