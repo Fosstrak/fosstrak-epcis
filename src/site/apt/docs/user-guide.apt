@@ -75,9 +75,14 @@ User Guide
    Tomcat's <webapps> directory. After restarting Tomcat, the WAR file will be
    exploded.
 
-   [[1]] Make sure you have have a {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL server}}
-   (version 5.0 or higher) running. It will be used by the EPCIS repository
+   [[1]] Install a {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL server}}
+   (version 5.0 or higher). It will be used by the EPCIS repository
    to store event data.
+   
+   [[1]] Make sure that web applications deployed to Tomcat can access your MySQL server
+   by installing the MySQL {{{http://www.mysql.com/products/connector/j/}Connector/J}}
+   driver. This is usually done by copying the <<<mysql-connector-java-\<version\>-bin.jar>>>
+   into Tomcat's <<<lib>>> (version 6) or <<<common/lib>>> (version 5.5) directory.  
 
    [[1]] Set up a {MySQL} database for the EPCIS repository to use.
  
