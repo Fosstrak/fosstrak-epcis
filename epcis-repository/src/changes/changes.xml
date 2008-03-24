@@ -3,6 +3,13 @@
         <title>Changes epcis-repository</title>
     </properties>
     <body>
+        <release version="0.3.1" date="2008-03-24"
+            description="Bug fix release">
+            <action dev="steybem" type="fix">
+                Fixed inconsistent capitalization of table names, which caused
+                problems on case-sensitive platforms (e.g., Linux).
+            </action>
+        </release>
         <release version="0.3.0" date="2008-03-20"
             description="Feature release: improved performance and interoperability">
             <!-- general changes -->
