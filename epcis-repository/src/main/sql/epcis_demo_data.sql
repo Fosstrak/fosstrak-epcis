@@ -38,14 +38,14 @@ INSERT INTO `BizTransaction` (`id`, `bizTrans`, `type`) VALUES
 INSERT INTO `event_AggregationEvent` (`id`, `eventTime`, `recordTime`, `eventTimeZoneOffset`, `parentID`, `action`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
 (1, '2006-06-01 15:55:04', '2006-08-18 13:50:07', '+01:00', 'urn:x:bar:5:036544:007325', 'ADD', 2, 2, 3, 1);
 
-INSERT INTO `event_AggregationEvent_EPCs` (`event_id`, `epc`) VALUES
-(1, 'urn:epc:id:sgtin:0057000.123430.2025'),
-(1, 'urn:epc:id:sgtin:0057000.123430.2027'),
-(1, 'urn:epc:id:sgtin:0057000.123430.2028');
+INSERT INTO `event_AggregationEvent_EPCs` (`event_id`, `epc`, `idx`) VALUES
+(1, 'urn:epc:id:sgtin:0057000.123430.2025', 0),
+(1, 'urn:epc:id:sgtin:0057000.123430.2027', 1),
+(1, 'urn:epc:id:sgtin:0057000.123430.2028', 2);
 
-INSERT INTO `event_AggregationEvent_bizTrans` (`event_id`, `bizTrans_id`) VALUES
-(1, 2),
-(1, 3);
+INSERT INTO `event_AggregationEvent_bizTrans` (`event_id`, `bizTrans_id`, `idx`) VALUES
+(1, 2, 0),
+(1, 3, 1);
 
 INSERT INTO `event_AggregationEvent_extensions` (`id`, `event_id`, `fieldname`, `prefix`, `intValue`) VALUES
 (1, 1, 'http://www.example.com/epcis/extensions/#temperature', 'xyz', 25);
@@ -68,22 +68,22 @@ INSERT INTO `event_ObjectEvent` (`id`, `eventTime`, `recordTime`, `eventTimeZone
 (10, '2006-09-15 11:45:06', '2006-09-01 00:10:12', '+01:00', 'OBSERVE', 3, NULL, 10, 8),
 (11, '2007-04-23 12:26:52', '2007-04-23 12:26:52', '+01:00', 'OBSERVE', 6, NULL, 5, 4);
 
-INSERT INTO `event_ObjectEvent_EPCs` (`event_id`, `epc`) VALUES
-(1, 'urn:epc:id:sgtin:0034000.987650.2686'),
-(2, 'urn:epc:id:sgtin:0034000.987650.2686'),
-(2, 'urn:epc:id:sgtin:0034000.987650.3542'),
-(3, 'urn:epc:id:sgtin:0057000.123780.7788'),
-(4, 'urn:epc:id:sgtin:0057000.123780.3167'),
-(5, 'urn:epc:id:sgtin:0000001.000001.0001'),
-(6, 'urn:epc:id:sgtin:0000001.000001.0001'),
-(7, 'urn:epc:id:sgtin:0000001.000001.0001'),
-(8, 'urn:epc:id:sgtin:0000001.000001.0002'),
-(9, 'urn:epc:id:sgtin:0000001.000001.0002'),
-(10, 'urn:epc:id:sgtin:0000001.000001.0002'),
-(11, 'urn:epc:id:sgtin:0057000.123430.2028');
+INSERT INTO `event_ObjectEvent_EPCs` (`event_id`, `epc`, `idx`) VALUES
+(1, 'urn:epc:id:sgtin:0034000.987650.2686', 0),
+(2, 'urn:epc:id:sgtin:0034000.987650.2686', 1),
+(2, 'urn:epc:id:sgtin:0034000.987650.3542', 2),
+(3, 'urn:epc:id:sgtin:0057000.123780.7788', 3),
+(4, 'urn:epc:id:sgtin:0057000.123780.3167', 4),
+(5, 'urn:epc:id:sgtin:0000001.000001.0001', 5),
+(6, 'urn:epc:id:sgtin:0000001.000001.0001', 6),
+(7, 'urn:epc:id:sgtin:0000001.000001.0001', 7),
+(8, 'urn:epc:id:sgtin:0000001.000001.0002', 8),
+(9, 'urn:epc:id:sgtin:0000001.000001.0002', 9),
+(10, 'urn:epc:id:sgtin:0000001.000001.0002', 10),
+(11, 'urn:epc:id:sgtin:0057000.123430.2028', 11);
 
-INSERT INTO `event_ObjectEvent_bizTrans` (`event_id`, `bizTrans_id`) VALUES
-(2, 2);
+INSERT INTO `event_ObjectEvent_bizTrans` (`event_id`, `bizTrans_id`, `idx`) VALUES
+(2, 2, 0);
 
 INSERT INTO `event_ObjectEvent_extensions` (`id`, `event_id`, `fieldname`, `prefix`, `intValue`, `floatValue`, `strValue`) VALUES
 (1, 1, 'http://www.example.com/epcis/extensions/#temperature', 'xyz', 21, NULL, NULL),
@@ -108,15 +108,15 @@ INSERT INTO `event_TransactionEvent` (`id`, `eventTime`, `recordTime`, `eventTim
 (1, '2006-08-20 07:03:51', '2006-08-18 13:49:47', '+01:00', NULL, 'DELETE', NULL, NULL, NULL, NULL),
 (2, '2006-08-18 11:53:01', '2006-08-18 13:49:53', '+01:00', NULL, 'ADD', NULL, NULL, NULL, NULL);
 
-INSERT INTO `event_TransactionEvent_EPCs` (`event_id`, `epc`) VALUES
-(1, 'urn:epc:id:sgtin:0057000.678930.5003'),
-(1, 'urn:epc:id:sgtin:0057000.678930.5004'),
-(2, 'urn:epc:id:sgtin:0057000.678930.5003'),
-(2, 'urn:epc:id:sgtin:0057000.678930.5004');
+INSERT INTO `event_TransactionEvent_EPCs` (`event_id`, `epc`, `idx`) VALUES
+(1, 'urn:epc:id:sgtin:0057000.678930.5003', 0),
+(1, 'urn:epc:id:sgtin:0057000.678930.5004', 1),
+(2, 'urn:epc:id:sgtin:0057000.678930.5003', 2),
+(2, 'urn:epc:id:sgtin:0057000.678930.5004', 3);
 
-INSERT INTO `event_TransactionEvent_bizTrans` (`event_id`, `bizTrans_id`) VALUES
-(1, 1),
-(2, 1);
+INSERT INTO `event_TransactionEvent_bizTrans` (`event_id`, `bizTrans_id`, `idx`) VALUES
+(1, 1, 0),
+(2, 1, 1);
 
 
 -- ---------------------------------------------
