@@ -3,6 +3,12 @@
         <title>Changes epcis-repository</title>
     </properties>
     <body>
+        <release version="0.3.2" date="2008-05-22"
+            description="Bug fix release">
+            <action dev="steybem" type="fix" issue="1964350">
+                Fixed parsing of values for extension fields.
+            </action>
+        </release>
         <release version="0.3.1" date="2008-03-24"
             description="Bug fix release">
             <action dev="steybem" type="fix">
