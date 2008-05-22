@@ -601,12 +601,13 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @return The Float holding the value of the query parameter.
      */
     private String parseAsString(Object queryParamValue) throws ClassCastException {
-        try {
+        if (queryParamValue instanceof String) {
             return (String) queryParamValue;
-        } catch (ClassCastException e) {
-            // trying to parse manually
+        } else if (queryParamValue instanceof Element) {
             Element elem = (Element) queryParamValue;
             return elem.getTextContent().trim();
+        } else {
+            return queryParamValue.toString();
         }
     }
 
@@ -619,13 +620,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws NumberFormatException
      *             If the query parameter value cannot be parsed as Float.
      */
-    private Float parseAsFloat(Object queryParamValue) throws ClassCastException, NumberFormatException {
-        try {
+    private Float parseAsFloat(Object queryParamValue) throws NumberFormatException {
+        if (queryParamValue instanceof Float) {
             return (Float) queryParamValue;
-        } catch (ClassCastException e) {
-            // trying to parse manually
+        } else if (queryParamValue instanceof Element) {
             Element elem = (Element) queryParamValue;
             return Float.valueOf(elem.getTextContent().trim());
+        } else {
+            return Float.valueOf(queryParamValue.toString());
         }
     }
 
@@ -640,8 +642,8 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws QueryParameterExceptionResponse
      *             If the query parameter value cannot be parsed as Timestamp.
      */
-    private Timestamp parseAsTimestamp(Object queryParamValue, String queryParamName) throws ClassCastException,
-            QueryParameterExceptionResponse {
+    private Timestamp parseAsTimestamp(Object queryParamValue, String queryParamName)
+            throws QueryParameterExceptionResponse {
         Timestamp ts;
         if (queryParamValue instanceof Calendar) {
             // Axis returns a Calendar instance
@@ -683,13 +685,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws NumberFormatException
      *             If the query parameter value cannot be parsed as Integer.
      */
-    private Integer parseAsInteger(Object queryParamValue) throws ClassCastException, NumberFormatException {
-        try {
+    private Integer parseAsInteger(Object queryParamValue) throws NumberFormatException {
+        if (queryParamValue instanceof Integer) {
             return (Integer) queryParamValue;
-        } catch (ClassCastException e) {
-            // trying to parse manually
+        } else if (queryParamValue instanceof Element) {
             Element elem = (Element) queryParamValue;
             return Integer.valueOf(elem.getTextContent().trim());
+        } else {
+            return Integer.valueOf(queryParamValue.toString());
         }
     }
 
