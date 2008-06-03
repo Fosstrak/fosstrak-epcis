@@ -8,6 +8,15 @@
             <action dev="steybem" type="fix" issue="1964350">
                 Fixed parsing of values for extension fields.
             </action>
+            <action dev="roduner" type="fix">
+                Fixed epcis_demo_data.sql. (Demo data did not match latest schema.) 
+            </action>
+            <action dev="roduner" type="fix">
+                Fixed interoperability issues of query client GUI
+                with other vendors' EPCIS repository. (The GUI
+                used a wrong query name when requesting
+                subscription IDs from repositories.) 
+            </action>
         </release>
         <release version="0.3.1" date="2008-03-24"
             description="Bug fix release">
