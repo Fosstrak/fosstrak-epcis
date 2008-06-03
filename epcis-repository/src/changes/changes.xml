@@ -15,7 +15,8 @@
                 Fixed interoperability issues of query client GUI
                 with other vendors' EPCIS repository. (The GUI
                 used a wrong query name when requesting
-                subscription IDs from repositories.) 
+                subscription IDs from repositories.) - Thanks to
+                Stefan Schweizer for pointing this out. 
             </action>
         </release>
         <release version="0.3.1" date="2008-03-24"
