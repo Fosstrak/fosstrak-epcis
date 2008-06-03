@@ -935,7 +935,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             return;
         }
         if (e.getSource() == mwSubscriptionIdButton) {
-            client.querySubscriptionId();
+            client.querySubscriptionIDs();
             return;
         }
         if (e.getSource() == mwFillInExampleButton) {

@@ -490,9 +490,9 @@ public class QueryClientGuiHelper {
     }
 
     /**
-     * Query the service for the supported standard version.
+     * Query the service for subscriptions.
      */
-    public void querySubscriptionId() {
+    public void querySubscriptionIDs() {
         String title = "Service is responding";
         StringBuilder msg = new StringBuilder();
         try {
@@ -500,16 +500,16 @@ public class QueryClientGuiHelper {
             parms.setQueryName("SimpleEventQuery");
             List<String> subscriptionIDs = queryClient.getSubscriptionIds(parms.getQueryName());
             if (subscriptionIDs != null && !subscriptionIDs.isEmpty()) {
-                msg.append("The Service found the following SubscriptionID(s):\n");
+                msg.append("The following subscription IDs were found in the repository:\n");
                 for (String s : subscriptionIDs) {
                     msg.append("- ").append(s).append("\n");
                 }
             } else {
-                msg.append("There are no Subscribed Queries.");
+                msg.append("There are no subscribed queries.");
             }
         } catch (Exception e) {
             title = "Service is not responding";
-            msg.append("Sorry, the Service doesn't work");
+            msg.append("Could not retrieve subscription IDs from repository.");
             e.printStackTrace();
         }
         JFrame frame = new JFrame();
