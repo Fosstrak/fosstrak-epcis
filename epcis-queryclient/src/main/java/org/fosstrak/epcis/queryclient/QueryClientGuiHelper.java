@@ -497,7 +497,7 @@ public class QueryClientGuiHelper {
         StringBuilder msg = new StringBuilder();
         try {
             GetSubscriptionIDs parms = new GetSubscriptionIDs();
-            parms.setQueryName("simpleQuery");
+            parms.setQueryName("SimpleEventQuery");
             List<String> subscriptionIDs = queryClient.getSubscriptionIds(parms.getQueryName());
             if (subscriptionIDs != null && !subscriptionIDs.isEmpty()) {
                 msg.append("The Service found the following SubscriptionID(s):\n");
