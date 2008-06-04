@@ -6,11 +6,11 @@
 
   <groupId>org.accada.epcis</groupId>
   <artifactId>epcis-interop-test</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.3.3-SNAPSHOT</version>
   <parent>
     <artifactId>epcis</artifactId>
     <groupId>org.accada.epcis</groupId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.3-SNAPSHOT</version>
   </parent>
   <packaging>pom</packaging>
   <modelVersion>4.0.0</modelVersion>
