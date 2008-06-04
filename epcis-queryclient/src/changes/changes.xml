@@ -4,6 +4,7 @@
     </properties>
     <body>
         <release version="0.3.2" date="2008-06-04"
+            description="Bug fix release">
             <action dev="roduner" type="fix">
                 Fixed interoperability issues of query client GUI
                 with other vendors' EPCIS repository. (The GUI
