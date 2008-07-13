@@ -218,7 +218,6 @@
             -->
             <excludes>
               <exclude>javax.mail:mail</exclude>
-              <exclude>javax.activation:activation</exclude>
             </excludes>
           </dependencies>
           <jnlp>
