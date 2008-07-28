@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class ImplementationExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.ImplementationException implementationException;
+    private org.fosstrak.epcis.model.ImplementationException implementationException;
 
     public ImplementationExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class ImplementationExceptionResponse extends Exception {
     }
 
     public ImplementationExceptionResponse(String message,
-            org.accada.epcis.model.ImplementationException implementationException) {
+            org.fosstrak.epcis.model.ImplementationException implementationException) {
         super(message);
         this.implementationException = implementationException;
     }
 
     public ImplementationExceptionResponse(String message,
-            org.accada.epcis.model.ImplementationException implementationException, Throwable cause) {
+            org.fosstrak.epcis.model.ImplementationException implementationException, Throwable cause) {
         super(message, cause);
         this.implementationException = implementationException;
     }
 
-    public org.accada.epcis.model.ImplementationException getFaultInfo() {
+    public org.fosstrak.epcis.model.ImplementationException getFaultInfo() {
         return this.implementationException;
     }
 }

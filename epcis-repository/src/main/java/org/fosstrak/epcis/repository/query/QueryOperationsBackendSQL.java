@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository.query;
+package org.fosstrak.epcis.repository.query;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,35 +47,35 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import org.accada.epcis.model.ActionType;
-import org.accada.epcis.model.AggregationEventType;
-import org.accada.epcis.model.AttributeType;
-import org.accada.epcis.model.BusinessLocationType;
-import org.accada.epcis.model.BusinessTransactionListType;
-import org.accada.epcis.model.BusinessTransactionType;
-import org.accada.epcis.model.EPC;
-import org.accada.epcis.model.EPCISEventType;
-import org.accada.epcis.model.EPCListType;
-import org.accada.epcis.model.IDListType;
-import org.accada.epcis.model.ImplementationException;
-import org.accada.epcis.model.ImplementationExceptionSeverity;
-import org.accada.epcis.model.ObjectEventType;
-import org.accada.epcis.model.QuantityEventType;
-import org.accada.epcis.model.QueryParam;
-import org.accada.epcis.model.QueryParams;
-import org.accada.epcis.model.QueryTooLargeException;
-import org.accada.epcis.model.ReadPointType;
-import org.accada.epcis.model.SubscriptionControls;
-import org.accada.epcis.model.TransactionEventType;
-import org.accada.epcis.model.VocabularyElementListType;
-import org.accada.epcis.model.VocabularyElementType;
-import org.accada.epcis.model.VocabularyType;
-import org.accada.epcis.repository.EpcisConstants;
-import org.accada.epcis.repository.query.SimpleEventQueryDTO.EventQueryParam;
-import org.accada.epcis.repository.query.SimpleEventQueryDTO.Operation;
-import org.accada.epcis.soap.ImplementationExceptionResponse;
-import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
-import org.accada.epcis.utils.TimeParser;
+import org.fosstrak.epcis.model.ActionType;
+import org.fosstrak.epcis.model.AggregationEventType;
+import org.fosstrak.epcis.model.AttributeType;
+import org.fosstrak.epcis.model.BusinessLocationType;
+import org.fosstrak.epcis.model.BusinessTransactionListType;
+import org.fosstrak.epcis.model.BusinessTransactionType;
+import org.fosstrak.epcis.model.EPC;
+import org.fosstrak.epcis.model.EPCISEventType;
+import org.fosstrak.epcis.model.EPCListType;
+import org.fosstrak.epcis.model.IDListType;
+import org.fosstrak.epcis.model.ImplementationException;
+import org.fosstrak.epcis.model.ImplementationExceptionSeverity;
+import org.fosstrak.epcis.model.ObjectEventType;
+import org.fosstrak.epcis.model.QuantityEventType;
+import org.fosstrak.epcis.model.QueryParam;
+import org.fosstrak.epcis.model.QueryParams;
+import org.fosstrak.epcis.model.QueryTooLargeException;
+import org.fosstrak.epcis.model.ReadPointType;
+import org.fosstrak.epcis.model.SubscriptionControls;
+import org.fosstrak.epcis.model.TransactionEventType;
+import org.fosstrak.epcis.model.VocabularyElementListType;
+import org.fosstrak.epcis.model.VocabularyElementType;
+import org.fosstrak.epcis.model.VocabularyType;
+import org.fosstrak.epcis.repository.EpcisConstants;
+import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.EventQueryParam;
+import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.Operation;
+import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
+import org.fosstrak.epcis.soap.QueryTooLargeExceptionResponse;
+import org.fosstrak.epcis.utils.TimeParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

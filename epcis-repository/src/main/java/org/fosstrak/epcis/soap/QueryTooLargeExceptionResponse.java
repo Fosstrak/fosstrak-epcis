@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class QueryTooLargeExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.QueryTooLargeException queryTooLargeException;
+    private org.fosstrak.epcis.model.QueryTooLargeException queryTooLargeException;
 
     public QueryTooLargeExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class QueryTooLargeExceptionResponse extends Exception {
     }
 
     public QueryTooLargeExceptionResponse(String message,
-            org.accada.epcis.model.QueryTooLargeException queryTooLargeException) {
+            org.fosstrak.epcis.model.QueryTooLargeException queryTooLargeException) {
         super(message);
         this.queryTooLargeException = queryTooLargeException;
     }
 
     public QueryTooLargeExceptionResponse(String message,
-            org.accada.epcis.model.QueryTooLargeException queryTooLargeException, Throwable cause) {
+            org.fosstrak.epcis.model.QueryTooLargeException queryTooLargeException, Throwable cause) {
         super(message, cause);
         this.queryTooLargeException = queryTooLargeException;
     }
 
-    public org.accada.epcis.model.QueryTooLargeException getFaultInfo() {
+    public org.fosstrak.epcis.model.QueryTooLargeException getFaultInfo() {
         return this.queryTooLargeException;
     }
 }

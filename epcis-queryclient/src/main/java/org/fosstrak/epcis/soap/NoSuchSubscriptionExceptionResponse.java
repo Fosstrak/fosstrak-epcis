@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class NoSuchSubscriptionExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.NoSuchSubscriptionException noSuchSubscriptionException;
+    private org.fosstrak.epcis.model.NoSuchSubscriptionException noSuchSubscriptionException;
 
     public NoSuchSubscriptionExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class NoSuchSubscriptionExceptionResponse extends Exception {
     }
 
     public NoSuchSubscriptionExceptionResponse(String message,
-            org.accada.epcis.model.NoSuchSubscriptionException noSuchSubscriptionException) {
+            org.fosstrak.epcis.model.NoSuchSubscriptionException noSuchSubscriptionException) {
         super(message);
         this.noSuchSubscriptionException = noSuchSubscriptionException;
     }
 
     public NoSuchSubscriptionExceptionResponse(String message,
-            org.accada.epcis.model.NoSuchSubscriptionException noSuchSubscriptionException, Throwable cause) {
+            org.fosstrak.epcis.model.NoSuchSubscriptionException noSuchSubscriptionException, Throwable cause) {
         super(message, cause);
         this.noSuchSubscriptionException = noSuchSubscriptionException;
     }
 
-    public org.accada.epcis.model.NoSuchSubscriptionException getFaultInfo() {
+    public org.fosstrak.epcis.model.NoSuchSubscriptionException getFaultInfo() {
         return this.noSuchSubscriptionException;
     }
 }

@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.captureclient;
+package org.fosstrak.epcis.captureclient;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -50,7 +50,7 @@ public class SampleEventsGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
         sb.append("<epcis:EPCISDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xsi:schemaLocation=\"urn:epcglobal:epcis:xsd:1 EPCglobal-epcis-1_0.xsd\"");
-        sb.append(" xmlns:ext=\"http://www.accada.org/epcis/extension\" creationDate=\"").append(time).append(
+        sb.append(" xmlns:ext=\"http://www.fosstrak.org/epcis/extension\" creationDate=\"").append(time).append(
                 "\" schemaVersion=\"1.0\">");
         sb.append("<EPCISBody>");
         sb.append("<EventList>");
@@ -65,16 +65,16 @@ public class SampleEventsGenerator {
             sb.append("<epc>").append(epc).append("</epc>");
             sb.append("</childEPCs>");
             sb.append("<action>ADD</action>");
-            sb.append("<bizStep>urn:accada:demo:bizstep:testing</bizStep>");
-            sb.append("<disposition>urn:accada:demo:disp:testing</disposition>");
+            sb.append("<bizStep>urn:fosstrak:demo:bizstep:testing</bizStep>");
+            sb.append("<disposition>urn:fosstrak:demo:disp:testing</disposition>");
             sb.append("<readPoint>");
-            sb.append("<id>urn:accada:demo:rp:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:rp:1.1</id>");
             sb.append("</readPoint>");
             sb.append("<bizLocation>");
-            sb.append("<id>urn:accada:demo:loc:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:loc:1.1</id>");
             sb.append("</bizLocation>");
             sb.append("<bizTransactionList>");
-            sb.append("<bizTransaction type=\"urn:accada:demo:btt:testing\">urn:accada:demo:biztrans:1.1</bizTransaction>");
+            sb.append("<bizTransaction type=\"urn:fosstrak:demo:btt:testing\">urn:fosstrak:demo:biztrans:1.1</bizTransaction>");
             sb.append("</bizTransactionList>");
             sb.append("<ext:temperature>25</ext:temperature>");
             sb.append("<ext:batchnumber>17</ext:batchnumber>");
@@ -108,16 +108,16 @@ public class SampleEventsGenerator {
             sb.append("<epc>").append(epc).append("</epc>");
             sb.append("</epcList>");
             sb.append("<action>ADD</action>");
-            sb.append("<bizStep>urn:accada:demo:bizstep:testing</bizStep>");
-            sb.append("<disposition>urn:accada:demo:disp:testing</disposition>");
+            sb.append("<bizStep>urn:fosstrak:demo:bizstep:testing</bizStep>");
+            sb.append("<disposition>urn:fosstrak:demo:disp:testing</disposition>");
             sb.append("<readPoint>");
-            sb.append("<id>urn:accada:demo:rp:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:rp:1.1</id>");
             sb.append("</readPoint>");
             sb.append("<bizLocation>");
-            sb.append("<id>urn:accada:demo:loc:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:loc:1.1</id>");
             sb.append("</bizLocation>");
             sb.append("<bizTransactionList>");
-            sb.append("<bizTransaction type=\"urn:accada:demo:btt:testing\">urn:accada:demo:biztrans:1.1</bizTransaction>");
+            sb.append("<bizTransaction type=\"urn:fosstrak:demo:btt:testing\">urn:fosstrak:demo:biztrans:1.1</bizTransaction>");
             sb.append("</bizTransactionList>");
             sb.append("</ObjectEvent>");
         }
@@ -146,19 +146,19 @@ public class SampleEventsGenerator {
             sb.append("<recordTime>").append(time).append("</recordTime>");
             sb.append("<eventTimeZoneOffset>").append(tz).append("</eventTimeZoneOffset>");
             sb.append("<bizTransactionList>");
-            sb.append("<bizTransaction type=\"urn:accada:demo:btt:testing\">urn:accada:demo:biztrans:1.1</bizTransaction>");
+            sb.append("<bizTransaction type=\"urn:fosstrak:demo:btt:testing\">urn:fosstrak:demo:biztrans:1.1</bizTransaction>");
             sb.append("</bizTransactionList>");
             sb.append("<epcList>");
             sb.append("<epc>").append(epc).append("</epc>");
             sb.append("</epcList>");
             sb.append("<action>ADD</action>");
-            sb.append("<bizStep>urn:accada:demo:bizstep:testing</bizStep>");
-            sb.append("<disposition>urn:accada:demo:disp:testing</disposition>");
+            sb.append("<bizStep>urn:fosstrak:demo:bizstep:testing</bizStep>");
+            sb.append("<disposition>urn:fosstrak:demo:disp:testing</disposition>");
             sb.append("<readPoint>");
-            sb.append("<id>urn:accada:demo:rp:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:rp:1.1</id>");
             sb.append("</readPoint>");
             sb.append("<bizLocation>");
-            sb.append("<id>urn:accada:demo:loc:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:loc:1.1</id>");
             sb.append("</bizLocation>");
             sb.append("</TransactionEvent>");
         }
@@ -188,16 +188,16 @@ public class SampleEventsGenerator {
             sb.append("<eventTimeZoneOffset>").append(tz).append("</eventTimeZoneOffset>");
             sb.append("<epcClass>").append(epc).append("</epcClass>");
             sb.append("<quantity>1</quantity>");
-            sb.append("<bizStep>urn:accada:demo:bizstep:testing</bizStep>");
-            sb.append("<disposition>urn:accada:demo:disp:testing</disposition>");
+            sb.append("<bizStep>urn:fosstrak:demo:bizstep:testing</bizStep>");
+            sb.append("<disposition>urn:fosstrak:demo:disp:testing</disposition>");
             sb.append("<readPoint>");
-            sb.append("<id>urn:accada:demo:rp:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:rp:1.1</id>");
             sb.append("</readPoint>");
             sb.append("<bizLocation>");
-            sb.append("<id>urn:accada:demo:loc:1.1</id>");
+            sb.append("<id>urn:fosstrak:demo:loc:1.1</id>");
             sb.append("</bizLocation>");
             sb.append("<bizTransactionList>");
-            sb.append("<bizTransaction type=\"urn:accada:demo:btt:testing\">urn:accada:demo:biztrans:1.1</bizTransaction>");
+            sb.append("<bizTransaction type=\"urn:fosstrak:demo:btt:testing\">urn:fosstrak:demo:biztrans:1.1</bizTransaction>");
             sb.append("</bizTransactionList>");
             sb.append("</QuantityEvent>");
         }
@@ -212,9 +212,9 @@ public class SampleEventsGenerator {
     /**
      * Formats a <code>Calendar</code> value into an ISO8601-compliant
      * date/time string. This method is copied from
-     * org.accada.epcis.utils.TimeParser (module epcis-commons).
+     * org.fosstrak.epcis.utils.TimeParser (module epcis-commons).
      * 
-     * @see org.accada.epcis.utils.TimeParser#format(Calendar)
+     * @see org.fosstrak.epcis.utils.TimeParser#format(Calendar)
      * @param cal
      *            The time value to be formatted into a date/time string.
      * @return The formatted date/time string.

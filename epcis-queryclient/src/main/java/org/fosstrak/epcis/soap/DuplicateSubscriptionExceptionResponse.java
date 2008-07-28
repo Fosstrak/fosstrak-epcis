@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class DuplicateSubscriptionExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.DuplicateSubscriptionException duplicateSubscriptionException;
+    private org.fosstrak.epcis.model.DuplicateSubscriptionException duplicateSubscriptionException;
 
     public DuplicateSubscriptionExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class DuplicateSubscriptionExceptionResponse extends Exception {
     }
 
     public DuplicateSubscriptionExceptionResponse(String message,
-            org.accada.epcis.model.DuplicateSubscriptionException duplicateSubscriptionException) {
+            org.fosstrak.epcis.model.DuplicateSubscriptionException duplicateSubscriptionException) {
         super(message);
         this.duplicateSubscriptionException = duplicateSubscriptionException;
     }
 
     public DuplicateSubscriptionExceptionResponse(String message,
-            org.accada.epcis.model.DuplicateSubscriptionException duplicateSubscriptionException, Throwable cause) {
+            org.fosstrak.epcis.model.DuplicateSubscriptionException duplicateSubscriptionException, Throwable cause) {
         super(message, cause);
         this.duplicateSubscriptionException = duplicateSubscriptionException;
     }
 
-    public org.accada.epcis.model.DuplicateSubscriptionException getFaultInfo() {
+    public org.fosstrak.epcis.model.DuplicateSubscriptionException getFaultInfo() {
         return this.duplicateSubscriptionException;
     }
 }

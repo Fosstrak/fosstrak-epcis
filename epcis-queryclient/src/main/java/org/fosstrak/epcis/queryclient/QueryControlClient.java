@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.queryclient;
+package org.fosstrak.epcis.queryclient;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -41,27 +41,27 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.accada.epcis.model.EmptyParms;
-import org.accada.epcis.model.GetSubscriptionIDs;
-import org.accada.epcis.model.Poll;
-import org.accada.epcis.model.QueryParams;
-import org.accada.epcis.model.QueryResults;
-import org.accada.epcis.model.Subscribe;
-import org.accada.epcis.model.SubscriptionControls;
-import org.accada.epcis.model.Unsubscribe;
-import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
-import org.accada.epcis.soap.EPCISServicePortType;
-import org.accada.epcis.soap.ImplementationExceptionResponse;
-import org.accada.epcis.soap.InvalidURIExceptionResponse;
-import org.accada.epcis.soap.NoSuchNameExceptionResponse;
-import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
-import org.accada.epcis.soap.QueryParameterExceptionResponse;
-import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
-import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
-import org.accada.epcis.soap.SecurityExceptionResponse;
-import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
-import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
-import org.accada.epcis.soap.ValidationExceptionResponse;
+import org.fosstrak.epcis.model.EmptyParms;
+import org.fosstrak.epcis.model.GetSubscriptionIDs;
+import org.fosstrak.epcis.model.Poll;
+import org.fosstrak.epcis.model.QueryParams;
+import org.fosstrak.epcis.model.QueryResults;
+import org.fosstrak.epcis.model.Subscribe;
+import org.fosstrak.epcis.model.SubscriptionControls;
+import org.fosstrak.epcis.model.Unsubscribe;
+import org.fosstrak.epcis.soap.DuplicateSubscriptionExceptionResponse;
+import org.fosstrak.epcis.soap.EPCISServicePortType;
+import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
+import org.fosstrak.epcis.soap.InvalidURIExceptionResponse;
+import org.fosstrak.epcis.soap.NoSuchNameExceptionResponse;
+import org.fosstrak.epcis.soap.NoSuchSubscriptionExceptionResponse;
+import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
+import org.fosstrak.epcis.soap.QueryTooComplexExceptionResponse;
+import org.fosstrak.epcis.soap.QueryTooLargeExceptionResponse;
+import org.fosstrak.epcis.soap.SecurityExceptionResponse;
+import org.fosstrak.epcis.soap.SubscribeNotPermittedExceptionResponse;
+import org.fosstrak.epcis.soap.SubscriptionControlsExceptionResponse;
+import org.fosstrak.epcis.soap.ValidationExceptionResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.Client;
@@ -81,7 +81,7 @@ public class QueryControlClient implements QueryControlInterface {
 
     private static final String PROPERTY_FILE = "/queryclient.properties";
     private static final String PROP_QUERY_URL = "default.url";
-    private static final String DEFAULT_QUERY_URL = "http://demo.accada.org/epcis/query";
+    private static final String DEFAULT_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
 
     private static final QName SERVICE = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISService");
     private static final QName PORT = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePort");
@@ -202,7 +202,7 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#getQueryNames()
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#getQueryNames()
      */
     public List<String> getQueryNames() throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse {
@@ -212,7 +212,7 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#getStandardVersion()
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#getStandardVersion()
      */
     public String getStandardVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse {
@@ -222,7 +222,7 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#getSubscriptionIds(java.lang.String)
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#getSubscriptionIds(java.lang.String)
      */
     public List<String> getSubscriptionIds(final String queryName) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse {
@@ -234,7 +234,7 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#getVendorVersion()
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#getVendorVersion()
      */
     public String getVendorVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse {
@@ -244,7 +244,7 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#poll(org.accada.epcis.model.Poll)
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#poll(org.fosstrak.epcis.model.Poll)
      */
     public QueryResults poll(final Poll poll) throws ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
             QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
@@ -325,7 +325,7 @@ public class QueryControlClient implements QueryControlInterface {
             QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse, NoSuchNameExceptionResponse, QueryParameterExceptionResponse, IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
+            JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             // setting schema to null will turn XML validation off
             // unmarshaller.setSchema(null);
@@ -344,9 +344,9 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#subscribe(java.lang.String,
-     *      org.accada.epcis.soapapi.QueryParam[], java.lang.String,
-     *      org.accada.epcis.soapapi.SubscriptionControls, java.lang.String)
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#subscribe(java.lang.String,
+     *      org.fosstrak.epcis.soapapi.QueryParam[], java.lang.String,
+     *      org.fosstrak.epcis.soapapi.SubscriptionControls, java.lang.String)
      */
     public void subscribe(final String queryName, final QueryParams params, final String dest,
             final SubscriptionControls controls, final String subscriptionId)
@@ -422,7 +422,7 @@ public class QueryControlClient implements QueryControlInterface {
             NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse,
             IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
+            JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             JAXBElement<Subscribe> elem = (JAXBElement<Subscribe>) unmarshaller.unmarshal(query);
             Subscribe subscribe = elem.getValue();
@@ -439,7 +439,7 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryControlInterface#unsubscribe(java.lang.String)
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#unsubscribe(java.lang.String)
      */
     public void unsubscribe(final String subscriptionId) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse {
@@ -462,7 +462,7 @@ public class QueryControlClient implements QueryControlInterface {
     public void unsubscribe(final InputStream unsubscribeIs) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse, IOException {
         try {
-            JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
+            JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             JAXBElement<Unsubscribe> elem = (JAXBElement<Unsubscribe>) unmarshaller.unmarshal(unsubscribeIs);
             Unsubscribe unsubscribe = elem.getValue();

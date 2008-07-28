@@ -4,12 +4,12 @@
   <!-- Basics                                                      -->
   <!-- =========================================================== -->
 
-  <groupId>org.accada.epcis</groupId>
+  <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis-interop-test</artifactId>
   <version>0.3.3-SNAPSHOT</version>
   <parent>
     <artifactId>epcis</artifactId>
-    <groupId>org.accada.epcis</groupId>
+    <groupId>org.fosstrak.epcis</groupId>
     <version>0.3.3-SNAPSHOT</version>
   </parent>
   <packaging>pom</packaging>
@@ -39,26 +39,26 @@
           we need this dependency because it will be deployed by
           the cargo plugin
       -->
-      <groupId>org.accada.epcis</groupId>
+      <groupId>org.fosstrak.epcis</groupId>
       <artifactId>epcis-repository</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.accada.epcis</groupId>
+      <groupId>org.fosstrak.epcis</groupId>
       <artifactId>epcis-commons</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.accada.epcis</groupId>
+      <groupId>org.fosstrak.epcis</groupId>
       <artifactId>epcis-captureclient</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.accada.epcis</groupId>
+      <groupId>org.fosstrak.epcis</groupId>
       <artifactId>epcis-queryclient</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -126,7 +126,7 @@
               <deployer>
                 <deployables>
                   <deployable>
-                    <groupId>org.accada.epcis</groupId>
+                    <groupId>org.fosstrak.epcis</groupId>
                     <artifactId>epcis-repository</artifactId>
                     <type>war</type>
                     <pingURL>http://localhost:8080/epcis-repository-${project.version}/capture</pingURL>
@@ -216,7 +216,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includes>**/*.java</includes>
-          <excludes>org/accada/epcis/soapapi/*.*</excludes>
+          <excludes>org/fosstrak/epcis/soapapi/*.*</excludes>
           <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
           <enableRulesSummary>false</enableRulesSummary>
           <xrefLocation>xref-test</xrefLocation>

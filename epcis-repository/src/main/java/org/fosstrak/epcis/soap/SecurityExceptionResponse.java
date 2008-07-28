@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class SecurityExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.SecurityException securityException;
+    private org.fosstrak.epcis.model.SecurityException securityException;
 
     public SecurityExceptionResponse() {
         super();
@@ -25,18 +25,18 @@ public class SecurityExceptionResponse extends Exception {
         super(message, cause);
     }
 
-    public SecurityExceptionResponse(String message, org.accada.epcis.model.SecurityException securityException) {
+    public SecurityExceptionResponse(String message, org.fosstrak.epcis.model.SecurityException securityException) {
         super(message);
         this.securityException = securityException;
     }
 
-    public SecurityExceptionResponse(String message, org.accada.epcis.model.SecurityException securityException,
+    public SecurityExceptionResponse(String message, org.fosstrak.epcis.model.SecurityException securityException,
             Throwable cause) {
         super(message, cause);
         this.securityException = securityException;
     }
 
-    public org.accada.epcis.model.SecurityException getFaultInfo() {
+    public org.fosstrak.epcis.model.SecurityException getFaultInfo() {
         return this.securityException;
     }
 }

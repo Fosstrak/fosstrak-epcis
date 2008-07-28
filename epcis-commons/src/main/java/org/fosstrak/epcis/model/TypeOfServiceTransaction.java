@@ -1,4 +1,4 @@
-package org.accada.epcis.model;
+package org.fosstrak.epcis.model;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

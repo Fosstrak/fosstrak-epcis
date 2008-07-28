@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.captureclient;
+package org.fosstrak.epcis.captureclient;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -34,19 +34,19 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.accada.epcis.model.ActionType;
-import org.accada.epcis.model.BusinessLocationType;
-import org.accada.epcis.model.EPC;
-import org.accada.epcis.model.EPCISBodyType;
-import org.accada.epcis.model.EPCISDocumentType;
-import org.accada.epcis.model.EPCListType;
-import org.accada.epcis.model.EventListType;
-import org.accada.epcis.model.ObjectEventType;
-import org.accada.epcis.model.ReadPointType;
+import org.fosstrak.epcis.model.ActionType;
+import org.fosstrak.epcis.model.BusinessLocationType;
+import org.fosstrak.epcis.model.EPC;
+import org.fosstrak.epcis.model.EPCISBodyType;
+import org.fosstrak.epcis.model.EPCISDocumentType;
+import org.fosstrak.epcis.model.EPCListType;
+import org.fosstrak.epcis.model.EventListType;
+import org.fosstrak.epcis.model.ObjectEventType;
+import org.fosstrak.epcis.model.ReadPointType;
 
 /**
  * A simple test utility class for sending a single or multiple capture
- * request(s) to the Accada EPCIS capture interface and bootstrapping the
+ * request(s) to the Fosstrak EPCIS capture interface and bootstrapping the
  * capture module.
  * 
  * @author Marco Steybe
@@ -71,13 +71,13 @@ public class SimpleCaptureTest {
         sb.append("<epc>urn:epc:id:sgtin:0057000.123780.7788</epc>");
         sb.append("</epcList>");
         sb.append("<action>ADD</action>");
-        sb.append("<bizStep>urn:accada:demo:bizstep:fmcg:production</bizStep>");
-        sb.append("<disposition>urn:accada:demo:disp:fmcg:pendingQA</disposition>");
+        sb.append("<bizStep>urn:fosstrak:demo:bizstep:fmcg:production</bizStep>");
+        sb.append("<disposition>urn:fosstrak:demo:disp:fmcg:pendingQA</disposition>");
         sb.append("<readPoint>");
-        sb.append("<id>urn:accada:demo:fmcg:ssl:0037000.00729.210,432</id>");
+        sb.append("<id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,432</id>");
         sb.append("</readPoint>");
         sb.append("<bizLocation>");
-        sb.append("<id>urn:accada:demo:fmcg:ssl:0037000.00729.210</id>");
+        sb.append("<id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210</id>");
         sb.append("</bizLocation>");
         sb.append("</ObjectEvent>");
         sb.append("</EventList>");
@@ -131,19 +131,19 @@ public class SimpleCaptureTest {
         objEvent.setAction(ActionType.ADD);
 
         // set bizStep
-        objEvent.setBizStep("urn:accada:demo:bizstep:fmcg:production");
+        objEvent.setBizStep("urn:fosstrak:demo:bizstep:fmcg:production");
 
         // set disposition
-        objEvent.setDisposition("urn:accada:demo:disp:fmcg:pendingQA");
+        objEvent.setDisposition("urn:fosstrak:demo:disp:fmcg:pendingQA");
 
         // set readPoint
         ReadPointType readPoint = new ReadPointType();
-        readPoint.setId("urn:accada:demo:fmcg:ssl:0037000.00729.210,432");
+        readPoint.setId("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,432");
         objEvent.setReadPoint(readPoint);
 
         // set bizLocation
         BusinessLocationType bizLocation = new BusinessLocationType();
-        bizLocation.setId("urn:accada:demo:fmcg:ssl:0037000.00729.210");
+        bizLocation.setId("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210");
         objEvent.setBizLocation(bizLocation);
 
         // create the EPCISDocument containing the ObjectEvent

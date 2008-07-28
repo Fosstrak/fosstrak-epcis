@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository.query;
+package org.fosstrak.epcis.repository.query;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,44 +39,44 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.accada.epcis.model.ArrayOfString;
-import org.accada.epcis.model.DuplicateSubscriptionException;
-import org.accada.epcis.model.EPCISEventType;
-import org.accada.epcis.model.EventListType;
-import org.accada.epcis.model.ImplementationException;
-import org.accada.epcis.model.ImplementationExceptionSeverity;
-import org.accada.epcis.model.InvalidURIException;
-import org.accada.epcis.model.NoSuchNameException;
-import org.accada.epcis.model.NoSuchSubscriptionException;
-import org.accada.epcis.model.QueryParam;
-import org.accada.epcis.model.QueryParameterException;
-import org.accada.epcis.model.QueryParams;
-import org.accada.epcis.model.QueryResults;
-import org.accada.epcis.model.QueryResultsBody;
-import org.accada.epcis.model.QuerySchedule;
-import org.accada.epcis.model.QueryTooLargeException;
-import org.accada.epcis.model.SubscribeNotPermittedException;
-import org.accada.epcis.model.SubscriptionControls;
-import org.accada.epcis.model.SubscriptionControlsException;
-import org.accada.epcis.model.ValidationException;
-import org.accada.epcis.model.VocabularyListType;
-import org.accada.epcis.repository.EpcisConstants;
-import org.accada.epcis.repository.EpcisQueryControlInterface;
-import org.accada.epcis.repository.query.SimpleEventQueryDTO.Operation;
-import org.accada.epcis.repository.query.SimpleEventQueryDTO.OrderDirection;
-import org.accada.epcis.soap.DuplicateSubscriptionExceptionResponse;
-import org.accada.epcis.soap.ImplementationExceptionResponse;
-import org.accada.epcis.soap.InvalidURIExceptionResponse;
-import org.accada.epcis.soap.NoSuchNameExceptionResponse;
-import org.accada.epcis.soap.NoSuchSubscriptionExceptionResponse;
-import org.accada.epcis.soap.QueryParameterExceptionResponse;
-import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
-import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
-import org.accada.epcis.soap.SecurityExceptionResponse;
-import org.accada.epcis.soap.SubscribeNotPermittedExceptionResponse;
-import org.accada.epcis.soap.SubscriptionControlsExceptionResponse;
-import org.accada.epcis.soap.ValidationExceptionResponse;
-import org.accada.epcis.utils.TimeParser;
+import org.fosstrak.epcis.model.ArrayOfString;
+import org.fosstrak.epcis.model.DuplicateSubscriptionException;
+import org.fosstrak.epcis.model.EPCISEventType;
+import org.fosstrak.epcis.model.EventListType;
+import org.fosstrak.epcis.model.ImplementationException;
+import org.fosstrak.epcis.model.ImplementationExceptionSeverity;
+import org.fosstrak.epcis.model.InvalidURIException;
+import org.fosstrak.epcis.model.NoSuchNameException;
+import org.fosstrak.epcis.model.NoSuchSubscriptionException;
+import org.fosstrak.epcis.model.QueryParam;
+import org.fosstrak.epcis.model.QueryParameterException;
+import org.fosstrak.epcis.model.QueryParams;
+import org.fosstrak.epcis.model.QueryResults;
+import org.fosstrak.epcis.model.QueryResultsBody;
+import org.fosstrak.epcis.model.QuerySchedule;
+import org.fosstrak.epcis.model.QueryTooLargeException;
+import org.fosstrak.epcis.model.SubscribeNotPermittedException;
+import org.fosstrak.epcis.model.SubscriptionControls;
+import org.fosstrak.epcis.model.SubscriptionControlsException;
+import org.fosstrak.epcis.model.ValidationException;
+import org.fosstrak.epcis.model.VocabularyListType;
+import org.fosstrak.epcis.repository.EpcisConstants;
+import org.fosstrak.epcis.repository.EpcisQueryControlInterface;
+import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.Operation;
+import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.OrderDirection;
+import org.fosstrak.epcis.soap.DuplicateSubscriptionExceptionResponse;
+import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
+import org.fosstrak.epcis.soap.InvalidURIExceptionResponse;
+import org.fosstrak.epcis.soap.NoSuchNameExceptionResponse;
+import org.fosstrak.epcis.soap.NoSuchSubscriptionExceptionResponse;
+import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
+import org.fosstrak.epcis.soap.QueryTooComplexExceptionResponse;
+import org.fosstrak.epcis.soap.QueryTooLargeExceptionResponse;
+import org.fosstrak.epcis.soap.SecurityExceptionResponse;
+import org.fosstrak.epcis.soap.SubscribeNotPermittedExceptionResponse;
+import org.fosstrak.epcis.soap.SubscriptionControlsExceptionResponse;
+import org.fosstrak.epcis.soap.ValidationExceptionResponse;
+import org.fosstrak.epcis.utils.TimeParser;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
@@ -1410,7 +1410,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             try {
                 new URL(serviceVersion);
             } catch (MalformedURLException e) {
-                serviceVersion = "http://www.accada.org/epcis/" + serviceVersion;
+                serviceVersion = "http://www.fosstrak.org/epcis/" + serviceVersion;
             }
         }
         this.serviceVersion = serviceVersion;

@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class QueryParameterExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.QueryParameterException queryParameterException;
+    private org.fosstrak.epcis.model.QueryParameterException queryParameterException;
 
     public QueryParameterExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class QueryParameterExceptionResponse extends Exception {
     }
 
     public QueryParameterExceptionResponse(String message,
-            org.accada.epcis.model.QueryParameterException queryParameterException) {
+            org.fosstrak.epcis.model.QueryParameterException queryParameterException) {
         super(message);
         this.queryParameterException = queryParameterException;
     }
 
     public QueryParameterExceptionResponse(String message,
-            org.accada.epcis.model.QueryParameterException queryParameterException, Throwable cause) {
+            org.fosstrak.epcis.model.QueryParameterException queryParameterException, Throwable cause) {
         super(message, cause);
         this.queryParameterException = queryParameterException;
     }
 
-    public org.accada.epcis.model.QueryParameterException getFaultInfo() {
+    public org.fosstrak.epcis.model.QueryParameterException getFaultInfo() {
         return this.queryParameterException;
     }
 }

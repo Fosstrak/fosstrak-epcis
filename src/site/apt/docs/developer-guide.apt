@@ -37,7 +37,7 @@ Developer Guide
 
 * {About this Guide}
 
-  This developer guide is intended for people who wish to work on Accada's
+  This developer guide is intended for people who wish to work on Fosstrak's
   EPCIS repository implementation and contribute to the project. It outlines
   the steps to follow for setting up the development environment and helps
   developers to find their way through the code.
@@ -48,7 +48,7 @@ Developer Guide
   continuing with the developer guide.
 
   If you cannot find your answer here, feel free to ask the
-  {{{mailto:accada-epcis-developer@lists.sourceforge.net}Accada EPCIS developer mailing list}}.
+  {{{mailto:fosstrak-epcis-developer@lists.sourceforge.net}Fosstrak EPCIS developer mailing list}}.
 
 
 * {Getting Started}
@@ -127,7 +127,7 @@ mvn eclipse:eclipse -DdownloadSources
    EPCIS code style profile active for your entire workspace, or go to the
    preferences of each individual EPCIS project (<Project> > <Properties>) and
    set the active code style profile to <EPCIS>. Prior to committing code to
-   SVN hit <<<CTRL+SHIRT+F>>> to format the code according to the Accada EPCIS
+   SVN hit <<<CTRL+SHIRT+F>>> to format the code according to the Fosstrak EPCIS
    code style.
 
 ** {Building and Deploying the Project}
@@ -191,7 +191,7 @@ mvn package
 
 ** {Project Modules}
 
-   Accada's EPCIS project is a multimodule project. Currently, it includes five
+   Fosstrak's EPCIS project is a multimodule project. Currently, it includes five
    modules which inherit from the base epcis-module:
 
    * <<epcis-commons>>

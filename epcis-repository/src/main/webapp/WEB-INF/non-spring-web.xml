@@ -13,7 +13,7 @@
   </context-param>
 
   <listener>
-    <listener-class>org.accada.epcis.repository.RepositoryContextListener</listener-class>
+    <listener-class>org.fosstrak.epcis.repository.RepositoryContextListener</listener-class>
   </listener>
 
   <servlet>
@@ -24,7 +24,7 @@
       for processing of the query according to the SOAP/HTTP Binding for the
       Query Control Interface (EPCglobal EPCIS Specification Section 11.2).
     </description>
-    <servlet-class>org.accada.epcis.repository.query.QueryInitServlet</servlet-class>
+    <servlet-class>org.fosstrak.epcis.repository.query.QueryInitServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
@@ -35,7 +35,7 @@
       data payload must contain an XML formatted EPCISDocument according to the
       schema for core event types (EPCglobal EPCIS Specification Section 9.5).
     </description>
-    <servlet-class>org.accada.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
+    <servlet-class>org.fosstrak.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>
 

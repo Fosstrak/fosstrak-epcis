@@ -39,20 +39,20 @@ User Guide
 
 * {About this Guide}
 
-  This guide is intended to help users get started with the Accada EPCIS module.
+  This guide is intended to help users get started with the Fosstrak EPCIS module.
   It outlines the steps to follow in order to set up your own EPCIS repository
   and describes how to interact with such a repository.
 
-  If you just want to see Accada's EPCIS repository in action and explore its
+  If you just want to see Fosstrak's EPCIS repository in action and explore its
   features and functionalities, you might want to try our Query and/or Capture
   client applications (available through Java Web Start at the
   {{{../demo.html}demo page}}) without setting up your own repository. If, however,
   you want to run your own instance of the EPCIS repository, or if you like
-  to incorporate Accada's EPCIS implementation into your own project, continue
+  to incorporate Fosstrak's EPCIS implementation into your own project, continue
   reading.
 
   If this guide doesn't answer the questions you may have, feel free to post them
-  to the {{{mailto:accada-epcis-user@lists.sourceforge.net}Accada EPCIS user mailing list}}.
+  to the {{{mailto:fosstrak-epcis-user@lists.sourceforge.net}Fosstrak EPCIS user mailing list}}.
 
 * {Getting Started}
 
@@ -70,7 +70,7 @@ User Guide
    servlet container (version 5.5 or higher) running. It will be used to deploy
    and run the EPCIS repository web application.
 
-   [[1]] {{{../download.html}Download}} the <Accada EPCIS repository>
+   [[1]] {{{../download.html}Download}} the <Fosstrak EPCIS repository>
    distribution and place the WAR file contained in the archive in your
    Tomcat's <webapps> directory. After restarting Tomcat, the WAR file will be
    exploded.
@@ -179,7 +179,7 @@ in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.
    [[1]] {{{download.html}Download}} the capture client binaries.
 
    [[1]] Run the executable JAR file contained in the archive you downloaded.
-   This will launch the Accada EPCIS Capture Client. 
+   This will launch the Fosstrak EPCIS Capture Client. 
 
 -------------------------------------------
 java -jar epcis-captureclient-<version>.jar
@@ -188,7 +188,7 @@ java -jar epcis-captureclient-<version>.jar
    [[1]] In the GUI, you need to specify the URL of the EPCIS repository you
    want to connect to. You can either use your local repository instance
    (e.g., <<<http://localhost:8080/epcis-repository-\<version\>/capture>>>>),
-   our public repository (<<<http://demo.accada.org/epcis/capture>>>), or any
+   our public repository (<<<http://demo.fosstrak.org/epcis/capture>>>), or any
    other EPCIS repository. You can now fill in the EPCIS event data and submit
    the EPCIS capture request by clicking "Generate event".
 
@@ -219,7 +219,7 @@ java -jar epcis-captureclient-<version>.jar
 
 * {Interacting with a Repository}
 
-  This section shows how to use the basic features of Accada's EPCIS
+  This section shows how to use the basic features of Fosstrak's EPCIS
   implementation, i.e., how to send EPCIS events to the capture interface and
   how to create an EPCIS query for retrieving information from the repository.
 
@@ -290,7 +290,7 @@ if (httpResponseCode != 200) {
   The event object required by the <<<CaptureClient>>>'s <<<capture>>> method
   can either be an XML <<<String>>>, an <<<InputStream>>> providing the XML as
   a stream of bytes, or an instance of <<<EPCISDocumentType>>>. The following
-  code snippet demonstrates how to use the <<<org.accada.epcis.model>>> package
+  code snippet demonstrates how to use the <<<org.fosstrak.epcis.model>>> package
   to create an <<<EPCISDocumentType>>> instance:
 
 ---------------------------------------------------------------------------
@@ -355,14 +355,14 @@ epcisDoc.setCreationDate(now);
 
   Since the classes in this package were automatically generated from EPCglobal's
   XML schema, they strictly follow the nomenclature mandated by JAXB and are
-  somewhat counterintuitive to use. Future versions of Accada EPCIS may provide
+  somewhat counterintuitive to use. Future versions of Fosstrak EPCIS may provide
   an additional, more intuitive object model on top of the automatically generated
-  <<<org.accada.epcis.model>>> package.
+  <<<org.fosstrak.epcis.model>>> package.
 
 
 ** {How to Query an EPCIS Repository}
 
-   The Accada EPCIS repository implements the SOAP/HTTP binding for the query
+   The Fosstrak EPCIS repository implements the SOAP/HTTP binding for the query
    interface, thus, you need to send queries inside a valid SOAP request to the
    repository. A sample query asking for <<<ObjectEvents>>> having an EPC equal to
    <<<urn:epc:id:sgtin:1.1.0>>> looks as follows:
@@ -405,7 +405,7 @@ results.getResultsBody(); // etc.
   The query object required by the <<<QueryControlClient>>>'s <<<poll>>> method
   can either be an XML <<<String>>>, an <<<InputStream>>> providing the XML as
   a stream of bytes, or an instance of <<<Poll>>>. The following code snippet
-  demonstrates how to use the <<<org.accada.epcis.model>>> package to create
+  demonstrates how to use the <<<org.fosstrak.epcis.model>>> package to create
   a <<<Poll>>> instance:
 
 ---------------------------------------------------------------------------
@@ -553,7 +553,7 @@ client.unsubscribe(queryId);
 ** {How to Subscribe a Triggered Query}
 
    A triggered query is much like a scheduled query, except that it is
-   associated with a trigger instead of a schedule. In Accada's EPCIS
+   associated with a trigger instead of a schedule. In Fosstrak's EPCIS
    repository, triggers are implemented as subscribed queries. This
    subscribed query, executed every couple of seconds, checks if incoming
    event data matches the trigger condition. If this condition is met, the
@@ -636,7 +636,7 @@ String response = listener.fetchResponse();
 
 * {Runtime Configuration of your EPCIS Repository}
 
-  In this section, we describe the properties you can use to configure Accada's
+  In this section, we describe the properties you can use to configure Fosstrak's
   EPCIS repository implementation.
 
   Basically there are three coniguration files relevant to the user of the
@@ -654,7 +654,7 @@ String response = listener.fetchResponse();
 # application.properties - various properties (loaded at runtime)
 
 # the version of this service, as exposed by getVendorVersion (must be valid URI)
-service.version=http://www.accada.org/epcis/epcis-repository-<version>
+service.version=http://www.fosstrak.org/epcis/epcis-repository-<version>
 
 # maximum number of result rows allowed for a single query before a
 # QueryTooLarge exception is raised
@@ -689,7 +689,7 @@ jndi.datasource.name=java:comp/env/jdbc/EPCISDB
 
 ---------------------------------------------------------------------------
 
-  We would like to outline one specific feature: The Accada EPCIS
+  We would like to outline one specific feature: The Fosstrak EPCIS
   implementation includes the option to specify an SQL script (see
   <dbResetScript> property) and trigger the execution of this script remotely.
   This behaviour is not part of the EPCIS specification, but can be used
@@ -746,7 +746,7 @@ jndi.datasource.name=java:comp/env/jdbc/EPCISDB
 log4j.rootCategory=INFO, LOGFILE
 
 # customize logging levels
-#log4j.logger.org.accada.epcis=DEBUG
+#log4j.logger.org.fosstrak.epcis=DEBUG
 
 # enable logging of SQL prepared statements
 #log4j.logger.org.hibernate.SQL=FINE

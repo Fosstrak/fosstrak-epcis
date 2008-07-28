@@ -5,7 +5,7 @@
   <!-- Basics                                                      -->
   <!-- =========================================================== -->
 
-  <groupId>org.accada.epcis</groupId>
+  <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis</artifactId>
   <version>0.3.3-SNAPSHOT</version>
   <packaging>pom</packaging> <!-- aggregator projects require 'pom' as packaging -->
@@ -85,9 +85,9 @@
 
   <repositories>
     <repository>
-      <id>accada-repository</id>
-      <name>Accada repository</name>
-      <url>http://maven-repository.accada.org/releases</url>
+      <id>fosstrak-repository</id>
+      <name>Fosstrak repository</name>
+      <url>http://maven-repository.fosstrak.org/releases</url>
       <layout>default</layout>
     </repository>
     <!--
@@ -164,7 +164,7 @@
                details on this issue. -->
           <version>2.0-beta-4</version>
           <configuration>
-            <tagBase>https://svn.accada.org/repos/epcis/tags</tagBase>
+            <tagBase>https://svn.fosstrak.org/repos/epcis/tags</tagBase>
           </configuration>
         </plugin>
         <plugin>
@@ -220,24 +220,24 @@
   <scm>
     <!-- keep empty tags here to avoid release:prepare crashes -->
     <connection></connection>
-    <developerConnection>scm:svn:https://svn.accada.org/repos/epcis</developerConnection>
-    <url>https://svn.accada.org/repos/epcis/</url>
+    <developerConnection>scm:svn:https://svn.fosstrak.org/repos/epcis</developerConnection>
+    <url>https://svn.fosstrak.org/repos/epcis/</url>
   </scm>
   <distributionManagement>
     <repository>
-      <id>accada-repository</id>
-      <name>Accada repository</name>
-      <url>sftp://maven-repository.accada.org/local/home/accadarep/public_html/releases</url>
+      <id>fosstrak-repository</id>
+      <name>Fosstrak repository</name>
+      <url>sftp://maven-repository.fosstrak.org/local/home/fosstrakrep/public_html/releases</url>
     </repository>
     <snapshotRepository>
-      <id>accada-repository</id>
-      <name>Accada repository</name>
-      <url>sftp://maven-repository.accada.org/local/home/accadarep/public_html/snapshots</url>
+      <id>fosstrak-repository</id>
+      <name>Fosstrak repository</name>
+      <url>sftp://maven-repository.fosstrak.org/local/home/fosstrakrep/public_html/snapshots</url>
     </snapshotRepository>
     <site>
-      <id>accada-website</id>
-      <name>Accada website</name>
-      <url>sftp://www.accada.org/local/home/accadaweb/public_html/epcis</url>
+      <id>fosstrak-website</id>
+      <name>Fosstrak website</name>
+      <url>sftp://www.fosstrak.org/local/home/fosstrakweb/public_html/epcis</url>
     </site>
   </distributionManagement>
   <issueManagement>
@@ -247,17 +247,17 @@
   <mailingLists>
     <mailingList>
       <name>EPCIS user mailing list</name>
-      <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</subscribe>
-      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</unsubscribe>
-      <post>accada-epcis-user@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-user</archive>
+      <subscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-user</subscribe>
+      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-user</unsubscribe>
+      <post>fosstrak-epcis-user@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=fosstrak-epcis-user</archive>
     </mailingList>
     <mailingList>
       <name>EPCIS developer mailing list</name>
-      <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
-      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
-      <post>accada-epcis-developer@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-developer</archive>
+      <subscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-developer</subscribe>
+      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-developer</unsubscribe>
+      <post>fosstrak-epcis-developer@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=fosstrak-epcis-developer</archive>
     </mailingList>
   </mailingLists>
 
@@ -330,7 +330,7 @@
   <!-- =========================================================== -->
 
   <name>epcis</name>
-  <url>http://www.accada.org/epcis</url>
+  <url>http://www.fosstrak.org/epcis</url>
   <licenses>
     <license>
       <name>GNU Lesser General Public License (LGPL)</name>

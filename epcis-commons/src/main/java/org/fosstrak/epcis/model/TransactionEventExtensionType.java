@@ -1,4 +1,4 @@
-package org.accada.epcis.model;
+package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

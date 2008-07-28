@@ -17,7 +17,7 @@
   </context-param>
 
   <listener>
-    <listener-class>org.accada.epcis.repository.RepositoryContextListener</listener-class>
+    <listener-class>org.fosstrak.epcis.repository.RepositoryContextListener</listener-class>
   </listener>
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -42,7 +42,7 @@
       data payload must contain an XML formatted EPCISDocument according to the
       schema for core event types (EPCglobal EPCIS Specification Section 9.5).
     </description>
-    <servlet-class>org.accada.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
+    <servlet-class>org.fosstrak.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>
   <!--

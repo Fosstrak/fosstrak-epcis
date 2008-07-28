@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository;
+package org.fosstrak.epcis.repository;
 
 import java.util.Enumeration;
 
@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * This RepositoryContextListener performs the initialization and termination
- * (shut-down) work required by the Accada EPCIS repository application, such as
+ * (shut-down) work required by the Fosstrak EPCIS repository application, such as
  * initializing the logging framework. This class receives notifications about
  * changes to the servlet context of the web application, e.g., when the servlet
  * context is loaded, or is about to be shut down.
@@ -73,7 +73,7 @@ public class RepositoryContextListener implements ServletContextListener {
         // set a system property to configure CXF to use LOG4J
         System.setProperty("org.apache.cxf.Logger", "org.apache.cxf.common.logging.Log4jLogger");
 
-        LOG.info("Starting Accada EPCIS Repository application");
+        LOG.info("Starting Fosstrak EPCIS Repository application");
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Logging application context init-parameters:");
@@ -91,7 +91,7 @@ public class RepositoryContextListener implements ServletContextListener {
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent event) {
-        LOG.info("Accada EPCIS Repository application shut down\n######################################");
+        LOG.info("Fosstrak EPCIS Repository application shut down\n######################################");
         LogFactory.releaseAll();
     }
 }

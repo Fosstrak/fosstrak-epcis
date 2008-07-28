@@ -2,10 +2,10 @@
 
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping package="org.accada.epcis.repository.model">
+<hibernate-mapping package="org.fosstrak.epcis.repository.model">
 
 	<class name="DispositionId" lazy="true" 
-		proxy="org.accada.epcis.repository.model.DispositionId"
+		proxy="org.fosstrak.epcis.repository.model.DispositionId"
 		dynamic-update="false" dynamic-insert="false"
 		select-before-update="false" table="voc_Disposition">
 

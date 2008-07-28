@@ -57,7 +57,7 @@
   <!--  Service layer definitions                                  -->
   <!-- =========================================================== -->
 
-  <bean id="queryOperationsModule" class="org.accada.epcis.repository.query.QueryOperationsModule">
+  <bean id="queryOperationsModule" class="org.fosstrak.epcis.repository.query.QueryOperationsModule">
     <property name="dataSource" ref="dataSource" />
     <property name="serviceVersion" value="${service.version}" />
     <property name="maxQueryRows" value="${maxQueryResultRows}" />
@@ -68,14 +68,14 @@
       <bean class="org.springframework.web.context.support.ServletContextFactoryBean" />
     </property>
     <property name="backend">
-      <bean class="org.accada.epcis.repository.query.QueryOperationsBackendSQL" />
+      <bean class="org.fosstrak.epcis.repository.query.QueryOperationsBackendSQL" />
     </property>
   </bean>
-  <bean id="queryOperationsWebService" class="org.accada.epcis.repository.query.QueryOperationsWebService">
+  <bean id="queryOperationsWebService" class="org.fosstrak.epcis.repository.query.QueryOperationsWebService">
     <constructor-arg><ref bean="queryOperationsModule" /></constructor-arg>
   </bean>
 
-  <bean id="captureOperationsModule" class="org.accada.epcis.repository.capture.CaptureOperationsModule">
+  <bean id="captureOperationsModule" class="org.fosstrak.epcis.repository.capture.CaptureOperationsModule">
     <property name="sessionFactory" ref="hibernateSessionFactory" />
     <property name="insertMissingVoc" value="${insertMissingVoc}" />
     <property name="dbResetAllowed" value="${dbResetAllowed}" />

@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository.query;
+package org.fosstrak.epcis.repository.query;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -60,26 +60,26 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import org.accada.epcis.model.EPCISQueryBodyType;
-import org.accada.epcis.model.EPCISQueryDocumentType;
-import org.accada.epcis.model.EventListType;
-import org.accada.epcis.model.ImplementationException;
-import org.accada.epcis.model.ObjectFactory;
-import org.accada.epcis.model.Poll;
-import org.accada.epcis.model.QueryParam;
-import org.accada.epcis.model.QueryParams;
-import org.accada.epcis.model.QueryResults;
-import org.accada.epcis.model.QueryTooLargeException;
-import org.accada.epcis.repository.EpcisQueryCallbackInterface;
-import org.accada.epcis.soap.EPCISServicePortType;
-import org.accada.epcis.soap.EPCglobalEPCISService;
-import org.accada.epcis.soap.ImplementationExceptionResponse;
-import org.accada.epcis.soap.NoSuchNameExceptionResponse;
-import org.accada.epcis.soap.QueryParameterExceptionResponse;
-import org.accada.epcis.soap.QueryTooComplexExceptionResponse;
-import org.accada.epcis.soap.QueryTooLargeExceptionResponse;
-import org.accada.epcis.soap.SecurityExceptionResponse;
-import org.accada.epcis.soap.ValidationExceptionResponse;
+import org.fosstrak.epcis.model.EPCISQueryBodyType;
+import org.fosstrak.epcis.model.EPCISQueryDocumentType;
+import org.fosstrak.epcis.model.EventListType;
+import org.fosstrak.epcis.model.ImplementationException;
+import org.fosstrak.epcis.model.ObjectFactory;
+import org.fosstrak.epcis.model.Poll;
+import org.fosstrak.epcis.model.QueryParam;
+import org.fosstrak.epcis.model.QueryParams;
+import org.fosstrak.epcis.model.QueryResults;
+import org.fosstrak.epcis.model.QueryTooLargeException;
+import org.fosstrak.epcis.repository.EpcisQueryCallbackInterface;
+import org.fosstrak.epcis.soap.EPCISServicePortType;
+import org.fosstrak.epcis.soap.EPCglobalEPCISService;
+import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
+import org.fosstrak.epcis.soap.NoSuchNameExceptionResponse;
+import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
+import org.fosstrak.epcis.soap.QueryTooComplexExceptionResponse;
+import org.fosstrak.epcis.soap.QueryTooLargeExceptionResponse;
+import org.fosstrak.epcis.soap.SecurityExceptionResponse;
+import org.fosstrak.epcis.soap.ValidationExceptionResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -461,7 +461,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      */
     private String marshalQueryDoc(EPCISQueryDocumentType epcisDoc) throws JAXBException {
         ObjectFactory objectFactory = new ObjectFactory();
-        JAXBContext context = JAXBContext.newInstance("org.accada.epcis.model");
+        JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
         JAXBElement<EPCISQueryDocumentType> item = objectFactory.createEPCISQueryDocument(epcisDoc);
         LOG.debug("Serializing " + item + " into XML");
         StringWriter writer = new StringWriter();

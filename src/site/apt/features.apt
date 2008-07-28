@@ -8,12 +8,12 @@
 
 Features
 
-  The following outlines the features available in Accada's EPCIS Repository
+  The following outlines the features available in Fosstrak's EPCIS Repository
   implementation and in its Capture and Query Clients.
 
-* Accada EPCIS Modules
+* Fosstrak EPCIS Modules
 
-  The Accada EPCIS Project comprises three separate modules:
+  The Fosstrak EPCIS Project comprises three separate modules:
 
   * an EPCIS Repository implementation
 
@@ -31,7 +31,7 @@ Features
   defined by EPCglobal and its members.
 
 
-* Accada EPCIS Repository Features
+* Fosstrak EPCIS Repository Features
 
   Our implementation features the EPCIS capture interface and the EPCIS
   query interface (including the query control interface and the query callback
@@ -40,34 +40,34 @@ Features
   higher) and a MySQL database (version 5.0.15 or higher) as a storage engine.
 
 
-* Accada EPCIS Capture and Query Client Features
+* Fosstrak EPCIS Capture and Query Client Features
 
-  The Accada EPCIS Capture and Query Clients provide an intuitive graphical
+  The Fosstrak EPCIS Capture and Query Clients provide an intuitive graphical
   user interface to store EPCIS events to and retrieve EPCIS events from an EPCIS
   Repository. They can be used to interactively test and explore any EPCIS
-  Repository (based on Accada or third-party products) supporting the HTTP binding 
+  Repository (based on Fosstrak or third-party products) supporting the HTTP binding 
   for the capture cnterface and the SOAP binding for the query interface.
   
   The following two screenshots show the features available in our EPCIS Capture
   and Query Clients:
 
 
-[images/epcis_capture_gui.png] Accada EPCIS Capture Client
+[images/epcis_capture_gui.png] Fosstrak EPCIS Capture Client
 
   .
 
-[images/epcis_query_gui.png] Accada EPCIS Query Client
+[images/epcis_query_gui.png] Fosstrak EPCIS Query Client
 
 
 * Detailed Feature List
 
-  Accada EPCIS supports all mandatory and some optional features of EPCglobal's
+  Fosstrak EPCIS supports all mandatory and some optional features of EPCglobal's
   EPC Information Services (EPCIS) Specification, Version 1.0. The following
   table gives an overview of which features are supported and which are not.
 
 *--------------+-----------------------------*----------------------*-----------*
 | <<Feature>>  | <<Described in>>            | <<Supported in>>     | <<Notes>> |
-|              | <<EPCIS Specification 1.0>> | <<Accada EPCIS 0.3>> |           |
+|              | <<EPCIS Specification 1.0>> | <<Fosstrak EPCIS 0.3>> |           |
 *--------------+-----------------------------*----------------------*-----------*
 | Extension mechanism (e.g. new event fields) | Sect. 6.3 | X | {{{#\[1\]}\[1\]}}
 *--------------+-----------------------------*----------------------*-----------*

@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.queryclient;
+package org.fosstrak.epcis.queryclient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,22 +37,22 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.xml.bind.JAXBElement;
 
-import org.accada.epcis.model.AggregationEventType;
-import org.accada.epcis.model.ArrayOfString;
-import org.accada.epcis.model.BusinessTransactionType;
-import org.accada.epcis.model.EPC;
-import org.accada.epcis.model.EPCISEventType;
-import org.accada.epcis.model.GetSubscriptionIDs;
-import org.accada.epcis.model.ObjectEventType;
-import org.accada.epcis.model.Poll;
-import org.accada.epcis.model.QuantityEventType;
-import org.accada.epcis.model.QueryParam;
-import org.accada.epcis.model.QueryParams;
-import org.accada.epcis.model.QueryResults;
-import org.accada.epcis.model.Subscribe;
-import org.accada.epcis.model.TransactionEventType;
-import org.accada.epcis.model.Unsubscribe;
-import org.accada.epcis.utils.TimeParser;
+import org.fosstrak.epcis.model.AggregationEventType;
+import org.fosstrak.epcis.model.ArrayOfString;
+import org.fosstrak.epcis.model.BusinessTransactionType;
+import org.fosstrak.epcis.model.EPC;
+import org.fosstrak.epcis.model.EPCISEventType;
+import org.fosstrak.epcis.model.GetSubscriptionIDs;
+import org.fosstrak.epcis.model.ObjectEventType;
+import org.fosstrak.epcis.model.Poll;
+import org.fosstrak.epcis.model.QuantityEventType;
+import org.fosstrak.epcis.model.QueryParam;
+import org.fosstrak.epcis.model.QueryParams;
+import org.fosstrak.epcis.model.QueryResults;
+import org.fosstrak.epcis.model.Subscribe;
+import org.fosstrak.epcis.model.TransactionEventType;
+import org.fosstrak.epcis.model.Unsubscribe;
+import org.fosstrak.epcis.utils.TimeParser;
 
 /**
  * Implements a Class to interface with the EPCIS query client. Also offers some
@@ -64,7 +64,7 @@ public class QueryClientGuiHelper {
 
     private static final String PROPERTY_FILE = "/queryclient.properties";
     private static final String PROP_QUERY_URL = "default.url";
-    private static final String DEFAULT_QUERY_URL = "http://demo.accada.org/epcis/query";
+    private static final String DEFAULT_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
 
     private QueryControlClient queryClient;
 

@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class InvalidURIExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.InvalidURIException invalidURIException;
+    private org.fosstrak.epcis.model.InvalidURIException invalidURIException;
 
     public InvalidURIExceptionResponse() {
         super();
@@ -25,18 +25,18 @@ public class InvalidURIExceptionResponse extends Exception {
         super(message, cause);
     }
 
-    public InvalidURIExceptionResponse(String message, org.accada.epcis.model.InvalidURIException invalidURIException) {
+    public InvalidURIExceptionResponse(String message, org.fosstrak.epcis.model.InvalidURIException invalidURIException) {
         super(message);
         this.invalidURIException = invalidURIException;
     }
 
-    public InvalidURIExceptionResponse(String message, org.accada.epcis.model.InvalidURIException invalidURIException,
+    public InvalidURIExceptionResponse(String message, org.fosstrak.epcis.model.InvalidURIException invalidURIException,
             Throwable cause) {
         super(message, cause);
         this.invalidURIException = invalidURIException;
     }
 
-    public org.accada.epcis.model.InvalidURIException getFaultInfo() {
+    public org.fosstrak.epcis.model.InvalidURIException getFaultInfo() {
         return this.invalidURIException;
     }
 }

@@ -5,12 +5,12 @@
   <!-- Basics                                                      -->
   <!-- =========================================================== -->
 
-  <groupId>org.accada.epcis</groupId>
+  <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis-commons</artifactId>
   <version>0.3.3-SNAPSHOT</version>
   <parent>
     <artifactId>epcis</artifactId>
-    <groupId>org.accada.epcis</groupId>
+    <groupId>org.fosstrak.epcis</groupId>
     <version>0.3.3-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
@@ -69,17 +69,17 @@
                   <wsdl>${basedir}/../epcis-repository/src/main/resources/wsdl/EPCglobal-epcis-query-1_0.wsdl</wsdl>
                   <extraargs>
                     <extraarg>-p</extraarg>
-                    <extraarg>urn:epcglobal:epcis:xsd:1=org.accada.epcis.model</extraarg>
+                    <extraarg>urn:epcglobal:epcis:xsd:1=org.fosstrak.epcis.model</extraarg>
                     <extraarg>-p</extraarg>
-                    <extraarg>urn:epcglobal:epcis-query:xsd:1=org.accada.epcis.model</extraarg>
+                    <extraarg>urn:epcglobal:epcis-query:xsd:1=org.fosstrak.epcis.model</extraarg>
                     <extraarg>-p</extraarg>
-                    <extraarg>urn:epcglobal:epcis-masterdata:xsd:1=org.accada.epcis.model</extraarg>
+                    <extraarg>urn:epcglobal:epcis-masterdata:xsd:1=org.fosstrak.epcis.model</extraarg>
                     <extraarg>-p</extraarg>
-                    <extraarg>urn:epcglobal:xsd:1=org.accada.epcis.model</extraarg>
+                    <extraarg>urn:epcglobal:xsd:1=org.fosstrak.epcis.model</extraarg>
                     <extraarg>-p</extraarg>
-                    <extraarg>http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader=org.accada.epcis.model</extraarg>
+                    <extraarg>http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader=org.fosstrak.epcis.model</extraarg>
                     <extraarg>-p</extraarg>
-                    <extraarg>urn:epcglobal:epcis:wsdl:1=org.accada.epcis.soap</extraarg>
+                    <extraarg>urn:epcglobal:epcis:wsdl:1=org.fosstrak.epcis.soap</extraarg>
                   </extraargs>
                 </wsdlOption>
               </wsdlOptions>
@@ -122,7 +122,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includes>**/*.java</includes>
-          <excludes>org/accada/epcis/soapapi/*.*</excludes>
+          <excludes>org/fosstrak/epcis/soapapi/*.*</excludes>
           <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
           <enableRulesSummary>false</enableRulesSummary>
           <xrefLocation>xref</xrefLocation>

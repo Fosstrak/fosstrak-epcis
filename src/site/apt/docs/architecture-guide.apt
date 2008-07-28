@@ -40,7 +40,7 @@ Architecture Guide
 
 * {About this Guide}
 
-  This guide describes the architecture and design of Accada's EPCIS
+  This guide describes the architecture and design of Fosstrak's EPCIS
   implementation. It is intended as an introduction to the project for future
   developers who are somewhat familiar with the EPCglobal EPC Information
   Services (EPCIS) standard. The latest version of the standard is available
@@ -53,7 +53,7 @@ Architecture Guide
   The goal of EPCIS is to enable applications to incorporate EPC-related data
   into their businesses. It provides means to store EPC data persistently and
   offers a framework to add data to a repository as well as query it. In order
-  to implement these means, Accada's EPCIS project provides three separate
+  to implement these means, Fosstrak's EPCIS project provides three separate
   modules: an EPCIS repository, an EPCIS capture application, and an EPCIS
   query application. The following figure gives a short overview of the basic
   interaction scenarios for these three modules.
@@ -74,7 +74,7 @@ Architecture Guide
 
 * {EPCIS Repository}
 
-  The Accada EPCIS repository implements the following five bindings as defined
+  The Fosstrak EPCIS repository implements the following five bindings as defined
   by the EPCIS specification:
 
   * XML binding for the data definition layer
@@ -206,7 +206,7 @@ Architecture Guide
   requests to the repository. We use the JAXB data binding to map EPCIS event
   domain model objects to XML and vice versa.
   
-  The Accada EPCIS capture application provides both a capture client API and a
+  The Fosstrak EPCIS capture application provides both a capture client API and a
   capture client GUI. The API can be used by other applications to send capture
   requests to the repository, and the GUI can be used to manually insert EPCIS
   events into a repository. Please refer to the {{{user-guide.html}User Guide}}

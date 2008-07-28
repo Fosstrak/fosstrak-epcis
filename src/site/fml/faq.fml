@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<faqs title="Accada EPCIS - Frequently Asked Questions">
+<faqs title="Fosstrak EPCIS - Frequently Asked Questions">
 
 <part id="about">
 
@@ -15,7 +15,7 @@
 
 <faq>
 <question>How can I get authentication and authorization in order to secure my repository?</question>
-<answer>You can easily add these features to an Accada-based EPCIS installation by setting up an instance of the Apache Webserver as a proxy and using Apache's authentication mechanisms.</answer>
+<answer>You can easily add these features to an Fosstrak-based EPCIS installation by setting up an instance of the Apache Webserver as a proxy and using Apache's authentication mechanisms.</answer>
 </faq>
 
 <faq>

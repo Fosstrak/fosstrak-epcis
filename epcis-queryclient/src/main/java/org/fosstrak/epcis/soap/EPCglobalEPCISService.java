@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,9 +24,9 @@ public class EPCglobalEPCISService extends Service {
     static {
         URL url = null;
         try {
-            url = new URL("http://demo.accada.org/epcis/query?wsdl");
+            url = new URL("http://demo.fosstrak.org/epcis/query?wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from http://demo.accada.org/epcis/query?wsdl");
+            System.err.println("Can not initialize the default wsdl from http://demo.fosstrak.org/epcis/query?wsdl");
         }
         WSDL_LOCATION = url;
     }

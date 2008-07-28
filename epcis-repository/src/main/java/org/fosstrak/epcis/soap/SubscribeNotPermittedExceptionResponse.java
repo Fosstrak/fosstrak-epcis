@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class SubscribeNotPermittedExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.SubscribeNotPermittedException subscribeNotPermittedException;
+    private org.fosstrak.epcis.model.SubscribeNotPermittedException subscribeNotPermittedException;
 
     public SubscribeNotPermittedExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class SubscribeNotPermittedExceptionResponse extends Exception {
     }
 
     public SubscribeNotPermittedExceptionResponse(String message,
-            org.accada.epcis.model.SubscribeNotPermittedException subscribeNotPermittedException) {
+            org.fosstrak.epcis.model.SubscribeNotPermittedException subscribeNotPermittedException) {
         super(message);
         this.subscribeNotPermittedException = subscribeNotPermittedException;
     }
 
     public SubscribeNotPermittedExceptionResponse(String message,
-            org.accada.epcis.model.SubscribeNotPermittedException subscribeNotPermittedException, Throwable cause) {
+            org.fosstrak.epcis.model.SubscribeNotPermittedException subscribeNotPermittedException, Throwable cause) {
         super(message, cause);
         this.subscribeNotPermittedException = subscribeNotPermittedException;
     }
 
-    public org.accada.epcis.model.SubscribeNotPermittedException getFaultInfo() {
+    public org.fosstrak.epcis.model.SubscribeNotPermittedException getFaultInfo() {
         return this.subscribeNotPermittedException;
     }
 }

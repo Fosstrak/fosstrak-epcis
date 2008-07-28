@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -20,32 +20,32 @@ public interface EPCISServicePortType {
     @WebMethod
     public java.lang.String getStandardVersion(
             @WebParam(partName = "parms", name = "GetStandardVersion", targetNamespace = "urn:epcglobal:epcis-query:xsd:1")
-            org.accada.epcis.model.EmptyParms parms) throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            org.fosstrak.epcis.model.EmptyParms parms) throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse;
 
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
     @WebResult(name = "QueryResults", targetNamespace = "urn:epcglobal:epcis-query:xsd:1", partName = "pollReturn")
     @WebMethod
-    public org.accada.epcis.model.QueryResults poll(
+    public org.fosstrak.epcis.model.QueryResults poll(
             @WebParam(partName = "parms", name = "Poll", targetNamespace = "urn:epcglobal:epcis-query:xsd:1")
-            org.accada.epcis.model.Poll parms) throws ImplementationExceptionResponse,
+            org.fosstrak.epcis.model.Poll parms) throws ImplementationExceptionResponse,
             QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse, NoSuchNameExceptionResponse, QueryParameterExceptionResponse;
 
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
     @WebResult(name = "GetQueryNamesResult", targetNamespace = "urn:epcglobal:epcis-query:xsd:1", partName = "getQueryNamesReturn")
     @WebMethod
-    public org.accada.epcis.model.ArrayOfString getQueryNames(
+    public org.fosstrak.epcis.model.ArrayOfString getQueryNames(
             @WebParam(partName = "parms", name = "GetQueryNames", targetNamespace = "urn:epcglobal:epcis-query:xsd:1")
-            org.accada.epcis.model.EmptyParms parms) throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            org.fosstrak.epcis.model.EmptyParms parms) throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse;
 
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
     @WebResult(name = "GetSubscriptionIDsResult", targetNamespace = "urn:epcglobal:epcis-query:xsd:1", partName = "getSubscriptionIDsReturn")
     @WebMethod
-    public org.accada.epcis.model.ArrayOfString getSubscriptionIDs(
+    public org.fosstrak.epcis.model.ArrayOfString getSubscriptionIDs(
             @WebParam(partName = "parms", name = "GetSubscriptionIDs", targetNamespace = "urn:epcglobal:epcis-query:xsd:1")
-            org.accada.epcis.model.GetSubscriptionIDs parms) throws ImplementationExceptionResponse,
+            org.fosstrak.epcis.model.GetSubscriptionIDs parms) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse;
 
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
@@ -53,23 +53,23 @@ public interface EPCISServicePortType {
     @WebMethod
     public java.lang.String getVendorVersion(
             @WebParam(partName = "parms", name = "GetVendorVersion", targetNamespace = "urn:epcglobal:epcis-query:xsd:1")
-            org.accada.epcis.model.EmptyParms parms) throws ImplementationExceptionResponse, SecurityExceptionResponse,
+            org.fosstrak.epcis.model.EmptyParms parms) throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse;
 
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
     @WebResult(name = "UnsubscribeResult", targetNamespace = "urn:epcglobal:epcis-query:xsd:1", partName = "unsubscribeReturn")
     @WebMethod
-    public org.accada.epcis.model.VoidHolder unsubscribe(
+    public org.fosstrak.epcis.model.VoidHolder unsubscribe(
             @WebParam(partName = "parms", name = "Unsubscribe", targetNamespace = "urn:epcglobal:epcis-query:xsd:1")
-            org.accada.epcis.model.Unsubscribe parms) throws ImplementationExceptionResponse,
+            org.fosstrak.epcis.model.Unsubscribe parms) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse;
 
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
     @WebResult(name = "SubscribeResult", targetNamespace = "urn:epcglobal:epcis-query:xsd:1", partName = "subscribeReturn")
     @WebMethod
-    public org.accada.epcis.model.VoidHolder subscribe(
+    public org.fosstrak.epcis.model.VoidHolder subscribe(
             @WebParam(partName = "parms", name = "Subscribe", targetNamespace = "urn:epcglobal:epcis-query:xsd:1")
-            org.accada.epcis.model.Subscribe parms) throws DuplicateSubscriptionExceptionResponse,
+            org.fosstrak.epcis.model.Subscribe parms) throws DuplicateSubscriptionExceptionResponse,
             ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
             InvalidURIExceptionResponse, ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse,
             NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse;

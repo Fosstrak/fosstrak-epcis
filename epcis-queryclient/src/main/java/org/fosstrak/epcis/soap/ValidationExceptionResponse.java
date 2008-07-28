@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class ValidationExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.ValidationException validationException;
+    private org.fosstrak.epcis.model.ValidationException validationException;
 
     public ValidationExceptionResponse() {
         super();
@@ -25,18 +25,18 @@ public class ValidationExceptionResponse extends Exception {
         super(message, cause);
     }
 
-    public ValidationExceptionResponse(String message, org.accada.epcis.model.ValidationException validationException) {
+    public ValidationExceptionResponse(String message, org.fosstrak.epcis.model.ValidationException validationException) {
         super(message);
         this.validationException = validationException;
     }
 
-    public ValidationExceptionResponse(String message, org.accada.epcis.model.ValidationException validationException,
+    public ValidationExceptionResponse(String message, org.fosstrak.epcis.model.ValidationException validationException,
             Throwable cause) {
         super(message, cause);
         this.validationException = validationException;
     }
 
-    public org.accada.epcis.model.ValidationException getFaultInfo() {
+    public org.fosstrak.epcis.model.ValidationException getFaultInfo() {
         return this.validationException;
     }
 }

@@ -1,36 +1,36 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.repository.query;
+package org.fosstrak.epcis.repository.query;
 
 import java.util.GregorianCalendar;
 
 import javax.management.Notification;
 import javax.management.timer.Timer;
 
-import org.accada.epcis.model.ArrayOfString;
-import org.accada.epcis.model.Poll;
-import org.accada.epcis.model.QueryParam;
-import org.accada.epcis.model.QueryParams;
-import org.accada.epcis.model.QueryResults;
-import org.accada.epcis.soap.ImplementationExceptionResponse;
+import org.fosstrak.epcis.model.ArrayOfString;
+import org.fosstrak.epcis.model.Poll;
+import org.fosstrak.epcis.model.QueryParam;
+import org.fosstrak.epcis.model.QueryParams;
+import org.fosstrak.epcis.model.QueryResults;
+import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,7 +63,7 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
      * {@inheritDoc} First checks on the trigger condition: if fulfilled then
      * execute Query.
      * 
-     * @see org.accada.epcis.repository.query.QuerySubscriptionScheduled#handleNotification(javax.management.Notification,
+     * @see org.fosstrak.epcis.repository.query.QuerySubscriptionScheduled#handleNotification(javax.management.Notification,
      *      java.lang.Object)
      */
     @Override

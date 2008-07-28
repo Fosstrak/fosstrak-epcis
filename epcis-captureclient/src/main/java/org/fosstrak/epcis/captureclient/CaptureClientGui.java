@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.captureclient;
+package org.fosstrak.epcis.captureclient;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -68,7 +68,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.accada.epcis.captureclient.CaptureEvent.BizTransaction;
+import org.fosstrak.epcis.captureclient.CaptureEvent.BizTransaction;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1562,10 +1562,10 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setEventTime("2006-09-20T06:36:17Z");
             ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(0);
-            ex.setBizStep("urn:accada:demo:bizstep:fmcg:production");
-            ex.setDisposition("urn:accada:demo:disp:fmcg:pendingQA");
-            ex.setBizLocation("urn:accada:demo:fmcg:ssl:0037000.00729.210");
-            ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037000.00729.210,432");
+            ex.setBizStep("urn:fosstrak:demo:bizstep:fmcg:production");
+            ex.setDisposition("urn:fosstrak:demo:disp:fmcg:pendingQA");
+            ex.setBizLocation("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210");
+            ex.setReadPoint("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,432");
             ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788");
             examples.add(ex);
 
@@ -1575,9 +1575,9 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setEventTime("2006-09-20T07:33:31.116Z");
             ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
-            ex.setBizStep("urn:accada:demo:bizstep:fmcg:production");
-            ex.setBizLocation("urn:accada:demo:fmcg:ssl:0037000.00729.210");
-            ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037000.00729.210,414");
+            ex.setBizStep("urn:fosstrak:demo:bizstep:fmcg:production");
+            ex.setBizLocation("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210");
+            ex.setReadPoint("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,414");
             ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788");
             examples.add(ex);
 
@@ -1587,10 +1587,10 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setEventTime("2006-09-20T07:53:01Z");
             ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(0);
-            ex.setBizTransaction("urn:accada:demo:biztrans:fmcg:QApassed",
-                    "http://demo.accada.org/QAtracker/q3432q4324");
-            ex.setBizLocation("urn:accada:demo:fmcg:ssl:0037000.00729.210");
-            ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037000.00729.210,414");
+            ex.setBizTransaction("urn:fosstrak:demo:biztrans:fmcg:QApassed",
+                    "http://demo.fosstrak.org/QAtracker/q3432q4324");
+            ex.setBizLocation("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210");
+            ex.setReadPoint("urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,414");
             ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788");
             examples.add(ex);
 
@@ -1600,11 +1600,11 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setAction(0);
             ex.setEventTime("2006-09-20T08:55:04Z");
             ex.setEventTimeZoneOffset("+00:00");
-            ex.setBizStep("urn:accada:demo:bizstep:fmcg:pickandpack");
-            ex.setDisposition("urn:accada:demo:disp:fmcg:readyforpickup");
-            ex.setBizLocation("urn:accada:demo:fmcg:ssl:0037000.00729.450");
-            ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037000.00729.450,9");
-            ex.setBizTransaction("urn:accada:demo:fmcg:btt:po", "http://transaction.accada.org/po/12345678");
+            ex.setBizStep("urn:fosstrak:demo:bizstep:fmcg:pickandpack");
+            ex.setDisposition("urn:fosstrak:demo:disp:fmcg:readyforpickup");
+            ex.setBizLocation("urn:fosstrak:demo:fmcg:ssl:0037000.00729.450");
+            ex.setReadPoint("urn:fosstrak:demo:fmcg:ssl:0037000.00729.450,9");
+            ex.setBizTransaction("urn:fosstrak:demo:fmcg:btt:po", "http://transaction.fosstrak.org/po/12345678");
             ex.setParentID("urn:x:bar:5:036544:007325");
             ex.setChildEPCs("urn:epc:id:sgtin:0057000.123780.7788 urn:epc:id:sgtin:0057000.123430.2027 "
                     + "urn:epc:id:sgtin:0057000.123430.2028 urn:epc:id:sgtin:0057000.123430.2029");
@@ -1616,9 +1616,9 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setEventTime("2006-09-20T10:33:31.116Z");
             ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
-            ex.setBizStep("urn:accada:demo:bizstep:fmcg:shipment");
-            ex.setBizLocation("urn:accada:demo:RepublicOfChina:Kaohsiung");
-            ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037200.00729.210,414");
+            ex.setBizStep("urn:fosstrak:demo:bizstep:fmcg:shipment");
+            ex.setBizLocation("urn:fosstrak:demo:RepublicOfChina:Kaohsiung");
+            ex.setReadPoint("urn:fosstrak:demo:fmcg:ssl:0037200.00729.210,414");
             ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 urn:epc:id:sgtin:0057000.123430.2027 "
                     + "urn:epc:id:sgtin:0057000.123430.2028 urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);
@@ -1629,9 +1629,9 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             ex.setEventTime("2006-09-20T12:33:31.116Z");
             ex.setEventTimeZoneOffset("+00:00");
             ex.setAction(1);
-            ex.setBizStep("urn:accada:demo:bizstep:fmcg:shipment");
-            ex.setBizLocation("urn:accada:demo:Netherlands:Rotterdam");
-            ex.setReadPoint("urn:accada:demo:fmcg:ssl:0037200.00729.210,234");
+            ex.setBizStep("urn:fosstrak:demo:bizstep:fmcg:shipment");
+            ex.setBizLocation("urn:fosstrak:demo:Netherlands:Rotterdam");
+            ex.setReadPoint("urn:fosstrak:demo:fmcg:ssl:0037200.00729.210,234");
             ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788 urn:epc:id:sgtin:0057000.123430.2027 "
                     + "urn:epc:id:sgtin:0057000.123430.2028 urn:epc:id:sgtin:0057000.123430.2029");
             examples.add(ex);

@@ -4,12 +4,12 @@
   <!-- Basics                                                      -->
   <!-- =========================================================== -->
 
-  <groupId>org.accada.epcis</groupId>
+  <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis-captureclient</artifactId>
   <version>0.3.3-SNAPSHOT</version>
   <parent>
     <artifactId>epcis</artifactId>
-    <groupId>org.accada.epcis</groupId>
+    <groupId>org.fosstrak.epcis</groupId>
     <version>0.3.3-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
@@ -23,7 +23,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.accada.epcis</groupId>
+      <groupId>org.fosstrak.epcis</groupId>
       <artifactId>epcis-commons</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -51,7 +51,7 @@
               <Class-Path>.</Class-Path>
             </manifestEntries>
             <manifest>
-              <mainClass>org.accada.epcis.captureclient.CaptureClientGui</mainClass>
+              <mainClass>org.fosstrak.epcis.captureclient.CaptureClientGui</mainClass>
               <addClasspath>true</addClasspath>
               <!-- <classpathPrefix>./lib</classpathPrefix> -->
             </manifest>
@@ -109,7 +109,7 @@
           </dependencies>
           <jnlp>
             <outputFile>epcis-captureclient.jnlp</outputFile>
-            <mainClass>org.accada.epcis.captureclient.CaptureClientGui</mainClass>
+            <mainClass>org.fosstrak.epcis.captureclient.CaptureClientGui</mainClass>
           </jnlp>
           <!-- kestore management (do not generate a new kestore) -->
           <keystore>
@@ -155,7 +155,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includes>**/*.java</includes>
-          <excludes>org/accada/epcis/soapapi/*.*</excludes>
+          <excludes>org/fosstrak/epcis/soapapi/*.*</excludes>
           <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
           <enableRulesSummary>false</enableRulesSummary>
           <xrefLocation>xref</xrefLocation>

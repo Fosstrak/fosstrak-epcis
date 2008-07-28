@@ -6,21 +6,21 @@
               03/06/2007
               -------------------
 
-Welcome to the Accada EPCIS Project
+Welcome to the Fosstrak EPCIS Project
 
 
 * Objective
 
-  The objective of the Accada EPCIS Project is to implement the EPCIS role in
+  The objective of the Fosstrak EPCIS Project is to implement the EPCIS role in
   the EPC network and to develop the appropriate tools that facilitate
   communication with an EPCIS Repository instance. 
 
 * Status
 
-  The Accada EPCIS implementation is complete available for download. It is based on
+  The Fosstrak EPCIS implementation is complete available for download. It is based on
   EPCglobal's Ratified Standard (Version 1.0 of April 12, 2007).
 
-* How can the Accada EPCIS Project help you?
+* How can the Fosstrak EPCIS Project help you?
 
   This project allows you to:
 
@@ -40,7 +40,7 @@ Welcome to the Accada EPCIS Project
   
 * Organization
 
-  The Accada EPCIS Project comprises three separate modules:
+  The Fosstrak EPCIS Project comprises three separate modules:
 
   * an EPCIS Repository implementation
 
@@ -54,10 +54,10 @@ Welcome to the Accada EPCIS Project
 
   []
 
-  The figure below gives an overview of the Accada EPCIS Implementation. For more
+  The figure below gives an overview of the Fosstrak EPCIS Implementation. For more
   information refer to the {{{docs/architecture-guide.html}Architecture Guide}}.
 
-[images/epcis_architecture.png] Accada EPCIS Implementation
+[images/epcis_architecture.png] Fosstrak EPCIS Implementation
 
 
 * Usage Scenarios 

@@ -22,25 +22,25 @@ PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
     <property name="hibernate.generate_statistics">true</property>
     <property name="hibernate.order_inserts">true</property>
     
-    <mapping resource="org/accada/epcis/repository/model/AggregationEvent.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/BusinessLocationId.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/BusinessStepId.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/BusinessTransaction.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/BusinessTransactionId.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/BusinessTransactionTypeId.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/DispositionId.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/EPCClass.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/ObjectEvent.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/QuantityEvent.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/ReadPointId.hbm.xml"/>
-    <mapping resource="org/accada/epcis/repository/model/TransactionEvent.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/AggregationEvent.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessLocationId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessStepId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessTransaction.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessTransactionId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessTransactionTypeId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/DispositionId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/EPCClass.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/ObjectEvent.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/QuantityEvent.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/ReadPointId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/TransactionEvent.hbm.xml"/>
     
-    <class-cache class="org.accada.epcis.repository.model.BusinessLocationId" usage="read-write"/>
-    <class-cache class="org.accada.epcis.repository.model.BusinessStepId" usage="read-write"/>
-    <class-cache class="org.accada.epcis.repository.model.BusinessTransactionTypeId" usage="read-write"/>
-    <class-cache class="org.accada.epcis.repository.model.DispositionId" usage="read-write"/>
-    <class-cache class="org.accada.epcis.repository.model.EPCClass" usage="read-write"/>
-    <class-cache class="org.accada.epcis.repository.model.ReadPointId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.BusinessLocationId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.BusinessStepId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.BusinessTransactionTypeId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.DispositionId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.EPCClass" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.ReadPointId" usage="read-write"/>
 
   </session-factory>
 </hibernate-configuration>

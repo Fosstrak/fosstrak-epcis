@@ -13,7 +13,7 @@ Demo
   Web Start. This environment allows you to explore the functionality of EPCIS 
   without installing any software on your computer.
 
-* Public Accada EPCIS Repository
+* Public Fosstrak EPCIS Repository
 
   We provide a public EPCIS Repository that can be used in
   connection with any capture or query application. We provide
@@ -21,16 +21,16 @@ Demo
   for the query interface. The two interfaces are available at
   the following URLs:
 
-  Accada EPCIS capture interface (HTTP binding):
+  Fosstrak EPCIS capture interface (HTTP binding):
 
 ------------------------------------
-http://demo.accada.org/epcis/capture
+http://demo.fosstrak.org/epcis/capture
 ------------------------------------
 
-  Accada EPCIS query interface (SOAP binding):
+  Fosstrak EPCIS query interface (SOAP binding):
 
 ----------------------------------
-http://demo.accada.org/epcis/query
+http://demo.fosstrak.org/epcis/query
 ----------------------------------
 
   This public EPCIS Repository is purged and initialized with some sample
@@ -40,7 +40,7 @@ http://demo.accada.org/epcis/query
 * Generic EPCIS Capture and Query Client
 
   We also provide a generic EPCIS Capture Client and Query Client.
-  You can use them to interact with our public Accada EPCIS Repository or with
+  You can use them to interact with our public Fosstrak EPCIS Repository or with
   any other third-party EPCIS Repository. Both
   applications include sample queries and sample capture data to illustrate the
   functionality offered by EPCIS. You can also use them as templates for your
@@ -60,9 +60,9 @@ http://demo.accada.org/epcis/query
 
 * Screenshots of Capture and Query Client
 
-[images/epcis_capture_gui.png] Accada EPCIS Capture GUI
+[images/epcis_capture_gui.png] Fosstrak EPCIS Capture GUI
 
   .
 
-[images/epcis_query_gui.png] Accada EPCIS Query GUI
+[images/epcis_query_gui.png] Fosstrak EPCIS Query GUI
 

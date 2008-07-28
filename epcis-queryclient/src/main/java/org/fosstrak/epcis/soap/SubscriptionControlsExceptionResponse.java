@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class SubscriptionControlsExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.SubscriptionControlsException subscriptionControlsException;
+    private org.fosstrak.epcis.model.SubscriptionControlsException subscriptionControlsException;
 
     public SubscriptionControlsExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class SubscriptionControlsExceptionResponse extends Exception {
     }
 
     public SubscriptionControlsExceptionResponse(String message,
-            org.accada.epcis.model.SubscriptionControlsException subscriptionControlsException) {
+            org.fosstrak.epcis.model.SubscriptionControlsException subscriptionControlsException) {
         super(message);
         this.subscriptionControlsException = subscriptionControlsException;
     }
 
     public SubscriptionControlsExceptionResponse(String message,
-            org.accada.epcis.model.SubscriptionControlsException subscriptionControlsException, Throwable cause) {
+            org.fosstrak.epcis.model.SubscriptionControlsException subscriptionControlsException, Throwable cause) {
         super(message, cause);
         this.subscriptionControlsException = subscriptionControlsException;
     }
 
-    public org.accada.epcis.model.SubscriptionControlsException getFaultInfo() {
+    public org.fosstrak.epcis.model.SubscriptionControlsException getFaultInfo() {
         return this.subscriptionControlsException;
     }
 }

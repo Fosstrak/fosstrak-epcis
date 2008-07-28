@@ -2,10 +2,10 @@
 
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping package="org.accada.epcis.repository.model">
+<hibernate-mapping package="org.fosstrak.epcis.repository.model">
 
 	<class name="TransactionEvent" lazy="true" 
-		proxy="org.accada.epcis.repository.model.TransactionEvent"
+		proxy="org.fosstrak.epcis.repository.model.TransactionEvent"
 		dynamic-update="false" dynamic-insert="false"
 		select-before-update="false" table="event_TransactionEvent">
 
@@ -37,24 +37,24 @@
 
 		<property name="action">
 			<column name="action" not-null="true" />
-			<type name="org.accada.epcis.repository.model.EnumUserType">
-				<param name="enumClassName">org.accada.epcis.repository.model.Action</param>
+			<type name="org.fosstrak.epcis.repository.model.EnumUserType">
+				<param name="enumClassName">org.fosstrak.epcis.repository.model.Action</param>
 			</type>
 		</property>
 
-		<many-to-one name="bizStep" class="org.accada.epcis.repository.model.BusinessStepId"
+		<many-to-one name="bizStep" class="org.fosstrak.epcis.repository.model.BusinessStepId"
 			index="event_TransactionEvent_bizStep_ix" update="false" insert="true"
 			access="property" not-null="false" />
 
-		<many-to-one name="disposition" class="org.accada.epcis.repository.model.DispositionId"
+		<many-to-one name="disposition" class="org.fosstrak.epcis.repository.model.DispositionId"
 			index="event_TransactionEvent_disposition_ix" update="false" insert="true"
 			access="property" not-null="false" />
 
-		<many-to-one name="bizLocation" class="org.accada.epcis.repository.model.BusinessLocationId"
+		<many-to-one name="bizLocation" class="org.fosstrak.epcis.repository.model.BusinessLocationId"
 			index="event_TransactionEvent_bizLocation_ix" update="false" insert="true"
 			access="property" not-null="false" />
 
-		<many-to-one name="readPoint" class="org.accada.epcis.repository.model.ReadPointId"
+		<many-to-one name="readPoint" class="org.fosstrak.epcis.repository.model.ReadPointId"
 			index="event_TransactionEvent_readPoint_ix" update="false" insert="true"
 			access="property" not-null="false" />
 
@@ -63,14 +63,14 @@
 				<column name="event_id" index="event_TransactionEvent_bizTrans_ix"/>
 			</key>
 			<index column="idx"/>
-			<many-to-many column="bizTrans_id" class="org.accada.epcis.repository.model.BusinessTransaction"/>
+			<many-to-many column="bizTrans_id" class="org.fosstrak.epcis.repository.model.BusinessTransaction"/>
 		</list>
 		
 		<bag name="extensions" table="event_TransactionEvent_extensions" lazy="true">
 			<key>
 				<column name="event_id" index="event_TransactionEvent_extensions_ix"/>
 			</key>
-			<composite-element class="org.accada.epcis.repository.model.EventFieldExtension">
+			<composite-element class="org.fosstrak.epcis.repository.model.EventFieldExtension">
 				<property name="fieldname" type="java.lang.String"/>
 				<property name="prefix" type="java.lang.String"/>
 				<property name="strValue" type="java.lang.String"/>

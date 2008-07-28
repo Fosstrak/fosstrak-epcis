@@ -1,4 +1,4 @@
-package org.accada.epcis.repository.model;
+package org.fosstrak.epcis.repository.model;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;

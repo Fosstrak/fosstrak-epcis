@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class NoSuchNameExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.NoSuchNameException noSuchNameException;
+    private org.fosstrak.epcis.model.NoSuchNameException noSuchNameException;
 
     public NoSuchNameExceptionResponse() {
         super();
@@ -25,18 +25,18 @@ public class NoSuchNameExceptionResponse extends Exception {
         super(message, cause);
     }
 
-    public NoSuchNameExceptionResponse(String message, org.accada.epcis.model.NoSuchNameException noSuchNameException) {
+    public NoSuchNameExceptionResponse(String message, org.fosstrak.epcis.model.NoSuchNameException noSuchNameException) {
         super(message);
         this.noSuchNameException = noSuchNameException;
     }
 
-    public NoSuchNameExceptionResponse(String message, org.accada.epcis.model.NoSuchNameException noSuchNameException,
+    public NoSuchNameExceptionResponse(String message, org.fosstrak.epcis.model.NoSuchNameException noSuchNameException,
             Throwable cause) {
         super(message, cause);
         this.noSuchNameException = noSuchNameException;
     }
 
-    public org.accada.epcis.model.NoSuchNameException getFaultInfo() {
+    public org.fosstrak.epcis.model.NoSuchNameException getFaultInfo() {
         return this.noSuchNameException;
     }
 }

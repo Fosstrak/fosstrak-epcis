@@ -1,24 +1,24 @@
 /*
  * Copyright (C) 2007 ETH Zurich
  *
- * This file is part of Accada (www.accada.org).
+ * This file is part of Fosstrak (www.fosstrak.org).
  *
- * Accada is free software; you can redistribute it and/or
+ * Fosstrak is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License version 2.1, as published by the Free Software Foundation.
  *
- * Accada is distributed in the hope that it will be useful,
+ * Fosstrak is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Accada; if not, write to the Free
+ * License along with Fosstrak; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
-package org.accada.epcis.queryclient;
+package org.fosstrak.epcis.queryclient;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,10 +30,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.accada.epcis.model.ImplementationException;
-import org.accada.epcis.model.QueryResults;
-import org.accada.epcis.model.QueryTooLargeException;
-import org.accada.epcis.utils.QueryResultsParser;
+import org.fosstrak.epcis.model.ImplementationException;
+import org.fosstrak.epcis.model.QueryResults;
+import org.fosstrak.epcis.model.QueryTooLargeException;
+import org.fosstrak.epcis.utils.QueryResultsParser;
 
 /**
  * @author Marco Steybe
@@ -46,7 +46,7 @@ public class QueryCallbackClient extends HttpServlet implements QueryCallbackInt
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryCallbackInterface#callbackResults(org.accada.epcis.soapapi.QueryResults)
+     * @see org.fosstrak.epcis.queryclient.QueryCallbackInterface#callbackResults(org.fosstrak.epcis.soapapi.QueryResults)
      */
     public void callbackResults(QueryResults result) {
         InputStream is = new ByteArrayInputStream(callbackResults.getBytes());
@@ -73,7 +73,7 @@ public class QueryCallbackClient extends HttpServlet implements QueryCallbackInt
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryCallbackInterface#callbackImplementationException(org.accada.epcis.soapapi.ImplementationException)
+     * @see org.fosstrak.epcis.queryclient.QueryCallbackInterface#callbackImplementationException(org.fosstrak.epcis.soapapi.ImplementationException)
      */
     public void callbackImplementationException(final ImplementationException e) {
         // TODO implement
@@ -83,7 +83,7 @@ public class QueryCallbackClient extends HttpServlet implements QueryCallbackInt
     /**
      * {@inheritDoc}
      * 
-     * @see org.accada.epcis.queryclient.QueryCallbackInterface#callbackQueryTooLargeException(org.accada.epcis.soapapi.QueryTooLargeException)
+     * @see org.fosstrak.epcis.queryclient.QueryCallbackInterface#callbackQueryTooLargeException(org.fosstrak.epcis.soapapi.QueryTooLargeException)
      */
     public void callbackQueryTooLargeException(final QueryTooLargeException e) {
         // TODO implement

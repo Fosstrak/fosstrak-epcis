@@ -1,4 +1,4 @@
-package org.accada.epcis.soap;
+package org.fosstrak.epcis.soap;
 
 import javax.xml.ws.WebFault;
 
@@ -11,7 +11,7 @@ import javax.xml.ws.WebFault;
 public class QueryTooComplexExceptionResponse extends Exception {
     public static final long serialVersionUID = 20080130154344L;
 
-    private org.accada.epcis.model.QueryTooComplexException queryTooComplexException;
+    private org.fosstrak.epcis.model.QueryTooComplexException queryTooComplexException;
 
     public QueryTooComplexExceptionResponse() {
         super();
@@ -26,18 +26,18 @@ public class QueryTooComplexExceptionResponse extends Exception {
     }
 
     public QueryTooComplexExceptionResponse(String message,
-            org.accada.epcis.model.QueryTooComplexException queryTooComplexException) {
+            org.fosstrak.epcis.model.QueryTooComplexException queryTooComplexException) {
         super(message);
         this.queryTooComplexException = queryTooComplexException;
     }
 
     public QueryTooComplexExceptionResponse(String message,
-            org.accada.epcis.model.QueryTooComplexException queryTooComplexException, Throwable cause) {
+            org.fosstrak.epcis.model.QueryTooComplexException queryTooComplexException, Throwable cause) {
         super(message, cause);
         this.queryTooComplexException = queryTooComplexException;
     }
 
-    public org.accada.epcis.model.QueryTooComplexException getFaultInfo() {
+    public org.fosstrak.epcis.model.QueryTooComplexException getFaultInfo() {
         return this.queryTooComplexException;
     }
 }
