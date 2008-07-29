@@ -7,7 +7,7 @@
 
   <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis</artifactId>
-  <version>0.3.3-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <packaging>pom</packaging> <!-- aggregator projects require 'pom' as packaging -->
   <modelVersion>4.0.0</modelVersion>
 
@@ -220,7 +220,7 @@
   <scm>
     <!-- keep empty tags here to avoid release:prepare crashes -->
     <connection></connection>
-    <developerConnection>scm:svn:https://svn.fosstrak.org/repos/epcis</developerConnection>
+    <developerConnection>scm:svn:https://svn.fosstrak.org/repos/epcis/trunk</developerConnection>
     <url>https://svn.fosstrak.org/repos/epcis/</url>
   </scm>
   <distributionManagement>
@@ -247,17 +247,17 @@
   <mailingLists>
     <mailingList>
       <name>EPCIS user mailing list</name>
-      <subscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-user</subscribe>
-      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-user</unsubscribe>
-      <post>fosstrak-epcis-user@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=fosstrak-epcis-user</archive>
+      <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</subscribe>
+      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-user</unsubscribe>
+      <post>accada-epcis-user@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-user</archive>
     </mailingList>
     <mailingList>
       <name>EPCIS developer mailing list</name>
-      <subscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-developer</subscribe>
-      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/fosstrak-epcis-developer</unsubscribe>
-      <post>fosstrak-epcis-developer@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=fosstrak-epcis-developer</archive>
+      <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
+      <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
+      <post>accada-epcis-developer@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-developer</archive>
     </mailingList>
   </mailingLists>
 
