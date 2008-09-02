@@ -966,6 +966,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
             LOG.debug("       query param 9: " + time);
 
             stmt.executeUpdate();
+            session.commit();
         } catch (IOException e) {
             String msg = "Unable to store the subscription to the database: " + e.getMessage();
             LOG.error(msg);
@@ -988,6 +989,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
             LOG.debug("     param1 = " + subscrId);
         }
         ps.executeUpdate();
+        session.commit();
     }
 
     /**

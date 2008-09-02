@@ -252,6 +252,7 @@ public class CaptureOperationsBackendSQL implements CaptureOperationsBackend {
         }
 
         ps.executeUpdate();
+        session.commit();
 
         return getLastAutoIncrementedId(session, "event_" + eventName);
     }

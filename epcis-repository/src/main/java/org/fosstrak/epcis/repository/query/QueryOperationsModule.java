@@ -1133,8 +1133,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
 
                 // dest may be null or empty. But we don't support pre-arranged
                 // destinations and throw an InvalidURIException according to
-                // the
-                // standard.
+                // the standard.
                 if (dest == null || dest.toString().equals("")) {
                     String msg = "Destination URI is empty. This implementation doesn't support pre-arranged destinations.";
                     LOG.info("QueryParameterException: " + msg);
@@ -1206,13 +1205,14 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     throw new SubscriptionControlsExceptionResponse(msg, e);
                 }
                 if (controls.getSchedule() != null) {
+                    LOG.debug("Received new scheduled query.");
                     // Scheduled Query -> parse schedule
                     schedule = new Schedule(controls.getSchedule());
                     newSubscription = new QuerySubscriptionScheduled(subscriptionID, params, dest,
                             Boolean.valueOf(controls.isReportIfEmpty()), initialRecordTime, initialRecordTime,
                             schedule, queryName);
                 } else {
-                    // -> Trigger
+                    LOG.debug("Received new triggered query.");
                     // need to set schedule which says how often the trigger
                     // condition is checked.
                     QuerySchedule qSchedule = new QuerySchedule();

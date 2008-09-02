@@ -75,6 +75,10 @@ public class QueryOperationsSession {
         connection.rollback();
     }
 
+    public void commit() throws SQLException {
+        connection.commit();
+    }
+
     public void close() throws SQLException {
         for (PreparedStatement ps : namedStatements.values()) {
             try {

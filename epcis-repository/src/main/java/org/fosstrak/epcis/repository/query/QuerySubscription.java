@@ -41,7 +41,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -181,6 +180,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             stmt.setString(3, subscriptionID);
             LOG.debug("       query param 3: " + subscriptionID);
             stmt.executeUpdate();
+            dbconnection.commit();
 
             // close the database connection
             dbconnection.close();
@@ -261,8 +261,6 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
 
             // set new lastTimeExecuted (must be <= to time when query is
             // executed, otherwise we loose results)
-            int offset = TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings();
-            cal.add(Calendar.MILLISECOND, offset);
             cal.add(Calendar.SECOND, 1);
             this.lastTimeExecuted = cal;
         } catch (QueryTooLargeExceptionResponse e) {
