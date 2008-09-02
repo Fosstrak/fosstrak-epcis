@@ -3,6 +3,15 @@
         <title>Changes epcis-repository</title>
     </properties>
     <body>
+        <release version="0.4.1" date="2008-09-02"
+            description="Bug fix release">
+            <action dev="steybem" type="fix" issue="2088556">
+                Results of subscribed queries were not reported correctly.
+            </action>
+            <action dev="steybem" type="fix" issue="2088551">
+                Subscriptions were not stored in the database.
+            </action>
+        </release>
         <release version="0.4.0" date="2008-07-29"
             description="Project name changed to Fosstrak">
             <action dev="roduner" type="update">
