@@ -119,6 +119,10 @@
     </resources>
     <plugins>
       <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+      <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <warSourceDirectory>${project.build.directory}/webapp-filtered</warSourceDirectory>
