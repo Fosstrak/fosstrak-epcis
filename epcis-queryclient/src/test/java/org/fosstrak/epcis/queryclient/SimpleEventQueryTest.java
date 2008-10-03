@@ -20,42 +20,30 @@
 
 package org.fosstrak.epcis.queryclient;
 
-import java.io.IOException;
+import java.net.URL;
 
 import org.fosstrak.epcis.model.ArrayOfString;
 import org.fosstrak.epcis.model.Poll;
 import org.fosstrak.epcis.model.QueryParam;
 import org.fosstrak.epcis.model.QueryParams;
 import org.fosstrak.epcis.model.QueryResults;
-import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
-import org.fosstrak.epcis.soap.NoSuchNameExceptionResponse;
-import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
-import org.fosstrak.epcis.soap.QueryTooComplexExceptionResponse;
-import org.fosstrak.epcis.soap.QueryTooLargeExceptionResponse;
-import org.fosstrak.epcis.soap.SecurityExceptionResponse;
-import org.fosstrak.epcis.soap.ValidationExceptionResponse;
 import org.fosstrak.epcis.utils.QueryResultsParser;
 
 /**
- * A simple test utility class for quickly testing event queries against the
- * Fosstrak EPCIS query module.
- * <p>
- * Note: keep the methods in this class static in order to prevent them from
- * being executed when building the project with Maven.
+ * A simple test utility class for demonstrating how to send simple event
+ * queries to the Fosstrak EPCIS query service.
  * 
  * @author Marco Steybe
  */
 public class SimpleEventQueryTest {
 
-    private static QueryControlClient client = new QueryControlClient();
+    // Note: keep the methods in this class static in order to prevent them from
+    // being executed when building the project with Maven.
 
     /**
-     * Creates a simple EPCIS query, sends it to the EPCIS query service for
-     * processing and prints the response to System.out.
+     * Creates and returns a simple EPCIS query in its XML form.
      */
-    public static void poll() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
-            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
-            QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
+    public static String createXmlQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append("<epcisq:Poll xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">");
         sb.append("<queryName>SimpleEventQuery</queryName>");
@@ -79,18 +67,13 @@ public class SimpleEventQueryTest {
         // sb.append("</param>");
         sb.append("</params>");
         sb.append("</epcisq:Poll>");
-
-        QueryResults results = client.poll(sb.toString());
-        QueryResultsParser.queryResultsToXml(results, System.out);
+        return sb.toString();
     }
 
     /**
-     * Creates a simple EPCIS query, sends it to the EPCIS query service for
-     * processing and prints the response to System.out.
+     * Creates and returns a simple EPCIS query Poll object.
      */
-    public static void pollWithApi() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
-            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
-            QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
+    public static Poll createPoll() {
         // construct the query parameters
         QueryParam queryParam1 = new QueryParam();
         queryParam1.setName("eventType");
@@ -101,7 +84,7 @@ public class SimpleEventQueryTest {
         QueryParam queryParam2 = new QueryParam();
         queryParam2.setName("MATCH_epc");
         ArrayOfString queryParamValue2 = new ArrayOfString();
-        queryParamValue2.getString().add("urn:epc:id:sgtin:1.1.0");
+        queryParamValue2.getString().add("urn:epc:id:sgtin:0000001.000001.0001");
         queryParam2.setValue(queryParamValue2);
 
         // add the query parameters to the list of parameters
@@ -113,13 +96,24 @@ public class SimpleEventQueryTest {
         Poll poll = new Poll();
         poll.setQueryName("SimpleEventQuery");
         poll.setParams(queryParams);
-
-        QueryResults results = client.poll(poll);
-        QueryResultsParser.queryResultsToXml(results, System.out);
+        return poll;
     }
 
     public static void main(String[] args) throws Exception {
-        // poll();
-        pollWithApi();
+        // configure query service
+        QueryControlClient client = new QueryControlClient();
+        client.configureService(new URL("http://demo.fosstrak.org/epcis/query"), null);
+
+        // create a query in its XML form
+        String xmlQuery = createXmlQuery();
+        // send the query to the query service
+        QueryResults results = client.poll(xmlQuery);
+        // print the results to System.out
+        QueryResultsParser.queryResultsToXml(results, System.out);
+
+        // create a query Poll object and send it to the query service
+        Poll poll = createPoll();
+        results = client.poll(poll);
+        QueryResultsParser.queryResultsToXml(results, System.out);
     }
 }

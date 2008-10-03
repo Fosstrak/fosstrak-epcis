@@ -20,19 +20,23 @@
 
 package org.fosstrak.epcis.queryclient;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -41,13 +45,20 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.fosstrak.epcis.model.EmptyParms;
 import org.fosstrak.epcis.model.GetSubscriptionIDs;
 import org.fosstrak.epcis.model.Poll;
-import org.fosstrak.epcis.model.QueryParams;
 import org.fosstrak.epcis.model.QueryResults;
 import org.fosstrak.epcis.model.Subscribe;
-import org.fosstrak.epcis.model.SubscriptionControls;
 import org.fosstrak.epcis.model.Unsubscribe;
 import org.fosstrak.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.fosstrak.epcis.soap.EPCISServicePortType;
@@ -62,13 +73,6 @@ import org.fosstrak.epcis.soap.SecurityExceptionResponse;
 import org.fosstrak.epcis.soap.SubscribeNotPermittedExceptionResponse;
 import org.fosstrak.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.fosstrak.epcis.soap.ValidationExceptionResponse;
-import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusFactory;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 /**
  * This query client makes calls against the EPCIS query control interface and
@@ -77,19 +81,10 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
  * 
  * @author Marco Steybe
  */
-public class QueryControlClient implements QueryControlInterface {
-
-    private static final String PROPERTY_FILE = "/queryclient.properties";
-    private static final String PROP_QUERY_URL = "default.url";
-    private static final String DEFAULT_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
+public class QueryControlClient implements QueryControlInterface, X509TrustManager {
 
     private static final QName SERVICE = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISService");
     private static final QName PORT = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePort");
-
-    /**
-     * The URL String at which the Query Operations Module listens.
-     */
-    private String endpointAddress = null;
 
     /**
      * The locator for the service.
@@ -97,39 +92,61 @@ public class QueryControlClient implements QueryControlInterface {
     private EPCISServicePortType servicePort;
 
     /**
-     * Constructs a new QueryClient which connects to the repository's Query
-     * Operations Module listening at a default url address.
+     * Whether or not this service is configured and ready to use.
+     */
+    private boolean serviceConfigured = false;
+
+    /**
+     * Instantiates a new unconfigured QueryControlClient. Configure the service
+     * through {@link #configureService(URL, String[])} prior to calling any
+     * QueryControlInterface service method.
      */
     public QueryControlClient() {
-        this(null);
     }
 
     /**
-     * Constructs a new QueryClient which connects to the repository's Query
-     * Operations Module listening at the given url address.
-     * 
-     * @param wsdlLocation
-     *            The URL String the query module is listening at.
+     * @return whether or not this service is configured and ready to use.
      */
-    public QueryControlClient(final String queryUrl) {
-        configureService(queryUrl);
+    public boolean isServiceConfigured() {
+        return serviceConfigured;
     }
 
-    private void configureService(final String queryUrl) {
-        if (queryUrl == null) {
-            Properties props = loadProperties();
-            endpointAddress = props.getProperty(PROP_QUERY_URL, DEFAULT_QUERY_URL);
-        } else {
-            endpointAddress = queryUrl;
-        }
+    private boolean isEmpty(String s) {
+        return s == null || "".equals(s);
+    }
 
-        // check if the endpointAddress is valid
-        try {
-            new URL(endpointAddress);
-        } catch (Exception e) {
-            System.out.println("Invalid endpoint address provided. Using default: " + DEFAULT_QUERY_URL);
-            endpointAddress = DEFAULT_QUERY_URL;
-        }
+    /**
+     * Configures the service to communicate with the given endpoint address
+     * using the desired authentication method.
+     * 
+     * @param endpointAddress
+     *            The endpoint address this client will communicate to.
+     * @param authenticationOptions
+     *            The authentication options:
+     *            <p>
+     *            <table border="1">
+     *            <tr>
+     *            <td><code>authenticationOptions[0]</code></td>
+     *            <td><code>[1]</code></td>
+     *            <td><code>[2]</code></td>
+     *            </tr>
+     *            <tr>
+     *            <td><code>QueryClientGuiHelper.AUTH_BASIC</code></td>
+     *            <td>username</td>
+     *            <td>password</td>
+     *            </tr>
+     *            <tr>
+     *            <td><code>QueryClientGuiHelper.AUTH_HTTPS_CLIENT_CERT</code></td>
+     *            <td>keystore file</td>
+     *            <td>password</td>
+     *            </tr>
+     *            </table>
+     * @throws Exception
+     */
+    public void configureService(URL endpointAddress, String[] authenticationOptions) throws Exception {
+        // logger.debug("Configuring service to communicate with endpoint: " +
+        // endpointAddress);
+        serviceConfigured = false;
 
         // setup the CXF bus
         setUpBus();
@@ -137,7 +154,7 @@ public class QueryControlClient implements QueryControlInterface {
         // instantiates a client proxy object from the EPCISServicePortType
         // interface using the JAX-WS API
         Service service = Service.create(SERVICE);
-        service.addPort(PORT, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
+        service.addPort(PORT, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress.toString());
         servicePort = service.getPort(PORT, EPCISServicePortType.class);
 
         // turn off chunked transfer encoding
@@ -146,6 +163,51 @@ public class QueryControlClient implements QueryControlInterface {
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setAllowChunking(false);
         httpConduit.setClient(httpClientPolicy);
+
+        // set up any authentication
+        if (authenticationOptions != null) {
+            if (QueryClientGuiHelper.AUTH_BASIC.equals(authenticationOptions[0])) {
+                // logger.debug("Authenticating via Basic as: " +
+                // authenticationOptions[1]);
+
+                if (isEmpty(authenticationOptions[1]) || isEmpty(authenticationOptions[2])) {
+                    throw new Exception("Authentication method " + authenticationOptions[0]
+                            + " requires a valid user name and password");
+                }
+
+                AuthorizationPolicy ap = httpConduit.getAuthorization();
+                ap.setUserName(authenticationOptions[1]);
+                ap.setPassword(authenticationOptions[2]);
+            } else if (QueryClientGuiHelper.AUTH_HTTPS_CLIENT_CERT.equals(authenticationOptions[0])) {
+                // logger.debug("Authenticating with certificate in file: " +
+                // authenticationOptions[1]);
+
+                if (!"HTTPS".equalsIgnoreCase(endpointAddress.getProtocol())) {
+                    throw new Exception("Authentication method " + authenticationOptions[0]
+                            + " requires the use of HTTPS");
+                }
+
+                if (isEmpty(authenticationOptions[1]) || isEmpty(authenticationOptions[2])) {
+                    throw new Exception("Authentication method " + authenticationOptions[0]
+                            + " requires a valid keystore (PKCS12 or JKS) and password");
+                }
+
+                String keyStoreFile = authenticationOptions[1];
+                char[] password = authenticationOptions[2].toCharArray();
+                KeyStore keyStore = KeyStore.getInstance(keyStoreFile.endsWith(".p12") ? "PKCS12" : "JKS");
+                keyStore.load(new FileInputStream(new File(keyStoreFile)), password);
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+                keyManagerFactory.init(keyStore, password);
+
+                TLSClientParameters tlscp = new TLSClientParameters();
+                tlscp.setKeyManagers(keyManagerFactory.getKeyManagers());
+                tlscp.setSecureRandom(new SecureRandom());
+                tlscp.setDisableCNCheck(true);
+                tlscp.setTrustManagers(new TrustManager[] { this });
+
+                httpConduit.setTlsClientParameters(tlscp);
+            }
+        }
 
         /*
          * For instantiating a client proxy object using reflection (CXF simple
@@ -167,6 +229,7 @@ public class QueryControlClient implements QueryControlInterface {
         // EPCglobalEPCISService s = new EPCglobalEPCISService(wsdlLocation,
         // SERVICE);
         // servicePort = s.getEPCglobalEPCISServicePort();
+        serviceConfigured = true;
     }
 
     private void setUpBus() {
@@ -183,20 +246,18 @@ public class QueryControlClient implements QueryControlInterface {
         // httpTransport.register();
     }
 
-    /**
-     * @return The queryclient properties.
-     */
-    private Properties loadProperties() {
-        InputStream is = getClass().getResourceAsStream(PROPERTY_FILE);
-        Properties props = new Properties();
-        try {
-            props.load(is);
-            is.close();
-        } catch (IOException e) {
-            System.out.println("Unable to load queryclient properties from "
-                    + QueryControlClient.class.getResource(PROPERTY_FILE).toString() + ". Using defaults.");
-        }
-        return props;
+    // X509TrustManager methods: Note that this client will trust any server
+    // you point it at. This is probably OK for the usage for which this program
+    // is intended, but is hardly a robust implementation.
+
+    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+    }
+
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+    }
+
+    public X509Certificate[] getAcceptedIssuers() {
+        return null;
     }
 
     /**
@@ -206,6 +267,10 @@ public class QueryControlClient implements QueryControlInterface {
      */
     public List<String> getQueryNames() throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse {
+        if (!serviceConfigured) {
+            throw new QueryClientNotConfiguredException(
+                    "Please configure service by calling configureService(URL, String[]).");
+        }
         return servicePort.getQueryNames(new EmptyParms()).getString();
     }
 
@@ -216,6 +281,10 @@ public class QueryControlClient implements QueryControlInterface {
      */
     public String getStandardVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse {
+        if (!serviceConfigured) {
+            throw new QueryClientNotConfiguredException(
+                    "Please configure service by calling configureService(URL, String[]).");
+        }
         return servicePort.getStandardVersion(new EmptyParms());
     }
 
@@ -226,6 +295,10 @@ public class QueryControlClient implements QueryControlInterface {
      */
     public List<String> getSubscriptionIds(final String queryName) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse {
+        if (!serviceConfigured) {
+            throw new QueryClientNotConfiguredException(
+                    "Please configure service by calling configureService(URL, String[]).");
+        }
         GetSubscriptionIDs parms = new GetSubscriptionIDs();
         parms.setQueryName(queryName);
         return servicePort.getSubscriptionIDs(parms).getString();
@@ -238,6 +311,10 @@ public class QueryControlClient implements QueryControlInterface {
      */
     public String getVendorVersion() throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse {
+        if (!serviceConfigured) {
+            throw new QueryClientNotConfiguredException(
+                    "Please configure service by calling configureService(URL, String[]).");
+        }
         return servicePort.getVendorVersion(new EmptyParms());
     }
 
@@ -249,27 +326,11 @@ public class QueryControlClient implements QueryControlInterface {
     public QueryResults poll(final Poll poll) throws ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
             QueryTooLargeExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
             NoSuchNameExceptionResponse, QueryParameterExceptionResponse {
+        if (!serviceConfigured) {
+            throw new QueryClientNotConfiguredException(
+                    "Please configure service by calling configureService(URL, String[]).");
+        }
         return servicePort.poll(poll);
-    }
-
-    /**
-     * Wraps the query given in its XML representation into a SOAP message and
-     * sends it directly to the repository's Query Operations Module using HTTP
-     * POST. The query results will be unwrapped from the SOAP response message.
-     * 
-     * @param query
-     *            The query in its XML form (will be wrapped into a SOAP request
-     *            message).
-     * @return The query results in its XML form (unwrapped from a SOAP response
-     *         message).
-     * @throws IOException
-     *             If an error on the transport layer (HTTP) occurred.
-     */
-    public String pollDirect(final String query) throws IOException {
-        String soapReq = wrapIntoSoapMessage(query);
-        String soapResp = doPost(soapReq.getBytes());
-        String queryResp = unwrapFromSoapMessage(soapResp);
-        return queryResp;
     }
 
     /**
@@ -329,8 +390,8 @@ public class QueryControlClient implements QueryControlInterface {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             // setting schema to null will turn XML validation off
             // unmarshaller.setSchema(null);
-            JAXBElement<Poll> elem = (JAXBElement<Poll>) unmarshaller.unmarshal(queryStream);
-            Poll poll = elem.getValue();
+            JAXBElement<?> elem = (JAXBElement<?>) unmarshaller.unmarshal(queryStream);
+            Poll poll = (Poll) elem.getValue();
             return poll(poll);
         } catch (JAXBException e) {
             // wrap JAXBException into IOException to keep the interface
@@ -344,22 +405,16 @@ public class QueryControlClient implements QueryControlInterface {
     /**
      * {@inheritDoc}
      * 
-     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#subscribe(java.lang.String,
-     *      org.fosstrak.epcis.soapapi.QueryParam[], java.lang.String,
-     *      org.fosstrak.epcis.soapapi.SubscriptionControls, java.lang.String)
+     * @see org.fosstrak.epcis.queryclient.QueryControlInterface#subscribe(org.fosstrak.epcis.model.Subscribe)
      */
-    public void subscribe(final String queryName, final QueryParams params, final String dest,
-            final SubscriptionControls controls, final String subscriptionId)
-            throws DuplicateSubscriptionExceptionResponse, ImplementationExceptionResponse,
-            QueryTooComplexExceptionResponse, SecurityExceptionResponse, InvalidURIExceptionResponse,
-            ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse, NoSuchNameExceptionResponse,
-            SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
-        Subscribe subscribe = new Subscribe();
-        subscribe.setControls(controls);
-        subscribe.setDest(dest);
-        subscribe.setParams(params);
-        subscribe.setQueryName(queryName);
-        subscribe.setSubscriptionID(subscriptionId);
+    public void subscribe(final Subscribe subscribe) throws DuplicateSubscriptionExceptionResponse,
+            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
+            InvalidURIExceptionResponse, ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse,
+            NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
+        if (!serviceConfigured) {
+            throw new QueryClientNotConfiguredException(
+                    "Please configure service by calling configureService(URL, String[]).");
+        }
         servicePort.subscribe(subscribe);
     }
 
@@ -424,9 +479,9 @@ public class QueryControlClient implements QueryControlInterface {
         try {
             JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            JAXBElement<Subscribe> elem = (JAXBElement<Subscribe>) unmarshaller.unmarshal(query);
-            Subscribe subscribe = elem.getValue();
-            servicePort.subscribe(subscribe);
+            JAXBElement<?> elem = (JAXBElement<?>) unmarshaller.unmarshal(query);
+            Subscribe subscribe = (Subscribe) elem.getValue();
+            subscribe(subscribe);
         } catch (JAXBException e) {
             // wrap JAXBException into IOException to keep the interface
             // JAXB-free
@@ -443,6 +498,10 @@ public class QueryControlClient implements QueryControlInterface {
      */
     public void unsubscribe(final String subscriptionId) throws ImplementationExceptionResponse,
             SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse {
+        if (!serviceConfigured) {
+            throw new QueryClientNotConfiguredException(
+                    "Please configure service by calling configureService(URL, String[]).");
+        }
         Unsubscribe parms = new Unsubscribe();
         parms.setSubscriptionID(subscriptionId);
         servicePort.unsubscribe(parms);
@@ -464,8 +523,8 @@ public class QueryControlClient implements QueryControlInterface {
         try {
             JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            JAXBElement<Unsubscribe> elem = (JAXBElement<Unsubscribe>) unmarshaller.unmarshal(unsubscribeIs);
-            Unsubscribe unsubscribe = elem.getValue();
+            JAXBElement<?> elem = (JAXBElement<?>) unmarshaller.unmarshal(unsubscribeIs);
+            Unsubscribe unsubscribe = (Unsubscribe) elem.getValue();
             unsubscribe(unsubscribe.getSubscriptionID());
         } catch (JAXBException e) {
             // wrap JAXBException into IOException to keep the interface
@@ -474,93 +533,5 @@ public class QueryControlClient implements QueryControlInterface {
             ioe.setStackTrace(e.getStackTrace());
             throw ioe;
         }
-    }
-
-    /**
-     * @return The URL String at which the Query Operations Module listens.
-     */
-    public String getEndpointAddress() {
-        return endpointAddress;
-    }
-
-    public void setEndpointAddress(String queryUrl) {
-        configureService(queryUrl);
-    }
-
-    /**
-     * Wraps the given query String into a SOAP envelope.
-     * 
-     * @param query
-     *            The query to be wrapped into the SOAP body.
-     * @return The SOAP envelope containing the query.
-     */
-    private String wrapIntoSoapMessage(final String query) {
-        StringBuilder soap = new StringBuilder();
-        soap.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        soap.append("<soapenv:Envelope ");
-        soap.append("xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ");
-        soap.append("xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" ");
-        soap.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
-        soap.append("<soapenv:Body>");
-        soap.append(query);
-        soap.append("</soapenv:Body>\n");
-        soap.append("</soapenv:Envelope>");
-        return soap.toString();
-    }
-
-    /**
-     * Extracts the contents of the body of the given SOAP envelope.
-     * 
-     * @param soapMsg
-     *            The SOAP envelope.
-     * @return The contents of the body of the SOAP envelope.
-     */
-    private String unwrapFromSoapMessage(final String soapMsg) {
-        int beginIndex = soapMsg.indexOf("<soapenv:Body>") + "<soapenv:Body>".length();
-        int endIndex = soapMsg.lastIndexOf("</soapenv:Body>");
-        return soapMsg.substring(beginIndex, endIndex);
-    }
-
-    /**
-     * Sends the given data to the repository's Query Operations Module using
-     * HTTP POST. The data must be a SOAP envelope.
-     * 
-     * @param data
-     *            The data to be sent.
-     * @return The response from the repository's Query Operations Module.
-     * @throws IOException
-     *             If an error on the transport layer (HTTP) occurred.
-     */
-    private String doPost(final byte[] data) throws IOException {
-        // the url where the query interface listens
-        URL serviceUrl = new URL(endpointAddress);
-
-        // open an http connection
-        HttpURLConnection connection = (HttpURLConnection) serviceUrl.openConnection();
-
-        // post the data
-        connection.setDoOutput(true);
-        connection.addRequestProperty("SOAPAction", "");
-        OutputStream out = connection.getOutputStream();
-        out.write(data);
-        out.flush();
-        out.close();
-
-        // get response
-        String response = "HTTP/1.0 " + connection.getResponseCode() + " " + connection.getResponseMessage() + ": ";
-
-        // read and return response
-        InputStream in = null;
-        try {
-            in = connection.getInputStream();
-        } catch (IOException e) {
-            in = connection.getErrorStream();
-        }
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String line;
-        while ((line = br.readLine()) != null) {
-            response = response + line + "\n";
-        }
-        return response.trim();
     }
 }

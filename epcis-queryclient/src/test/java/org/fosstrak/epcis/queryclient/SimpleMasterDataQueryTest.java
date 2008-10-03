@@ -20,38 +20,26 @@
 
 package org.fosstrak.epcis.queryclient;
 
-import java.io.IOException;
+import java.net.URL;
 
 import org.fosstrak.epcis.model.QueryResults;
-import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
-import org.fosstrak.epcis.soap.NoSuchNameExceptionResponse;
-import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
-import org.fosstrak.epcis.soap.QueryTooComplexExceptionResponse;
-import org.fosstrak.epcis.soap.QueryTooLargeExceptionResponse;
-import org.fosstrak.epcis.soap.SecurityExceptionResponse;
-import org.fosstrak.epcis.soap.ValidationExceptionResponse;
 import org.fosstrak.epcis.utils.QueryResultsParser;
 
 /**
- * A simple test utility class for quickly testing masterdata queries against
- * the Fosstrak EPCIS query module.
- * <p>
- * Note: keep the methods in this class static in order to prevent them from
- * being executed when building the project with Maven.
+ * A simple test utility class for demonstrating how to send masterdata queries
+ * to the Fosstrak EPCIS query module.
  * 
  * @author Marco Steybe
  */
 public class SimpleMasterDataQueryTest {
 
-    private static QueryControlClient client = new QueryControlClient();
+    // Note: keep the methods in this class static in order to prevent them from
+    // being executed when building the project with Maven.
 
     /**
-     * Creates a simple EPCIS masterdata query, sends it to the EPCIS query
-     * service for processing and prints the response to System.out.
+     * Creates and returns a simple EPCIS masterdata query in its XML form.
      */
-    public static void testPoll() throws QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse,
-            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
-            QueryParameterExceptionResponse, IOException, ImplementationExceptionResponse {
+    public static String createXmlQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append("<epcisq:Poll xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">");
         sb.append("<queryName>SimpleMasterDataQuery</queryName>");
@@ -70,12 +58,19 @@ public class SimpleMasterDataQueryTest {
         sb.append("</param>");
         sb.append("</params>");
         sb.append("</epcisq:Poll>");
-
-        QueryResults results = client.poll(sb.toString());
-        QueryResultsParser.queryResultsToXml(results, System.out);
+        return sb.toString();
     }
 
     public static void main(String[] args) throws Exception {
-        testPoll();
+        // configure query service
+        QueryControlClient client = new QueryControlClient();
+        client.configureService(new URL("http://demo.fosstrak.org/epcis/query"), null);
+
+        // create a query in its XML form
+        String xmlQuery = createXmlQuery();
+        // send the query to the query service
+        QueryResults results = client.poll(xmlQuery);
+        // print the results to System.out
+        QueryResultsParser.queryResultsToXml(results, System.out);
     }
 }

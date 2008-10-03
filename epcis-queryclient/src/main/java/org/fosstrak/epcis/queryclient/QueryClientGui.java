@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -55,6 +56,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.xml.datatype.DatatypeFactory;
 
 import org.fosstrak.epcis.model.ArrayOfString;
@@ -72,23 +75,21 @@ import org.fosstrak.epcis.utils.TimeParser;
 public class QueryClientGui extends WindowAdapter implements ActionListener {
 
     /**
-     * The enumaration of all possible Types a Queryparameter can have.
+     * The enumeration of all possible query parameter types.
      */
     public enum ParameterType {
         ListOfString, Boolean, Int, Float, String, Time, noType
     };
 
-    private String queryUrl;
+    /**
+     * The Map which holds all possible query parameters. Key is the user text.
+     */
+    private Map<String, QueryItem> queryParamsUserText;
 
     /**
-     * The HasMap wich holds all possible queryParameters. Key is the UserText.
+     * The Map which holds all possible query parameters. Key is the query text.
      */
-    private LinkedHashMap<String, QueryItem> queryParamsUserText;
-
-    /**
-     * The HasMap wich holds all possible queryParameters. Key is the QueryText.
-     */
-    private LinkedHashMap<String, QueryItem> queryParamsQueryText;
+    private Map<String, QueryItem> queryParamsQueryText;
 
     /**
      * Contains the column names for the result table.
@@ -125,13 +126,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private JPanel mwSubscribeManagementPanel;
     private JPanel mwEventTypeSelectPanel;
     private JPanel mwQueryPanel;
+    private AuthenticationPanel mwAuthOptions;
     private JPanel mwSubscriptionPanel;
     private JPanel mwQueryArgsPanel;
     private JPanel mwQueryExamplesPanel;
     private JPanel mwButtonPanel;
     private JLabel mwServiceUrlLabel;
 
-    private JTextField mwServiceUrlTextField;
+    private JTextField mwServiceUrlTextField = new JTextField("", 40);
     private JButton mwServiceInfoButton;
     private JLabel mwUnsubscribeQueryLabel;
     private JTextField mwUnsubscribeQueryTextField;
@@ -213,6 +215,17 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     public QueryClientGui(final String address) {
         generateParamHashMap();
 
+        // set up query client. The supplied JTextArea is used for debug output
+        createDebugWindow();
+        client = new QueryClientGuiHelper(this);
+
+        // update queryUrl, in case the provided address parameter was null
+        if (address != null) {
+            mwServiceUrlTextField.setText(address);
+        } else {
+        	mwServiceUrlTextField.setText(client.getDefaultEndpointAddress());
+        }
+
         // setup client GUI
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -220,14 +233,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             }
         });
 
-        // set up query client. The supplied JTextArea is used for debug output
-        createDebugWindow();
-        client = new QueryClientGuiHelper(address, dwOutputTextArea);
-
-        // update queryUrl, in case the provided address parameter was null
-        queryUrl = client.getEndpointAddress();
-        mwServiceUrlTextField.setText(queryUrl);
-    }
+}
 
     /**
      * Initialized all the possible Query Parameters.
@@ -567,9 +573,9 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 BorderFactory.createTitledBorder("Subscription Arguments"), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwServiceUrlLabel = new JLabel("Query interface URL: ");
-        mwServiceUrlTextField = new JTextField(queryUrl, 40);
         mwServiceInfoButton = new JButton("Info");
         mwServiceInfoButton.addActionListener(this);
+        mwAuthOptions = new AuthenticationPanel(client);
 
         mwUnsubscribeQueryLabel = new JLabel("Unsubscribe ID: ");
         mwUnsubscribeQueryTextField = new JTextField("", 40);
@@ -582,6 +588,27 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mwShowDebugWindowCheckBox = new JCheckBox("Show debug window", false);
         mwShowDebugWindowCheckBox.addActionListener(this);
 
+        mwServiceUrlTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+			public void changedUpdate(DocumentEvent e) {
+				client.setConfigurationChanged(isComplete());
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				client.setConfigurationChanged(isComplete());
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				client.setConfigurationChanged(isComplete());
+			}
+			
+			public boolean isComplete() {
+				String url = mwServiceUrlTextField.getText();
+				return url != null && url.length() > 0;
+			}
+        	
+        });
+        
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(5, 5, 5, 0);
@@ -600,6 +627,11 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 1;
+        c.gridwidth=2;
+        mwConfigPanel.add(mwAuthOptions, c);
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 2;
         c.gridwidth = 2;
         mwConfigPanel.add(mwShowDebugWindowCheckBox, c);
 
@@ -935,7 +967,16 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             return;
         }
         if (e.getSource() == mwSubscriptionIdButton) {
-            client.querySubscriptionIDs();
+        	try {
+        		client.querySubscriptionIDs();
+        		return;
+        	}
+        	catch (Exception ex) {
+                JFrame frame = new JFrame();
+                String msg = ex.getMessage();
+                JOptionPane.showMessageDialog(frame, msg + "\n" + e.toString(), "Service invocation error",
+                        JOptionPane.ERROR_MESSAGE);
+        	}
             return;
         }
         if (e.getSource() == mwFillInExampleButton) {
@@ -944,9 +985,19 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         }
         if (e.getSource() == dwClearButton) {
             dwOutputTextArea.setText("");
+            return;
         }
         if (e.getSource() == mwUnsubscribeQueryButton) {
-            client.unsubscribeQuery(mwUnsubscribeQueryTextField.getText());
+        	try {
+        		client.unsubscribeQuery(mwUnsubscribeQueryTextField.getText());
+        		return;
+        	}
+        	catch (Exception ex) {
+                JFrame frame = new JFrame();
+                String msg = ex.getMessage();
+                JOptionPane.showMessageDialog(frame, msg + "\n" + e.toString(), "Service invocation error",
+                        JOptionPane.ERROR_MESSAGE);
+        	}
         }
         if (e.getSource() == ewOkButton) {
             examplesChanged();
@@ -972,7 +1023,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             resultsWindow.dispose();
         }
         try {
-            checkQueryUrl(mwServiceUrlTextField.getText());
+//            checkQueryUrl(mwServiceUrlTextField.getText());
             client.clearParameters();
 
             /* get event type selection from GUI */
@@ -1124,7 +1175,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private void mwInfoButtonPressed() {
         dwOutputTextArea.setText("");
         try {
-            checkQueryUrl(mwServiceUrlTextField.getText());
             String standardVersion = client.queryStandardVersion();
             String vendorVersion = client.queryVendorVersion();
             List<String> queryNames = client.queryNames();
@@ -1147,22 +1197,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             JFrame frame = new JFrame();
             JOptionPane.showMessageDialog(frame, "Error:\n" + e.getMessage(), "Service invocation error",
                     JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    /**
-     * Checks if the provided queryUrl is still a valid URL and updates the
-     * query client in case it has changed.
-     */
-    private void checkQueryUrl(String url) {
-        if (url == null || "".equals(url)) {
-            // query url has been deleted ... replace with previous url
-            mwServiceUrlTextField.setText(queryUrl);
-        } else if (!url.equals(queryUrl)) {
-            // query url has changed
-            System.out.println("Query service URL has changed, updating query client");
-            queryUrl = client.updateEndpointAddress(mwServiceUrlTextField.getText());
-            mwServiceUrlTextField.setText(queryUrl);
         }
     }
 
@@ -1533,7 +1567,26 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             return examples;
         }
     }
+    
+    void debug(String debugMessage) {
+    	dwOutputTextArea.append(debugMessage);
+    }
+    
+    String getAddress() {
+    	return mwServiceUrlTextField.getText();
+    }
+    
+    String[] getAuthenticationOptions() {
+    	return mwAuthOptions.getAuthenticationOptions();
+    }
 
+    void setButtonsEnabled(boolean buttonsEnabled) {
+    	JButton[] buttons = { mwRunQueryButton, mwServiceInfoButton, mwUnsubscribeQueryButton, mwSubscriptionIdButton };
+    	for (JButton button : buttons) {
+    		button.setEnabled(buttonsEnabled);
+    	}
+    }
+    
     /**
      * Instantiates a new QueryClientGui and sets its look-and-feel to the one
      * matching the current operating system.

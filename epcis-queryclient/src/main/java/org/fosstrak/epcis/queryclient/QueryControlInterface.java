@@ -23,9 +23,8 @@ package org.fosstrak.epcis.queryclient;
 import java.util.List;
 
 import org.fosstrak.epcis.model.Poll;
-import org.fosstrak.epcis.model.QueryParams;
 import org.fosstrak.epcis.model.QueryResults;
-import org.fosstrak.epcis.model.SubscriptionControls;
+import org.fosstrak.epcis.model.Subscribe;
 import org.fosstrak.epcis.soap.DuplicateSubscriptionExceptionResponse;
 import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
 import org.fosstrak.epcis.soap.InvalidURIExceptionResponse;
@@ -67,17 +66,9 @@ public interface QueryControlInterface {
      * Performs a subscribe operation at the repository's Query Controls Module,
      * i.e. subscribes a query for later execution.
      * 
-     * @param queryName
-     *            The name of the query to be executed.
-     * @param params
-     *            The parameters of the query to be executed.
-     * @param dest
-     *            The destination address where QueryResults will be sent once
-     *            the subscribed query gets executed.
-     * @param controls
-     *            The SubscriptionControls.
-     * @param subscriptionId
-     *            The ID of the subscription.
+     * @param subscribe
+     *            The Subscribe object including the query name, the parameters,
+     *            and subscription id used for subscribing the query.
      * @throws QueryParameterExceptionResponse
      * @throws SubscriptionControlsExceptionResponse
      * @throws NoSuchNameExceptionResponse
@@ -89,12 +80,10 @@ public interface QueryControlInterface {
      * @throws ImplementationExceptionResponse
      * @throws DuplicateSubscriptionExceptionResponse
      */
-    void subscribe(final String queryName, final QueryParams params, final String dest,
-            final SubscriptionControls controls, final String subscriptionId)
-            throws DuplicateSubscriptionExceptionResponse, ImplementationExceptionResponse,
-            QueryTooComplexExceptionResponse, SecurityExceptionResponse, InvalidURIExceptionResponse,
-            ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse, NoSuchNameExceptionResponse,
-            SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse;
+    void subscribe(final Subscribe subscribe) throws DuplicateSubscriptionExceptionResponse,
+            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
+            InvalidURIExceptionResponse, ValidationExceptionResponse, SubscribeNotPermittedExceptionResponse,
+            NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse;
 
     /**
      * Perform an unsubscribe operation at the repository's Query Controls
@@ -116,7 +105,6 @@ public interface QueryControlInterface {
      * @return A List of query names.
      * @throws ValidationExceptionResponse
      * @throws SecurityExceptionResponse
-     * @throws ImplementationExceptionResponse
      */
     List<String> getQueryNames() throws ImplementationExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse;

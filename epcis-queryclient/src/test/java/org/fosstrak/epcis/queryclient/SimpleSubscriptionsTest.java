@@ -25,6 +25,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,35 +42,38 @@ import org.fosstrak.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.fosstrak.epcis.soap.ValidationExceptionResponse;
 
 /**
- * A simple test utility class for sending subscriptions (available from file
- * names) to a repository.
- * <p>
- * Note: keep the methods in this class static in order to prevent them from
- * being executed when building the project with Maven.
+ * A simple test utility class for sending subscriptions to a repository.
  * 
  * @author Marco Steybe
  */
 public class SimpleSubscriptionsTest {
 
-    private static QueryControlClient client = new QueryControlClient();
+    // Note: keep the methods in this class static in order to prevent them from
+    // being executed when building the project with Maven.
 
-    public static void subscribeFromFile(String filename) throws IOException, SubscribeNotPermittedExceptionResponse,
-            DuplicateSubscriptionExceptionResponse, ImplementationExceptionResponse, QueryTooComplexExceptionResponse,
-            SecurityExceptionResponse, InvalidURIExceptionResponse, ValidationExceptionResponse,
-            NoSuchNameExceptionResponse, SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
+    public static void subscribeFromFile(String filename, QueryControlClient client) throws IOException,
+            SubscribeNotPermittedExceptionResponse, DuplicateSubscriptionExceptionResponse,
+            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
+            InvalidURIExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
+            SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
         InputStream is = new FileInputStream(filename);
         client.subscribe(is);
     }
 
-    public static void unsubscribeFromFile(String filename) throws ImplementationExceptionResponse,
-            SecurityExceptionResponse, ValidationExceptionResponse, NoSuchSubscriptionExceptionResponse, IOException {
+    public static void unsubscribeFromFile(String filename, QueryControlClient client)
+            throws ImplementationExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
+            NoSuchSubscriptionExceptionResponse, IOException {
         InputStream is = new FileInputStream(filename);
         client.unsubscribe(is);
     }
 
     public static void main(String[] args) throws Exception {
+        // configure query service
+        QueryControlClient client = new QueryControlClient();
+        client.configureService(new URL("http://demo.fosstrak.org/epcis/query"), null);
+
         // change this flag, if you want to run unsubscribe
-        boolean doSubscribe = true;
+        boolean doSubscribe = false;
         String dir = "D:/test/subscriptions";
 
         /*
@@ -79,17 +83,17 @@ public class SimpleSubscriptionsTest {
          * directory
          */
 
-        String ext = "subscribe.xml";
+        String ext = "_subscribe.xml";
         if (!doSubscribe) {
-            ext = "unsubscribe.xml";
+            ext = "_unsubscribe.xml";
         }
         List<String> xmlFiles = listFileNames(dir, ext);
         for (String fileName : xmlFiles) {
             System.out.println(fileName);
             if (doSubscribe) {
-                subscribeFromFile(fileName);
+                subscribeFromFile(fileName, client);
             } else {
-                unsubscribeFromFile(fileName);
+                unsubscribeFromFile(fileName, client);
             }
         }
     }

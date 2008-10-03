@@ -34,7 +34,6 @@ import java.util.TimeZone;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.xml.bind.JAXBElement;
 
 import org.fosstrak.epcis.model.AggregationEventType;
@@ -55,7 +54,7 @@ import org.fosstrak.epcis.model.Unsubscribe;
 import org.fosstrak.epcis.utils.TimeParser;
 
 /**
- * Implements a Class to interface with the EPCIS query client. Also offers some
+ * Implements a class to interface with the EPCIS query client. Also offers some
  * helper methods to convert between different formats and for debug output.
  * 
  * @author David Gubler
@@ -66,6 +65,10 @@ public class QueryClientGuiHelper {
     private static final String PROP_QUERY_URL = "default.url";
     private static final String DEFAULT_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
 
+    public static final String AUTH_NONE = "None";
+    public static final String AUTH_BASIC = "Basic";
+    public static final String AUTH_HTTPS_CLIENT_CERT = "X.509 Certificate";
+
     private QueryControlClient queryClient;
 
     /**
@@ -73,10 +76,11 @@ public class QueryClientGuiHelper {
      */
     private List<QueryParam> internalQueryParams = new ArrayList<QueryParam>();
 
-    /**
-     * All debug output is written into this text field.
-     */
-    private JTextArea debugTextArea;
+    private QueryClientGui mainWindow;
+
+    private String defaultEndpointAddress;
+
+    private boolean configurationChanged;
 
     /**
      * Constructor. Takes the service endpoint address and a JTextArea used for
@@ -87,46 +91,24 @@ public class QueryClientGuiHelper {
      * @param area
      *            The text area where debug output will be written to.
      */
-    public QueryClientGuiHelper(final String queryUrl, final JTextArea area) {
-        debugTextArea = area;
-        queryClient = new QueryControlClient(queryUrl);
-    }
-
-    public String updateEndpointAddress(final String address) {
-        String endpointAddress;
-        if (address == null) {
-            Properties props = loadProperties();
-            endpointAddress = props.getProperty(PROP_QUERY_URL, DEFAULT_QUERY_URL);
-        } else {
-            endpointAddress = address;
-        }
-
-        // check if the endpointAddress is valid
+    public QueryClientGuiHelper(QueryClientGui mainWindow) {
+        this.mainWindow = mainWindow;
+        queryClient = new QueryControlClient();
+        Properties props = loadProperties();
+        defaultEndpointAddress = props.getProperty(PROP_QUERY_URL, DEFAULT_QUERY_URL);
         try {
-            new URL(endpointAddress);
+            new URL(defaultEndpointAddress);
         } catch (Exception e) {
-            System.out.println("Invalid endpoint address provided. Using default: " + DEFAULT_QUERY_URL);
-            endpointAddress = DEFAULT_QUERY_URL;
+            defaultEndpointAddress = DEFAULT_QUERY_URL;
         }
-        setEndpointAddress(endpointAddress);
-        return endpointAddress;
     }
 
     /**
-     * Sets the service endpoint address.
-     * 
-     * @param queryUrl
-     *            The URL of the query web service.
+     * Gets the default repository endpoint address as specified in the
+     * application properties file.
      */
-    private void setEndpointAddress(final String queryUrl) {
-        queryClient.setEndpointAddress(queryUrl);
-    }
-
-    /**
-     * @return The service endpoint address
-     */
-    public String getEndpointAddress() {
-        return queryClient.getEndpointAddress();
+    public String getDefaultEndpointAddress() {
+        return defaultEndpointAddress;
     }
 
     /**
@@ -175,55 +157,55 @@ public class QueryClientGuiHelper {
         Object[][] table = new Object[nofEvents][12];
         int row = 0;
 
-        debugTextArea.append("\n\n" + nofEvents + " events returned by the server:\n\n");
+        debug("\n\n" + nofEvents + " events returned by the server:\n\n");
         for (Object o : eventList) {
             if (o instanceof JAXBElement<?>) {
                 o = ((JAXBElement<?>) o).getValue();
             }
             EPCISEventType event = (EPCISEventType) o;
-            debugTextArea.append("[ EPCISEvent ]\n");
+            debug("[ EPCISEvent ]\n");
             String eventTime = prettyStringCalendar(event.getEventTime().toGregorianCalendar());
-            debugTextArea.append("eventTime:\t" + eventTime + "\n");
+            debug("eventTime:\t" + eventTime + "\n");
             table[row][1] = eventTime;
             String recordTime = prettyStringCalendar(event.getRecordTime().toGregorianCalendar());
-            debugTextArea.append("recordTime:\t" + recordTime + "\n");
+            debug("recordTime:\t" + recordTime + "\n");
             table[row][2] = recordTime;
-            debugTextArea.append("timeZoneOffset:\t" + event.getEventTimeZoneOffset() + "\n");
+            debug("timeZoneOffset:\t" + event.getEventTimeZoneOffset() + "\n");
 
             if (event instanceof ObjectEventType) {
-                debugTextArea.append("[ ObjectEvent ]\n");
+                debug("[ ObjectEvent ]\n");
                 ObjectEventType e = (ObjectEventType) event;
                 table[row][0] = "Object";
-                debugTextArea.append("epcList:\t");
+                debug("epcList:\t");
                 table[row][5] = "";
                 for (EPC epc : e.getEpcList().getEpc()) {
-                    debugTextArea.append(" '" + epc.getValue() + "'");
+                    debug(" '" + epc.getValue() + "'");
                     table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
                 }
-                debugTextArea.append("\n");
-                debugTextArea.append("action:\t\t" + e.getAction().toString() + "\n");
+                debug("\n");
+                debug("action:\t\t" + e.getAction().toString() + "\n");
                 table[row][6] = e.getAction().toString();
-                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                debug("bizStep:\t" + e.getBizStep() + "\n");
                 table[row][7] = e.getBizStep();
-                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                debug("disposition:\t" + e.getDisposition() + "\n");
                 table[row][8] = e.getDisposition();
                 if (e.getReadPoint() != null) {
-                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
                     table[row][9] = e.getReadPoint().getId();
                 } else {
-                    debugTextArea.append("readPoint:\tnull\n");
+                    debug("readPoint:\tnull\n");
                 }
                 if (e.getBizLocation() != null) {
-                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
                     table[row][10] = e.getBizLocation().getId();
                 } else {
-                    debugTextArea.append("bizLocation:\tnull\n");
+                    debug("bizLocation:\tnull\n");
                 }
                 if (e.getBizTransactionList() != null) {
-                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    debug("bizTrans:\tType, ID\n");
                     table[row][11] = "";
                     for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
                         table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
                                 + "' ; ";
                     }
@@ -232,46 +214,46 @@ public class QueryClientGuiHelper {
                         table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
                     }
                 } else {
-                    debugTextArea.append("bizTrans:\tnull\n");
+                    debug("bizTrans:\tnull\n");
                 }
-                debugTextArea.append("\n");
+                debug("\n");
 
             } else if (event instanceof TransactionEventType) {
-                debugTextArea.append("[ TransactionEvent ]\n");
+                debug("[ TransactionEvent ]\n");
                 TransactionEventType e = (TransactionEventType) event;
                 table[row][0] = "Transaction";
-                debugTextArea.append("parentID:\t" + e.getParentID() + "\n");
+                debug("parentID:\t" + e.getParentID() + "\n");
                 table[row][3] = e.getParentID();
-                debugTextArea.append("epcList:\t");
+                debug("epcList:\t");
                 table[row][5] = "";
                 for (EPC epc : e.getEpcList().getEpc()) {
-                    debugTextArea.append(" '" + epc.getValue() + "'");
+                    debug(" '" + epc.getValue() + "'");
                     table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
                 }
-                debugTextArea.append("\n");
-                debugTextArea.append("action:\t\t" + e.getAction().toString() + "\n");
+                debug("\n");
+                debug("action:\t\t" + e.getAction().toString() + "\n");
                 table[row][6] = e.getAction().toString();
-                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                debug("bizStep:\t" + e.getBizStep() + "\n");
                 table[row][7] = e.getBizStep();
-                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                debug("disposition:\t" + e.getDisposition() + "\n");
                 table[row][8] = e.getDisposition();
                 if (e.getReadPoint() != null) {
-                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
                     table[row][9] = e.getReadPoint().getId();
                 } else {
-                    debugTextArea.append("readPoint:\tnull\n");
+                    debug("readPoint:\tnull\n");
                 }
                 if (e.getBizLocation() != null) {
-                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
                     table[row][10] = e.getBizLocation().getId();
                 } else {
-                    debugTextArea.append("bizLocation:\tnull\n");
+                    debug("bizLocation:\tnull\n");
                 }
                 if (e.getBizTransactionList() != null) {
-                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    debug("bizTrans:\tType, ID\n");
                     table[row][11] = "";
                     for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
                         table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
                                 + "' ; ";
                     }
@@ -280,46 +262,46 @@ public class QueryClientGuiHelper {
                         table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
                     }
                 } else {
-                    debugTextArea.append("bizTrans:\tnull\n");
+                    debug("bizTrans:\tnull\n");
                 }
-                debugTextArea.append("\n");
+                debug("\n");
 
             } else if (event instanceof AggregationEventType) {
-                debugTextArea.append("[ AggregationEvent ]\n");
+                debug("[ AggregationEvent ]\n");
                 AggregationEventType e = (AggregationEventType) event;
                 table[row][0] = "Aggregation";
-                debugTextArea.append("parentID:\t" + e.getParentID() + "\n");
+                debug("parentID:\t" + e.getParentID() + "\n");
                 table[row][3] = e.getParentID();
-                debugTextArea.append("childEPCs:\t");
+                debug("childEPCs:\t");
                 table[row][5] = "";
                 for (EPC epc : e.getChildEPCs().getEpc()) {
-                    debugTextArea.append(" '" + epc.getValue() + "'");
+                    debug(" '" + epc.getValue() + "'");
                     table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
                 }
-                debugTextArea.append("\n");
-                debugTextArea.append("action:\t\t" + e.getAction().toString() + "\n");
+                debug("\n");
+                debug("action:\t\t" + e.getAction().toString() + "\n");
                 table[row][6] = e.getAction().toString();
-                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                debug("bizStep:\t" + e.getBizStep() + "\n");
                 table[row][7] = e.getBizStep();
-                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                debug("disposition:\t" + e.getDisposition() + "\n");
                 table[row][8] = e.getDisposition();
                 if (e.getReadPoint() != null) {
-                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
                     table[row][9] = e.getReadPoint().getId();
                 } else {
-                    debugTextArea.append("readPoint:\tnull\n");
+                    debug("readPoint:\tnull\n");
                 }
                 if (e.getBizLocation() != null) {
-                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
                     table[row][10] = e.getBizLocation().getId();
                 } else {
-                    debugTextArea.append("bizLocation:\tnull\n");
+                    debug("bizLocation:\tnull\n");
                 }
                 if (e.getBizTransactionList() != null) {
-                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    debug("bizTrans:\tType, ID\n");
                     table[row][11] = "";
                     for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
                         table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
                                 + "' ; ";
                     }
@@ -328,39 +310,39 @@ public class QueryClientGuiHelper {
                         table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
                     }
                 } else {
-                    debugTextArea.append("bizTrans:\tnull\n");
+                    debug("bizTrans:\tnull\n");
                 }
-                debugTextArea.append("\n");
+                debug("\n");
 
             } else if (event instanceof QuantityEventType) {
-                debugTextArea.append("[ QuantityEvent ]\n");
+                debug("[ QuantityEvent ]\n");
                 QuantityEventType e = (QuantityEventType) event;
                 table[row][0] = "Quantity";
-                debugTextArea.append("quantity:\t" + e.getQuantity() + "\n");
+                debug("quantity:\t" + e.getQuantity() + "\n");
                 table[row][4] = Integer.valueOf(e.getQuantity());
-                debugTextArea.append("ecpClass:\t" + e.getEpcClass() + "\n");
+                debug("ecpClass:\t" + e.getEpcClass() + "\n");
                 table[row][5] = e.getEpcClass();
-                debugTextArea.append("bizStep:\t" + e.getBizStep() + "\n");
+                debug("bizStep:\t" + e.getBizStep() + "\n");
                 table[row][7] = e.getBizStep();
-                debugTextArea.append("disposition:\t" + e.getDisposition() + "\n");
+                debug("disposition:\t" + e.getDisposition() + "\n");
                 table[row][8] = e.getDisposition();
                 if (e.getReadPoint() != null) {
-                    debugTextArea.append("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
                     table[row][9] = e.getReadPoint().getId();
                 } else {
-                    debugTextArea.append("readPoint:\tnull\n");
+                    debug("readPoint:\tnull\n");
                 }
                 if (e.getBizLocation() != null) {
-                    debugTextArea.append("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
                     table[row][10] = e.getBizLocation().getId();
                 } else {
-                    debugTextArea.append("bizLocation:\tnull\n");
+                    debug("bizLocation:\tnull\n");
                 }
                 if (e.getBizTransactionList() != null) {
-                    debugTextArea.append("bizTrans:\tType, ID\n");
+                    debug("bizTrans:\tType, ID\n");
                     table[row][11] = "";
                     for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
-                        debugTextArea.append("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
                         table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
                                 + "' ; ";
                     }
@@ -369,9 +351,9 @@ public class QueryClientGuiHelper {
                         table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
                     }
                 } else {
-                    debugTextArea.append("bizTrans:\tnull\n");
+                    debug("bizTrans:\tnull\n");
                 }
-                debugTextArea.append("\n");
+                debug("\n");
             }
             row++;
         }
@@ -404,20 +386,21 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public Object[][] runQuery() throws Exception {
+        configureServiceIfNecessary();
         QueryParams queryParams = new QueryParams();
         queryParams.getParam().addAll(internalQueryParams);
-        debugTextArea.append("Number of query parameters: " + queryParams.getParam().size() + "\n");
+        debug("Number of query parameters: " + queryParams.getParam().size() + "\n");
         for (QueryParam queryParam : internalQueryParams) {
-            debugTextArea.append(queryParam.getName() + " " + queryParam.getValue() + "\n");
+            debug(queryParam.getName() + " " + queryParam.getValue() + "\n");
         }
 
         Poll poll = new Poll();
         poll.setQueryName("SimpleEventQuery");
         poll.setParams(queryParams);
 
-        debugTextArea.append("running query...\n");
+        debug("running query...\n");
         QueryResults results = queryClient.poll(poll);
-        debugTextArea.append("done\n");
+        debug("done\n");
 
         // print to debug window and return result
         if (results != null && results.getResultsBody() != null && results.getResultsBody().getEventList() != null) {
@@ -436,15 +419,15 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public void subscribeQuery(final Subscribe subscribe) throws Exception {
+        configureServiceIfNecessary();
         QueryParams queryParams = new QueryParams();
         queryParams.getParam().addAll(internalQueryParams);
-        debugTextArea.append("Number of query parameters: " + queryParams.getParam().size() + "\n");
+        debug("Number of query parameters: " + queryParams.getParam().size() + "\n");
         for (QueryParam queryParam : internalQueryParams) {
-            debugTextArea.append(queryParam.getName() + " " + queryParam.getValue() + "\n");
+            debug(queryParam.getName() + " " + queryParam.getValue() + "\n");
         }
         subscribe.setParams(queryParams);
-        queryClient.subscribe(subscribe.getQueryName(), subscribe.getParams(), subscribe.getDest(),
-                subscribe.getControls(), subscribe.getSubscriptionID());
+        queryClient.subscribe(subscribe);
     }
 
     /**
@@ -453,7 +436,8 @@ public class QueryClientGuiHelper {
      * @param subscriptionID
      *            The ID of the query to be unsubscribed.
      */
-    public void unsubscribeQuery(final String subscriptionID) {
+    public void unsubscribeQuery(final String subscriptionID) throws Exception {
+        configureServiceIfNecessary();
         try {
             JFrame frame = new JFrame();
             if (subscriptionID.equals("")) {
@@ -486,13 +470,15 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public String queryStandardVersion() throws Exception {
+        configureServiceIfNecessary();
         return queryClient.getStandardVersion();
     }
 
     /**
      * Query the service for subscriptions.
      */
-    public void querySubscriptionIDs() {
+    public void querySubscriptionIDs() throws Exception {
+        configureServiceIfNecessary();
         String title = "Service is responding";
         StringBuilder msg = new StringBuilder();
         try {
@@ -524,6 +510,7 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public String queryVendorVersion() throws Exception {
+        configureServiceIfNecessary();
         return queryClient.getVendorVersion();
     }
 
@@ -535,6 +522,7 @@ public class QueryClientGuiHelper {
      *             If any Exception occurred while invoking the query service.
      */
     public List<String> queryNames() throws Exception {
+        configureServiceIfNecessary();
         return queryClient.getQueryNames();
     }
 
@@ -550,5 +538,47 @@ public class QueryClientGuiHelper {
         ArrayOfString strings = new ArrayOfString();
         strings.getString().addAll(tokens);
         return strings;
+    }
+
+    /**
+     * Forces the client to reconfigure the service if the any of its parameters
+     * (authentication, endpoint address) have been changed.
+     * 
+     * @throws Exception
+     */
+    private void configureServiceIfNecessary() throws Exception {
+        if (!queryClient.isServiceConfigured() || configurationChanged) {
+            // validate the URL and get auth options from the main window
+            queryClient.configureService(new URL(mainWindow.getAddress()), mainWindow.getAuthenticationOptions());
+            configurationChanged = false;
+        }
+    }
+
+    /**
+     * Set whether or not the configuration has changed. The components in the
+     * configuration panel call this method when their state is updated.
+     * 
+     * @param configurationComplete
+     *            Indicates whether or not the information present is enough to
+     *            enable the client to connect to a repository (e.g. both a
+     *            username and password are available if Basic authentication is
+     *            chosen).
+     */
+    void setConfigurationChanged(boolean configurationComplete) {
+        this.configurationChanged = true;
+        mainWindow.setButtonsEnabled(configurationComplete);
+    }
+
+    /**
+     * Writes a message to the debug window.
+     * 
+     * @param msg
+     *            The message.
+     */
+    void debug(String msg) {
+        mainWindow.debug(msg);
+        if (!msg.endsWith("\n")) {
+            mainWindow.debug("\n");
+        }
     }
 }
