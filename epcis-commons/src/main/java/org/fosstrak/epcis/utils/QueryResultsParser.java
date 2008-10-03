@@ -75,8 +75,8 @@ public final class QueryResultsParser {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             // setting schema to null will turn XML validation off
             // unmarshaller.setSchema(null);
-            JAXBElement<QueryResults> results = (JAXBElement<QueryResults>) unmarshaller.unmarshal(xml);
-            return results.getValue();
+            JAXBElement<?> results = (JAXBElement<?>) unmarshaller.unmarshal(xml);
+            return (QueryResults) results.getValue();
         } catch (JAXBException e) {
             // wrap JAXBException into IOException to keep the interface
             // JAXB-free
@@ -102,8 +102,9 @@ public final class QueryResultsParser {
         try {
             JAXBContext context = JAXBContext.newInstance(EPCISQueryDocumentType.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            JAXBElement<EPCISQueryDocumentType> results = (JAXBElement<EPCISQueryDocumentType>) unmarshaller.unmarshal(r);
-            return results.getValue().getEPCISBody().getQueryResults();
+            JAXBElement<?> results = (JAXBElement<?>) unmarshaller.unmarshal(r);
+            EPCISQueryDocumentType doc = (EPCISQueryDocumentType) results.getValue();
+            return doc.getEPCISBody().getQueryResults();
         } catch (JAXBException e) {
             // wrap JAXBException into IOException to keep the interface
             // JAXB-free
