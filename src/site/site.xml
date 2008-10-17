@@ -2,12 +2,9 @@
 <project name="Fosstrak EPCIS">
   <bannerLeft>
     <name>Fosstrak</name>
-    <src>images/banner2_left.jpg</src>
+    <src>images/banner_left.gif</src>
     <href>http://www.fosstrak.org/</href>
   </bannerLeft>
-  <bannerRight>
-    <src>images/banner2_middle.jpg</src>
-  </bannerRight>
   <skin>
     <groupId>org.apache.maven.skins</groupId>
     <artifactId>maven-stylus-skin</artifactId>
