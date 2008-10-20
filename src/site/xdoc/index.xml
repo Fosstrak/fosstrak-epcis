@@ -1,0 +1,59 @@
+<document>
+  <properties>
+    <title>Welcome to the Fosstrak EPCIS Project</title>
+  </properties>
+
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Welcome to the Fosstrak EPCIS Project">
+      
+
+<subsection name="Objective">
+The objective of the Fosstrak EPCIS Project is to implement the EPCIS role in
+the EPC network and to develop the appropriate tools that facilitate
+communication with an EPCIS Repository instance. 
+</subsection>
+
+<subsection name="Status">
+Fosstrak EPCIS is a complete implementation of the EPCIS standard specification
+(Version 1.0.1 of September 21, 2007). It successfully passed conformance testing
+and is <a href="http://www.epcglobalinc.org/certification/"><b>EPCglobal certified</b></a>.
+<br/>
+<center><a href="http://www.epcglobalinc.org/certification/"><img src="images/epc_cert_mark.png"/></a></center>
+</subsection>
+
+<subsection name="How can the Fosstrak EPCIS Project help you?">
+This project allows you to:
+<ul>
+<li>deploy an EPCIS Repository using our implementation</li>
+<li>query an existing EPCIS Repository using our graphical user interface</li>
+<li>fill an existing EPCIS Repository with EPC data using our graphical user interface</li>
+</ul>
+</subsection>
+  
+<subsection name="Organization">
+The Fosstrak EPCIS Project comprises three separate modules:
+<ul>
+<li>an EPCIS Repository implementation</li>
+<li>an interactive EPCIS Capture Application</li>
+<li>an interactive EPCIS Query Application</li>
+</ul>
+The figure below gives an overview of the Fosstrak EPCIS Implementation. For more
+information refer to the <a href="docs/architecture-guide.html">Architecture Guide</a>.
+<br/>
+<img src="images/epcis_architecture.png"/>
+</subsection>
+
+<subsection name="Usage Scenarios">
+Possible usage scenarios include the following:
+<ul>
+<li>Embed our EPCIS Repository into your own applications to add an EPCIS interface to it</li>
+<li>Interactively explore any EPCIS Repository using our graphical EPCIS Query Application</li>
+<li>Use our EPCIS accessing applications as a blueprint to build your own EPCIS Capture or Query Application</li>
+</ul>
+</subsection>
+
+
+    </section>
+  </body>
+</document>
