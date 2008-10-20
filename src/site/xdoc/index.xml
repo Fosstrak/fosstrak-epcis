@@ -15,10 +15,11 @@ communication with an EPCIS Repository instance.
 </subsection>
 
 <subsection name="Status">
+<p>
 Fosstrak EPCIS is a complete implementation of the EPCIS standard specification
 (Version 1.0.1 of September 21, 2007). It successfully passed conformance testing
 and is <a href="http://www.epcglobalinc.org/certification/"><b>EPCglobal certified</b></a>.
-<br/>
+</p>
 <center><a href="http://www.epcglobalinc.org/certification/"><img src="images/epc_cert_mark.png"/></a></center>
 </subsection>
 
