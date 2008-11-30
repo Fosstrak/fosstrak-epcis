@@ -34,6 +34,8 @@ User Guide
 
          [[i]] {{{#How to Use the Query Callback Interface}How to Use the Query Callback Interface}}
 
+         [[i]] {{{#How to Use Event Field Extensions}How to Use Event Field Extensions}}
+
    [[1]] {{{#Runtime Configuration of your EPCIS Repository}Runtime Configuration of your EPCIS Repository}}
 
 
@@ -632,6 +634,72 @@ String response = listener.fetchResponse();
    In this code, the <<<wait()>>> method waits until either the listener
    receives a response or the specified <<<timeout>>> has elapsed.
 
+
+** {How to Use Event Field Extensions}
+
+   The EPCIS specification allows you to extend events with custom fields. In
+   the following we provide an example which demonstrates how to capture EPCIS
+   events with custom event fields and how to query for them.
+
+   A custom event field consists of the field name (including a unique
+   namespace) and the field value. The following EPCIS document contains a
+   single EPCIS event which contains a custom event field with the name
+   "my_extensionfield". The value of the field is "My Extension". Note that the
+   field's namespace is declared along with the other schema namespaces in the
+   XML root element:
+
+---------------------------------------------------------------------------
+<epcis:EPCISDocument xmlns:epcis="urn:epcglobal:epcis:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" <b>xmlns:my_ns="http://my.unique.namespace"</b>>
+<EPCISBody>
+  <EventList>
+    <ObjectEvent>
+      <eventTime>2008-11-09T13:30:17Z</eventTime>
+      <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
+      <epcList>
+        <epc>urn:epc:id:sgtin:0057000.123780.7788</epc>
+      </epcList>
+      <action>ADD</action>
+      <bizStep>urn:fosstrak:demo:bizstep:fmcg:production</bizStep>
+      <disposition>urn:fosstrak:demo:disp:fmcg:pendingQA</disposition>
+      <readPoint>
+        <id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,432</id>
+      </readPoint>
+      <bizLocation>
+         <id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210</id>
+      </bizLocation>
+      <my_ns:my_extensionfield>My Extension</my_ns:my_extensionfield>
+    </ObjectEvent>
+  </EventList>
+</EPCISBody>
+</epcis:EPCISDocument>
+---------------------------------------------------------------------------
+
+  If you send this XML to the repository's capture interface using HTTP POST
+  (see {{{#How to Capture EPCIS Events}How to Capture EPCIS Events}}), the
+  my_extensionsfield extension will be stored along with all the other event
+  fields.
+
+  Next, you can explicitly query for events with your custom event field. Make
+  sure that the query parameter name contains your unique namespace, followed
+  by a "#", followed by the name of your event field extension, as described in
+  the EPCIS specification. The following snippet is a valid EPCIS query poll
+  which returns the event you just captured in the previous step:
+
+---------------------------------------------------------------------------
+<epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1">
+  <queryName>SimpleEventQuery</queryName>
+  <params>
+    <param>
+      <name>EQ_http://my.unique.namespace#my_extensionfield</name>
+      <value><string>My Extension</string></value>
+    </param>
+  </params>
+</epcisq:Poll>
+---------------------------------------------------------------------------
+
+  You can also use "LT_", "LE_", "GT_", or "GE_" query parameters to retrieve
+  the corresponding events. Of course this would only make sense if the value
+  of your custom event field was of type integer, floating point, or date/time.
 
 
 * {Runtime Configuration of your EPCIS Repository}
