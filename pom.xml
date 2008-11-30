@@ -341,8 +341,7 @@
     <developer>
       <id>roduner</id>
       <name>Christof Roduner</name>
-      <email>roduner@inf.ethz.ch</email>
-      <url>http://people.inf.ethz.ch/rodunerc</url>
+      <email>roduner at inf.ethz.ch</email>
       <organization>ETH Zurich</organization>
       <roles>
         <role>project coordinator</role>
@@ -353,9 +352,9 @@
     <developer>
       <id>steybem</id>
       <name>Marco Steybe</name>
-      <email>marco.steybe@zuehlke.com</email>
+      <email>marco.steybe at zuehlke.com</email>
+      <organization>Zuehlke Engineering</organization>
       <roles>
-        <role>architect</role>
         <role>developer</role>
       </roles>
       <timezone>+1</timezone>
@@ -364,13 +363,16 @@
   <contributors>
     <contributor>
       <name>Sean Wellington</name>
+      <email>-</email>
+      <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
     </contributor>
     <contributor>
       <name>Andrea Groessbauer</name>
-      <email>andreagr@student.ethz.ch</email>
+      <email>-</email>
+      <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
@@ -378,7 +380,8 @@
     </contributor>
     <contributor>
       <name>Alain Remund</name>
-      <email>remunda@student.ethz.ch</email>
+      <email>-</email>
+      <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
@@ -386,7 +389,8 @@
     </contributor>
     <contributor>
       <name>Arthur Van Dorp</name>
-      <email>vandorpa@student.ethz.ch</email>
+      <email>-</email>
+      <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
@@ -394,7 +398,8 @@
     </contributor>
     <contributor>
       <name>David Gubler</name>
-      <email>dgubler@student.ethz.ch</email>
+      <email>-</email>
+      <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
