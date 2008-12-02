@@ -61,7 +61,6 @@ import org.fosstrak.epcis.model.ImplementationException;
 import org.fosstrak.epcis.model.ImplementationExceptionSeverity;
 import org.fosstrak.epcis.model.ObjectEventType;
 import org.fosstrak.epcis.model.QuantityEventType;
-import org.fosstrak.epcis.model.QueryParam;
 import org.fosstrak.epcis.model.QueryParams;
 import org.fosstrak.epcis.model.QueryTooLargeException;
 import org.fosstrak.epcis.model.ReadPointType;
@@ -871,13 +870,8 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                 String subscrId = rs.getString("subscriptionid");
 
                 ObjectInput in = new ObjectInputStream(rs.getBinaryStream("params"));
+                QueryParams params = (QueryParams) in.readObject();
 
-                QueryParam[] paramArray = (QueryParam[]) in.readObject();
-                // convert QueryParam[] to QueryParams
-                QueryParams params = new QueryParams();
-                for (int i = 0; i < paramArray.length; i++) {
-                    params.getParam().add(paramArray[i]);
-                }
                 String dest = rs.getString("dest");
 
                 in = new ObjectInputStream(rs.getBinaryStream("sched"));
