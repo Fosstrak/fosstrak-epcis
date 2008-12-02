@@ -3,6 +3,12 @@
         <title>Changes epcis-commons</title>
     </properties>
     <body>
+        <release version="0.4.2" date="" description="Bug fix release">
+            <action dev="steybem" type="fix" issue="2379542" due-to="Nektarios Leontiadis">
+                Fixed query subscription error (unable to serialize and store
+                objects of type ArrayOfString to database)
+            </action>
+        </release>
         <release version="0.4.0" date="2008-07-29"
             description="Project name changed to Fosstrak">
             <action dev="roduner" type="update">
