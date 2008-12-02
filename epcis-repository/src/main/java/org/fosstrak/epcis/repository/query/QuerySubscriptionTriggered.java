@@ -101,7 +101,8 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
                 poll.setParams(params);
                 poll.setQueryName(queryName);
                 QueryResults results = executePoll(poll);
-                if (results.getResultsBody().getEventList() != null) {
+                if (results != null && results.getResultsBody() != null
+                        && results.getResultsBody().getEventList() != null) {
                     LOG.debug("Trigger condition fulfilled!");
                     LOG.debug("Executing subscribed query associated with trigger event ...");
                     super.executeQuery();
