@@ -20,29 +20,12 @@
 
 package org.fosstrak.epcis.queryclient;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.fosstrak.epcis.soap.DuplicateSubscriptionExceptionResponse;
-import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
-import org.fosstrak.epcis.soap.InvalidURIExceptionResponse;
-import org.fosstrak.epcis.soap.NoSuchNameExceptionResponse;
-import org.fosstrak.epcis.soap.NoSuchSubscriptionExceptionResponse;
-import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
-import org.fosstrak.epcis.soap.QueryTooComplexExceptionResponse;
-import org.fosstrak.epcis.soap.SecurityExceptionResponse;
-import org.fosstrak.epcis.soap.SubscribeNotPermittedExceptionResponse;
-import org.fosstrak.epcis.soap.SubscriptionControlsExceptionResponse;
-import org.fosstrak.epcis.soap.ValidationExceptionResponse;
-
 /**
- * A simple test utility class for sending subscriptions to a repository.
+ * A simple test utility class which demonstrates how to send an EPCIS query
+ * subscription to the Fosstrak EPCIS repository.
  * 
  * @author Marco Steybe
  */
@@ -51,68 +34,68 @@ public class SimpleSubscriptionsTest {
     // Note: keep the methods in this class static in order to prevent them from
     // being executed when building the project with Maven.
 
-    public static void subscribeFromFile(String filename, QueryControlClient client) throws IOException,
-            SubscribeNotPermittedExceptionResponse, DuplicateSubscriptionExceptionResponse,
-            ImplementationExceptionResponse, QueryTooComplexExceptionResponse, SecurityExceptionResponse,
-            InvalidURIExceptionResponse, ValidationExceptionResponse, NoSuchNameExceptionResponse,
-            SubscriptionControlsExceptionResponse, QueryParameterExceptionResponse {
-        InputStream is = new FileInputStream(filename);
-        client.subscribe(is);
-    }
-
-    public static void unsubscribeFromFile(String filename, QueryControlClient client)
-            throws ImplementationExceptionResponse, SecurityExceptionResponse, ValidationExceptionResponse,
-            NoSuchSubscriptionExceptionResponse, IOException {
-        InputStream is = new FileInputStream(filename);
-        client.unsubscribe(is);
-    }
-
     public static void main(String[] args) throws Exception {
-        // configure query service
+        // configure the query service
+        String queryUrl = "http://demo.fosstrak.org/epcis/query";
         QueryControlClient client = new QueryControlClient();
-        client.configureService(new URL("http://demo.fosstrak.org/epcis/query"), null);
+        client.configureService(new URL(queryUrl), null);
 
-        // change this flag, if you want to run unsubscribe
-        boolean doSubscribe = false;
-        String dir = "D:/test/subscriptions";
+        // subscribe a query
+        System.out.println("Sending subscription:");
+        String mySubscrId = "mySubscription";
+        String xml = createSubscriptionXml(mySubscrId);
+        System.out.println(xml);
+        client.subscribe(xml);
 
-        /*
-         * NOTE: to subscribe, use the subscribe.xml extension (e.g.,
-         * test1_subscribe.xml) in file names; to unsubscribe, use the
-         * unsubscribe.xml extension. The files must be located in the specified
-         * directory
-         */
-
-        String ext = "_subscribe.xml";
-        if (!doSubscribe) {
-            ext = "_unsubscribe.xml";
+        // list subscription IDs
+        System.out.println("Listing all subscribed queries:");
+        List<String> subscrIds = client.getSubscriptionIds("SimpleEventQuery");
+        for (String subscrId : subscrIds) {
+            System.out.println(" - " + subscrId);
         }
-        List<String> xmlFiles = listFileNames(dir, ext);
-        for (String fileName : xmlFiles) {
-            System.out.println(fileName);
-            if (doSubscribe) {
-                subscribeFromFile(fileName, client);
-            } else {
-                unsubscribeFromFile(fileName, client);
-            }
+
+        // TODO you should wait here and listen for callbacks on the specified address
+
+        // unsubscribe a query
+        System.out.println("Unsubscribing query subscription with ID: " + mySubscrId);
+        client.unsubscribe(mySubscrId);
+
+        // list subscription IDs ('mySubscription' should not be present anymore)
+        System.out.println("Listing all subscribed queries:");
+        subscrIds = client.getSubscriptionIds("SimpleEventQuery");
+        for (String subscrId : subscrIds) {
+            System.out.println(" - " + subscrId);
         }
     }
 
-    private static List<String> listFileNames(String dirName, final String fileNameEndingFilter) {
-        List<String> fileNames = new ArrayList<String>();
-        File dir = new File(dirName);
-        if (dir.isDirectory()) {
-            for (File f : dir.listFiles(new FileFilter() {
-                public boolean accept(File file) {
-                    if (file.getName().endsWith(fileNameEndingFilter)) {
-                        return true;
-                    }
-                    return false;
-                }
-            })) {
-                fileNames.add(f.getPath());
-            }
-        }
-        return fileNames;
+    private static String createSubscriptionXml(String subscriptionId) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<epcisq:Subscribe xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">\n");
+        sb.append("<queryName>SimpleEventQuery</queryName>\n");
+        sb.append("<params>\n");
+        sb.append("  <param>\n");
+        sb.append("    <name>eventType</name>\n");
+        sb.append("    <value>\n");
+        sb.append("      <string>ObjectEvent</string>\n");
+        sb.append("    </value>\n");
+        sb.append("  </param>\n");
+        sb.append("  <param>\n");
+        sb.append("    <name>MATCH_epc</name>\n");
+        sb.append("    <value>\n");
+        sb.append("      <string>urn:epc:id:sgtin:0614141.107346.2017</string>\n");
+        sb.append("    </value>\n");
+        sb.append("  </param>\n");
+        sb.append("</params>\n");
+        sb.append("<dest>http://localhost:8888/</dest> <!-- this is where query results will be delivered to -->\n");
+        sb.append("<controls>\n");
+        sb.append("  <schedule>\n");
+        sb.append("    <second>0</second> <!-- every full minute -->\n");
+        sb.append("  </schedule>\n");
+        sb.append("  <initialRecordTime>2008-03-16T00:00:00+01:00</initialRecordTime>\n");
+        sb.append("  <reportIfEmpty>false</reportIfEmpty>\n");
+        sb.append("</controls>\n");
+        sb.append("<subscriptionID>").append(subscriptionId).append("</subscriptionID>\n");
+        sb.append("</epcisq:Subscribe>");
+        return sb.toString();
     }
 }

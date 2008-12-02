@@ -36,41 +36,43 @@ public class SimpleMasterDataQueryTest {
     // Note: keep the methods in this class static in order to prevent them from
     // being executed when building the project with Maven.
 
-    /**
-     * Creates and returns a simple EPCIS masterdata query in its XML form.
-     */
-    public static String createXmlQuery() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<epcisq:Poll xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">");
-        sb.append("<queryName>SimpleMasterDataQuery</queryName>");
-        sb.append("<params>");
-        sb.append("<param>");
-        sb.append("<name>includeAttributes</name>");
-        sb.append("<value>true</value>");
-        sb.append("</param>");
-        sb.append("<param>");
-        sb.append("<name>includeChildren</name>");
-        sb.append("<value>true</value>");
-        sb.append("</param>");
-        sb.append("<param>");
-        sb.append("<name>EQ_name</name>");
-        sb.append("<value><string>urn:epcglobal:fmcg:loc:0614141073467</string></value>");
-        sb.append("</param>");
-        sb.append("</params>");
-        sb.append("</epcisq:Poll>");
-        return sb.toString();
-    }
-
     public static void main(String[] args) throws Exception {
-        // configure query service
+        // configure the query service
+        String queryUrl = "http://demo.fosstrak.org/epcis/query";
         QueryControlClient client = new QueryControlClient();
-        client.configureService(new URL("http://demo.fosstrak.org/epcis/query"), null);
+        client.configureService(new URL(queryUrl), null);
 
-        // create a query in its XML form
-        String xmlQuery = createXmlQuery();
-        // send the query to the query service
+        // create a query in its XML form and send it to the repository
+        System.out.println("Sending query:");
+        String xmlQuery = createPollXml();
+        System.out.println(xmlQuery);
         QueryResults results = client.poll(xmlQuery);
         // print the results to System.out
         QueryResultsParser.queryResultsToXml(results, System.out);
+    }
+
+    /**
+     * Creates and returns a simple EPCIS masterdata query in its XML form.
+     */
+    public static String createPollXml() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<epcisq:Poll xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">\n");
+        sb.append("<queryName>SimpleMasterDataQuery</queryName>\n");
+        sb.append("<params>\n");
+        sb.append("  <param>\n");
+        sb.append("    <name>includeAttributes</name>\n");
+        sb.append("    <value>true</value>\n");
+        sb.append("  </param>\n");
+        sb.append("  <param>\n");
+        sb.append("    <name>includeChildren</name>\n");
+        sb.append("    <value>true</value>\n");
+        sb.append("  </param>\n");
+        sb.append("  <param>\n");
+        sb.append("    <name>EQ_name</name>\n");
+        sb.append("    <value><string>urn:epcglobal:fmcg:loc:0614141073467</string></value>\n");
+        sb.append("  </param>\n");
+        sb.append("</params>\n");
+        sb.append("</epcisq:Poll>");
+        return sb.toString();
     }
 }

@@ -40,40 +40,30 @@ public class SimpleEventQueryTest {
     // Note: keep the methods in this class static in order to prevent them from
     // being executed when building the project with Maven.
 
-    /**
-     * Creates and returns a simple EPCIS query in its XML form.
-     */
-    public static String createXmlQuery() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<epcisq:Poll xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">");
-        sb.append("<queryName>SimpleEventQuery</queryName>");
-        sb.append("<params>");
-        sb.append("<param>");
-        sb.append("<name>eventType</name>");
-        sb.append("<value><string>ObjectEvent</string></value>");
-        sb.append("</param>");
-        sb.append("<param>");
-        sb.append("<name>GE_eventTime</name>");
-        sb.append("<value>2006-06-25T08:15:00+02:00</value>");
-        sb.append("</param>");
-        // uncomment or add your own query parameters ...
-        // sb.append("<param>");
-        // sb.append("<name>HASATTR_bizLocation</name>");
-        // sb.append("<value><string>urn:epcglobal:fmcg:foo</string><string>urn:demo:ctry</string></value>");
-        // sb.append("</param>");
-        // sb.append("<param>");
-        // sb.append("<name>EQATTR_bizLocation_urn:demo:ctry</name>");
-        // sb.append("<value><string>US</string></value>");
-        // sb.append("</param>");
-        sb.append("</params>");
-        sb.append("</epcisq:Poll>");
-        return sb.toString();
+    public static void main(String[] args) throws Exception {
+        // configure the query service
+        String queryUrl = "http://demo.fosstrak.org/epcis/query";
+        QueryControlClient client = new QueryControlClient();
+        client.configureService(new URL(queryUrl), null);
+
+        // create a query in its XML form and send it to the repository
+        System.out.println("Sending query:");
+        String xmlQuery = createPollXml();
+        System.out.println(xmlQuery);
+        QueryResults results = client.poll(xmlQuery);
+        // print the results to System.out
+        QueryResultsParser.queryResultsToXml(results, System.out);
+
+        // create a query Poll object and send it to the query service
+        Poll poll = createPoll();
+        results = client.poll(poll);
+        QueryResultsParser.queryResultsToXml(results, System.out);
     }
 
     /**
      * Creates and returns a simple EPCIS query Poll object.
      */
-    public static Poll createPoll() {
+    private static Poll createPoll() {
         // construct the query parameters
         QueryParam queryParam1 = new QueryParam();
         queryParam1.setName("eventType");
@@ -84,7 +74,7 @@ public class SimpleEventQueryTest {
         QueryParam queryParam2 = new QueryParam();
         queryParam2.setName("MATCH_epc");
         ArrayOfString queryParamValue2 = new ArrayOfString();
-        queryParamValue2.getString().add("urn:epc:id:sgtin:0000001.000001.0001");
+        queryParamValue2.getString().add("urn:epc:id:sgtin:0614141.107346.2017");
         queryParam2.setValue(queryParamValue2);
 
         // add the query parameters to the list of parameters
@@ -99,21 +89,28 @@ public class SimpleEventQueryTest {
         return poll;
     }
 
-    public static void main(String[] args) throws Exception {
-        // configure query service
-        QueryControlClient client = new QueryControlClient();
-        client.configureService(new URL("http://demo.fosstrak.org/epcis/query"), null);
-
-        // create a query in its XML form
-        String xmlQuery = createXmlQuery();
-        // send the query to the query service
-        QueryResults results = client.poll(xmlQuery);
-        // print the results to System.out
-        QueryResultsParser.queryResultsToXml(results, System.out);
-
-        // create a query Poll object and send it to the query service
-        Poll poll = createPoll();
-        results = client.poll(poll);
-        QueryResultsParser.queryResultsToXml(results, System.out);
+    /**
+     * Creates and returns a simple EPCIS query in its XML form.
+     */
+    private static String createPollXml() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<epcisq:Poll xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">\n");
+        sb.append("<queryName>SimpleEventQuery</queryName>\n");
+        sb.append("<params>\n");
+        sb.append("  <param>\n");
+        sb.append("    <name>eventType</name>\n");
+        sb.append("    <value>\n");
+        sb.append("      <string>ObjectEvent</string>\n");
+        sb.append("    </value>\n");
+        sb.append("  </param>\n");
+        sb.append("  <param>\n");
+        sb.append("    <name>MATCH_epc</name>\n");
+        sb.append("    <value>\n");
+        sb.append("      <string>urn:epc:id:sgtin:0614141.107346.2017</string>\n");
+        sb.append("    </value>\n");
+        sb.append("  </param>\n");
+        sb.append("</params>\n");
+        sb.append("</epcisq:Poll>");
+        return sb.toString();
     }
 }
