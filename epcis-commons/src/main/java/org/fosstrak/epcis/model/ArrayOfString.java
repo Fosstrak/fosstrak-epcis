@@ -1,5 +1,6 @@
 package org.fosstrak.epcis.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,9 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ArrayOfString", propOrder = { "string" })
-public class ArrayOfString {
+public class ArrayOfString implements Serializable {
+
+    private static final long serialVersionUID = -7854306152565003137L;
 
     @XmlElement(required = true)
     protected List<String> string;
