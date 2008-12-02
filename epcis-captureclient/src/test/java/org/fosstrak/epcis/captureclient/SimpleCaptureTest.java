@@ -20,11 +20,7 @@
 
 package org.fosstrak.epcis.captureclient;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.GregorianCalendar;
@@ -45,59 +41,72 @@ import org.fosstrak.epcis.model.ObjectEventType;
 import org.fosstrak.epcis.model.ReadPointType;
 
 /**
- * A simple test utility class for sending a single or multiple capture
- * request(s) to the Fosstrak EPCIS capture interface and bootstrapping the
- * capture module.
+ * A simple test utility class for demonstrating how to capture EPCIS events to
+ * the Fosstrak EPCIS capture interface
  * 
  * @author Marco Steybe
  */
 public class SimpleCaptureTest {
 
-    /**
-     * Constructs a simple EPCIS event XML String, sends it to the EPCIS
-     * repository at the specified URL String, and returns the response from the
-     * repository.
-     */
-    public static boolean capture(String captureUrl) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<epcis:EPCISDocument xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" creationDate=\"2008-03-06T11:42:15.016+01:00\" schemaVersion=\"1.0\">");
-        sb.append("<EPCISBody>");
-        sb.append("<EventList>");
-        sb.append("<ObjectEvent>");
-        sb.append("<eventTime>2006-09-20T06:36:17Z</eventTime>");
-        sb.append("<eventTimeZoneOffset>+00:00</eventTimeZoneOffset>");
-        sb.append("<epcList>");
-        sb.append("<epc>urn:epc:id:sgtin:0057000.123780.7788</epc>");
-        sb.append("</epcList>");
-        sb.append("<action>ADD</action>");
-        sb.append("<bizStep>urn:fosstrak:demo:bizstep:fmcg:production</bizStep>");
-        sb.append("<disposition>urn:fosstrak:demo:disp:fmcg:pendingQA</disposition>");
-        sb.append("<readPoint>");
-        sb.append("<id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,432</id>");
-        sb.append("</readPoint>");
-        sb.append("<bizLocation>");
-        sb.append("<id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210</id>");
-        sb.append("</bizLocation>");
-        sb.append("</ObjectEvent>");
-        sb.append("</EventList>");
-        sb.append("</EPCISBody>");
-        sb.append("</epcis:EPCISDocument>");
-
+    public static void main(String[] args) throws Exception {
+        // configure the capture service
+        String captureUrl = "http://demo.fosstrak.org/epcis/capture";
         CaptureClient client = new CaptureClient(captureUrl);
-        int responseCode = client.capture(sb.toString());
-        if (responseCode == 200) {
-            return true;
+
+        // create a request in its XML form and send it to the repository
+        System.out.println("Sending events:");
+        String xml = createEventsXml();
+        System.out.println(xml);
+        int htmlResponseCode = client.capture(xml);
+        if (htmlResponseCode == 200) {
+            System.out.println("Capture of events successful");
         }
-        return false;
+
+        // create a request using the API and send it to the repository
+        EPCISDocumentType epcisDoc = createEpcisDoc();
+        htmlResponseCode = client.capture(epcisDoc);
+        if (htmlResponseCode == 200) {
+            System.out.println("Capture of events successful");
+        }
     }
 
     /**
-     * Constructs a simple EPCIS event XML using the API objects from the EPCIS
-     * schema, sends it to the repository at the specified URL String, and
-     * returns the response from the repository.
+     * Constructs and returns a simple EPCIS event XML String.
      */
-    public static boolean captureWithApi(String captureUrl) throws IOException, JAXBException {
+    private static String createEventsXml() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        sb.append("<epcis:EPCISDocument xmlns:epcis=\"urn:epcglobal:epcis:xsd:1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" creationDate=\"2008-03-06T11:42:15.016+01:00\" schemaVersion=\"1.0\" xmlns:my_ns=\"http://my.unique.namespace\">\n");
+        sb.append("<EPCISBody>\n");
+        sb.append("  <EventList>\n");
+        sb.append("    <ObjectEvent>\n");
+        sb.append("      <eventTime>2008-11-09T14:30:17Z</eventTime>\n");
+        sb.append("      <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>\n");
+        sb.append("      <epcList>\n");
+        sb.append("        <epc>urn:epc:id:sgtin:0057000.123780.7788</epc>\n");
+        sb.append("      </epcList>\n");
+        sb.append("      <action>ADD</action>\n");
+        sb.append("      <bizStep>urn:fosstrak:demo:bizstep:fmcg:production</bizStep>\n");
+        sb.append("      <disposition>urn:fosstrak:demo:disp:fmcg:pendingQA</disposition>\n");
+        sb.append("      <readPoint>\n");
+        sb.append("        <id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,432</id>\n");
+        sb.append("      </readPoint>\n");
+        sb.append("      <bizLocation>\n");
+        sb.append("        <id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210</id>\n");
+        sb.append("      </bizLocation>\n");
+        sb.append("      <my_ns:my_extensionfield>My Extension</my_ns:my_extensionfield>\n");
+        sb.append("    </ObjectEvent>\n");
+        sb.append("  </EventList>\n");
+        sb.append("</EPCISBody>\n");
+        sb.append("</epcis:EPCISDocument>");
+        return sb.toString();
+    }
+
+    /**
+     * Constructs and returns a simple EPCIS event XML using the API objects
+     * from the EPCIS schema.
+     */
+    private static EPCISDocumentType createEpcisDoc() throws IOException, JAXBException {
         ObjectEventType objEvent = new ObjectEventType();
 
         // get the current time and set the eventTime
@@ -156,59 +165,6 @@ public class SimpleCaptureTest {
         epcisDoc.setSchemaVersion(new BigDecimal("1.0"));
         epcisDoc.setCreationDate(now);
 
-        // send the EPCISDocument to the repository using the CaptureClient
-        CaptureClient client = new CaptureClient(captureUrl);
-        int responseCode = client.capture(epcisDoc);
-        if (responseCode == 200) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean captureFromFile(String filename, String captureUrl) throws IOException {
-        CaptureClient client = new CaptureClient(captureUrl);
-        System.out.println("capturing file: " + filename);
-        System.out.println("capturing url: " + client.getCaptureUrl());
-        InputStream is = new FileInputStream(filename);
-        int responseCode = client.capture(is);
-        if (responseCode == 200) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean captureFromDir(String dirname, String captureUrl) throws IOException {
-        // capture all xml files in the given folder
-        File dir = new File(dirname);
-        boolean allOk = true;
-        if (dir.isDirectory()) {
-            for (File f : dir.listFiles(new FileFilter() {
-                public boolean accept(File file) {
-                    if (file.getName().endsWith(".xml")) {
-                        return true;
-                    }
-                    return false;
-                }
-            })) {
-                boolean ok = captureFromFile(f.getPath(), captureUrl);
-                if (!ok) {
-                    allOk = false;
-                }
-            }
-        }
-        return allOk;
-    }
-
-    public static void main(String[] args) throws Exception {
-        String captureUrl = null; // use default
-        boolean ok = captureWithApi(captureUrl);
-        // boolean ok = capture(captureUrl);
-        // boolean ok = captureFromFile("D:/test/test.xml", captureUrl);
-        // boolean ok = captureFromDir("D:/test/events", captureUrl);
-        if (ok) {
-            System.out.println("Capture of all events successful");
-        } else {
-            System.out.println("Capture of at least one event failed");
-        }
+        return epcisDoc;
     }
 }
