@@ -36,6 +36,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBElement;
 
+import org.fosstrak.epcis.gui.AuthenticationOptionsChangeEvent;
+import org.fosstrak.epcis.gui.AuthenticationOptionsChangeListener;
 import org.fosstrak.epcis.model.AggregationEventType;
 import org.fosstrak.epcis.model.ArrayOfString;
 import org.fosstrak.epcis.model.BusinessTransactionType;
@@ -59,15 +61,11 @@ import org.fosstrak.epcis.utils.TimeParser;
  * 
  * @author David Gubler
  */
-public class QueryClientGuiHelper {
+public class QueryClientGuiHelper implements AuthenticationOptionsChangeListener {
 
     private static final String PROPERTY_FILE = "/queryclient.properties";
     private static final String PROP_QUERY_URL = "default.url";
     private static final String DEFAULT_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
-
-    public static final String AUTH_NONE = "None";
-    public static final String AUTH_BASIC = "Basic";
-    public static final String AUTH_HTTPS_CLIENT_CERT = "X.509 Certificate";
 
     private QueryControlClient queryClient;
 
@@ -115,14 +113,20 @@ public class QueryClientGuiHelper {
      * @return The query client properties.
      */
     private Properties loadProperties() {
-        InputStream is = getClass().getResourceAsStream(PROPERTY_FILE);
         Properties props = new Properties();
-        try {
-            props.load(is);
-            is.close();
-        } catch (IOException e) {
+        InputStream is = getClass().getResourceAsStream(PROPERTY_FILE);
+        if (is != null) {
+	        try {
+	            props.load(is);
+	            is.close();
+	        } catch (IOException e) {
+	            System.out.println("Unable to load queryclient properties from "
+	                    + QueryControlClient.class.getResource(PROPERTY_FILE).toString() + ". Using defaults.");
+	        }
+        }
+        else {
             System.out.println("Unable to load queryclient properties from "
-                    + QueryControlClient.class.getResource(PROPERTY_FILE).toString() + ". Using defaults.");
+                    + PROPERTY_FILE + ". Using defaults.");
         }
         return props;
     }
@@ -564,9 +568,9 @@ public class QueryClientGuiHelper {
      *            username and password are available if Basic authentication is
      *            chosen).
      */
-    void setConfigurationChanged(boolean configurationComplete) {
+    public void configurationChanged(AuthenticationOptionsChangeEvent ace) {
         this.configurationChanged = true;
-        mainWindow.setButtonsEnabled(configurationComplete);
+        mainWindow.setButtonsEnabled(ace.isComplete());
     }
 
     /**

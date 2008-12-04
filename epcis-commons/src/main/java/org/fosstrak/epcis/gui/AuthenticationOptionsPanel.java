@@ -18,13 +18,14 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.fosstrak.epcis.queryclient;
+package org.fosstrak.epcis.gui;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -38,52 +39,58 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 
+import org.fosstrak.epcis.utils.AuthenticationType;
+
+
 /**
- * The AuthenticationPanel is a pull down list of authentication modes and
+ * The AuthenticationConfigurationPanel is a pull down list of authentication modes and
  * widgets to accept parameters relevant to those choices. It is displayed
- * inline beneath the "Query interface URL" text field. It has two subcomponents
+ * inline beneath the "URL" text field in the capture and query clients. It has two subcomponents
  * (BasicOptionsPanel and CertificateOptionsPanel) that contain inputs relevant
  * to the parameters for those authentication methods.
  * 
  * @author Sean Wellington
  */
-public class AuthenticationPanel extends JPanel implements ActionListener {
+public class AuthenticationOptionsPanel extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = -6085494400041808090L;
 
-    private static final String[] authTypes = {
-            QueryClientGuiHelper.AUTH_NONE, QueryClientGuiHelper.AUTH_BASIC,
-            QueryClientGuiHelper.AUTH_HTTPS_CLIENT_CERT };
-
-    private QueryClientGuiHelper helper;
+    private static final Map<String, AuthenticationType> authTypes = new LinkedHashMap<String, AuthenticationType>();
+    static {
+    	authTypes.put("None", AuthenticationType.NONE);
+    	authTypes.put("Basic", AuthenticationType.BASIC);
+    	authTypes.put("X.509 Certificate", AuthenticationType.HTTPS_WITH_CLIENT_CERT);
+    }
+    
+    private AuthenticationOptionsChangeListener helper;
 
     private JLabel authTypeLabel;
     private JComboBox authTypeSelector;
     private OptionsPanel selectedOptionsPanel;
 
-    private Map<String, OptionsPanel> allOptionsPanels = new HashMap<String, OptionsPanel>();
+    private Map<AuthenticationType, OptionsPanel> allOptionsPanels = new HashMap<AuthenticationType, OptionsPanel>();
 
-    public AuthenticationPanel(QueryClientGuiHelper helper) {
+    public AuthenticationOptionsPanel(AuthenticationOptionsChangeListener helper) {
         super(new FlowLayout(FlowLayout.LEFT, 5, 0));
         this.helper = helper;
 
         authTypeLabel = new JLabel("Authentication Mode:");
         add(authTypeLabel);
 
-        authTypeSelector = new JComboBox(authTypes);
+        authTypeSelector = new JComboBox(authTypes.keySet().toArray());
         authTypeSelector.addActionListener(this);
         add(authTypeSelector);
 
         OptionsPanel noneOptions = new NoneOptionsPanel();
-        allOptionsPanels.put(QueryClientGuiHelper.AUTH_NONE, noneOptions);
+        allOptionsPanels.put(AuthenticationType.NONE, noneOptions);
         add((JPanel) noneOptions);
 
         OptionsPanel basicOptions = new BasicOptionsPanel();
-        allOptionsPanels.put(QueryClientGuiHelper.AUTH_BASIC, basicOptions);
+        allOptionsPanels.put(AuthenticationType.BASIC, basicOptions);
         add((JPanel) basicOptions);
 
         OptionsPanel certOptions = new CertificateOptionsPanel();
-        allOptionsPanels.put(QueryClientGuiHelper.AUTH_HTTPS_CLIENT_CERT, certOptions);
+        allOptionsPanels.put(AuthenticationType.HTTPS_WITH_CLIENT_CERT, certOptions);
         add((JPanel) certOptions);
 
         selectedOptionsPanel = noneOptions;
@@ -92,18 +99,20 @@ public class AuthenticationPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (authTypeSelector == e.getSource()) {
             selectedOptionsPanel.setVisible(false);
-            selectedOptionsPanel = allOptionsPanels.get(authTypeSelector.getSelectedItem());
+            AuthenticationType at = authTypes.get(authTypeSelector.getSelectedItem());
+            selectedOptionsPanel = allOptionsPanels.get(at);
             selectedOptionsPanel.setVisible(true);
-            helper.setConfigurationChanged(selectedOptionsPanel.isComplete());
+            helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, selectedOptionsPanel.isComplete()));
         }
     }
 
-    public String[] getAuthenticationOptions() {
+    public Object[] getAuthenticationOptions() {
         return selectedOptionsPanel.getAuthenticationOptions();
     }
 
     private interface OptionsPanel {
-        public String[] getAuthenticationOptions();
+
+    	public Object[] getAuthenticationOptions();
 
         public void setVisible(boolean visible);
 
@@ -114,8 +123,8 @@ public class AuthenticationPanel extends JPanel implements ActionListener {
 
         private static final long serialVersionUID = -3875349682626806242L;
 
-        public String[] getAuthenticationOptions() {
-            return new String[] { QueryClientGuiHelper.AUTH_NONE };
+        public Object[] getAuthenticationOptions() {
+            return new Object[] { AuthenticationType.NONE };
         }
 
         public boolean isComplete() {
@@ -152,21 +161,21 @@ public class AuthenticationPanel extends JPanel implements ActionListener {
             setVisible(false);
         }
 
-        public String[] getAuthenticationOptions() {
-            return new String[] {
-                    QueryClientGuiHelper.AUTH_BASIC, userNameInput.getText(), new String(passwordInput.getPassword()) };
+        public Object[] getAuthenticationOptions() {
+            return new Object[] {
+                    AuthenticationType.BASIC, userNameInput.getText(), new String(passwordInput.getPassword()) };
         }
 
         public void changedUpdate(DocumentEvent e) {
-            helper.setConfigurationChanged(isComplete());
+            helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
         }
 
         public void insertUpdate(DocumentEvent e) {
-            helper.setConfigurationChanged(isComplete());
+            helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
         }
 
         public void removeUpdate(DocumentEvent e) {
-            helper.setConfigurationChanged(isComplete());
+            helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
         }
 
         public boolean isComplete() {
@@ -223,9 +232,9 @@ public class AuthenticationPanel extends JPanel implements ActionListener {
             setVisible(false);
         }
 
-        public String[] getAuthenticationOptions() {
-            return new String[] {
-                    QueryClientGuiHelper.AUTH_HTTPS_CLIENT_CERT, keyStoreInput.getText(),
+        public Object[] getAuthenticationOptions() {
+            return new Object[] {
+                    AuthenticationType.HTTPS_WITH_CLIENT_CERT, keyStoreInput.getText(),
                     new String(passwordInput.getPassword()) };
         }
 
@@ -235,7 +244,7 @@ public class AuthenticationPanel extends JPanel implements ActionListener {
                 if (returnCode == JFileChooser.APPROVE_OPTION) {
                     File f = fileChooser.getSelectedFile();
                     keyStoreInput.setText(f.toString());
-                    helper.setConfigurationChanged(isComplete());
+                    helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
                 }
             }
         }
@@ -247,15 +256,15 @@ public class AuthenticationPanel extends JPanel implements ActionListener {
         }
 
         public void changedUpdate(DocumentEvent e) {
-            helper.setConfigurationChanged(isComplete());
+            helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
         }
 
         public void insertUpdate(DocumentEvent e) {
-            helper.setConfigurationChanged(isComplete());
+            helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
         }
 
         public void removeUpdate(DocumentEvent e) {
-            helper.setConfigurationChanged(isComplete());
+            helper.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
         }
     }
 }

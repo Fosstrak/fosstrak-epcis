@@ -60,6 +60,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.xml.datatype.DatatypeFactory;
 
+import org.fosstrak.epcis.gui.AuthenticationOptionsChangeEvent;
+import org.fosstrak.epcis.gui.AuthenticationOptionsPanel;
 import org.fosstrak.epcis.model.ArrayOfString;
 import org.fosstrak.epcis.model.QueryParam;
 import org.fosstrak.epcis.model.QuerySchedule;
@@ -126,7 +128,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private JPanel mwSubscribeManagementPanel;
     private JPanel mwEventTypeSelectPanel;
     private JPanel mwQueryPanel;
-    private AuthenticationPanel mwAuthOptions;
+    private AuthenticationOptionsPanel mwAuthOptions;
     private JPanel mwSubscriptionPanel;
     private JPanel mwQueryArgsPanel;
     private JPanel mwQueryExamplesPanel;
@@ -575,7 +577,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mwServiceUrlLabel = new JLabel("Query interface URL: ");
         mwServiceInfoButton = new JButton("Info");
         mwServiceInfoButton.addActionListener(this);
-        mwAuthOptions = new AuthenticationPanel(client);
+        mwAuthOptions = new AuthenticationOptionsPanel(client);
 
         mwUnsubscribeQueryLabel = new JLabel("Unsubscribe ID: ");
         mwUnsubscribeQueryTextField = new JTextField("", 40);
@@ -591,15 +593,15 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mwServiceUrlTextField.getDocument().addDocumentListener(new DocumentListener() {
 
 			public void changedUpdate(DocumentEvent e) {
-				client.setConfigurationChanged(isComplete());
+				client.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
 			}
 
 			public void insertUpdate(DocumentEvent e) {
-				client.setConfigurationChanged(isComplete());
+				client.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
 			}
 
 			public void removeUpdate(DocumentEvent e) {
-				client.setConfigurationChanged(isComplete());
+				client.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
 			}
 			
 			public boolean isComplete() {
@@ -1576,7 +1578,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     	return mwServiceUrlTextField.getText();
     }
     
-    String[] getAuthenticationOptions() {
+    Object[] getAuthenticationOptions() {
     	return mwAuthOptions.getAuthenticationOptions();
     }
 

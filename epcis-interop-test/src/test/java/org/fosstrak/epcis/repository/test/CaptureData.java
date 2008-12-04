@@ -57,7 +57,7 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testCommissionCases() throws IOException {
+    public void testCommissionCases() throws Exception {
         // read the events
         InputStream fis = new FileInputStream(COMMISSION_CASES_XML);
         byte[] xml = new byte[fis.available()];
@@ -76,7 +76,7 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testCommissionPallets() throws IOException {
+    public void testCommissionPallets() throws Exception {
         // read the events
         InputStream fis = new FileInputStream(COMMISSION_PALLETS_XML);
         byte[] xml = new byte[fis.available()];
@@ -95,7 +95,7 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testPackCases() throws IOException {
+    public void testPackCases() throws Exception {
         // read the events
         InputStream fis = new FileInputStream(PACK_CASES_XML);
         byte[] xml = new byte[fis.available()];
@@ -114,8 +114,8 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testReceivePallets() throws IOException {
-        // read the events
+    public void testReceivePallets() throws Exception {
+       // read the events
         InputStream fis = new FileInputStream(REICEIVE_PALLET_XML);
         byte[] xml = new byte[fis.available()];
         fis.read(xml);
@@ -133,7 +133,7 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testPickOrder() throws IOException {
+    public void testPickOrder() throws Exception {
         // read the events
         InputStream fis = new FileInputStream(PICK_ORDER_XML);
         byte[] xml = new byte[fis.available()];
@@ -152,7 +152,7 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testShipOrder() throws IOException {
+    public void testShipOrder() throws Exception {
         // read the events
         InputStream fis = new FileInputStream(SHIP_ORDER_XML);
         byte[] xml = new byte[fis.available()];
@@ -171,7 +171,7 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testReceiveOrder() throws IOException {
+    public void testReceiveOrder() throws Exception {
         // read the events
         InputStream fis = new FileInputStream(RECEIVE_ORDER_XML);
         byte[] xml = new byte[fis.available()];
@@ -190,7 +190,7 @@ public class CaptureData extends TestCase {
      * @throws IOException
      *             Error Reading file
      */
-    public void testStoreInventory() throws IOException {
+    public void testStoreInventory() throws Exception {
         // read the events
         InputStream fis = new FileInputStream(STORE_INVENTORY_XML);
         byte[] xml = new byte[fis.available()];
@@ -203,7 +203,7 @@ public class CaptureData extends TestCase {
         assertEquals(200, response);
     }
 
-    public void captureAll() throws IOException {
+    public void captureAll() throws Exception {
         this.testCommissionCases();
         this.testCommissionPallets();
         this.testPackCases();

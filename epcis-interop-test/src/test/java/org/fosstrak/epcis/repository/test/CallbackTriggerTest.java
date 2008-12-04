@@ -131,7 +131,7 @@ public class CallbackTriggerTest extends TestCase {
                 client.capture(event.toString());
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

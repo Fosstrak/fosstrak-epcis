@@ -43,7 +43,7 @@ public class MassCaptureTest {
     private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
     private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
 
-    public static void testCaptureRequest(final int epcSerialNr) throws IOException {
+    public static void testCaptureRequest(final int epcSerialNr) throws Exception {
         Calendar now = Calendar.getInstance();
         String time = format(now);
         String tz = getTimeZone(now);
@@ -158,7 +158,7 @@ public class MassCaptureTest {
         return buf.toString();
     }
 
-    public static void main(final String[] args) throws IOException {
+    public static void main(final String[] args) throws Exception {
         for (int epcSerialNr = 0; epcSerialNr < 1000; epcSerialNr++) {
             testCaptureRequest(epcSerialNr);
         }

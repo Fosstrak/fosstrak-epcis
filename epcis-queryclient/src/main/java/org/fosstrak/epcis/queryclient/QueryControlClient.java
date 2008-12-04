@@ -73,6 +73,7 @@ import org.fosstrak.epcis.soap.SecurityExceptionResponse;
 import org.fosstrak.epcis.soap.SubscribeNotPermittedExceptionResponse;
 import org.fosstrak.epcis.soap.SubscriptionControlsExceptionResponse;
 import org.fosstrak.epcis.soap.ValidationExceptionResponse;
+import org.fosstrak.epcis.utils.AuthenticationType;
 
 /**
  * This query client makes calls against the EPCIS query control interface and
@@ -103,7 +104,17 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
      */
     public QueryControlClient() {
     }
-
+    
+    /**
+     * Instantiates a new QueryControlClient configured to communicate with
+     * the repository indicated by URL, with no authentication.
+     * @param url the URL of the repositor to communicate with.
+     * @throws Exception
+     */
+    public QueryControlClient(String url) throws Exception {
+    	configureService(new URL(url), null);
+    }
+    
     /**
      * @return whether or not this service is configured and ready to use.
      */
@@ -131,19 +142,19 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
      *            <td><code>[2]</code></td>
      *            </tr>
      *            <tr>
-     *            <td><code>QueryClientGuiHelper.AUTH_BASIC</code></td>
+     *            <td><code>AuthenticationType.BASIC</code></td>
      *            <td>username</td>
      *            <td>password</td>
      *            </tr>
      *            <tr>
-     *            <td><code>QueryClientGuiHelper.AUTH_HTTPS_CLIENT_CERT</code></td>
+     *            <td><code>AuthenticationType.HTTPS_WITH_CLIENT_CERT</code></td>
      *            <td>keystore file</td>
      *            <td>password</td>
      *            </tr>
      *            </table>
      * @throws Exception
      */
-    public void configureService(URL endpointAddress, String[] authenticationOptions) throws Exception {
+    public void configureService(URL endpointAddress, Object[] authenticationOptions) throws Exception {
         // logger.debug("Configuring service to communicate with endpoint: " +
         // endpointAddress);
         serviceConfigured = false;
@@ -166,19 +177,22 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
 
         // set up any authentication
         if (authenticationOptions != null) {
-            if (QueryClientGuiHelper.AUTH_BASIC.equals(authenticationOptions[0])) {
+            if (AuthenticationType.BASIC.equals(authenticationOptions[0])) {
                 // logger.debug("Authenticating via Basic as: " +
                 // authenticationOptions[1]);
 
-                if (isEmpty(authenticationOptions[1]) || isEmpty(authenticationOptions[2])) {
+            	String username = (String)authenticationOptions[1];
+            	String password = (String)authenticationOptions[2];
+            	
+                if (isEmpty(username) || isEmpty(password)) {
                     throw new Exception("Authentication method " + authenticationOptions[0]
                             + " requires a valid user name and password");
                 }
 
                 AuthorizationPolicy ap = httpConduit.getAuthorization();
-                ap.setUserName(authenticationOptions[1]);
-                ap.setPassword(authenticationOptions[2]);
-            } else if (QueryClientGuiHelper.AUTH_HTTPS_CLIENT_CERT.equals(authenticationOptions[0])) {
+                ap.setUserName(username);
+                ap.setPassword(password);
+            } else if (AuthenticationType.HTTPS_WITH_CLIENT_CERT.equals(authenticationOptions[0])) {
                 // logger.debug("Authenticating with certificate in file: " +
                 // authenticationOptions[1]);
 
@@ -186,18 +200,19 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
                     throw new Exception("Authentication method " + authenticationOptions[0]
                             + " requires the use of HTTPS");
                 }
+                
+    			String keyStoreFile = (String)authenticationOptions[1];
+    			String password = (String)authenticationOptions[2];
 
-                if (isEmpty(authenticationOptions[1]) || isEmpty(authenticationOptions[2])) {
+                if (isEmpty(keyStoreFile) || isEmpty(password)) {
                     throw new Exception("Authentication method " + authenticationOptions[0]
                             + " requires a valid keystore (PKCS12 or JKS) and password");
                 }
 
-                String keyStoreFile = authenticationOptions[1];
-                char[] password = authenticationOptions[2].toCharArray();
                 KeyStore keyStore = KeyStore.getInstance(keyStoreFile.endsWith(".p12") ? "PKCS12" : "JKS");
-                keyStore.load(new FileInputStream(new File(keyStoreFile)), password);
+                keyStore.load(new FileInputStream(new File(keyStoreFile)), password.toCharArray());
                 KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-                keyManagerFactory.init(keyStore, password);
+                keyManagerFactory.init(keyStore, password.toCharArray());
 
                 TLSClientParameters tlscp = new TLSClientParameters();
                 tlscp.setKeyManagers(keyManagerFactory.getKeyManagers());

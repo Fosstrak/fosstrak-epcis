@@ -58,6 +58,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,6 +71,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.fosstrak.epcis.captureclient.CaptureEvent.BizTransaction;
+import org.fosstrak.epcis.gui.AuthenticationOptionsChangeEvent;
+import org.fosstrak.epcis.gui.AuthenticationOptionsChangeListener;
+import org.fosstrak.epcis.gui.AuthenticationOptionsPanel;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -80,7 +85,7 @@ import org.w3c.dom.Element;
  * @author David Gubler
  * @author Marco Steybe
  */
-public class CaptureClientGui extends WindowAdapter implements ActionListener {
+public class CaptureClientGui extends WindowAdapter implements ActionListener, AuthenticationOptionsChangeListener {
 
     /**
      * Miscellaneous numeric formats used in formatting.
@@ -138,6 +143,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     /* main window */
     private JFrame mainWindow;
     private JPanel mwMainPanel;
+    private AuthenticationOptionsPanel mwAuthOptions;
     private JPanel mwConfigPanel;
     private JPanel mwEventTypePanel;
     private JPanel mwEventDataPanel;
@@ -217,7 +223,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
     private JScrollPane dwOutputScrollPane;
     private JPanel dwButtonPanel;
     private JButton dwClearButton;
-
+    
     /**
      * Constructs a new CaptureClientGui initialized with a default address.
      */
@@ -271,7 +277,31 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         mwServiceUrlLabel = new JLabel("Capture interface URL: ");
-        mwServiceUrlTextField = new JTextField(client.getCaptureUrl(), 40);
+        mwServiceUrlTextField = new JTextField(client.getCaptureUrl(), 75);
+        mwAuthOptions = new AuthenticationOptionsPanel(this);
+        
+        mwServiceUrlTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+			public void changedUpdate(DocumentEvent e) {
+				configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
+			}
+			
+			public boolean isComplete() {
+				String url = mwServiceUrlTextField.getText();
+				return url != null && url.length() > 0;
+			}
+        	
+        });
+
+        
         mwShowDebugWindowCheckBox = new JCheckBox("Show debug window", false);
         mwShowDebugWindowCheckBox.addActionListener(this);
 
@@ -289,6 +319,11 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 1;
+        c.gridwidth = 2;
+        mwConfigPanel.add(mwAuthOptions, c);
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 2;
         mwConfigPanel.add(mwShowDebugWindowCheckBox, c);
 
         mwEventTypeChooserComboBox = new JComboBox(eventTypes);
@@ -807,7 +842,6 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
      *            for the Action
      */
     public void actionPerformed(final ActionEvent e) {
-        client.setCaptureUrl(mwServiceUrlTextField.getText());
         if (e.getSource() == mwEventTypeChooserComboBox) {
             mwEventTypeChooserComboBoxChanged();
             return;
@@ -1861,4 +1895,15 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener {
             new CaptureClientGui();
         }
     }
+
+	public void configurationChanged(AuthenticationOptionsChangeEvent ace) {
+        if (ace.isComplete()) {
+        	mwGenerateEventButton.setEnabled(true);
+        	client = new CaptureClient(mwServiceUrlTextField.getText(), mwAuthOptions.getAuthenticationOptions());
+        }
+        else {
+        	mwGenerateEventButton.setEnabled(false);
+        }
+	}
+    
 }
