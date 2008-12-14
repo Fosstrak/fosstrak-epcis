@@ -22,8 +22,6 @@ package org.fosstrak.epcis.queryclient;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -442,28 +440,17 @@ public class QueryClientGuiHelper implements AuthenticationOptionsChangeListener
      */
     public void unsubscribeQuery(final String subscriptionID) throws Exception {
         configureServiceIfNecessary();
-        try {
-            JFrame frame = new JFrame();
-            if (subscriptionID.equals("")) {
-                JOptionPane.showMessageDialog(frame, "Please specify a SubscriptionID", "Service is responding",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            Unsubscribe parms = new Unsubscribe();
-            parms.setSubscriptionID(subscriptionID);
-            queryClient.unsubscribe(parms.getSubscriptionID());
-            JOptionPane.showMessageDialog(frame, "Successfully unsubscribed.", "Service is responding",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            JFrame frame = new JFrame();
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            String stacktrace = sw.toString();
-            JOptionPane.showMessageDialog(frame, "Sorry, the Service returned an Error:\n" + stacktrace,
-                    "Service is not responding", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        JFrame frame = new JFrame();
+        if (subscriptionID.equals("")) {
+            JOptionPane.showMessageDialog(frame, "Please specify a SubscriptionID", "Service is responding",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
         }
-
+        Unsubscribe parms = new Unsubscribe();
+        parms.setSubscriptionID(subscriptionID);
+        queryClient.unsubscribe(parms.getSubscriptionID());
+        JOptionPane.showMessageDialog(frame, "Successfully unsubscribed.", "Service is responding",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -485,22 +472,16 @@ public class QueryClientGuiHelper implements AuthenticationOptionsChangeListener
         configureServiceIfNecessary();
         String title = "Service is responding";
         StringBuilder msg = new StringBuilder();
-        try {
-            GetSubscriptionIDs parms = new GetSubscriptionIDs();
-            parms.setQueryName("SimpleEventQuery");
-            List<String> subscriptionIDs = queryClient.getSubscriptionIds(parms.getQueryName());
-            if (subscriptionIDs != null && !subscriptionIDs.isEmpty()) {
-                msg.append("The following subscription IDs were found in the repository:\n");
-                for (String s : subscriptionIDs) {
-                    msg.append("- ").append(s).append("\n");
-                }
-            } else {
-                msg.append("There are no subscribed queries.");
+        GetSubscriptionIDs parms = new GetSubscriptionIDs();
+        parms.setQueryName("SimpleEventQuery");
+        List<String> subscriptionIDs = queryClient.getSubscriptionIds(parms.getQueryName());
+        if (subscriptionIDs != null && !subscriptionIDs.isEmpty()) {
+            msg.append("The following subscription IDs were found in the repository:\n");
+            for (String s : subscriptionIDs) {
+                msg.append("- ").append(s).append("\n");
             }
-        } catch (Exception e) {
-            title = "Service is not responding";
-            msg.append("Could not retrieve subscription IDs from repository.");
-            e.printStackTrace();
+        } else {
+            msg.append("There are no subscribed queries.");
         }
         JFrame frame = new JFrame();
         JOptionPane.showMessageDialog(frame, msg.toString(), title, JOptionPane.INFORMATION_MESSAGE);

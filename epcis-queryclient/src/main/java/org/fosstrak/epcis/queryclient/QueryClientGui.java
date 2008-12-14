@@ -972,12 +972,13 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         	try {
         		client.querySubscriptionIDs();
         		return;
-        	}
-        	catch (Exception ex) {
-                JFrame frame = new JFrame();
-                String msg = ex.getMessage();
-                JOptionPane.showMessageDialog(frame, msg + "\n" + e.toString(), "Service invocation error",
-                        JOptionPane.ERROR_MESSAGE);
+        	} catch (Exception ex) {
+                dwOutputTextArea.append("Could not fetch subscription IDs from repository.");
+                StringWriter detailed = new StringWriter();
+                PrintWriter pw = new PrintWriter(detailed);
+                ex.printStackTrace(pw);
+                dwOutputTextArea.append(detailed.toString());
+                showErrorFrame();
         	}
             return;
         }
@@ -995,10 +996,12 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         		return;
         	}
         	catch (Exception ex) {
-                JFrame frame = new JFrame();
-                String msg = ex.getMessage();
-                JOptionPane.showMessageDialog(frame, msg + "\n" + e.toString(), "Service invocation error",
-                        JOptionPane.ERROR_MESSAGE);
+                dwOutputTextArea.append("Could not unsubscribe query.");
+                StringWriter detailed = new StringWriter();
+                PrintWriter pw = new PrintWriter(detailed);
+                ex.printStackTrace(pw);
+                dwOutputTextArea.append(detailed.toString());
+                showErrorFrame();
         	}
         }
         if (e.getSource() == ewOkButton) {
@@ -1136,13 +1139,22 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             dwOutputTextArea.append(sw.toString());
-            JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, msg + "\n" + e.toString(), "Service invocation error",
-                    JOptionPane.ERROR_MESSAGE);
+        	showErrorFrame();
         }
     }
 
     /**
+     * Shows a new JFrame with a specific invocation error message.
+     */
+    private void showErrorFrame() {
+		JFrame frame = new JFrame();
+		String msg = "Unexpected error while invoking EPCIS Query Interface.\n"
+				+ "See the Debug output window for more details.";
+		JOptionPane.showMessageDialog(frame, msg, "Service invocation failed",
+				JOptionPane.ERROR_MESSAGE);
+	}
+
+	/**
      * Handles the event of a changed JComboBox in the query arguments section
      * Will add or remove JComboBoxes as necessary and resize the window.
      * 
@@ -1189,16 +1201,12 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             JOptionPane.showMessageDialog(frame, text, "Service invocation successful", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
-
             dwOutputTextArea.append("Could not execute query:");
             StringWriter detailed = new StringWriter();
             PrintWriter pw = new PrintWriter(detailed);
             e.printStackTrace(pw);
             dwOutputTextArea.append(detailed.toString());
-
-            JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, "Error:\n" + e.getMessage(), "Service invocation error",
-                    JOptionPane.ERROR_MESSAGE);
+            showErrorFrame();
         }
     }
 
