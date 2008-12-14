@@ -53,7 +53,7 @@
             <manifest>
               <mainClass>org.fosstrak.epcis.captureclient.CaptureClientGui</mainClass>
               <addClasspath>true</addClasspath>
-              <!-- <classpathPrefix>./lib</classpathPrefix> -->
+              <classpathPrefix>./lib</classpathPrefix>
             </manifest>
           </archive>
         </configuration>
