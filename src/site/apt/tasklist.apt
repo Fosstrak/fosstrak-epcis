@@ -1,0 +1,104 @@
+        -------------------
+        Tasklist
+        -------------------
+        -------------------
+        -------------------
+
+Fosstrak EPCIS - Tasklist
+
+  The following list contains the tasks that need to be addressed for the next
+  major releases. If you feel like contributing to one of these tasks or if you
+  have any other ideas that you think should be apprached, please contact the
+  developer mailing list (see the project {{{mail-lists.html}mailing lists}}).
+
+=======================================================================
+
+* Support attributes for extensions
+
+  The Fosstrak EPCIS implementation accepts EPCIS events with custom event fields
+  (event field extensions) but does not support attributes for these event
+  fields. According to the specification, extension elements may have attributes
+  and thus support for such attributes should be added to the Fosstrak EPCIS
+  implementation.
+
+  For example, Fosstrak EPCIS should be able to handle to following snippet of an
+  EPCIS event:
+
+------------------------------------------------------------------------
+<ObjectEvent>
+  <eventTime>2008-11-09T13:30:17Z</eventTime>
+  <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
+  <epcList>
+    <epc>urn:epc:id:sgtin:0057000.123780.7788</epc>
+  </epcList>
+  ...
+  <myns:myextension myattribute="My Attribute">My Extension</myns:myextension>
+</ObjectEvent>
+------------------------------------------------------------------------
+
+  Above EPCIS event can be successfully captured to the Fosstrak EPCIS repository,
+  but the information in the attribute, e.g., the value "My Attribute", is lost.
+  
+* Refactoring db layer and performance evaluation
+
+  ...
+
+* Improvement of test environment and quality assurance
+
+  The epcis-interop-test module provides a way to test the <interoperability>
+  of the repository implementation. Unfortunately, the test setup is rather
+  cumbersome and the tests require manual modifications in order to run
+  successfully. Therefore we need an improved test setup with integration
+  tests and further unit tests in order to assure code quality.
+  
+  The EPCglobal EPCIS Conformance Requirements document is a good place to
+  start.
+
+* Refactoring of triggered query subscriptions
+
+  Currently triggered queries are implemented with help of scheduled queries,
+  i.e., the trigger condition is checked using a scheduled query which runs
+  every once in a while. This adds up a lot of overhead ...
+
+* More user-friendly object model
+
+  The current internal object model is automatically generated from XML
+  schema files using JAXB and is used in the repository as well as in the
+  clients. This rather counterintuitive model should be hidden from the user
+  API and instead a new object model wrapping the current model should be
+  provided to the user.
+
+* Access control
+
+  Add a simple access control mechanism to define which events a given user
+  is allowed to retrieve. Restrictions can be based on EPC, read point, biz
+  location, biz step, disposition, time. See also section 8.2.2 in the EPCIS
+  specification.
+
+* Improvement of capture and query clients
+
+  The Fosstrak EPCIS capture and query clients do not support the entire range
+  of event fields or query parameters especially when dealing with extensions.
+  For example adding events or querying for events with event field extensions
+  is not possible. Furthermore, the GUIs are not very strong from a usability
+  point of view. Improvements and refactorings are necessary.
+
+* Cleanup tasks
+
+** Generic ISO8601 time parser
+
+  The current org.fosstrak.epcis.utils.TimeParser does only handle specific
+  cases when parsing event times. This time parser should be made more
+  generic or could be replaced by an existing ISO8601 parser
+  ({{http://joda-time.sourceforge.net}} might be an alternative).
+
+** Support for milliseconds
+
+  MySQL does not support milliseconds, therefore, event times are truncated
+  when stored to the database. Event times could be stored as a long
+  (millisecond) in the database.
+
+** Generic EPC parser
+
+  Incoming EPCs are parsed and validated using a rough algorithm. EPC
+  validation should be handled by {{{http://www.fosstrak.org/tdt/}fosstrak-tdt}}.
