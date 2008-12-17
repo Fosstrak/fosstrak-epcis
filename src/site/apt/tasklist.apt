@@ -118,7 +118,7 @@ for (EpcisEvent event : events) {
 
   Currently triggered queries are implemented with the help of scheduled
   queries, i.e., the trigger condition is checked using a scheduled query which
-  runs every once in a while (see the {{{docs/user-guide.html}user guide} for
+  runs every once in a while (see the {{{docs/user-guide.html}user guide}} for
   information on how to configure at which intervals the repository should
   check for the trigger condition). This checking for trigger condition adds up
   a lot of overhead and might be better implemented using a different approach.
