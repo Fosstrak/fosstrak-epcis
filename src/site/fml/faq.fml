@@ -2,6 +2,7 @@
 <faqs title="Fosstrak EPCIS - Frequently Asked Questions">
 
 <part id="about">
+<title>About</title>
 
 <faq>
 <question>What is EPCIS?</question>
@@ -21,10 +22,11 @@
 </part>
 
 <part id="how-to">
+<title>How-to</title>
 
 <faq>
 <question>How do I interact with the repository?</question>
-<answer>Please consult the user guide.</answer>
+<answer>Please consult the <a href="docs/user-guide.html">user guide</a>.</answer>
 </faq>
 
 <faq>
@@ -35,6 +37,7 @@
 </part>
 
 <part id="testing">
+<title>Testing</title>
 
 <faq>
 <question>Why do not all the interoperability tests run successfully?</question>

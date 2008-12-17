@@ -39,9 +39,26 @@ Fosstrak EPCIS - Tasklist
   Above EPCIS event can be successfully captured to the Fosstrak EPCIS repository,
   but the information in the attribute, e.g., the value "My Attribute", is lost.
   
-* Refactoring db layer and performance evaluation
+* Refactoring resource layer and performance evaluation
 
-  ...
+  The repository is split into the capture operations and the query operations
+  modules. The capture part makes use of Hibernate to separate the database
+  from the domain model. For the query module, we implemented an SQL backend
+  which uses JDBC to connect to the database (see the
+  {{{docs/architecture-guide.html}architecture guide}} for more details).
+  Unfortunately the query backend is still too much coupled with the actual
+  query operations module. The goal would be to have a fully decoupled front-
+  and backend, such that the DBMS could be easily replaced.
+
+  One idea is to use the Java Persistence API, e.g., OpenJPA. As Hibernate
+  implements the JPA interfaces we could use the same approach for both the
+  capture and query modules.
+  
+  In order to measure the repository throughput a thorough performance analysis
+  is also required which should result in a performance benchmark. This benchmark
+  should then indicate whether further work on the resource layer is required
+  in order to improve performance, or, it could be used to further promote the
+  repository.
 
 * Improvement of test environment and quality assurance
 
@@ -54,12 +71,6 @@ Fosstrak EPCIS - Tasklist
   The EPCglobal EPCIS Conformance Requirements document is a good place to
   start.
 
-* Refactoring of triggered query subscriptions
-
-  Currently triggered queries are implemented with help of scheduled queries,
-  i.e., the trigger condition is checked using a scheduled query which runs
-  every once in a while. This adds up a lot of overhead ...
-
 * More user-friendly object model
 
   The current internal object model is automatically generated from XML
@@ -67,6 +78,26 @@ Fosstrak EPCIS - Tasklist
   clients. This rather counterintuitive model should be hidden from the user
   API and instead a new object model wrapping the current model should be
   provided to the user.
+
+  For example, in order to print the timestamps of a number of RFID events in a
+  list, a developer currently has to write the following code:
+
+------------------------------------------------------------------------
+for (int i = 0; i < events.getObjectEventOrAggregationEventOrQuantityEvent().size(); i++) {
+  JAXBElement element = (JAXBElement) events.getObjectEventOrAggregationEventOrQuantityEvent().get(i);
+  EPCISEventType event = element.getValue();
+  System.out.println(event.getEventTime());
+}
+------------------------------------------------------------------------
+
+  It would be much easier for a developer if he or she could write something
+  like the following instead:
+
+------------------------------------------------------------------------
+for (EpcisEvent event : events) {
+  System.out.println(event.getEventTime());
+}
+------------------------------------------------------------------------
 
 * Access control
 
@@ -82,6 +113,16 @@ Fosstrak EPCIS - Tasklist
   For example adding events or querying for events with event field extensions
   is not possible. Furthermore, the GUIs are not very strong from a usability
   point of view. Improvements and refactorings are necessary.
+
+* Refactoring of triggered query subscriptions
+
+  Currently triggered queries are implemented with the help of scheduled
+  queries, i.e., the trigger condition is checked using a scheduled query which
+  runs every once in a while (see the {{{docs/user-guide.html}user guide} for
+  information on how to configure at which intervals the repository should
+  check for the trigger condition). This checking for trigger condition adds up
+  a lot of overhead and might be better implemented using a different approach.
+  Some investigations are required here.
 
 * Cleanup tasks
 
