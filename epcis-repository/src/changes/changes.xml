@@ -3,9 +3,12 @@
         <title>Changes epcis-repository</title>
     </properties>
     <body>
-        <release version="0.4.2" date="" description="Bug fix release">
+        <release version="0.4.2" date="2008-12-18" description="Bug fix release">
             <action dev="steybem" type="fix" issue="2379949" due-to="Marc-Antoine Mouilleron">
                 Subscriptions not tolerant to server restart.
+            </action>
+            <action dev="steybem" type="fix" issue="2379542" due-to="Nektarios Leontiadis">
+                ArrayOfStrings cannot be serialized and stored to db.
             </action>
         </release>
         <release version="0.4.1" date="2008-09-02"

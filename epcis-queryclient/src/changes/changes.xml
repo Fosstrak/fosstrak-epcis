@@ -3,12 +3,14 @@
         <title>Changes epcis-queryclient</title>
     </properties>
     <body>
-        <release version="0.4.2" date="2008-10-10"
-            description="Feature release">
-            <action dev="steybem" type="add" due-to="Sean Wellington">
-                Modified the query client to support connecting to EPCIS
-                repositories that require client authentication. Two methods
-                are implemented: HTTP Basic and HTTPS with client certificates.
+        <release version="0.4.2" date="2008-12-18" description="Feature release">
+            <action dev="wellington" type="add">
+                Added support for connecting to EPCIS repositories that require
+                client authentication (HTTP Basic and HTTPS with client
+                certificates).
+            </action>
+            <action dev="steybem" type="fix">
+                Fixed some issues with huge pop-up windows showing stack traces.
             </action>
         </release>
         <release version="0.4.0" date="2008-07-29"
