@@ -36,6 +36,10 @@ User Guide
 
          [[i]] {{{#How to Use Event Field Extensions}How to Use Event Field Extensions}}
 
+   [[1]] {{{#Securing your Repository}Securing your Repository}}
+
+         [[i]] {{{#Setting up Authentication in Tomcat}Setting up Authentication in Tomcat}}
+
    [[1]] {{{#Runtime Configuration of your EPCIS Repository}Runtime Configuration of your EPCIS Repository}}
 
 
@@ -700,6 +704,71 @@ String response = listener.fetchResponse();
   You can also use "LT_", "LE_", "GT_", or "GE_" query parameters to retrieve
   the corresponding events. Of course this would only make sense if the value
   of your custom event field was of type integer, floating point, or date/time.
+
+
+
+* {Securing your Repository}
+
+  The EPCIS specification also allows an implementation to authenticate the
+  client's identity, or allows a client to authenticate the repository's
+  identity. For example, an EPCIS implementation may want to decide whether a
+  capture operation is permitted or not. Additionally, the specification also
+  included the possibility to provide access to only a subset of information,
+  depending on the identity of the requesting client (authorization).
+
+  The Fosstrak EPCIS repository implementation does not yet make any use of
+  authentication or authorization. Nevertheless, the Fosstrak query and
+  capture clients are equipped with means to provide client authentication.
+  Both the query and capture client implement HTTP Basic (username/password)
+  and HTTPS with client certificates to provide the client's identity to a
+  requesting server.
+
+** {Setting up Authentication in Tomcat}
+
+   This is actually outside the scope of the Fosstrak implementations.
+   Nevertheless, we include it here to show how user's can setup HTTP Basic
+   authentication for the EPCIS repository application running inside a Tomcat
+   container:
+
+   [[1]] Edit tomcat-users.xml
+
+       This file specifies the names of the users that can access the pages and
+       servlets running in Tomcat, and the roles that they are assigned. Add a
+       new user and a new role element to
+       <<<TOMCAT_HOME/conf/tomcat-users.xml>>>:
+
+---------------------------------------------------------------------------
+<tomcat-users>
+  <role rolename="epcis-user"/>
+  <user username="user" password="epcis" roles="epcis-user" />
+</tomcat-users>
+---------------------------------------------------------------------------
+
+   [[1]] Edit web.xml
+
+   ...
+
+---------------------------------------------------------------------------
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Fosstrak EPCIS</web-resource-name>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>epcis-user</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>Fosstrak EPCIS</realm-name>
+  </login-config>
+
+  <security-role>
+    <description>Fosstrak EPCIS User</description>
+    <role-name>epcis-user</role-name>
+  </security-role>
+---------------------------------------------------------------------------
 
 
 * {Runtime Configuration of your EPCIS Repository}
