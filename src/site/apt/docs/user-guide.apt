@@ -725,17 +725,18 @@ String response = listener.fetchResponse();
 
 ** {Setting up Authentication in Tomcat}
 
-   This is actually outside the scope of the Fosstrak implementations.
-   Nevertheless, we include it here to show how user's can setup HTTP Basic
-   authentication for the EPCIS repository application running inside a Tomcat
-   container:
+   The following description is actually a container-managed authentication
+   method which controls how a user's credentials (username and password) are
+   verified when the application is accessed. Thus, this method is really
+   outside the scope of the Fosstrak implementation. Nevertheless, we include
+   it here to show how users can apply simple access restrictions to their
+   EPCIS repository application running whithin Tomcat:
 
    [[1]] Edit tomcat-users.xml
 
        This file specifies the names of the users that can access the pages and
        servlets running in Tomcat, and the roles that they are assigned. Add a
-       new user and a new role element to
-       <<<TOMCAT_HOME/conf/tomcat-users.xml>>>:
+       new user and a new role to <<<TOMCAT_HOME/conf/tomcat-users.xml>>>:
 
 ---------------------------------------------------------------------------
 <tomcat-users>
@@ -744,9 +745,16 @@ String response = listener.fetchResponse();
 </tomcat-users>
 ---------------------------------------------------------------------------
 
+      You can provide any username/password you like.
+
    [[1]] Edit web.xml
 
-   ...
+   In the application's deployment descriptor, you need to specify which
+   resources need to be protected, which roles are allowed access and which
+   authentication method to use. Add a <<<security-constraint>>>, a
+   <<<login-config>>>, and a <<<security-role>>> element to the Fosstrak EPCIS
+   Repository's deployment descriptor
+   (<<<$TOMCAT_HOME/webapps/epcis-repository-<version>/WEB-INF/web.xml>>>):
 
 ---------------------------------------------------------------------------
   <security-constraint>
@@ -761,7 +769,7 @@ String response = listener.fetchResponse();
 
   <login-config>
     <auth-method>BASIC</auth-method>
-    <realm-name>Fosstrak EPCIS</realm-name>
+    <realm-name>Fosstrak EPCIS Auth</realm-name>
   </login-config>
 
   <security-role>
@@ -770,6 +778,10 @@ String response = listener.fetchResponse();
   </security-role>
 ---------------------------------------------------------------------------
 
+   After you applied these settings, you need to restart Tomcat. If you now
+   connect to your repository with any of the Fosstrak clients, you need to
+   provide a valid username and password using the provided fields in the GUI
+   (make sure you use a client version starting from 0.4.2).
 
 * {Runtime Configuration of your EPCIS Repository}
 
