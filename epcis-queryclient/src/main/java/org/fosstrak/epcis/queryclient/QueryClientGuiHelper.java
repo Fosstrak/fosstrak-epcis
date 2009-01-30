@@ -393,7 +393,11 @@ public class QueryClientGuiHelper implements AuthenticationOptionsChangeListener
         queryParams.getParam().addAll(internalQueryParams);
         debug("Number of query parameters: " + queryParams.getParam().size() + "\n");
         for (QueryParam queryParam : internalQueryParams) {
-            debug(queryParam.getName() + " " + queryParam.getValue() + "\n");
+        	if (queryParam.getValue() instanceof ArrayOfString) {
+        		debug(queryParam.getName() + " " + ((ArrayOfString) queryParam.getValue()).getString() + "\n");
+        	} else {
+        		debug(queryParam.getName() + " " + queryParam.getValue() + "\n");
+        	}
         }
 
         Poll poll = new Poll();
