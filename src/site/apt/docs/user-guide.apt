@@ -83,14 +83,14 @@ User Guide
 
    [[1]] Install a {{{http://dev.mysql.com/downloads/mysql/5.0.html}MySQL server}}
    (version 5.0 or higher). It will be used by the EPCIS repository
-   to store event data.
+   to store event data. (*)
    
    [[1]] Make sure that web applications deployed to Tomcat can access your MySQL server
    by installing the MySQL {{{http://www.mysql.com/products/connector/j/}Connector/J}}
    driver. This is usually done by copying the <<<mysql-connector-java-\<version\>-bin.jar>>>
-   into Tomcat's <<<lib>>> (version 6) or <<<common/lib>>> (version 5.5) directory.  
+   into Tomcat's <<<lib>>> (version 6) or <<<common/lib>>> (version 5.5) directory.
 
-   [[1]] Set up a {MySQL} database for the EPCIS repository to use.
+   [[1]] Set up a {MySQL} database for the EPCIS repository to use. (*)
  
    Log into the MySQL Command Line Client as <root> and perform the following
    steps:
@@ -179,6 +179,11 @@ in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6.
    In case of problems with your own EPCIS repository instance, this is the
    first place to look for information about errors or specific exceptions
    thrown by the application.
+   
+   []
+
+   (\*) If you intend to use a Microsoft SQL Server, you should have a look at
+   {{{http://sourceforge.net/mailarchive/forum.php?thread_name=BAY103-W4999604BD3CB752CBDCE54BDFA0%40phx.gbl&forum_name=accada-epcis-developer}this thread in the Fosstrak developer mailing-list}}. 
 
 ** {Using the Capture Client to send Events to a Repository}
 
