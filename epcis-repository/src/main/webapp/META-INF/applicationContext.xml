@@ -33,7 +33,8 @@
 
   <!-- data source configuration available via JNDI (in JEE environments) -->
   <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean" scope="singleton">
-    <property name="jndiName" value="java:comp/env/jdbc/EPCISDB" />
+    <property name="jndiName" value="jdbc/EPCISDB" />
+    <property name="resourceRef" value="true" />
   </bean>
   <!-- data source configuration (any environment) -->
   <!--
