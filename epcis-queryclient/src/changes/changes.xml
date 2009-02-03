@@ -12,6 +12,12 @@
             <action dev="steybem" type="fix">
                 Fixed some issues with huge pop-up windows showing stack traces.
             </action>
+            <action dev="roduner" type="fix">
+                Removed MATCH_childEPC from list of operators that can be
+                selected by users. (MATCH_childEPC was defined in a draft
+                version of the EPCIS specification but does not exist in
+                the final release.)
+            </action>
         </release>
         <release version="0.4.0" date="2008-07-29"
             description="Project name changed to Fosstrak">
