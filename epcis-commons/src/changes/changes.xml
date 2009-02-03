@@ -3,7 +3,7 @@
         <title>Changes epcis-commons</title>
     </properties>
     <body>
-        <release version="0.4.2" date="" description="Bug fix release">
+        <release version="0.4.2" date="2009-02-03" description="Bug fix release">
             <action dev="steybem" type="fix" issue="2379542" due-to="Nektarios Leontiadis">
                 Fixed query subscription error (unable to serialize and store
                 objects of type ArrayOfString to database)

@@ -3,7 +3,7 @@
         <title>Changes epcis-repository</title>
     </properties>
     <body>
-        <release version="0.4.2" date="2008-12-18" description="Bug fix release">
+        <release version="0.4.2" date="2009-02-03" description="Bug fix release">
             <action dev="steybem" type="fix" issue="2379949" due-to="Marc-Antoine Mouilleron">
                 Subscriptions not tolerant to server restart.
             </action>
