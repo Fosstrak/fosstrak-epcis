@@ -6,9 +6,9 @@
 
 Fosstrak EPCIS - Tasklist
 
-  The following list contains the tasks that need to be addressed for the next
+  This page lists all tasks that we would like to address in the next
   major releases. If you feel like contributing to one of these tasks or if you
-  have any other ideas that you think should be apprached, please contact the
+  have any other ideas for features you'd love to see implemented, please contact the
   developer mailing list (see the project {{{mail-lists.html}mailing lists}}).
 
 =======================================================================
@@ -16,13 +16,12 @@ Fosstrak EPCIS - Tasklist
 * Support attributes for extensions
 
   The Fosstrak EPCIS implementation accepts EPCIS events with custom event fields
-  (event field extensions) but does not support attributes for these event
+  (event field extensions), but does not support attributes for these event
   fields. According to the specification, extension elements may have attributes
   and thus support for such attributes should be added to the Fosstrak EPCIS
   implementation.
 
-  For example, Fosstrak EPCIS should be able to handle to following snippet of an
-  EPCIS event:
+  For example, Fosstrak EPCIS should be able to handle to following EPCIS event:
 
 ------------------------------------------------------------------------
 <ObjectEvent>
@@ -37,9 +36,9 @@ Fosstrak EPCIS - Tasklist
 ------------------------------------------------------------------------
 
   Above EPCIS event can be successfully captured to the Fosstrak EPCIS repository,
-  but the information in the attribute, e.g., the value "My Attribute", is lost.
+  but the information in the attribute (e.g., the value "My Attribute") is lost.
   
-* Refactoring resource layer and performance evaluation
+* Refactoring of resource layer and performance evaluation
 
   The repository is split into the capture operations and the query operations
   modules. The capture part makes use of Hibernate to separate the database
@@ -51,14 +50,13 @@ Fosstrak EPCIS - Tasklist
   and backend, such that the DBMS could be easily replaced.
 
   One idea is to use the Java Persistence API, e.g., OpenJPA. As Hibernate
-  implements the JPA interfaces we could use the same approach for both the
+  implements the JPA interfaces, we could use the same approach for both the
   capture and query modules.
   
-  In order to measure the repository throughput a thorough performance analysis
+  In order to measure the repository throughput, a thorough performance analysis
   is also required which should result in a performance benchmark. This benchmark
   should then indicate whether further work on the resource layer is required
-  in order to improve performance, or, it could be used to further promote the
-  repository.
+  in order to improve performance.
 
 * Improvement of test environment and quality assurance
 
@@ -91,7 +89,7 @@ for (int i = 0; i < events.getObjectEventOrAggregationEventOrQuantityEvent().siz
 ------------------------------------------------------------------------
 
   It would be much easier for a developer if he or she could write something
-  like the following instead:
+  like the following:
 
 ------------------------------------------------------------------------
 for (EpcisEvent event : events) {
@@ -109,37 +107,37 @@ for (EpcisEvent event : events) {
 * Improvement of capture and query clients
 
   The Fosstrak EPCIS capture and query clients do not support the entire range
-  of event fields or query parameters especially when dealing with extensions.
-  For example adding events or querying for events with event field extensions
-  is not possible. Furthermore, the GUIs are not very strong from a usability
-  point of view. Improvements and refactorings are necessary.
+  of event fields or query parameters, especially when dealing with extensions.
+  For example, adding events or querying for events with event field extensions
+  is not possible. Also, the GUIs are not very appealing from a usability
+  point of view. Improvements and refactoring are necessary.
 
 * Refactoring of triggered query subscriptions
 
-  Currently triggered queries are implemented with the help of scheduled
+  Triggered queries are currently implemented with the help of scheduled
   queries, i.e., the trigger condition is checked using a scheduled query which
   runs every once in a while (see the {{{docs/user-guide.html}user guide}} for
   information on how to configure at which intervals the repository should
   check for the trigger condition). This checking for trigger condition adds up
-  a lot of overhead and might be better implemented using a different approach.
-  Some investigations are required here.
+  to a lot of overhead and might be implemented more efficiently using a
+  different approach.
 
 * Cleanup tasks
 
 ** Generic ISO8601 time parser
 
-  The current org.fosstrak.epcis.utils.TimeParser does only handle specific
-  cases when parsing event times. This time parser should be made more
+  The current org.fosstrak.epcis.utils.TimeParser can only handle specific
+  cases when event times are parsed. This time parser should be made more
   generic or could be replaced by an existing ISO8601 parser
   ({{http://joda-time.sourceforge.net}} might be an alternative).
 
 ** Support for milliseconds
 
   MySQL does not support milliseconds, therefore, event times are truncated
-  when stored to the database. Event times could be stored as a long
-  (millisecond) in the database.
+  when stored in the database. Event times could be stored in the database
+  as long values (millisecond).
 
 ** Generic EPC parser
 
-  Incoming EPCs are parsed and validated using a rough algorithm. EPC
-  validation should be handled by {{{http://www.fosstrak.org/tdt/}fosstrak-tdt}}.
+  Incoming EPCs are parsed and validated in a very basic way. EPC validation
+  should be handled by {{{http://www.fosstrak.org/tdt/}fosstrak-tdt}} instead.

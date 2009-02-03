@@ -714,33 +714,35 @@ String response = listener.fetchResponse();
 
 * {Securing your Repository}
 
-  The EPCIS specification also allows an implementation to authenticate the
-  client's identity, or allows a client to authenticate the repository's
-  identity. For example, an EPCIS implementation may want to decide whether a
-  capture operation is permitted or not. Additionally, the specification also
-  included the possibility to provide access to only a subset of information,
+  The EPCIS specification allows both the repository to authenticate a
+  client's identity and a client to authenticate the repository's
+  identity. For example, an EPCIS implementation could restrict capture
+  operations to certain clients only. Additionally, the specification allows
+  a repository to provide access only to a subset of information,
   depending on the identity of the requesting client (authorization).
 
-  The Fosstrak EPCIS repository implementation does not yet make any use of
-  authentication or authorization. Nevertheless, the Fosstrak query and
-  capture clients are equipped with means to provide client authentication.
-  Both the query and capture client implement HTTP Basic (username/password)
-  and HTTPS with client certificates to provide the client's identity to a
-  requesting server.
+  The Fosstrak EPCIS <repository> implementation does not currently offer
+  fine-grained access control. However, you can configure Tomcat to require
+  client authentication before access to the EPCIS repository is granted.
+  This is described in the following section. Also, both <capture and query clients>
+  support HTTP Basic (username/password) client certificate-based
+  authentication and are thus able to provide the client's identity to
+  a requesting server.
 
-** {Setting up Authentication in Tomcat}
+** {Setting up Client Authentication in Tomcat}
 
-   The following description is actually a container-managed authentication
-   method which controls how a user's credentials (username and password) are
-   verified when the application is accessed. Thus, this method is really
-   outside the scope of the Fosstrak implementation. Nevertheless, we include
-   it here to show how users can apply simple access restrictions to their
-   EPCIS repository application running whithin Tomcat:
+   Tomcat can be configured to check a client's credentials (username and
+   password) whenever a web application is accessed. Please note that the
+   setup described in this section is entirely generic and can be used to
+   secure any web application running in Tomcat. Thus, the method presented
+   here is really outside the scope of the Fosstrak implementation. We still
+   include it here to show how users can apply simple access restrictions to
+   their EPCIS repository application running on Tomcat:
 
    [[1]] Edit tomcat-users.xml
 
        This file specifies the names of the users that can access the pages and
-       servlets running in Tomcat, and the roles that they are assigned. Add a
+       servlets running on Tomcat as well as the roles they are assigned. Add a
        new user and a new role to <<<TOMCAT_HOME/conf/tomcat-users.xml>>>:
 
 ---------------------------------------------------------------------------
@@ -754,9 +756,9 @@ String response = listener.fetchResponse();
 
    [[1]] Edit web.xml
 
-   In the application's deployment descriptor, you need to specify which
-   resources need to be protected, which roles are allowed access and which
-   authentication method to use. Add a <<<security-constraint>>>, a
+   In the application's deployment descriptor, you need to specify the resources
+   you want Tomcat to protect, the roles that are granted access, and the
+   authentication method to be used. Add a <<<security-constraint>>>, a
    <<<login-config>>>, and a <<<security-role>>> element to the Fosstrak EPCIS
    Repository's deployment descriptor
    (<<<$TOMCAT_HOME/webapps/epcis-repository-<version>/WEB-INF/web.xml>>>):
@@ -783,9 +785,9 @@ String response = listener.fetchResponse();
   </security-role>
 ---------------------------------------------------------------------------
 
-   After you applied these settings, you need to restart Tomcat. If you now
-   connect to your repository with any of the Fosstrak clients, you need to
-   provide a valid username and password using the provided fields in the GUI
+   Don't forget to restart Tomcat after these changes. If you now
+   connect to your repository with either of the Fosstrak clients, you will be
+   asked to provide a valid username and password in the GUI
    (make sure you use a client version starting from 0.4.2).
 
 * {Runtime Configuration of your EPCIS Repository}
