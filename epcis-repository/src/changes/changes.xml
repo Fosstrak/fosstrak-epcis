@@ -14,6 +14,10 @@
                 Updated demo data. Example events are now compliant with
                 EPCglobal's Core Business Vocabulary.
             </action>
+            <action dev="roduner" type="fix">
+                Added "resource-ref" mapping in web.xml for easier
+                deployment in containers other than Tomcat.
+            </action>
         </release>
         <release version="0.4.1" date="2008-09-02"
             description="Bug fix release">
