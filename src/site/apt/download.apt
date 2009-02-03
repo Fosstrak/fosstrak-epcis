@@ -9,7 +9,7 @@
 
 Download
 
-  The current version of Fosstrak EPCIS is 0.4.1.
+  The current version of Fosstrak EPCIS is 0.4.2.
 
 
 * Latest Releases 
@@ -17,13 +17,13 @@ Download
 *----------+--------------------+-----------------------+-------------+
 <<Module>> | <<Download (zip)>> | <<Download (tar.gz)>> | <<Notes>> |
 *----------+--------------------+-----------------------+-------------+
-Fosstrak EPCIS Repository 0.4.1 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.1/epcis-repository-0.4.1-bin-with-dependencies.zip}epcis-repository-0.4.1-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.1/epcis-repository-0.4.1-bin-with-dependencies.tar.gz}epcis-repository-0.4.1-bin-with-dependencies.tar.gz}} | {{{epcis-repository/changes-report.html}Changes}} | 
+Fosstrak EPCIS Repository 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.2/epcis-repository-0.4.2-bin-with-dependencies.zip}epcis-repository-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.2/epcis-repository-0.4.2-bin-with-dependencies.tar.gz}epcis-repository-0.4.2-bin-with-dependencies.tar.gz}} | {{{epcis-repository/changes-report.html}Changes}} | 
 *----------+--------------------+-----------------------+-------------+
-Fosstrak EPCIS Capture Client 0.4.1 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.1/epcis-captureclient-0.4.1-bin-with-dependencies.zip}epcis-captureclient-0.4.1-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.1/epcis-captureclient-0.4.1-bin-with-dependencies.tar.gz}epcis-captureclient-0.4.1-bin-with-dependencies.tar.gz}} | {{{epcis-captureclient/changes-report.html}Changes}} |
+Fosstrak EPCIS Capture Client 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.2/epcis-captureclient-0.4.2-bin-with-dependencies.zip}epcis-captureclient-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.2/epcis-captureclient-0.4.2-bin-with-dependencies.tar.gz}epcis-captureclient-0.4.2-bin-with-dependencies.tar.gz}} | {{{epcis-captureclient/changes-report.html}Changes}} |
 *----------+--------------------+-----------------------+-------------+
-Fosstrak EPCIS Query Client 0.4.1 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.1/epcis-queryclient-0.4.1-bin-with-dependencies.zip}epcis-queryclient-0.4.1-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.1/epcis-queryclient-0.4.1-bin-with-dependencies.tar.gz}epcis-queryclient-0.4.1-bin-with-dependencies.tar.gz}} | {{{epcis-queryclient/changes-report.html}Changes}} |
+Fosstrak EPCIS Query Client 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.2/epcis-queryclient-0.4.2-bin-with-dependencies.zip}epcis-queryclient-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.2/epcis-queryclient-0.4.2-bin-with-dependencies.tar.gz}epcis-queryclient-0.4.2-bin-with-dependencies.tar.gz}} | {{{epcis-queryclient/changes-report.html}Changes}} |
 *----------+--------------------+-----------------------+-------------+
-Fosstrak EPCIS Source Code 0.4.1 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.1/epcis-0.4.1-src.zip}epcis-0.4.1-src.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.1/epcis-0.4.1-src.tar.gz}epcis-0.4.1-src.tar.gz}} | |
+Fosstrak EPCIS Source Code 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.2/epcis-0.4.2-src.zip}epcis-0.4.2-src.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.2/epcis-0.4.2-src.tar.gz}epcis-0.4.2-src.tar.gz}} | |
 *----------+--------------------+-----------------------+-------------+
 
 
