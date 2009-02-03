@@ -10,6 +10,10 @@
             <action dev="steybem" type="fix" issue="2379542" due-to="Nektarios Leontiadis">
                 ArrayOfStrings cannot be serialized and stored to db.
             </action>
+            <action dev="roduner" type="fix">
+                Updated demo data. Example events are now compliant with
+                EPCglobal's Core Business Vocabulary.
+            </action>
         </release>
         <release version="0.4.1" date="2008-09-02"
             description="Bug fix release">

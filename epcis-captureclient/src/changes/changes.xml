@@ -9,6 +9,10 @@
                 client authentication (HTTP Basic and HTTPS with client
                 certificates).
             </action>
+            <action dev="roduner" type="fix">
+                Updated example events. They are now compliant with
+                EPCglobal's Core Business Vocabulary.
+            </action>
         </release>
         <release version="0.4.0" date="2008-07-29"
             description="Project name changed to Fosstrak">
