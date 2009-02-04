@@ -11,5 +11,8 @@
     <j2se version="1.5+" />
     $dependencies
   </resources>
+  <security>
+    <all-permissions/>
+  </security>
   <application-desc main-class="$mainClass" />
 </jnlp>
