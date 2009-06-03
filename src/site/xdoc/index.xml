@@ -1,11 +1,11 @@
 <document>
   <properties>
-    <title>Welcome to the Fosstrak EPCIS Project</title>
+    <title>Fosstrak EPCIS</title>
   </properties>
 
   <body>
     <!-- The body of the document contains a number of sections -->
-    <section name="Welcome to the Fosstrak EPCIS Project">
+    <section name="Fosstrak EPCIS: ECPglobal certified EPCIS Repository and EPCIS Query and Capture Clients">
       
 
 <subsection name="Objective">

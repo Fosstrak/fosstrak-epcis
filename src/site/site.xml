@@ -13,15 +13,15 @@
   <poweredBy>
     <logo img="images/logos/supportedByAutoid4.png" name="Auto-ID" href="http://www.autoidlabs.org/" />
   </poweredBy>
-  <publishDate position="left" format="MMM d, yyyy HH:mm:ss z"/>
+  <publishDate position="none" />
 
   <body>
     <links>
-      <item name="Fosstrak" href="../index.html" />
-      <item name="Reader" href="../reader/index.html"/>
-      <item name="Filtering and Collection" href="../fc/index.html"/>
-      <item name="EPCIS" href="index.html"/>
-      <item name="Tag Data Translation" href="../tdt/index.html"/>
+      <links>
+      <item name="EPCIS Repository" href="index.html"/>
+	  <item name="TDT Engine" href="../tdt/index.html"/>
+      <item name="ALE Middleware" href="../fc/index.html"/>
+	  <item name="LLRP Commander" href="../llrp/index.html"/>
     </links>
 
 
@@ -29,10 +29,8 @@
     <!-- Navigation Menu                                             -->
     <!-- =========================================================== -->
 
-    <menu name="Fosstrak" inherit="top">
-      <item name="Home" href="../index.html"/>
-    </menu>
-    <menu name="EPCIS Project" inherit="top">
+
+    <menu name="EPCIS" inherit="top">
       <item name="Overview" href="index.html"/>
       <item name="Features" href="features.html"/>
       <item name="Demo" href="demo.html"/>
@@ -52,7 +50,7 @@
       <!-- <item name="Source Repository" href="source-repository.html"/> -->
       <!-- <item name="Source Xref" href="xref/index.html"/> -->
     </menu>
-    <menu name="EPCIS Project Modules" inherit="none">
+    <menu name="EPCIS Modules" inherit="none">
       <item name="EPCIS Repository" href="epcis-repository/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
