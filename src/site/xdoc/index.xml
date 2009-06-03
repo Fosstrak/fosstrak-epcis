@@ -5,14 +5,12 @@
 
   <body>
     <!-- The body of the document contains a number of sections -->
-    <section name="Fosstrak EPCIS: ECPglobal certified EPCIS Repository and EPCIS Query and Capture Clients">
+    <section name="Fosstrak EPCIS: EPCglobal certified EPCIS Repository and Query/Capture Clients">
       
 
-<subsection name="Objective">
 The objective of the Fosstrak EPCIS Project is to implement the EPCIS role in
 the EPC network and to develop the appropriate tools that facilitate
 communication with an EPCIS Repository instance. 
-</subsection>
 
 <subsection name="Status">
 <p>
