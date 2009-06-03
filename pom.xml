@@ -252,13 +252,13 @@
       <post>accada-epcis-user@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-user</archive>
     </mailingList>
-    <mailingList>
+    <!-- <mailingList>
       <name>EPCIS developer mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
       <post>accada-epcis-developer@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-developer</archive>
-    </mailingList>
+    </mailingList> -->
   </mailingLists>
 
 
@@ -334,7 +334,7 @@
   <licenses>
     <license>
       <name>GNU Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+      <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</url>
     </license>
   </licenses>
   <developers>
