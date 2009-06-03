@@ -11,7 +11,7 @@
 
 <faq>
 <question>Is this a reference implementation of the EPCglobal EPC Information Services (EPCIS) Specification?</question>
-<answer>No. It is currently alpha software that is intended to facilitate rapid prototyping.</answer>
+<answer>No, but the Fosstrak EPCIS repository has been EPCglobal certified.</answer>
 </faq>
 
 <faq>
