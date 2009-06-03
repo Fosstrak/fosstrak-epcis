@@ -17,7 +17,6 @@
 
   <body>
     <links>
-      <links>
       <item name="EPCIS Repository" href="index.html"/>
 	  <item name="TDT Engine" href="../tdt/index.html"/>
       <item name="ALE Middleware" href="../fc/index.html"/>
