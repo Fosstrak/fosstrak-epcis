@@ -5,18 +5,14 @@
 
   <body>
     <!-- The body of the document contains a number of sections -->
-    <section name="Fosstrak EPCIS: EPCglobal certified EPCIS Repository and Query/Capture Clients">
-      
-
-The objective of the Fosstrak EPCIS Project is to implement the EPCIS role in
-the EPC network and to develop the appropriate tools that facilitate
-communication with an EPCIS Repository instance. 
+    <section name="Fosstrak EPCIS">
+<p>Fosstrak EPCIS provides an EPCglobal-certified EPCIS Repository as well as Query and Capture clients.</p>    
 
 <subsection name="Status">
 <p>
 Fosstrak EPCIS is a complete implementation of the EPCIS standard specification
 (Version 1.0.1 of September 21, 2007). It successfully passed conformance testing
-and is <a href="http://www.epcglobalinc.org/certification/"><b>EPCglobal certified</b></a>.
+and is <a href="http://www.epcglobalinc.org/certification/"><b>EPCglobal-certified</b></a>.
 </p>
 <center><a href="http://www.epcglobalinc.org/certification/"><img src="images/epc_cert_mark.png"/></a></center>
 </subsection>
@@ -39,6 +35,7 @@ The Fosstrak EPCIS Project comprises three separate modules:
 </ul>
 The figure below gives an overview of the Fosstrak EPCIS Implementation. For more
 information refer to the <a href="docs/architecture-guide.html">Architecture Guide</a>.
+<br/>
 <br/>
 <img src="images/epcis_architecture.png"/>
 </subsection>
