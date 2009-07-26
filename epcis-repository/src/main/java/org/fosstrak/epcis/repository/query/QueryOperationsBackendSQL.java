@@ -182,11 +182,11 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
         }
 
         boolean joinedEpcs = false;
-        boolean joinedExtensions = false;
         boolean joinedBizTransacitions = false;
 
         // construct the SQL query dynamically
         List<EventQueryParam> eventQueryParams = seQuery.getEventQueryParams();
+        int nofEventFieldExtensions = 0;
         for (EventQueryParam queryParam : eventQueryParams) {
             String eventField = queryParam.getEventField();
             Operation op = queryParam.getOp();
@@ -206,15 +206,24 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
             } else if (eventField.startsWith("extension")) {
                 // we have a query on an extension field, so we need to join the
                 // appropriate "_extensions" table
-                if (!joinedExtensions) {
-                    sqlSelectFrom.append(" JOIN event_").append(eventType).append("_extensions AS extension");
-                    sqlSelectFrom.append(" ON event_").append(eventType).append(".id=extension.event_id");
-                    joinedExtensions = true;
+
+                /*
+                 * For every extension condition there are two EventQueryParams,
+                 * one for the name of the parameter and another one for the
+                 * value. Example: extension.intValue extension.fieldname
+                 * Therefore, the JOINs will be created once from every two
+                 * extension conditions (the even ones)
+                 */
+                nofEventFieldExtensions++;
+                if (nofEventFieldExtensions % 2 == 0) {
+                    sqlSelectFrom.append(" JOIN event_").append(eventType).append("_extensions AS extension").append(
+                            nofEventFieldExtensions / 2);
+                    sqlSelectFrom.append(" ON event_").append(eventType).append(".id=extension").append(
+                            nofEventFieldExtensions / 2).append(".event_id");
                 }
             } else if (eventField.startsWith("bizTrans")) {
                 // we have a query on business transactions, so we need to join
-                // the
-                // appropriate "_bizTrans" and "bizTransList" tables
+                // the appropriate "_bizTrans" and "bizTransList" tables
                 if (!joinedBizTransacitions) {
                     sqlSelectFrom.append(" JOIN event_").append(eventType).append("_bizTrans AS bizTransList");
                     sqlSelectFrom.append(" ON event_").append(eventType).append(".id=bizTransList.event_id");

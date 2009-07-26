@@ -215,6 +215,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
         // names in order to cope with duplicates
         List<String> sortedParamNames = new ArrayList<String>();
 
+        int nofEventFieldExtensions = 0;
         for (QueryParam param : queryParams.getParam()) {
             String paramName = param.getName();
             Object paramValue = param.getValue();
@@ -375,23 +376,25 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                         String msg = "Invalid parameter " + paramName;
                         throw queryParameterException(msg, null);
                     }
+                    nofEventFieldExtensions++;
+                    String eventFieldExtBase = "extension" + nofEventFieldExtensions;
                     Operation op = Operation.valueOf(paramName.substring(0, 2));
                     String eventField;
                     Object value;
                     try {
                         value = parseAsInteger(paramValue);
-                        eventField = "extension.intValue";
+                        eventField = eventFieldExtBase + ".intValue";
                     } catch (NumberFormatException e1) {
                         try {
                             value = parseAsFloat(paramValue);
-                            eventField = "extension.floatValue";
+                            eventField = eventFieldExtBase + ".floatValue";
                         } catch (NumberFormatException e2) {
                             try {
                                 value = parseAsTimestamp(paramValue, paramName);
-                                eventField = "extension.dateValue";
+                                eventField = eventFieldExtBase + ".dateValue";
                             } catch (QueryParameterExceptionResponse e) {
                                 value = parseAsString(paramValue);
-                                eventField = "extension.strValue";
+                                eventField = eventFieldExtBase + ".strValue";
                             }
                         }
                     }
@@ -399,10 +402,11 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     objEventQuery.addEventQueryParam(eventField, op, value);
                     quantEventQuery.addEventQueryParam(eventField, op, value);
                     transEventQuery.addEventQueryParam(eventField, op, value);
-                    aggrEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
-                    objEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
-                    quantEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
-                    transEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                    String eventFieldExt = eventFieldExtBase + ".fieldname";
+                    aggrEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
+                    objEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
+                    quantEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
+                    transEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
 
                 } else if (paramName.startsWith("EXISTS_")) {
                     String fieldname = paramName.substring(7);
@@ -446,10 +450,12 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                             String msg = "Invalid parameter " + paramName;
                             throw queryParameterException(msg, null);
                         }
-                        aggrEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
-                        objEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
-                        quantEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
-                        transEventQuery.addEventQueryParam("extension.fieldname", Operation.EQ, fieldname);
+                        nofEventFieldExtensions++;
+                        String eventFieldExt = "extension" + nofEventFieldExtensions + ".fieldname";
+                        aggrEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
+                        objEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
+                        quantEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
+                        transEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
                     }
 
                 } else if (paramName.startsWith("HASATTR_")) {
