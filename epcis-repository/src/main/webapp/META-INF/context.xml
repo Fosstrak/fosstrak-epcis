@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Context reloadable="true">
+<!--
+  antiResourceLocking="true" prevents JAR-file locking on Windows systems and
+  allows clean undeploys but also impacts application startup time. This flag
+  can be omitted on non-Windows systems.
+ -->
+<Context reloadable="true" antiResourceLocking="true">
 
   <!--
      Parameters defined here are 'initial parameters' which are loaded at

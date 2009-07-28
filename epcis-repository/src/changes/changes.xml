@@ -4,6 +4,11 @@
     </properties>
     <body>
         <release version="0.4.3" date="2009-??-??" description="Bug fix release">
+            <action dev="steybem" type="update">
+                Set the antiResourceLocking flag in the application context to
+                true in order to prevent JAR file locking and allow clean
+                undeploys on Windows systems.
+            </action>
             <action dev="steybem" type="fix" issue="2495950" due-to="Oscar Saiz">
                 Use correct number of SQL joins for queries with two or more
                 EQ_fieldname parameters.
