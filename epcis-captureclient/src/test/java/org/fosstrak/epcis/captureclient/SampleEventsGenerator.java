@@ -29,8 +29,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 /**
- * A simple utility class to generate some simple EPCIS events with some sample
- * contents.
+ * A simple utility class to generate EPCIS events with some sample contents.
  * 
  * @author Marco Steybe
  */
@@ -43,6 +42,16 @@ public class SampleEventsGenerator {
     private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
     private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
 
+    public static void main(String[] args) throws IOException {
+        generateAggregationEvents("aggregationevents.xml", 5);
+        generateObjectEvents("objectevents.xml", 5);
+        generateQuantityEvents("quantityevents.xml", 5);
+        generateTransactionEvents("transactionevents.xml", 5);
+    }
+
+    /**
+     * Generates <code>nr</code> AggregationEvents and writes them to a file called <code>fileName</code>.
+     */
     public static void generateAggregationEvents(String fileName, int nr) throws IOException {
         Calendar now = Calendar.getInstance();
         String time = format(now);
@@ -88,6 +97,9 @@ public class SampleEventsGenerator {
         bw.close();
     }
 
+    /**
+     * Generates <code>nr</code> ObjectEvents and writes them to a file called <code>fileName</code>.
+     */
     public static void generateObjectEvents(String fileName, int nr) throws IOException {
         Calendar now = Calendar.getInstance();
         String time = format(now);
@@ -129,6 +141,9 @@ public class SampleEventsGenerator {
         bw.close();
     }
 
+    /**
+     * Generates <code>nr</code> TransactionEvents and writes them to a file called <code>fileName</code>.
+     */
     public static void generateTransactionEvents(String fileName, int nr) throws IOException {
         Calendar now = Calendar.getInstance();
         String time = format(now);
@@ -170,6 +185,9 @@ public class SampleEventsGenerator {
         bw.close();
     }
 
+    /**
+     * Generates <code>nr</code> QuantityEvents and writes them to a file called <code>fileName</code>.
+     */
     public static void generateQuantityEvents(String fileName, int nr) throws IOException {
         Calendar now = Calendar.getInstance();
         String time = format(now);
@@ -286,12 +304,4 @@ public class SampleEventsGenerator {
         buf.append(XX_FORMAT.format(minutes));
         return buf.toString();
     }
-
-    public static void main(String[] args) throws IOException {
-        generateAggregationEvents("D:/test/aggrevents.xml", 5);
-        generateObjectEvents("D:/test/objevents.xml", 5);
-        generateQuantityEvents("D:/test/quantevents.xml", 5);
-        generateTransactionEvents("D:/test/transevents.xml", 5);
-    }
-
 }

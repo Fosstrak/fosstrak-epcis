@@ -20,7 +20,6 @@
 
 package org.fosstrak.epcis.captureclient;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -42,6 +41,13 @@ public class MassCaptureTest {
     private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
     private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
     private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
+
+
+    public static void main(final String[] args) throws Exception {
+        for (int epcSerialNr = 0; epcSerialNr < 1000; epcSerialNr++) {
+            testCaptureRequest(epcSerialNr);
+        }
+    }
 
     public static void testCaptureRequest(final int epcSerialNr) throws Exception {
         Calendar now = Calendar.getInstance();
@@ -157,11 +163,4 @@ public class MassCaptureTest {
         buf.append(XX_FORMAT.format(minutes));
         return buf.toString();
     }
-
-    public static void main(final String[] args) throws Exception {
-        for (int epcSerialNr = 0; epcSerialNr < 1000; epcSerialNr++) {
-            testCaptureRequest(epcSerialNr);
-        }
-    }
-
 }
