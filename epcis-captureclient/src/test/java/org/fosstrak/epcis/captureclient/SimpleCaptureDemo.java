@@ -55,7 +55,8 @@ import org.w3c.dom.Element;
  */
 public class SimpleCaptureDemo {
 
-	private static final String DEFAULT_EPCIS_CAPTURE_URL = "http://localhost:8080/epcis-repository/capture";
+	protected static final String LOCAL_EPCIS_CAPTURE_URL = "http://localhost:8080/epcis-repository/capture";
+	protected static final String DEMO_EPCIS_CAPTURE_URL = "http://demo.fosstrak.org/epcis/capture";
 
 	/**
 	 * Reads a sample EPCIS capture request and submits it to an EPCIS
@@ -67,7 +68,7 @@ public class SimpleCaptureDemo {
 	 *            provided if this argument is omitted.
 	 */
 	public static void main(String[] args) throws Exception {
-		String captureUrl = DEFAULT_EPCIS_CAPTURE_URL;
+		String captureUrl = LOCAL_EPCIS_CAPTURE_URL;
 		if (args.length > 0) {
 			// read command-line arguments
 			for (int i = 0; i < args.length; i++) {

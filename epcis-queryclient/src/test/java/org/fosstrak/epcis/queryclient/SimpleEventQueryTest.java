@@ -37,12 +37,15 @@ import org.fosstrak.epcis.utils.QueryResultsParser;
  */
 public class SimpleEventQueryTest {
 
+	protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query";
+	protected static final String DEMO_EPCIS_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
+
     // Note: keep the methods in this class static in order to prevent them from
     // being executed when building the project with Maven.
 
     public static void main(String[] args) throws Exception {
         // configure the query service
-        String queryUrl = "http://demo.fosstrak.org/epcis/query";
+        String queryUrl = LOCAL_EPCIS_QUERY_URL;
         QueryControlClient client = new QueryControlClient();
         client.configureService(new URL(queryUrl), null);
 
@@ -108,6 +111,14 @@ public class SimpleEventQueryTest {
         sb.append("    <value>\n");
         sb.append("      <string>urn:epc:id:sgtin:0614141.107346.2017</string>\n");
         sb.append("    </value>\n");
+        sb.append("  </param>\n");
+        sb.append("  <param>\n");
+        sb.append("  <name>EQ_http://my.unique.namespace#my_extensionfield</name>");
+        sb.append("  <value><string>My Extension</string></value>");
+        sb.append("  </param>\n");
+        sb.append("  <param>\n");
+        sb.append("  <name>EQ_http://my.unique.namespace#my_extensionfield2</name>");
+        sb.append("  <value><string>My Extension2</string></value>");
         sb.append("  </param>\n");
         sb.append("</params>\n");
         sb.append("</epcisq:Poll>");

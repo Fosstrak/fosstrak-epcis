@@ -38,7 +38,8 @@ import java.io.InputStream;
  */
 public class SimpleCaptureApp {
 
-	private static final String DEFAULT_EPCIS_CAPTURE_URL = "http://localhost:8080/epcis-repository/capture";
+	protected static final String LOCAL_EPCIS_CAPTURE_URL = "http://localhost:8080/epcis-repository/capture";
+	protected static final String DEMO_EPCIS_CAPTURE_URL = "http://demo.fosstrak.org/epcis/capture";
 	private static final String SAMPLE_CAPTURE_REQUEST_XML = "sampleCaptureRequest.xml";
 
 	/**
@@ -53,7 +54,7 @@ public class SimpleCaptureApp {
 	 *            these arguments is omitted.
 	 */
 	public static void main(String[] args) throws Exception {
-		String captureUrl = DEFAULT_EPCIS_CAPTURE_URL;
+		String captureUrl = LOCAL_EPCIS_CAPTURE_URL;
 		String xmlFile = SAMPLE_CAPTURE_REQUEST_XML;
 		if (args.length > 0) {
 			// read command-line arguments
