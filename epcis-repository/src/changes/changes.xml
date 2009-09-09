@@ -19,7 +19,8 @@
                 Subscriptions not tolerant to server restart.
             </action>
             <action dev="steybem" type="fix" issue="2379542" due-to="Nektarios Leontiadis">
-                ArrayOfStrings cannot be serialized and stored to db.
+                Fixed query subscription error (unable to serialize and store
+                objects of type ArrayOfString to database)
             </action>
             <action dev="roduner" type="fix">
                 Updated demo data. Example events are now compliant with
@@ -100,15 +101,24 @@
                 Added database indexes wherever reasonable for improved
                 performance.
             </action>
-            <action dev="steybem" type="remove">
-                Removed EPCIS WSDL and schema files - they will now be
-                provided by epcis-commons and will be available on the
-                classpath.
+            <action dev="steybem" type="update">
+                Moved EPCIS WSDL and schema files to module epcis-commons.
             </action>
             <action dev="steybem" type="remove">
                 Removed 'vocabularies' table from the database schema -
                 the mapping of vocabulary names to the corresponding
                 database table is now handled in the code.
+            </action>
+            <action dev="steybem" type="add">
+                Added utility class for parsing and printing QueryResults.
+            </action>
+            <action dev="steybem" type="update">
+                Replaced Axis-generated Web service stubs with
+                CXF-generated Java beans.
+            </action>
+            <action dev="steybem" type="fix">
+                Fixed TimeParser to catch any exceptions caused by
+                invalid input and wrap them into QueryParameterExceptions.
             </action>
             <!-- changes to query interface -->
             <action dev="steybem" type="add">
@@ -251,6 +261,16 @@
             </action>
             <action dev="steybem" type="fix">
                 Fixed QuerySchedule to correctly handle leap years.
+            </action>
+            <action dev="steybem" type="add">
+                Added test case for TimeParser.
+            </action>
+            <action dev="steybem" type="fix" issue="1845531">
+                Corrected serialization of time values into XML.
+            </action>
+            <action dev="steybem" type="fix" issue="1789784">
+                Fixed parsing of event time when time value does not
+                have exactly three digits for millisecond.
             </action>
         </release>
         <release version="0.2.2" date="2007-08-31"
