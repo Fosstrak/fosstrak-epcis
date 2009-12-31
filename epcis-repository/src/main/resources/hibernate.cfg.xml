@@ -15,7 +15,7 @@ PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
     <property name="hibernate.jdbc.batch_size">50</property>
     <property name="hibernate.connection.autocommit">false</property>
     <property name="hibernate.cache.use_second_level_cache">true</property>
-    <property name="hibernate.cache.use_query_cache">true</property>
+    <property name="hibernate.cache.use_query_cache">false</property>
     <property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
     <property name="hibernate.cache.use_structured_entries">true</property>
     <property name="hibernate.jdbc.use_get_generated_keys">true</property>
