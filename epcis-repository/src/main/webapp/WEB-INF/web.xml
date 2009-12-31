@@ -45,6 +45,10 @@
     <servlet-class>org.fosstrak.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>
+  <servlet>
+  	<servlet-name>WelcomePage</servlet-name>
+  	<jsp-file>/WEB-INF/jsp/index.jsp</jsp-file>
+  </servlet>
   <!--
   <servlet>
     <servlet-name>epcisRepository</servlet-name>
@@ -61,7 +65,12 @@
   <servlet-mapping>
     <!-- The query Web service will be available at http://{url:port}/{context-path}/query -->
     <servlet-name>EpcisQueryInterface</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/query/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <!-- The welcome page -->
+    <servlet-name>WelcomePage</servlet-name>
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
 
   <session-config>
@@ -78,7 +87,7 @@
   </mime-mapping>
 
   <welcome-file-list id="WelcomeFileList">
-    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
  
   <resource-ref>
