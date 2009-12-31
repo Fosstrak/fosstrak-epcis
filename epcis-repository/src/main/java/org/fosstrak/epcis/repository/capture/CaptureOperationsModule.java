@@ -30,9 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Principal;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -56,6 +54,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.fosstrak.epcis.repository.EpcisConstants;
 import org.fosstrak.epcis.repository.InvalidFormatException;
 import org.fosstrak.epcis.repository.model.Action;
@@ -75,8 +75,6 @@ import org.fosstrak.epcis.repository.model.ReadPointId;
 import org.fosstrak.epcis.repository.model.TransactionEvent;
 import org.fosstrak.epcis.repository.model.VocabularyElement;
 import org.fosstrak.epcis.utils.TimeParser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
@@ -183,7 +181,7 @@ public class CaptureOperationsModule {
      * @throws UnsupportedOperationsException
      *             If database resets are not allowed.
      */
-    public void doDbReset() throws SQLException, IOException {
+    public void doDbReset() throws SQLException, IOException, UnsupportedOperationException {
         if (dbResetAllowed) {
             Session session = null;
             try {
@@ -191,18 +189,15 @@ public class CaptureOperationsModule {
                 Transaction tx = null;
                 try {
                     tx = session.beginTransaction();
-                    Connection connection = session.connection();
                     LOG.info("Running db reset script from file " + dbResetScript);
-                    Statement stmt = connection.createStatement();
                     BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
                     String line;
                     while ((line = reader.readLine()) != null) {
                         if (!line.startsWith("--")) {
                             LOG.debug("SQL: " + line);
-                            stmt.addBatch(line);
+                            session.createSQLQuery(line).executeUpdate();
                         }
                     }
-                    stmt.executeBatch();
                     tx.commit();
                 } catch (Exception e) {
                     LOG.error("dbReset failed: " + e.toString(), e);
@@ -596,8 +591,8 @@ public class CaptureOperationsModule {
      *            InvalidFormatException if the given <code>epcOrUri</code> is
      *            an invalid EPC, but might be a valid URI), <code>false</code>
      *            otherwise.
-     * @return <code>true</code> if the given <code>epcOrUri</code> is a
-     *         valid EPC, <code>false</code> otherwise.
+     * @return <code>true</code> if the given <code>epcOrUri</code> is a valid
+     *         EPC, <code>false</code> otherwise.
      * @throws InvalidFormatException
      */
     protected boolean checkEpcOrUri(String epcOrUri, boolean epcRequired) throws InvalidFormatException {
