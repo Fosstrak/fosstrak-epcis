@@ -91,19 +91,15 @@ Developer Guide
 
 ** {Setting up Eclipse}
 
-   If you intend to use the Eclipse IDE to work on the project, you should
-   consider the following guidelines:
+   We recommend using the Eclipse IDE to work on the Fosstrak projects. Please
+   follow these steps to set up the projects in Eclipse:
 
-   [[1]] Eclipse needs to know the path to your local Maven repository. Run the
-   following command to automatically set up the class path variable
-   <<<M2_REPO>>> for your Eclipse workspace:
+   [[1]] Add the classpath variable <<<M2_REPO>>> to Eclipse:
 
 ---------------------------------------------------------------------------
-mvn eclipse:add-maven-repo -Declipse.workspace=<path-to-your-eclipse-workspace>
+mvn eclipse:configure-workspace -Declipse.workspace=<path-to-your-eclipse-workspace>
 ---------------------------------------------------------------------------
 
-   If you use an Eclipse WTP, you should also add the <<<-Dwtpversion=1.5>>>
-   switch and specify the WTP version you use.
 
    [[1]] In order to generate the <<<.project>>> and <<<.classpath>>> files
    used by Eclipse, run the following command from the <<<EPCIS_HOME>>>
@@ -116,9 +112,10 @@ mvn eclipse:eclipse -DdownloadSources
    If you do not want to download all the sources, ignore the
    <<<-DdownloadSources>>> switch.
 
-   [[1]] Form inside Eclipse, import all the sub-modules: go to <File> >
+   [[1]] From inside Eclipse, import all the sub-modules: go to <File> >
    <Import> > <Existing Projects into Workspace> and select all four projects
    available there.
+
 
    [[1]] In Eclipse, import the code formatter stylesheet: go to <Window> >
    <Preferences...>, navigate to the branch <Java> > <Code Style> >
