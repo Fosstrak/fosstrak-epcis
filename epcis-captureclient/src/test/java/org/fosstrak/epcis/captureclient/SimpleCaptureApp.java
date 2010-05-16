@@ -40,7 +40,7 @@ public class SimpleCaptureApp {
 
 	protected static final String LOCAL_EPCIS_CAPTURE_URL = "http://localhost:8080/epcis-repository/capture";
 	protected static final String DEMO_EPCIS_CAPTURE_URL = "http://demo.fosstrak.org/epcis/capture";
-	private static final String SAMPLE_CAPTURE_REQUEST_XML = "sampleCaptureRequest.xml";
+	private static final String SAMPLE_CAPTURE_REQUEST_XML = "src/test/resources/sampleCaptureRequest.xml";
 
 	/**
 	 * Reads a sample EPCIS capture request and submits it to an EPCIS
