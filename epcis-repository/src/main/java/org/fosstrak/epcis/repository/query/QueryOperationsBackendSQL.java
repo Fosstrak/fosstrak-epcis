@@ -265,7 +265,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                     sqlParams.add(eventField);
                 }
             } else if (value != null) {
-                if (value instanceof List) {
+                if (value instanceof List<?>) {
                     // we have a multi-value query parameter, e.g. action, EPCs,
                     // vocabulary types
                     List<?> paramValues = (List<?>) value;
