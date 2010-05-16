@@ -22,9 +22,24 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+  
+  <filter>
+    <filter-name>FosstrakCaptureInterfaceFilter</filter-name>
+    <description>
+      This filter can be placed 'in front' of the EPCIS capture interface
+      servlet, such that the capture interface can also be invoked from
+      HTML pages using forms. Note that this is a Fosstrak extension and
+      not part of the EPCIS specification.
+    </description>
+    <filter-class>org.fosstrak.epcis.repository.capture.MultipartFormDataFilter</filter-class>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>FosstrakCaptureInterfaceFilter</filter-name>
+    <servlet-name>EpcisCaptureInterface</servlet-name>
+  </filter-mapping>
 
   <servlet>
-    <!-- CXFServlet providing the Query Interface Endpoint -->
     <servlet-name>EpcisQueryInterface</servlet-name>
     <description>
       This servlet dispatches EPCIS query requests to the Web service framework
@@ -35,7 +50,6 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
-    <!-- CaptureOperationsModule servlet providing the Capture Interface -->
     <servlet-name>EpcisCaptureInterface</servlet-name>
     <description>
       This servlet captures EPCIS events sent in HTTP POST requests. The POST
@@ -44,6 +58,13 @@
     </description>
     <servlet-class>org.fosstrak.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
+  </servlet>
+  <servlet>
+  	<servlet-name>StaticContent</servlet-name>
+  	<description>
+  	  A servlet which handles access to static content (images, styles, etc.)
+  	</description>
+  	<servlet-class>org.fosstrak.epcis.repository.StaticContentServlet</servlet-class>
   </servlet>
   <servlet>
   	<servlet-name>WelcomePage</servlet-name>
@@ -58,17 +79,18 @@
   -->
 
   <servlet-mapping>
-    <!-- The capture servlet will be available at http://{url:port}/{context-path}/capture -->
     <servlet-name>EpcisCaptureInterface</servlet-name>
     <url-pattern>/capture</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <!-- The query Web service will be available at http://{url:port}/{context-path}/query -->
     <servlet-name>EpcisQueryInterface</servlet-name>
     <url-pattern>/query/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <!-- The welcome page -->
+    <servlet-name>StaticContent</servlet-name>
+    <url-pattern>/static/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>WelcomePage</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>

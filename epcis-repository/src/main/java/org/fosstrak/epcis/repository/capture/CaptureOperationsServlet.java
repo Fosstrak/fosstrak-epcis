@@ -35,9 +35,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fosstrak.epcis.repository.InvalidFormatException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.fosstrak.epcis.repository.InvalidFormatException;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -61,6 +61,9 @@ public class CaptureOperationsServlet extends HttpServlet {
     private static final String PROP_DB_RESET_ALLOWED = "dbResetAllowed";
     private static final String PROP_DB_RESET_SCRIPT = "dbResetScript";
     private static final String PROP_EPCIS_SCHEMA_FILE = "epcisSchemaFile";
+
+    private static final String PAGE_CAPTURE_INTERFACE = "/WEB-INF/jsp/capture.jsp";
+    private static final String PAGE_CAPTURE_FORM = "/WEB-INF/jsp/captureForm.jsp";
 
     private static final Log LOG = LogFactory.getLog(CaptureOperationsServlet.class);
 
@@ -165,27 +168,32 @@ public class CaptureOperationsServlet extends HttpServlet {
     }
 
     /**
-     * Returns a simple information page.
+     * Handles HTTP GET requests by dispatching to simple information pages.
      * 
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      * @param req
-     *            The HttpServletRequest.
+     *            The servlet request.
      * @param rsp
-     *            The HttpServletResponse.
+     *            The servlet response.
      * @throws IOException
      *             If an error occurred while writing the response.
      */
     public void doGet(final HttpServletRequest req, final HttpServletResponse rsp) throws ServletException, IOException {
-        String dbReset = req.getParameter("dbReset");
-        // uncomment if you want to enable dbReset for GET requests
-//        if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
-//            doDbReset(rsp);
-//        } else {
-            String nextJSP = "/WEB-INF/jsp/capture.jsp";
-            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
-            dispatcher.forward(req, rsp);
-//        }
+        RequestDispatcher dispatcher;
+        // un-comment if you want to enable dbReset for GET requests
+//      String dbReset = req.getParameter("dbReset");
+//      if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
+//          doDbReset(rsp);
+//      } else {
+        String showCaptureForm = req.getParameter("showCaptureForm");
+        if (showCaptureForm != null && "true".equals(showCaptureForm)) {
+            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_FORM);
+        } else {
+            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_INTERFACE);
+        }
+        dispatcher.forward(req, rsp);
+//      }
     }
 
     /**
@@ -202,14 +210,14 @@ public class CaptureOperationsServlet extends HttpServlet {
      *             If an error occurred while validating the request or writing
      *             the response.
      */
-    public void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws IOException {
+    public void doPost(final HttpServletRequest req, final HttpServletResponse rsp) throws ServletException, IOException {
         LOG.info("EPCIS Capture Interface invoked.");
-        rsp.setContentType("text/plain");
-        final PrintWriter out = rsp.getWriter();
-
         InputStream is = null;
+        
         // check if we have a POST request with form parameters
         if ("application/x-www-form-urlencoded".equalsIgnoreCase(req.getContentType())) {
+            rsp.setContentType("text/plain");
+            PrintWriter out = rsp.getWriter();
             // check if the 'event' or 'dbReset' form parameter are given
             String event = req.getParameter("event");
             String dbReset = req.getParameter("dbReset");
@@ -226,30 +234,43 @@ public class CaptureOperationsServlet extends HttpServlet {
             return;
         } else {
             is = req.getInputStream();
-            try {
-                captureOperationsModule.doCapture(is, req.getUserPrincipal());
-                rsp.setStatus(HttpServletResponse.SC_OK);
-                out.println("Capture request succeeded.");
-            } catch (SAXException e) {
-                String msg = "An error processing the XML document occurred";
-                LOG.error(msg, e);
-                rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.println(msg);
-            } catch (InvalidFormatException e) {
-                String msg = "An error parsing the XML contents occurred";
-                LOG.error(msg, e);
-                rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.println(msg);
-            } catch (final Exception e) {
-                String msg = "An unexpected error occurred";
-                LOG.error(msg, e);
-                rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.println(msg);
-            }
-
-            out.flush();
-            out.close();
         }
+        
+        // do the capture operation and handle exceptions
+        String responseMsg = null;
+        String detailedMsg = null;
+        try {
+            captureOperationsModule.doCapture(is, req.getUserPrincipal());
+            rsp.setStatus(HttpServletResponse.SC_OK);
+            responseMsg = "EPCIS capture request succeeded.";
+        } catch (SAXException e) {
+            responseMsg = "An error processing the XML document occurred.";
+            detailedMsg = "Unable to parse incoming XML due to error: " + e.getMessage();
+            LOG.info(detailedMsg);
+            rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (InvalidFormatException e) {
+            responseMsg = "An error parsing the XML contents occurred.";
+            detailedMsg = "Unable to parse incoming EPCISDocument due to error: " + e.getMessage();
+            LOG.info(detailedMsg);
+            rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (final Exception e) {
+            responseMsg = "An unexpected error occurred.";
+            detailedMsg = "The repository is unable to handle the request due to an internal error.";
+            LOG.error(responseMsg, e);
+            rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
+        // dispatch the response
+        req.setAttribute("responseMsg", responseMsg);
+        req.setAttribute("detailedMsg", detailedMsg);
+        RequestDispatcher dispatcher;
+        String showCaptureForm = (String) req.getAttribute("showCaptureForm");
+        if (showCaptureForm != null && "true".equals(showCaptureForm)) {
+            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_FORM);
+        } else {
+            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_INTERFACE);
+        }
+        dispatcher.forward(req, rsp);
     }
 
     private void doDbReset(final HttpServletResponse rsp) throws IOException {

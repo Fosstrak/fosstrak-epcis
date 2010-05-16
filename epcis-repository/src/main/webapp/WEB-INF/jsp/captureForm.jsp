@@ -16,16 +16,17 @@
 	        The payload of the HTTP POST request is expected to be an XML document conforming to the EPCISDocument schema.
 		</div>
 	    <br />
-		<div>
-			For further information refer to the xml schema files, check the Example <br />
-	        in 'EPC Information Services (EPCIS) Version 1.0 Specification', Section 9.6,<br />
-	        or see the <a href="http://www.fosstrak.org/epcis/docs/user-guide.html#How%20to%20Capture%20EPCIS%20Events">Fosstrak EPCIS user guide</a>.
+		<div id="captureFormDiv">
+		    <form name="captureForm?showCaptureForm=true" action="capture" method="post" enctype="multipart/form-data">
+		    	<input name="showCaptureForm" type="hidden" value="true" />
+		    	<textarea rows="12" cols="100" name="event"><% if (request.getAttribute("xml") == null) { %><%@ include file="../../static/sampleCaptureRequest.xml" %><% } else { %><%= request.getAttribute("xml") %><% } %></textarea>
+		    	<br />
+		    	<input type="submit" value="submit" />
+		    </form>
 	    </div>
+	    <div><%= request.getAttribute("responseMsg") %></div>
 	    <br />
-	    <br />
-	    <div style="font-size:10px">
-	    	<a href="capture?showCaptureForm=true">&raquo; show HTML capture form</a>
-	    </div>
+	    <div><%= request.getAttribute("detailedMsg") %></div>
 	</div>
 </body>
 </html>

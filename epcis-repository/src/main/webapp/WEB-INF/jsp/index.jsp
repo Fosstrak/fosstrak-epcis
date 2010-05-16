@@ -5,13 +5,18 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 	<title>Fosstrak EPCIS Capture and Query Services</title>
+	<link rel="stylesheet" type="text/css" href="static/style.css" />
 </head>
 <body>
-	<p>Hello,</p>
-	<p>this is the Fosstrak EPCIS Web application providing the following two services</p>
-	<ul>
-		<li><a href="capture">Fosstrak EPCIS Capture interface</a> (HTTP POST)</li>
-		<li><a href="query">Fosstrak EPCIS Query interface</a> (Web service)</li>
-	</ul>
+	<%@ include file="banner.jsp" %>
+	<div id="content">
+		<h1>Fosstrak EPCIS Capture and Query Services</h1>
+		<div>This is the Fosstrak EPCIS Web application providing the following two services</div>
+		<br />
+		<ul>
+			<li><a href="capture">Fosstrak EPCIS Capture interface</a> (HTTP POST)</li>
+			<li><a href="query">Fosstrak EPCIS Query interface</a> (Web service)</li>
+		</ul>
+	</div>
 </body>
 </html>
