@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epcis:EPCISDocument xmlns:epcis="urn:epcglobal:epcis:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" creationDate="2008-03-06T11:42:15.016+01:00" schemaVersion="1.0" xmlns:my_ns="http://my.unique.namespace">
+  <EPCISBody>
+    <EventList>
+      <ObjectEvent>
+        <eventTime>2009-08-21T13:28:17Z</eventTime>
+        <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
+        <epcList>
+          <epc>urn:epc:id:sgtin:0057000.123780.7788</epc>
+        </epcList>
+        <action>ADD</action>
+        <bizStep>urn:fosstrak:demo:bizstep:fmcg:production</bizStep>
+        <disposition>urn:fosstrak:demo:disp:fmcg:pendingQA</disposition>
+        <readPoint>
+          <id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210,432</id>
+        </readPoint>
+        <bizLocation>
+          <id>urn:fosstrak:demo:fmcg:ssl:0037000.00729.210</id>
+        </bizLocation>
+        <!-- uncomment the following for capturing an event field extension -->
+        <!-- <myNs:myExtensionField>My Extension Value</myNs:myExtensionField> -->
+      </ObjectEvent>
+    </EventList>
+  </EPCISBody>
+</epcis:EPCISDocument>

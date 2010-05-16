@@ -1,0 +1,22 @@
+body {
+	background-color: #fff;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	padding: 0px;
+	margin: 0px;
+}
+
+#banner {
+	margin: 0px;
+	padding: 0px;
+	height: 105px;
+	background-image: url('banner_middle.gif');
+}
+
+#bannerLeft img {
+	border: none;
+}
+
+#content {
+	margin: 5px;
+}
