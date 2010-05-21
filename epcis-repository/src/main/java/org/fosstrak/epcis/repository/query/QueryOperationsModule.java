@@ -23,7 +23,6 @@ package org.fosstrak.epcis.repository.query;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -267,13 +266,13 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     }
                 } else if (paramName.equals("GE_eventTime") || paramName.equals("LT_eventTime")
                         || paramName.equals("GE_recordTime") || paramName.equals("LT_recordTime")) {
-                    Timestamp ts = parseAsTimestamp(paramValue, paramName);
+                	Calendar cal = parseAsCalendar(paramValue, paramName);
                     Operation op = Operation.valueOf(paramName.substring(0, 2));
-                    String eventField = paramName.substring(3, paramName.length());
-                    aggrEventQuery.addEventQueryParam(eventField, op, ts);
-                    objEventQuery.addEventQueryParam(eventField, op, ts);
-                    quantEventQuery.addEventQueryParam(eventField, op, ts);
-                    transEventQuery.addEventQueryParam(eventField, op, ts);
+                    String eventField = paramName.substring(3, paramName.length()) + "Ms";
+                    aggrEventQuery.addEventQueryParam(eventField, op, cal.getTimeInMillis());
+                    objEventQuery.addEventQueryParam(eventField, op, cal.getTimeInMillis());
+                    quantEventQuery.addEventQueryParam(eventField, op, cal.getTimeInMillis());
+                    transEventQuery.addEventQueryParam(eventField, op, cal.getTimeInMillis());
 
                 } else if (paramName.equals("EQ_action")) {
                     // QuantityEvents have no "action" field, thus exclude them
@@ -390,7 +389,7 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                             eventField = eventFieldExtBase + ".floatValue";
                         } catch (NumberFormatException e2) {
                             try {
-                                value = parseAsTimestamp(paramValue, paramName);
+                                value = parseAsCalendar(paramValue, paramName);
                                 eventField = eventFieldExtBase + ".dateValue";
                             } catch (QueryParameterExceptionResponse e) {
                                 value = parseAsString(paramValue);
@@ -648,16 +647,16 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
      * @throws QueryParameterExceptionResponse
      *             If the query parameter value cannot be parsed as Timestamp.
      */
-    private Timestamp parseAsTimestamp(Object queryParamValue, String queryParamName)
+    private Calendar parseAsCalendar(Object queryParamValue, String queryParamName)
             throws QueryParameterExceptionResponse {
-        Timestamp ts;
+        Calendar cal;
         if (queryParamValue instanceof Calendar) {
             // Axis returns a Calendar instance
-            ts = TimeParser.convert((Calendar) queryParamValue);
+            cal = (Calendar) queryParamValue;
         } else if (queryParamValue instanceof XMLGregorianCalendar) {
             // CXF returns an XMLGregorianCalendar instance if the
             // XML type is specified
-            ts = TimeParser.convert(((XMLGregorianCalendar) queryParamValue).toGregorianCalendar());
+            cal = ((XMLGregorianCalendar) queryParamValue).toGregorianCalendar();
         } else {
             // try to parse the value manually
             String date = null;
@@ -673,13 +672,13 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 LOG.debug("Trying to parse the value (" + date + ") for parameter " + queryParamName + " as date/time");
             }
             try {
-                ts = TimeParser.parseAsTimestamp(date);
+                cal = TimeParser.parseAsCalendar(date);
             } catch (ParseException e) {
                 String msg = "Unable to parse the value for query parameter '" + queryParamName + "' as date/time";
                 throw queryParameterException(msg, e);
             }
         }
-        return ts;
+        return cal;
     }
 
     /**
@@ -1130,9 +1129,11 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                 String triggerURI = controls.getTrigger();
                 QuerySubscriptionScheduled newSubscription = null;
                 Schedule schedule = null;
-                GregorianCalendar initialRecordTime = controls.getInitialRecordTime().toGregorianCalendar();
-                if (initialRecordTime == null) {
-                    initialRecordTime = new GregorianCalendar();
+                Calendar initialRecordTime;
+                try {
+                	initialRecordTime = controls.getInitialRecordTime().toGregorianCalendar();
+                }catch(Exception e){
+                	initialRecordTime = GregorianCalendar.getInstance();
                 }
 
                 // a few input sanity checks

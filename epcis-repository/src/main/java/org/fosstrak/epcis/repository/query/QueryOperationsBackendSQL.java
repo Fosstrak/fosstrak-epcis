@@ -47,6 +47,8 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.fosstrak.epcis.model.ActionType;
 import org.fosstrak.epcis.model.AggregationEventType;
 import org.fosstrak.epcis.model.AttributeType;
@@ -74,9 +76,6 @@ import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.EventQueryParam;
 import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.Operation;
 import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
 import org.fosstrak.epcis.soap.QueryTooLargeExceptionResponse;
-import org.fosstrak.epcis.utils.TimeParser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * The QueryOperationsBackendSQL uses basic SQL statements (actually
@@ -89,10 +88,10 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
 
     private static final Log LOG = LogFactory.getLog(QueryOperationsBackendSQL.class);
 
-    private static final String SQL_SELECT_FROM_AGGREGATIONEVENT = "SELECT DISTINCT event_AggregationEvent.id, eventTime, recordTime, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, action, parentID FROM event_AggregationEvent LEFT JOIN voc_BizStep AS bizStep ON event_AggregationEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_AggregationEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_AggregationEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_AggregationEvent.bizLocation=bizLocation.id";
-    private static final String SQL_SELECT_FROM_OBJECTEVENT = "SELECT DISTINCT event_ObjectEvent.id, eventTime, recordTime, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, action FROM event_ObjectEvent LEFT JOIN voc_BizStep AS bizStep ON event_ObjectEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_ObjectEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_ObjectEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_ObjectEvent.bizLocation=bizLocation.id";
-    private static final String SQL_SELECT_FROM_QUANTITYEVENT = "SELECT DISTINCT event_QuantityEvent.id, eventTime, recordTime, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, epcClass.uri AS epcClass, quantity FROM event_QuantityEvent LEFT JOIN voc_BizStep AS bizStep ON event_QuantityEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_QuantityEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_QuantityEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_QuantityEvent.bizLocation=bizLocation.id LEFT JOIN voc_EPCClass AS epcClass ON event_QuantityEvent.epcClass=epcClass.id";
-    private static final String SQL_SELECT_FROM_TRANSACTIONEVENT = "SELECT DISTINCT event_TransactionEvent.id, eventTime, recordTime, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, action, parentID FROM event_TransactionEvent LEFT JOIN voc_BizStep AS bizStep ON event_TransactionEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_TransactionEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_TransactionEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_TransactionEvent.bizLocation=bizLocation.id";
+    private static final String SQL_SELECT_FROM_AGGREGATIONEVENT = "SELECT DISTINCT event_AggregationEvent.id, eventTime, eventTimeMs, recordTime, recordTimeMs, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, action, parentID FROM event_AggregationEvent LEFT JOIN voc_BizStep AS bizStep ON event_AggregationEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_AggregationEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_AggregationEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_AggregationEvent.bizLocation=bizLocation.id";
+    private static final String SQL_SELECT_FROM_OBJECTEVENT = "SELECT DISTINCT event_ObjectEvent.id, eventTime, eventTimeMs, recordTime, recordTimeMs, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, action FROM event_ObjectEvent LEFT JOIN voc_BizStep AS bizStep ON event_ObjectEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_ObjectEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_ObjectEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_ObjectEvent.bizLocation=bizLocation.id";
+    private static final String SQL_SELECT_FROM_QUANTITYEVENT = "SELECT DISTINCT event_QuantityEvent.id, eventTime, eventTimeMs, recordTime, recordTimeMs, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, epcClass.uri AS epcClass, quantity FROM event_QuantityEvent LEFT JOIN voc_BizStep AS bizStep ON event_QuantityEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_QuantityEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_QuantityEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_QuantityEvent.bizLocation=bizLocation.id LEFT JOIN voc_EPCClass AS epcClass ON event_QuantityEvent.epcClass=epcClass.id";
+    private static final String SQL_SELECT_FROM_TRANSACTIONEVENT = "SELECT DISTINCT event_TransactionEvent.id, eventTime, eventTimeMs, recordTime, recordTimeMs, eventTimeZoneOffset, readPoint.uri AS readPoint, bizLocation.uri AS bizLocation, bizStep.uri AS bizStep, disposition.uri AS disposition, action, parentID FROM event_TransactionEvent LEFT JOIN voc_BizStep AS bizStep ON event_TransactionEvent.bizStep=bizStep.id LEFT JOIN voc_Disposition AS disposition ON event_TransactionEvent.disposition=disposition.id LEFT JOIN voc_ReadPoint AS readPoint ON event_TransactionEvent.readPoint=readPoint.id LEFT JOIN voc_BizLoc AS bizLocation ON event_TransactionEvent.bizLocation=bizLocation.id";
 
     private static final String SQL_SELECT_AGGREGATIONEVENT_EXTENSIONS = "SELECT ext.fieldname, ext.prefix, ext.intValue, ext.floatValue, ext.dateValue, ext.strValue FROM event_AggregationEvent_extensions AS ext WHERE ext.event_id=?";
     private static final String SQL_SELECT_OBJECTEVENT_EXTENSIONS = "SELECT ext.fieldname, ext.prefix, ext.intValue, ext.floatValue, ext.dateValue, ext.strValue FROM event_ObjectEvent_extensions AS ext WHERE event_id=?";
@@ -381,23 +380,25 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
         while (rs.next()) {
             actEventCount++;
             int eventId = rs.getInt(1);
-            Timestamp eventTime = rs.getTimestamp(2);
-            Timestamp recordTime = rs.getTimestamp(3);
-            String eventTimeZoneOffset = rs.getString(4);
-            String readPointId = rs.getString(5);
+            // Timestamp eventTime = rs.getTimestamp(2);
+            long eventTimeMs = rs.getLong(3);
+            // Timestamp recordTime = rs.getTimestamp(4);
+            long recordTimeMs = rs.getLong(5);
+            String eventTimeZoneOffset = rs.getString(6);
+            String readPointId = rs.getString(7);
             ReadPointType readPoint = null;
             if (readPointId != null) {
                 readPoint = new ReadPointType();
                 readPoint.setId(readPointId);
             }
-            String bizLocationId = rs.getString(6);
+            String bizLocationId = rs.getString(8);
             BusinessLocationType bizLocation = null;
             if (bizLocationId != null) {
                 bizLocation = new BusinessLocationType();
                 bizLocation.setId(bizLocationId);
             }
-            String bizStep = rs.getString(7);
-            String disposition = rs.getString(8);
+            String bizStep = rs.getString(9);
+            String disposition = rs.getString(10);
             // fetch biz transactions
             if (LOG.isDebugEnabled()) {
                 LOG.debug("SQL: " + selectBizTrans);
@@ -413,8 +414,8 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                 aggrEvent.setBizLocation(bizLocation);
                 aggrEvent.setBizStep(bizStep);
                 aggrEvent.setDisposition(disposition);
-                aggrEvent.setAction(ActionType.valueOf(rs.getString(9)));
-                aggrEvent.setParentID(rs.getString(10));
+                aggrEvent.setAction(ActionType.valueOf(rs.getString(11)));
+                aggrEvent.setParentID(rs.getString(12));
                 aggrEvent.setBizTransactionList(bizTransList);
                 // fetch EPCs
                 if (LOG.isDebugEnabled()) {
@@ -437,7 +438,7 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                 objEvent.setBizLocation(bizLocation);
                 objEvent.setBizStep(bizStep);
                 objEvent.setDisposition(disposition);
-                objEvent.setAction(ActionType.valueOf(rs.getString(9)));
+                objEvent.setAction(ActionType.valueOf(rs.getString(11)));
                 objEvent.setBizTransactionList(bizTransList);
                 // fetch EPCs
                 if (LOG.isDebugEnabled()) {
@@ -460,8 +461,8 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                 quantEvent.setBizLocation(bizLocation);
                 quantEvent.setBizStep(bizStep);
                 quantEvent.setDisposition(disposition);
-                quantEvent.setEpcClass(rs.getString(9));
-                quantEvent.setQuantity(rs.getInt(10));
+                quantEvent.setEpcClass(rs.getString(11));
+                quantEvent.setQuantity(rs.getInt(12));
                 quantEvent.setBizTransactionList(bizTransList);
                 // fetch and fill extensions
                 if (LOG.isDebugEnabled()) {
@@ -477,8 +478,8 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                 transEvent.setBizLocation(bizLocation);
                 transEvent.setBizStep(bizStep);
                 transEvent.setDisposition(disposition);
-                transEvent.setAction(ActionType.valueOf(rs.getString(9)));
-                transEvent.setParentID(rs.getString(10));
+                transEvent.setAction(ActionType.valueOf(rs.getString(11)));
+                transEvent.setParentID(rs.getString(12));
                 transEvent.setBizTransactionList(bizTransList);
                 // fetch EPCs
                 if (LOG.isDebugEnabled()) {
@@ -502,8 +503,8 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                 ie.setReason(msg);
                 throw new ImplementationExceptionResponse(msg, ie);
             }
-            event.setEventTime(timestampToXmlCalendar(eventTime));
-            event.setRecordTime(timestampToXmlCalendar(recordTime));
+            event.setEventTime(timeToXmlCalendar(eventTimeMs));
+            event.setRecordTime(timeToXmlCalendar(recordTimeMs));
             event.setEventTimeZoneOffset(eventTimeZoneOffset);
             eventList.add(event);
         }
@@ -996,19 +997,20 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
     }
 
     /**
-     * Creates a new XMLGregorianCalendar from the given java.sql.Timestamp.
+     * Creates a new XMLGregorianCalendar from the given milliseconds time.
      * 
      * @param time
-     *            The timestamp to convert.
+     *            The time in ms to convert.
      * @return The XML calendar object representing the given timestamp.
      * @throws ImplementationExceptionResponse
      *             If an error occurred when parsing the given timestamp into a
      *             calendar instance.
      */
-    private XMLGregorianCalendar timestampToXmlCalendar(Timestamp time) throws ImplementationExceptionResponse {
+    private XMLGregorianCalendar timeToXmlCalendar(long time) throws ImplementationExceptionResponse {
         try {
             DatatypeFactory factory = DatatypeFactory.newInstance();
-            Calendar cal = TimeParser.convert(time);
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.setTimeInMillis(time);
             return factory.newXMLGregorianCalendar((GregorianCalendar) cal);
         } catch (DatatypeConfigurationException e) {
             String msg = "Unable to instantiate an XML representation for a date/time datatype.";

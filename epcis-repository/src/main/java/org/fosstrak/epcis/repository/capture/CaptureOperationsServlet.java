@@ -181,19 +181,18 @@ public class CaptureOperationsServlet extends HttpServlet {
      */
     public void doGet(final HttpServletRequest req, final HttpServletResponse rsp) throws ServletException, IOException {
         RequestDispatcher dispatcher;
-        // un-comment if you want to enable dbReset for GET requests
-//      String dbReset = req.getParameter("dbReset");
-//      if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
-//          doDbReset(rsp);
-//      } else {
-        String showCaptureForm = req.getParameter("showCaptureForm");
-        if (showCaptureForm != null && "true".equals(showCaptureForm)) {
-            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_FORM);
+        String dbReset = req.getParameter("dbReset");
+        if (dbReset != null && dbReset.equalsIgnoreCase("true")) {
+            doDbReset(rsp);
         } else {
-            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_INTERFACE);
+	        String showCaptureForm = req.getParameter("showCaptureForm");
+	        if (showCaptureForm != null && "true".equals(showCaptureForm)) {
+	            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_FORM);
+	        } else {
+	            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_INTERFACE);
+	        }
+	        dispatcher.forward(req, rsp);
         }
-        dispatcher.forward(req, rsp);
-//      }
     }
 
     /**

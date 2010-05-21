@@ -99,11 +99,11 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
     // the parameters from the subscribed query
     protected String subscriptionID;
     protected String dest;
-    protected GregorianCalendar initialRecordTime;
+    protected Calendar initialRecordTime;
     protected Boolean reportIfEmpty;
     protected String queryName;
     private QueryParams queryParams;
-    private GregorianCalendar lastTimeExecuted;
+    private Calendar lastTimeExecuted;
 
     private Properties properties;
 
@@ -127,8 +127,8 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      *            queryName.
      */
     public QuerySubscription(final String subscriptionID, final QueryParams queryParams, final String dest,
-            final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
-            final GregorianCalendar lastTimeExecuted, final String queryName) {
+            final Boolean reportIfEmpty, final Calendar initialRecordTime,
+            final Calendar lastTimeExecuted, final String queryName) {
         LOG.debug("Constructing Query Subscription with ID '" + subscriptionID + "'");
         this.queryParams = queryParams;
         this.subscriptionID = subscriptionID;
@@ -155,7 +155,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      * @param lastTimeExecuted
      *            The new lastTimeExecuted.
      */
-    private void updateSubscription(final GregorianCalendar lastTimeExecuted) {
+    private void updateSubscription(final Calendar lastTimeExecuted) {
         String jndiName = getProperties().getProperty("jndi.datasource.name", "java:comp/env/jdbc/EPCISDB");
         try {
             // open a database connection
@@ -206,19 +206,19 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
      *            The time to which the 'GE_recordTime' parameter will be
      *            updated.
      */
-    private void updateRecordTime(final QueryParams queryParams, final GregorianCalendar initialRecordTime) {
+    private void updateRecordTime(final QueryParams queryParams, final Calendar initialRecordTime) {
         // update or add GE_recordTime restriction
         boolean foundRecordTime = false;
         for (QueryParam p : this.queryParams.getParam()) {
             if (p.getName().equalsIgnoreCase("GE_recordTime")) {
-                LOG.debug("Updating query parameter 'GE_recordTime' with value '" + initialRecordTime.getTime() + "'.");
-                p.setValue(initialRecordTime);
+                LOG.debug("Updating query parameter 'GE_recordTime' with value '" + initialRecordTime + "'.");
+                p.setValue(initialRecordTime.getTimeInMillis());
                 foundRecordTime = true;
                 break;
             }
         }
         if (!foundRecordTime) {
-            LOG.debug("Adding query parameter 'GE_recordTime' with value '" + initialRecordTime.getTime() + "'.");
+            LOG.debug("Adding query parameter 'GE_recordTime' with value '" + initialRecordTime + "'.");
             QueryParam newParam = new QueryParam();
             newParam.setName("GE_recordTime");
             newParam.setValue(initialRecordTime);
@@ -261,7 +261,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
 
             // set new lastTimeExecuted (must be <= to time when query is
             // executed, otherwise we loose results)
-            cal.add(Calendar.SECOND, 1);
+            // cal.add(Calendar.SECOND, 1);
             this.lastTimeExecuted = cal;
         } catch (QueryTooLargeExceptionResponse e) {
             // send exception back to client
@@ -605,7 +605,7 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
     /**
      * @return The initial record time.
      */
-    public GregorianCalendar getInitialRecordTime() {
+    public Calendar getInitialRecordTime() {
         return initialRecordTime;
     }
 

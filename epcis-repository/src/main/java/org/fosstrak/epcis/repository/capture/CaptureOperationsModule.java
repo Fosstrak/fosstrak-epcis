@@ -31,9 +31,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Principal;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fosstrak.epcis.repository.EpcisConstants;
@@ -134,10 +136,9 @@ public class CaptureOperationsModule {
     private boolean dbResetAllowed = false;
 
     /**
-     * The name of the SQL script used to clean and refill the database with
-     * test data.
+     * The SQL files to be executed when the dbReset operation is invoked.
      */
-    private File dbResetScript = null;
+    private List<File> dbResetScripts = null;
 
     /**
      * Interface to the database.
@@ -183,34 +184,45 @@ public class CaptureOperationsModule {
      */
     public void doDbReset() throws SQLException, IOException, UnsupportedOperationException {
         if (dbResetAllowed) {
-            Session session = null;
-            try {
-                session = sessionFactory.openSession();
-                Transaction tx = null;
-                try {
-                    tx = session.beginTransaction();
-                    LOG.info("Running db reset script from file " + dbResetScript);
-                    BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (!line.startsWith("--")) {
-                            LOG.debug("SQL: " + line);
-                            session.createSQLQuery(line).executeUpdate();
-                        }
+            if (dbResetScripts == null || dbResetScripts.isEmpty()) {
+            	LOG.warn("dbReset operation invoked but no dbReset script is configured!");
+            } else {
+	            Session session = null;
+	            try {
+	                session = sessionFactory.openSession();
+	                Transaction tx = null;
+                    for (File file : dbResetScripts) {
+                    	try {
+		                    tx = session.beginTransaction();
+		                    LOG.info("Running db reset script from file " + file);
+		                    BufferedReader reader = new BufferedReader(new FileReader(file));
+		                    String line;
+		                    String sql = "";
+		                    while ((line = reader.readLine()) != null) {
+		                        if (!line.startsWith("--") && StringUtils.isNotBlank(line)) {
+	                        		sql += line;
+		                        	if (sql.endsWith(";")) {
+			                            LOG.debug("SQL: " + sql);
+			                            session.createSQLQuery(sql).executeUpdate();
+			                            sql = "";
+		                        	}
+		                        }
+		                    }
+		                    tx.commit();
+		                } catch (Throwable e) {
+		                    LOG.error("dbReset failed for " + file + ": " + e.toString(), e);
+		                    if (tx != null) {
+		                        tx.rollback();
+		                    }
+		                    throw new SQLException(e.toString());
+		                }
                     }
-                    tx.commit();
-                } catch (Exception e) {
-                    LOG.error("dbReset failed: " + e.toString(), e);
-                    if (tx != null) {
-                        tx.rollback();
-                    }
-                    throw new SQLException(e.toString());
-                }
-            } finally {
-                if (session != null) {
-                    session.close();
-                }
-            }
+	            } finally {
+	                if (session != null) {
+	                    session.close();
+	                }
+	            }
+	        }
         } else {
             throw new UnsupportedOperationException();
         }
@@ -383,8 +395,8 @@ public class CaptureOperationsModule {
         // variables having type URI are declared as Vocabularies in the
         // Standard. Commonly, we use String for the Standard-Type URI.
 
-        Timestamp eventTime = null;
-        Timestamp recordTime = new Timestamp(System.currentTimeMillis());
+        Calendar eventTime = null;
+        Calendar recordTime = GregorianCalendar.getInstance();
         String eventTimeZoneOffset = null;
         String action = null;
         String parentId = null;
@@ -414,11 +426,11 @@ public class CaptureOperationsModule {
                 String xmlTime = curEventNode.getTextContent();
                 LOG.debug("    eventTime in xml is '" + xmlTime + "'");
                 try {
-                    eventTime = TimeParser.parseAsTimestamp(xmlTime);
+                    eventTime = TimeParser.parseAsCalendar(xmlTime);
                 } catch (ParseException e) {
                     throw new SAXException("Invalid date/time (must be ISO8601).", e);
                 }
-                LOG.debug("    eventTime parsed as '" + eventTime + "'");
+                LOG.debug("    eventTime parsed as '" + eventTime.getTime() + "'");
             } else if (nodeName.equals("recordTime")) {
                 // ignore recordTime
             } else if (nodeName.equals("eventTimeZoneOffset")) {
@@ -851,8 +863,26 @@ public class CaptureOperationsModule {
     }
 
     public void setDbResetScript(String dbResetScript) {
-        URL url = this.getClass().getResource(dbResetScript);
-        this.dbResetScript = new File(url.getFile());
+    	if (dbResetScript != null) {
+    		String[] scripts = dbResetScript.split(",");
+    		List<File> scriptList = new ArrayList<File>(scripts.length);
+    		for (String script : scripts) {
+    			if (!StringUtils.isBlank(script)) {
+    				script = "/" + script.trim();
+	    	        URL url = ClassLoader.getSystemResource(script);
+	    	        if (url == null) {
+	    	        	url = this.getClass().getResource(script);
+	    	        }
+	    	        if (url == null) {
+	    	        	LOG.warn("unable to find sql script " + script + " in classpath");
+	    	        } else {
+	    	        	LOG.debug("found dbReset sql script at " + url);
+	    	        	scriptList.add(new File(url.getFile()));
+	    	        }
+    			}
+    		}
+    		this.dbResetScripts = scriptList;
+    	}
     }
 
     public boolean isInsertMissingVoc() {

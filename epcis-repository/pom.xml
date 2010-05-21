@@ -125,6 +125,12 @@
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
+      <resource>
+        <directory>src/main/sql</directory>
+        <includes>
+          <include>**/*.sql</include>
+        </includes>
+      </resource>
     </resources>
     <plugins>
       <plugin>

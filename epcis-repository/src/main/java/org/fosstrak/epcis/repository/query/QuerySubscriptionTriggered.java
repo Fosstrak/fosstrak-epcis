@@ -20,7 +20,7 @@
 
 package org.fosstrak.epcis.repository.query;
 
-import java.util.GregorianCalendar;
+import java.util.Calendar;
 
 import javax.management.Notification;
 import javax.management.timer.Timer;
@@ -51,8 +51,8 @@ public class QuerySubscriptionTriggered extends QuerySubscriptionScheduled {
     private String trigger;
 
     public QuerySubscriptionTriggered(final String subscriptionID, final QueryParams queryParams, final String dest,
-            final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
-            final GregorianCalendar lastTimeExecuted, final String queryName, final String trigger,
+            final Boolean reportIfEmpty, final Calendar initialRecordTime,
+            final Calendar lastTimeExecuted, final String queryName, final String trigger,
             final Schedule every10min) throws ImplementationExceptionResponse {
         super(subscriptionID, queryParams, dest, reportIfEmpty, initialRecordTime, lastTimeExecuted, every10min,
               queryName);

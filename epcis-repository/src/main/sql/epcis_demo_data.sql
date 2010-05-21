@@ -19,12 +19,10 @@
 
 -- This script inserts some test data to play around with into the EPCIS database.
 
-BEGIN;
 
 -- ---------------------------------------------
 -- Business Transaction Test Data
 -- ---------------------------------------------
-
 INSERT INTO `BizTransaction` (`id`, `bizTrans`, `type`) VALUES
 (1, 1, 1),
 (2, 2, 1),
@@ -34,9 +32,8 @@ INSERT INTO `BizTransaction` (`id`, `bizTrans`, `type`) VALUES
 -- ---------------------------------------------
 -- Aggregation Event Test Data
 -- ---------------------------------------------
-
-INSERT INTO `event_AggregationEvent` (`id`, `eventTime`, `recordTime`, `eventTimeZoneOffset`, `parentID`, `action`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
-(1, '2006-06-01 15:55:04', '2006-08-18 13:50:07', '+01:00', 'urn:epc:id:sscc:0614141.1234567890', 'ADD', 13, 6, 3, 1);
+INSERT INTO `event_AggregationEvent` (`id`, `eventTime`, `eventTimeMs`, `recordTime`, `recordTimeMs`, `eventTimeZoneOffset`, `parentID`, `action`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
+(1, '2006-06-01 15:55:04', 1149170104000, '2006-08-18 13:50:07', 1155901807000, '+01:00', 'urn:epc:id:sscc:0614141.1234567890', 'ADD', 13, 6, 3, 1);
 
 INSERT INTO `event_AggregationEvent_EPCs` (`event_id`, `epc`, `idx`) VALUES
 (1, 'urn:epc:id:sgtin:0057000.123430.2025', 0),
@@ -54,19 +51,18 @@ INSERT INTO `event_AggregationEvent_extensions` (`id`, `event_id`, `fieldname`, 
 -- ---------------------------------------------
 -- Object Event Test Data
 -- ---------------------------------------------
-
-INSERT INTO `event_ObjectEvent` (`id`, `eventTime`, `recordTime`, `eventTimeZoneOffset`, `action`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
-(1, '2006-05-10 04:50:35', '2006-08-18 13:50:11', '+01:00', 'OBSERVE', 14, 14, 4, 3),
-(2, '2006-05-09 21:01:44', '2006-08-18 13:50:16', '+01:00', 'OBSERVE', 10, 7, 5, 4),
-(3, '2006-04-03 22:36:17', '2006-08-18 13:50:21', '+01:00', 'ADD', 3, 1, 6, 5),
-(4, '2006-04-03 20:33:31', '2006-08-18 13:50:26', '+01:00', 'ADD', 3, NULL, 7, 5),
-(5, '2006-05-10 21:38:46', '2006-09-01 00:05:37', '+01:00', 'ADD', 3, NULL, 8, 6),
-(6, '2006-05-21 09:21:40', '2006-09-01 00:06:03', '+01:00', 'OBSERVE', 14, NULL, 9, 7),
-(7, '2006-06-27 16:55:08', '2006-09-01 00:06:16', '+01:00', 'OBSERVE', 14, NULL, 10, 8),
-(8, '2006-06-16 14:28:23', '2006-09-01 00:07:46', '+01:00', 'ADD', 3, NULL, 8, 6),
-(9, '2006-08-13 17:07:50', '2006-09-01 00:09:37', '+01:00', 'OBSERVE', 14, NULL, 11, 9),
-(10, '2006-09-15 11:45:06', '2006-09-01 00:10:12', '+01:00', 'OBSERVE', 14, NULL, 10, 8),
-(11, '2007-04-23 12:26:52', '2007-04-23 12:26:52', '+01:00', 'OBSERVE', 17, NULL, 5, 4);
+INSERT INTO `event_ObjectEvent` (`id`, `eventTime`, `eventTimeMs`, `recordTime`, `recordTimeMs`, `eventTimeZoneOffset`, `action`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
+(1, '2006-05-10 04:50:35', 1147229435000, '2006-08-18 13:50:11', 1155901811000, '+01:00', 'OBSERVE', 14, 14, 4, 3),
+(2, '2006-05-09 21:01:44', 1147201304000, '2006-08-18 13:50:16', 1155901816000, '+01:00', 'OBSERVE', 10, 7, 5, 4),
+(3, '2006-04-03 22:36:17', 1144096577000, '2006-08-18 13:50:21', 1155901821000, '+01:00', 'ADD', 3, 1, 6, 5),
+(4, '2006-04-03 20:33:31', 1144089211000, '2006-08-18 13:50:26', 1155901826000, '+01:00', 'ADD', 3, NULL, 7, 5),
+(5, '2006-05-10 21:38:46', 1147289926000, '2006-09-01 00:05:37', 1157061937000, '+01:00', 'ADD', 3, NULL, 8, 6),
+(6, '2006-05-21 09:21:40', 1148196100000, '2006-09-01 00:06:03', 1157061963000, '+01:00', 'OBSERVE', 14, NULL, 9, 7),
+(7, '2006-06-27 16:55:08', 1151420108000, '2006-09-01 00:06:16', 1157061976000, '+01:00', 'OBSERVE', 14, NULL, 10, 8),
+(8, '2006-06-16 14:28:23', 1150460903000, '2006-09-01 00:07:46', 1157062066000, '+01:00', 'ADD', 3, NULL, 8, 6),
+(9, '2006-08-13 17:07:50', 1155481670000, '2006-09-01 00:09:37', 1157062177000, '+01:00', 'OBSERVE', 14, NULL, 11, 9),
+(10, '2006-09-15 11:45:06', 1158313506000, '2006-09-01 00:10:12', 1157062212000, '+01:00', 'OBSERVE', 14, NULL, 10, 8),
+(11, '2007-04-23 12:26:52', 1177324012000, '2007-04-23 12:26:52', 1177324012000, '+01:00', 'OBSERVE', 17, NULL, 5, 4);
 
 INSERT INTO `event_ObjectEvent_EPCs` (`event_id`, `epc`, `idx`) VALUES
 (1, 'urn:epc:id:sgtin:0034000.987650.2686', 0),
@@ -94,19 +90,17 @@ INSERT INTO `event_ObjectEvent_extensions` (`id`, `event_id`, `fieldname`, `pref
 -- ---------------------------------------------
 -- Quantity Event Test Data
 -- ---------------------------------------------
-
-INSERT INTO `event_QuantityEvent` (`id`, `eventTime`, `recordTime`, `eventTimeZoneOffset`, `epcClass`, `quantity`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
-(1, '2006-08-10 18:14:00', '2006-08-18 13:49:56', '+01:00', 1, 1000, NULL, NULL, 1, 1),
-(2, '2006-01-15 16:15:31', '2006-08-18 13:50:00', '+01:00', 2, 67, 20, 1, 2, 2);
+INSERT INTO `event_QuantityEvent` (`id`, `eventTime`, `eventTimeMs`, `recordTime`, `recordTimeMs`, `eventTimeZoneOffset`, `epcClass`, `quantity`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
+(1, '2006-08-10 18:14:00', 1155226440000, '2006-08-18 13:49:56', 1155901796000, '+01:00', 1, 1000, NULL, NULL, 1, 1),
+(2, '2006-01-15 16:15:31', 1137338131000, '2006-08-18 13:50:00', 1155901800000, '+01:00', 2, 67, 20, 1, 2, 2);
 
 
 -- ---------------------------------------------
 -- Transaction Event Test Data
 -- ---------------------------------------------
-
-INSERT INTO `event_TransactionEvent` (`id`, `eventTime`, `recordTime`, `eventTimeZoneOffset`, `parentID`, `action`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
-(1, '2006-08-20 07:03:51', '2006-08-18 13:49:47', '+01:00', NULL, 'DELETE', NULL, NULL, NULL, NULL),
-(2, '2006-08-18 11:53:01', '2006-08-18 13:49:53', '+01:00', NULL, 'ADD', NULL, NULL, NULL, NULL);
+INSERT INTO `event_TransactionEvent` (`id`, `eventTime`, `eventTimeMs`, `recordTime`, `recordTimeMs`, `eventTimeZoneOffset`, `parentID`, `action`, `bizStep`, `disposition`, `readPoint`, `bizLocation`) VALUES
+(1, '2006-08-20 07:03:51', 1156050231000, '2006-08-18 13:49:47', 1155901787000, '+01:00', NULL, 'DELETE', NULL, NULL, NULL, NULL),
+(2, '2006-08-18 11:53:01', 1155894781000, '2006-08-18 13:49:53', 1155901793000, '+01:00', NULL, 'ADD', NULL, NULL, NULL, NULL);
 
 INSERT INTO `event_TransactionEvent_EPCs` (`event_id`, `epc`, `idx`) VALUES
 (1, 'urn:epc:id:sgtin:0057000.678930.5003', 0),
@@ -122,7 +116,6 @@ INSERT INTO `event_TransactionEvent_bizTrans` (`event_id`, `bizTrans_id`, `idx`)
 -- ---------------------------------------------
 -- Vocabularies Test Data
 -- ---------------------------------------------
-
 INSERT INTO `voc_BizLoc` (`id`, `uri`) VALUES
 (1, 'urn:epc:id:sgln:0614141.00729.whatever450'),
 (2, 'urn:epc:id:sgln:0614141.00102.loc007'),
@@ -201,5 +194,3 @@ INSERT INTO `voc_ReadPoint` (`id`, `uri`) VALUES
 (9, 'http://epcis.fosstrak.org/demo/loc/usa/baltimore'),
 (10, 'http://epcis.fosstrak.org/demo/loc/usa/newport'),
 (11, 'http://epcis.fosstrak.org/demo/loc/germany/hamburg');
-
-COMMIT;

@@ -21,8 +21,8 @@
 package org.fosstrak.epcis.repository.query;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -80,8 +80,8 @@ public class QuerySubscriptionScheduled extends QuerySubscription implements Not
      *             If the Scheduler could not be started.
      */
     public QuerySubscriptionScheduled(final String subscriptionID, final QueryParams queryParams, final String dest,
-            final Boolean reportIfEmpty, final GregorianCalendar initialRecordTime,
-            final GregorianCalendar lastTimeExecuted, final Schedule schedule, final String queryName)
+            final Boolean reportIfEmpty, final Calendar initialRecordTime,
+            final Calendar lastTimeExecuted, final Schedule schedule, final String queryName)
             throws ImplementationExceptionResponse {
         super(subscriptionID, queryParams, dest, reportIfEmpty, initialRecordTime, lastTimeExecuted, queryName);
         this.schedule = schedule;

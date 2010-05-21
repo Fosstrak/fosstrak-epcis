@@ -12,13 +12,19 @@
 		<id name="id">
 			<generator class="native" />
 		</id>
-	
+
 		<property name="eventTime" type="timestamp" not-null="false" 
 			insert="true" update="false"/>
-		
+
+		<property name="eventTimeMs" type="long" not-null="false" 
+			insert="true" update="false"/>
+
 		<property name="recordTime" type="timestamp" not-null="false"
 			insert="true" update="false"/>
-			
+
+		<property name="recordTimeMs" type="long" not-null="false"
+			insert="true" update="false"/>
+
 		<property name="eventTimeZoneOffset" type="java.lang.String" not-null="true"
 			insert="true" update="false"/>
 

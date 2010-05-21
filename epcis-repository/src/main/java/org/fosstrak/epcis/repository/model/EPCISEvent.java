@@ -21,6 +21,7 @@
 package org.fosstrak.epcis.repository.model;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 /**
  * An EPCISEvent as defined in section 7.2.8 of the spec.
@@ -30,8 +31,20 @@ import java.sql.Timestamp;
 public abstract class EPCISEvent {
 
     private Timestamp eventTime;
+    private long eventTimeMs;
     private Timestamp recordTime;
+    private long recordTimeMs;
     private String eventTimeZoneOffset;
+
+    public void setEventTime(Calendar eventTime) {
+        this.eventTime = new Timestamp(eventTime.getTimeInMillis());
+        this.eventTimeMs = eventTime.getTimeInMillis();
+    }
+
+    public void setRecordTime(Calendar recordTime) {
+        this.recordTime = new Timestamp(recordTime.getTimeInMillis());
+        this.recordTimeMs = recordTime.getTimeInMillis();
+    }
 
     public Timestamp getEventTime() {
         return eventTime;
@@ -41,12 +54,28 @@ public abstract class EPCISEvent {
         this.eventTime = eventTime;
     }
 
+    public long getEventTimeMs() {
+        return eventTimeMs;
+    }
+
+    public void setEventTimeMs(long eventTimeMs) {
+        this.eventTimeMs = eventTimeMs;
+    }
+
     public Timestamp getRecordTime() {
         return recordTime;
     }
 
     public void setRecordTime(Timestamp recordTime) {
         this.recordTime = recordTime;
+    }
+
+    public long getRecordTimeMs() {
+        return recordTimeMs;
+    }
+
+    public void setRecordTimeMs(long recordTimeMs) {
+        this.recordTimeMs = recordTimeMs;
     }
 
     public String getEventTimeZoneOffset() {

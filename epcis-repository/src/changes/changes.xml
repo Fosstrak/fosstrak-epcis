@@ -5,6 +5,13 @@
     </properties>
     <body>
         <release version="0.5" date="2009-??-??" description="Bug fix and feature release">
+            <action dev="steybem" date="2010-05-21" type="update" due-to="Adrien Laurence">
+                Updated SQL schema by adding two fields eventTimeMs and recordTimeMs
+                to event tables which store the milliseconds of the eventTime and
+                recordTime respectively. Updated all code fragments in order to make
+                use of the new fields. Fixes issues with fine-grained time queries
+                and with rounded time values in query responses.
+            </action>
             <action dev="steybem" date="2010-05-16" type="add">
                 Added a JSP with an HTML form to quickly debug and submit capture
                 requests directly via browser.

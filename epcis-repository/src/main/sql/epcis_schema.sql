@@ -143,7 +143,9 @@ CREATE TABLE `BizTransaction` (
 CREATE TABLE `event_AggregationEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `eventTime` timestamp NOT NULL,
+`eventTimeMs` bigint(20) NOT NULL,
 `recordTime` timestamp NOT NULL,
+`recordTimeMs` bigint(20) NOT NULL,
 `eventTimeZoneOffset` varchar(8) NOT NULL,
 `parentID` varchar(1023) DEFAULT NULL, -- varchar(1023) good choice?
 `action` varchar(8) NOT NULL CHECK (`action` IN ('ADD','OBSERVE','DELETE')),
@@ -191,7 +193,9 @@ INDEX (event_id)
 CREATE TABLE `event_ObjectEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment -> cross platform sequence???
 `eventTime` timestamp NOT NULL,
+`eventTimeMs` bigint(20) NOT NULL,
 `recordTime` timestamp NOT NULL,
+`recordTimeMs` bigint(20) NOT NULL,
 `eventTimeZoneOffset` varchar(8) NOT NULL,
 `action` varchar(8) NOT NULL CHECK (`action` IN ('ADD','OBSERVE','DELETE')),
 `bizStep` bigint DEFAULT NULL REFERENCES `voc_BizStep` (`id`),
@@ -236,7 +240,9 @@ INDEX (event_id)
 CREATE TABLE `event_QuantityEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `eventTime` timestamp NOT NULL,
+`eventTimeMs` bigint(20) NOT NULL,
 `recordTime` timestamp NOT NULL,
+`recordTimeMs` bigint(20) NOT NULL,
 `eventTimeZoneOffset` varchar(8) NOT NULL,
 `epcClass` bigint NOT NULL REFERENCES `voc_EPCClass` (`id`),
 `quantity` bigint NOT NULL,
@@ -274,7 +280,9 @@ INDEX (event_id)
 CREATE TABLE `event_TransactionEvent` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `eventTime` timestamp NOT NULL,
+`eventTimeMs` bigint(20) NOT NULL,
 `recordTime` timestamp NOT NULL,
+`recordTimeMs` bigint(20) NOT NULL,
 `eventTimeZoneOffset` varchar(8) NOT NULL,
 `parentID` varchar(1023) DEFAULT NULL,
 `action` varchar(8) NOT NULL CHECK (`action` IN ('ADD','OBSERVE','DELETE')),

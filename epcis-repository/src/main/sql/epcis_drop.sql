@@ -48,4 +48,4 @@ drop table voc_ReadPoint;
 drop table voc_ReadPoint_attr;
 drop table voc_Any;
 drop table voc_Any_attr;
-
+drop table subscription;
