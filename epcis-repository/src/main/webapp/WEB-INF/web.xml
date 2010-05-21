@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-<!DOCTYPE web-app 
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" 
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app>
   <display-name>EPCIS Repository</display-name>
 
   <context-param>
@@ -15,22 +13,15 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>META-INF/applicationContext.xml</param-value>
   </context-param>
-
-  <listener>
-    <listener-class>org.fosstrak.epcis.repository.RepositoryContextListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
   
   <filter>
-    <filter-name>FosstrakCaptureInterfaceFilter</filter-name>
     <description>
       This filter can be placed 'in front' of the EPCIS capture interface
       servlet, such that the capture interface can also be invoked from
       HTML pages using forms. Note that this is a Fosstrak extension and
       not part of the EPCIS specification.
     </description>
+    <filter-name>FosstrakCaptureInterfaceFilter</filter-name>
     <filter-class>org.fosstrak.epcis.repository.capture.MultipartFormDataFilter</filter-class>
   </filter>
   
@@ -39,31 +30,38 @@
     <servlet-name>EpcisCaptureInterface</servlet-name>
   </filter-mapping>
 
+  <listener>
+    <listener-class>org.fosstrak.epcis.repository.RepositoryContextListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
   <servlet>
-    <servlet-name>EpcisQueryInterface</servlet-name>
     <description>
       This servlet dispatches EPCIS query requests to the Web service framework
       for processing of the query according to the SOAP/HTTP Binding for the
       Query Control Interface (EPCglobal EPCIS Specification Section 11.2).
     </description>
+    <servlet-name>EpcisQueryInterface</servlet-name>
     <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
-    <servlet-name>EpcisCaptureInterface</servlet-name>
     <description>
       This servlet captures EPCIS events sent in HTTP POST requests. The POST
       data payload must contain an XML formatted EPCISDocument according to the
       schema for core event types (EPCglobal EPCIS Specification Section 9.5).
     </description>
+    <servlet-name>EpcisCaptureInterface</servlet-name>
     <servlet-class>org.fosstrak.epcis.repository.capture.CaptureOperationsServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>
   <servlet>
-  	<servlet-name>StaticContent</servlet-name>
   	<description>
   	  A servlet which handles access to static content (images, styles, etc.)
   	</description>
+  	<servlet-name>StaticContent</servlet-name>
   	<servlet-class>org.fosstrak.epcis.repository.StaticContentServlet</servlet-class>
   </servlet>
   <servlet>
