@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- EPCIS QUERY SERVICE DEFINITIONS -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:epcis="urn:epcglobal:epcis:xsd:1" xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" xmlns:epcglobal="urn:epcglobal:xsd:1" xmlns:impl="urn:epcglobal:epcis:wsdl:1" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:epcglobal:epcis:wsdl:1">
+    <wsdl:documentation>
+        <epcglobal:copyright>
+            Copyright (C) 2006, 2005 EPCglobal Inc., All Rights Reserved.
+        </epcglobal:copyright>
+        <epcglobal:disclaimer>
+            EPCglobal Inc., its members, officers, directors, employees, or agents shall not be liable for any injury, loss, damages, financial or otherwise, arising from, related to, or caused by the use of this document.  The use of said document shall constitute your express consent to the foregoing exculpation.
+        </epcglobal:disclaimer>
+        <epcglobal:specification>
+        </epcglobal:specification>
+    </wsdl:documentation>
 	<wsdl:types>
 		<xsd:schema targetNamespace="urn:epcglobal:epcis:wsdl:1" xmlns:impl="urn:epcglobal:epcis:wsdl:1" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 			<xsd:import namespace="urn:epcglobal:xsd:1" schemaLocation="EPCglobal.xsd"/>
@@ -327,16 +337,6 @@
 			<wsdlsoap:address location="${url.query}"/>
 		</wsdl:port>
 	</wsdl:service>
-	<wsdl:documentation>
-		<epcglobal:copyright>
-       Copyright (C) 2006, 2005 EPCglobal Inc., All Rights Reserved.
-    </epcglobal:copyright>
-		<epcglobal:disclaimer>
-        EPCglobal Inc., its members, officers, directors, employees, or agents shall not be liable for any injury, loss, damages, financial or otherwise, arising from, related to, or caused by the use of this document.  The use of said document shall constitute your express consent to the foregoing exculpation.
-    </epcglobal:disclaimer>
-		<epcglobal:specification>
-    </epcglobal:specification>
-	</wsdl:documentation>
 	<!-- EPCISSERVICE TYPES -->
 	<!-- EPCIS QUERY SERVICE MESSAGES -->
 	<!-- EPCISSERVICE FAULT EXCEPTIONS -->
