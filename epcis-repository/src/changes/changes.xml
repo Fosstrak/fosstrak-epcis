@@ -1,15 +1,32 @@
-<document>
+<?xml version="1.0" encoding="UTF-8"?>  
+<document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
     <properties>
         <title>Changes epcis-repository</title>
     </properties>
     <body>
-        <release version="0.4.3" date="2009-??-??" description="Bug fix release">
-            <action dev="steybem" type="update">
+        <release version="0.5" date="2009-??-??" description="Bug fix and feature release">
+            <action dev="steybem" date="2010-05-16" type="add">
+                Added a JSP with an HTML form to quickly debug and submit capture
+                requests directly via browser.
+            </action>
+            <action dev="steybem" date="2010-05-16" type="add">
+                Introduced JSP pages for the repository to show the requested
+                information for browser GET requests. 
+            </action>
+            <action dev="steybem" date="2010-05-16" type="fix">
+                Fixed handling of dbReset scripts. Furthermore, use Hibernate to
+                run the scripts (removes the need of deprecated method).
+            </action>
+            <action dev="steybem" date="2009-12-31" type="update">
+                Disabled the Hibernate query_cache since we're mainly running
+                updates/inserts and no queries.
+            </action>
+            <action dev="steybem" date="2009-07-28" type="update">
                 Set the antiResourceLocking flag in the application context to
                 true in order to prevent JAR file locking and allow clean
                 undeploys on Windows systems.
             </action>
-            <action dev="steybem" type="fix" issue="2495950" due-to="Oscar Saiz">
+            <action dev="steybem" date="2009-07-26" type="fix" issue="2495950" due-to="Oscar Saiz">
                 Use correct number of SQL joins for queries with two or more
                 EQ_fieldname parameters.
             </action>
