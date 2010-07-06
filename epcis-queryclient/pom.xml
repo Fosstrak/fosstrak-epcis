@@ -17,7 +17,7 @@
   <name>epcis-queryclient</name>
 
   <properties>
-    <lib-cxf-version>2.0.7</lib-cxf-version>
+    <lib-cxf-version>2.2.8</lib-cxf-version>
   </properties>
 
 
@@ -34,7 +34,7 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
+      <version>2.4</version>
       <scope>provided</scope>
     </dependency>
     <!-- CXF dependencies - only minimal set of transitive dependencies included -->
