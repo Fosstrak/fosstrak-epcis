@@ -17,7 +17,7 @@
   <name>epcis-repository</name>
 
   <properties>
-    <lib-cxf-version>2.2.8</lib-cxf-version>
+    <lib-cxf-version>2.2.9</lib-cxf-version>
     <lib-spring-version>2.5.1</lib-spring-version>
   </properties>
 
