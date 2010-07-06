@@ -37,7 +37,7 @@ import org.fosstrak.epcis.utils.QueryResultsParser;
  */
 public class SimpleEventQueryTest {
 
-	protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query";
+	protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query/query";
 	protected static final String DEMO_EPCIS_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
 
     // Note: keep the methods in this class static in order to prevent them from
@@ -50,8 +50,8 @@ public class SimpleEventQueryTest {
         client.configureService(new URL(queryUrl), null);
 
         // create a query in its XML form and send it to the repository
-        System.out.println("Sending query:");
         String xmlQuery = createPollXml();
+        System.out.println("Sending query:");
         System.out.println(xmlQuery);
         QueryResults results = client.poll(xmlQuery);
         // print the results to System.out
@@ -59,6 +59,7 @@ public class SimpleEventQueryTest {
 
         // create a query Poll object and send it to the query service
         Poll poll = createPoll();
+        System.out.println("Sending query:");
         results = client.poll(poll);
         QueryResultsParser.queryResultsToXml(results, System.out);
     }
@@ -77,7 +78,7 @@ public class SimpleEventQueryTest {
         QueryParam queryParam2 = new QueryParam();
         queryParam2.setName("MATCH_epc");
         ArrayOfString queryParamValue2 = new ArrayOfString();
-        queryParamValue2.getString().add("urn:epc:id:sgtin:0614141.107346.2017");
+        queryParamValue2.getString().add("urn:epc:id:sgtin:0057000.123780.3167");
         queryParam2.setValue(queryParamValue2);
 
         // add the query parameters to the list of parameters
@@ -109,17 +110,17 @@ public class SimpleEventQueryTest {
         sb.append("  <param>\n");
         sb.append("    <name>MATCH_epc</name>\n");
         sb.append("    <value>\n");
-        sb.append("      <string>urn:epc:id:sgtin:0614141.107346.2017</string>\n");
+        sb.append("      <string>urn:epc:id:sgtin:0057000.123780.3167</string>\n");
         sb.append("    </value>\n");
         sb.append("  </param>\n");
-        sb.append("  <param>\n");
-        sb.append("  <name>EQ_http://my.unique.namespace#my_extensionfield</name>");
-        sb.append("  <value><string>My Extension</string></value>");
-        sb.append("  </param>\n");
-        sb.append("  <param>\n");
-        sb.append("  <name>EQ_http://my.unique.namespace#my_extensionfield2</name>");
-        sb.append("  <value><string>My Extension2</string></value>");
-        sb.append("  </param>\n");
+//        sb.append("  <param>\n");
+//        sb.append("    <name>EQ_http://my.unique.namespace#my_extensionfield</name>\n");
+//        sb.append("    <value><string>My Extension</string></value>\n");
+//        sb.append("  </param>\n");
+//        sb.append("  <param>\n");
+//        sb.append("    <name>EQ_http://my.unique.namespace#my_extensionfield2</name>\n");
+//        sb.append("    <value><string>My Extension2</string></value>\n");
+//        sb.append("  </param>\n");
         sb.append("</params>\n");
         sb.append("</epcisq:Poll>");
         return sb.toString();
