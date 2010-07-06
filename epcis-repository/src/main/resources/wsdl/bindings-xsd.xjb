@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="2.1"
+      xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd">
+  <jxb:bindings schemaLocation="EPCglobal.xsd" node="/xsd:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="org.fosstrak.epcis.model" />
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="EPCglobal-epcis-1_0.xsd" node="/xsd:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="org.fosstrak.epcis.model" />
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="EPCglobal-epcis-query-1_0.xsd" node="/xsd:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="org.fosstrak.epcis.model" />
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="EPCglobal-epcis-masterdata-1_0.xsd" node="/xsd:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="org.fosstrak.epcis.model" />
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="StandardBusinessDocumentHeader.xsd" node="/xsd:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="org.fosstrak.epcis.model" />
+    </jxb:schemaBindings>
+  </jxb:bindings>
+</jxb:bindings>

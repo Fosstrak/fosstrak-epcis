@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxws:bindings version="1.0"
+      xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+      xmlns:wsdl="http://schemas.xmlsoap.org/wsdl"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/jaxws http://java.sun.com/xml/ns/jaxws/wsdl_customizationschema_2_0.xsd">
+  <jaxws:bindings wsdlLocation="EPCglobal-epcis-query-1_0.wsdl" node="wsdl:definitions">
+    <jaxws:package name="org.fosstrak.epcis.soap" />
+  </jaxws:bindings>
+  <!-- set the default wsdl location to "http://demo.fosstrak.org/epcis/query?wsdl" -->
+  
+</jaxws:bindings>
