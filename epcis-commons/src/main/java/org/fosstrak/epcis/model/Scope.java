@@ -115,9 +115,9 @@ public class Scope {
      * </pre>
      * <p>
      * Objects of the following type(s) are allowed in the list
+     * {@link JAXBElement }{@code <}{@link BusinessService }{@code >}
      * {@link JAXBElement }{@code <}{@link Object }{@code >} {@link JAXBElement }
-     * {@code <}{@link BusinessService }{@code >} {@link JAXBElement }{@code <}
-     * {@link CorrelationInformation }{@code >}
+     * {@code <}{@link CorrelationInformation }{@code >}
      */
     public List<JAXBElement<?>> getScopeInformation() {
         if (scopeInformation == null) {

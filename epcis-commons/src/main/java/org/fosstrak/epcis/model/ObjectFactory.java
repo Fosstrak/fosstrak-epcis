@@ -84,8 +84,8 @@ public class ObjectFactory {
     private final static QName _NoSuchSubscriptionException_QNAME = new QName("urn:epcglobal:epcis-query:xsd:1",
             "NoSuchSubscriptionException");
     private final static QName _EventListTypeExtension_QNAME = new QName("", "extension");
-    private final static QName _EventListTypeTransactionEvent_QNAME = new QName("", "TransactionEvent");
     private final static QName _EventListTypeObjectEvent_QNAME = new QName("", "ObjectEvent");
+    private final static QName _EventListTypeTransactionEvent_QNAME = new QName("", "TransactionEvent");
     private final static QName _EventListTypeQuantityEvent_QNAME = new QName("", "QuantityEvent");
     private final static QName _EventListTypeAggregationEvent_QNAME = new QName("", "AggregationEvent");
 
@@ -97,80 +97,10 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link AggregationEventExtensionType }
+     * Create an instance of {@link QueryResultsBody }
      */
-    public AggregationEventExtensionType createAggregationEventExtensionType() {
-        return new AggregationEventExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link EPCISQueryDocumentExtensionType }
-     */
-    public EPCISQueryDocumentExtensionType createEPCISQueryDocumentExtensionType() {
-        return new EPCISQueryDocumentExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link ValidationException }
-     */
-    public ValidationException createValidationException() {
-        return new ValidationException();
-    }
-
-    /**
-     * Create an instance of {@link NoSuchNameException }
-     */
-    public NoSuchNameException createNoSuchNameException() {
-        return new NoSuchNameException();
-    }
-
-    /**
-     * Create an instance of {@link BusinessTransactionListType }
-     */
-    public BusinessTransactionListType createBusinessTransactionListType() {
-        return new BusinessTransactionListType();
-    }
-
-    /**
-     * Create an instance of {@link EPCISEventExtensionType }
-     */
-    public EPCISEventExtensionType createEPCISEventExtensionType() {
-        return new EPCISEventExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link GetSubscriptionIDs }
-     */
-    public GetSubscriptionIDs createGetSubscriptionIDs() {
-        return new GetSubscriptionIDs();
-    }
-
-    /**
-     * Create an instance of {@link EPCISEventListExtensionType }
-     */
-    public EPCISEventListExtensionType createEPCISEventListExtensionType() {
-        return new EPCISEventListExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link BusinessLocationType }
-     */
-    public BusinessLocationType createBusinessLocationType() {
-        return new BusinessLocationType();
-    }
-
-    /**
-     * Create an instance of {@link EPCISHeaderType }
-     */
-    public EPCISHeaderType createEPCISHeaderType() {
-        return new EPCISHeaderType();
-    }
-
-    /**
-     * Create an instance of {@link Manifest }
-     */
-    public Manifest createManifest() {
-        return new Manifest();
+    public QueryResultsBody createQueryResultsBody() {
+        return new QueryResultsBody();
     }
 
     /**
@@ -181,388 +111,10 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SubscriptionControls }
-     */
-    public SubscriptionControls createSubscriptionControls() {
-        return new SubscriptionControls();
-    }
-
-    /**
-     * Create an instance of {@link ServiceTransaction }
-     */
-    public ServiceTransaction createServiceTransaction() {
-        return new ServiceTransaction();
-    }
-
-    /**
-     * Create an instance of {@link VocabularyExtensionType }
-     */
-    public VocabularyExtensionType createVocabularyExtensionType() {
-        return new VocabularyExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link SecurityException }
-     */
-    public SecurityException createSecurityException() {
-        return new SecurityException();
-    }
-
-    /**
-     * Create an instance of {@link Unsubscribe }
-     */
-    public Unsubscribe createUnsubscribe() {
-        return new Unsubscribe();
-    }
-
-    /**
-     * Create an instance of {@link StandardBusinessDocumentHeader }
-     */
-    public StandardBusinessDocumentHeader createStandardBusinessDocumentHeader() {
-        return new StandardBusinessDocumentHeader();
-    }
-
-    /**
-     * Create an instance of {@link ObjectEventType }
-     */
-    public ObjectEventType createObjectEventType() {
-        return new ObjectEventType();
-    }
-
-    /**
-     * Create an instance of {@link InvalidURIException }
-     */
-    public InvalidURIException createInvalidURIException() {
-        return new InvalidURIException();
-    }
-
-    /**
-     * Create an instance of {@link Scope }
-     */
-    public Scope createScope() {
-        return new Scope();
-    }
-
-    /**
-     * Create an instance of {@link EPCISMasterDataDocumentExtensionType }
-     */
-    public EPCISMasterDataDocumentExtensionType createEPCISMasterDataDocumentExtensionType() {
-        return new EPCISMasterDataDocumentExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link EPCISException }
-     */
-    public EPCISException createEPCISException() {
-        return new EPCISException();
-    }
-
-    /**
-     * Create an instance of {@link EPC }
-     */
-    public EPC createEPC() {
-        return new EPC();
-    }
-
-    /**
-     * Create an instance of {@link VocabularyElementExtensionType }
-     */
-    public VocabularyElementExtensionType createVocabularyElementExtensionType() {
-        return new VocabularyElementExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link DuplicateSubscriptionException }
-     */
-    public DuplicateSubscriptionException createDuplicateSubscriptionException() {
-        return new DuplicateSubscriptionException();
-    }
-
-    /**
-     * Create an instance of {@link QuantityEventExtensionType }
-     */
-    public QuantityEventExtensionType createQuantityEventExtensionType() {
-        return new QuantityEventExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link DocumentIdentification }
-     */
-    public DocumentIdentification createDocumentIdentification() {
-        return new DocumentIdentification();
-    }
-
-    /**
-     * Create an instance of {@link TransactionEventExtensionType }
-     */
-    public TransactionEventExtensionType createTransactionEventExtensionType() {
-        return new TransactionEventExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link VocabularyListType }
-     */
-    public VocabularyListType createVocabularyListType() {
-        return new VocabularyListType();
-    }
-
-    /**
-     * Create an instance of {@link EPCISDocumentExtensionType }
-     */
-    public EPCISDocumentExtensionType createEPCISDocumentExtensionType() {
-        return new EPCISDocumentExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link EPCListType }
-     */
-    public EPCListType createEPCListType() {
-        return new EPCListType();
-    }
-
-    /**
-     * Create an instance of {@link ImplementationException }
-     */
-    public ImplementationException createImplementationException() {
-        return new ImplementationException();
-    }
-
-    /**
-     * Create an instance of {@link StandardBusinessDocument }
-     */
-    public StandardBusinessDocument createStandardBusinessDocument() {
-        return new StandardBusinessDocument();
-    }
-
-    /**
      * Create an instance of {@link EPCISDocumentType }
      */
     public EPCISDocumentType createEPCISDocumentType() {
         return new EPCISDocumentType();
-    }
-
-    /**
-     * Create an instance of {@link TransactionEventType }
-     */
-    public TransactionEventType createTransactionEventType() {
-        return new TransactionEventType();
-    }
-
-    /**
-     * Create an instance of {@link ReadPointType }
-     */
-    public ReadPointType createReadPointType() {
-        return new ReadPointType();
-    }
-
-    /**
-     * Create an instance of {@link NoSuchSubscriptionException }
-     */
-    public NoSuchSubscriptionException createNoSuchSubscriptionException() {
-        return new NoSuchSubscriptionException();
-    }
-
-    /**
-     * Create an instance of {@link DuplicateNameException }
-     */
-    public DuplicateNameException createDuplicateNameException() {
-        return new DuplicateNameException();
-    }
-
-    /**
-     * Create an instance of {@link SubscriptionControlsException }
-     */
-    public SubscriptionControlsException createSubscriptionControlsException() {
-        return new SubscriptionControlsException();
-    }
-
-    /**
-     * Create an instance of {@link ArrayOfString }
-     */
-    public ArrayOfString createArrayOfString() {
-        return new ArrayOfString();
-    }
-
-    /**
-     * Create an instance of {@link EPCISBodyExtensionType }
-     */
-    public EPCISBodyExtensionType createEPCISBodyExtensionType() {
-        return new EPCISBodyExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link BusinessTransactionType }
-     */
-    public BusinessTransactionType createBusinessTransactionType() {
-        return new BusinessTransactionType();
-    }
-
-    /**
-     * Create an instance of {@link SubscriptionControlsExtensionType }
-     */
-    public SubscriptionControlsExtensionType createSubscriptionControlsExtensionType() {
-        return new SubscriptionControlsExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link ManifestItem }
-     */
-    public ManifestItem createManifestItem() {
-        return new ManifestItem();
-    }
-
-    /**
-     * Create an instance of {@link BusinessScope }
-     */
-    public BusinessScope createBusinessScope() {
-        return new BusinessScope();
-    }
-
-    /**
-     * Create an instance of {@link EPCISQueryBodyType }
-     */
-    public EPCISQueryBodyType createEPCISQueryBodyType() {
-        return new EPCISQueryBodyType();
-    }
-
-    /**
-     * Create an instance of {@link EPCISMasterDataBodyType }
-     */
-    public EPCISMasterDataBodyType createEPCISMasterDataBodyType() {
-        return new EPCISMasterDataBodyType();
-    }
-
-    /**
-     * Create an instance of {@link VocabularyElementListType }
-     */
-    public VocabularyElementListType createVocabularyElementListType() {
-        return new VocabularyElementListType();
-    }
-
-    /**
-     * Create an instance of {@link QueryResultsBody }
-     */
-    public QueryResultsBody createQueryResultsBody() {
-        return new QueryResultsBody();
-    }
-
-    /**
-     * Create an instance of {@link BusinessLocationExtensionType }
-     */
-    public BusinessLocationExtensionType createBusinessLocationExtensionType() {
-        return new BusinessLocationExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link EventListType }
-     */
-    public EventListType createEventListType() {
-        return new EventListType();
-    }
-
-    /**
-     * Create an instance of {@link IDListType }
-     */
-    public IDListType createIDListType() {
-        return new IDListType();
-    }
-
-    /**
-     * Create an instance of {@link ReadPointExtensionType }
-     */
-    public ReadPointExtensionType createReadPointExtensionType() {
-        return new ReadPointExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link ContactInformation }
-     */
-    public ContactInformation createContactInformation() {
-        return new ContactInformation();
-    }
-
-    /**
-     * Create an instance of {@link EPCISMasterDataHeaderExtensionType }
-     */
-    public EPCISMasterDataHeaderExtensionType createEPCISMasterDataHeaderExtensionType() {
-        return new EPCISMasterDataHeaderExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link Partner }
-     */
-    public Partner createPartner() {
-        return new Partner();
-    }
-
-    /**
-     * Create an instance of {@link BusinessService }
-     */
-    public BusinessService createBusinessService() {
-        return new BusinessService();
-    }
-
-    /**
-     * Create an instance of {@link AggregationEventType }
-     */
-    public AggregationEventType createAggregationEventType() {
-        return new AggregationEventType();
-    }
-
-    /**
-     * Create an instance of {@link QueryTooLargeException }
-     */
-    public QueryTooLargeException createQueryTooLargeException() {
-        return new QueryTooLargeException();
-    }
-
-    /**
-     * Create an instance of {@link QueryParams }
-     */
-    public QueryParams createQueryParams() {
-        return new QueryParams();
-    }
-
-    /**
-     * Create an instance of {@link EmptyParms }
-     */
-    public EmptyParms createEmptyParms() {
-        return new EmptyParms();
-    }
-
-    /**
-     * Create an instance of {@link ObjectEventExtensionType }
-     */
-    public ObjectEventExtensionType createObjectEventExtensionType() {
-        return new ObjectEventExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link SubscribeNotPermittedException }
-     */
-    public SubscribeNotPermittedException createSubscribeNotPermittedException() {
-        return new SubscribeNotPermittedException();
-    }
-
-    /**
-     * Create an instance of {@link EPCISMasterDataBodyExtensionType }
-     */
-    public EPCISMasterDataBodyExtensionType createEPCISMasterDataBodyExtensionType() {
-        return new EPCISMasterDataBodyExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link Poll }
-     */
-    public Poll createPoll() {
-        return new Poll();
-    }
-
-    /**
-     * Create an instance of {@link Subscribe }
-     */
-    public Subscribe createSubscribe() {
-        return new Subscribe();
     }
 
     /**
@@ -573,59 +125,17 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EPCISMasterDataDocumentType }
+     * Create an instance of {@link EPCISMasterDataDocumentExtensionType }
      */
-    public EPCISMasterDataDocumentType createEPCISMasterDataDocumentType() {
-        return new EPCISMasterDataDocumentType();
+    public EPCISMasterDataDocumentExtensionType createEPCISMasterDataDocumentExtensionType() {
+        return new EPCISMasterDataDocumentExtensionType();
     }
 
     /**
-     * Create an instance of {@link EPCISHeaderExtensionType }
+     * Create an instance of {@link ReadPointExtensionType }
      */
-    public EPCISHeaderExtensionType createEPCISHeaderExtensionType() {
-        return new EPCISHeaderExtensionType();
-    }
-
-    /**
-     * Create an instance of {@link VocabularyType }
-     */
-    public VocabularyType createVocabularyType() {
-        return new VocabularyType();
-    }
-
-    /**
-     * Create an instance of {@link QueryParameterException }
-     */
-    public QueryParameterException createQueryParameterException() {
-        return new QueryParameterException();
-    }
-
-    /**
-     * Create an instance of {@link VoidHolder }
-     */
-    public VoidHolder createVoidHolder() {
-        return new VoidHolder();
-    }
-
-    /**
-     * Create an instance of {@link PartnerIdentification }
-     */
-    public PartnerIdentification createPartnerIdentification() {
-        return new PartnerIdentification();
-    }
-
-    /**
-     * Create an instance of {@link CorrelationInformation }
-     */
-    public CorrelationInformation createCorrelationInformation() {
-        return new CorrelationInformation();
-    }
-
-    /**
-     * Create an instance of {@link QuerySchedule }
-     */
-    public QuerySchedule createQuerySchedule() {
-        return new QuerySchedule();
+    public ReadPointExtensionType createReadPointExtensionType() {
+        return new ReadPointExtensionType();
     }
 
     /**
@@ -636,10 +146,136 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link QueryResults }
+     * Create an instance of {@link EPC }
      */
-    public QueryResults createQueryResults() {
-        return new QueryResults();
+    public EPC createEPC() {
+        return new EPC();
+    }
+
+    /**
+     * Create an instance of {@link Unsubscribe }
+     */
+    public Unsubscribe createUnsubscribe() {
+        return new Unsubscribe();
+    }
+
+    /**
+     * Create an instance of {@link BusinessTransactionType }
+     */
+    public BusinessTransactionType createBusinessTransactionType() {
+        return new BusinessTransactionType();
+    }
+
+    /**
+     * Create an instance of {@link Partner }
+     */
+    public Partner createPartner() {
+        return new Partner();
+    }
+
+    /**
+     * Create an instance of {@link ObjectEventType }
+     */
+    public ObjectEventType createObjectEventType() {
+        return new ObjectEventType();
+    }
+
+    /**
+     * Create an instance of {@link NoSuchNameException }
+     */
+    public NoSuchNameException createNoSuchNameException() {
+        return new NoSuchNameException();
+    }
+
+    /**
+     * Create an instance of {@link EPCISDocumentExtensionType }
+     */
+    public EPCISDocumentExtensionType createEPCISDocumentExtensionType() {
+        return new EPCISDocumentExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link Poll }
+     */
+    public Poll createPoll() {
+        return new Poll();
+    }
+
+    /**
+     * Create an instance of {@link IDListType }
+     */
+    public IDListType createIDListType() {
+        return new IDListType();
+    }
+
+    /**
+     * Create an instance of {@link DuplicateNameException }
+     */
+    public DuplicateNameException createDuplicateNameException() {
+        return new DuplicateNameException();
+    }
+
+    /**
+     * Create an instance of {@link InvalidURIException }
+     */
+    public InvalidURIException createInvalidURIException() {
+        return new InvalidURIException();
+    }
+
+    /**
+     * Create an instance of {@link EPCISHeaderExtensionType }
+     */
+    public EPCISHeaderExtensionType createEPCISHeaderExtensionType() {
+        return new EPCISHeaderExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link PartnerIdentification }
+     */
+    public PartnerIdentification createPartnerIdentification() {
+        return new PartnerIdentification();
+    }
+
+    /**
+     * Create an instance of {@link SubscriptionControls }
+     */
+    public SubscriptionControls createSubscriptionControls() {
+        return new SubscriptionControls();
+    }
+
+    /**
+     * Create an instance of {@link VocabularyExtensionType }
+     */
+    public VocabularyExtensionType createVocabularyExtensionType() {
+        return new VocabularyExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link EPCISEventListExtensionType }
+     */
+    public EPCISEventListExtensionType createEPCISEventListExtensionType() {
+        return new EPCISEventListExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link VocabularyElementExtensionType }
+     */
+    public VocabularyElementExtensionType createVocabularyElementExtensionType() {
+        return new VocabularyElementExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link VocabularyType }
+     */
+    public VocabularyType createVocabularyType() {
+        return new VocabularyType();
+    }
+
+    /**
+     * Create an instance of {@link ValidationException }
+     */
+    public ValidationException createValidationException() {
+        return new ValidationException();
     }
 
     /**
@@ -650,24 +286,66 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link QueryTooComplexException }
+     * Create an instance of {@link DuplicateSubscriptionException }
      */
-    public QueryTooComplexException createQueryTooComplexException() {
-        return new QueryTooComplexException();
+    public DuplicateSubscriptionException createDuplicateSubscriptionException() {
+        return new DuplicateSubscriptionException();
     }
 
     /**
-     * Create an instance of {@link QueryScheduleExtensionType }
+     * Create an instance of {@link TransactionEventType }
      */
-    public QueryScheduleExtensionType createQueryScheduleExtensionType() {
-        return new QueryScheduleExtensionType();
+    public TransactionEventType createTransactionEventType() {
+        return new TransactionEventType();
     }
 
     /**
-     * Create an instance of {@link QueryResultsExtensionType }
+     * Create an instance of {@link QuerySchedule }
      */
-    public QueryResultsExtensionType createQueryResultsExtensionType() {
-        return new QueryResultsExtensionType();
+    public QuerySchedule createQuerySchedule() {
+        return new QuerySchedule();
+    }
+
+    /**
+     * Create an instance of {@link ServiceTransaction }
+     */
+    public ServiceTransaction createServiceTransaction() {
+        return new ServiceTransaction();
+    }
+
+    /**
+     * Create an instance of {@link EPCISEventExtensionType }
+     */
+    public EPCISEventExtensionType createEPCISEventExtensionType() {
+        return new EPCISEventExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link VocabularyElementListType }
+     */
+    public VocabularyElementListType createVocabularyElementListType() {
+        return new VocabularyElementListType();
+    }
+
+    /**
+     * Create an instance of {@link VocabularyElementType }
+     */
+    public VocabularyElementType createVocabularyElementType() {
+        return new VocabularyElementType();
+    }
+
+    /**
+     * Create an instance of {@link BusinessService }
+     */
+    public BusinessService createBusinessService() {
+        return new BusinessService();
+    }
+
+    /**
+     * Create an instance of {@link QueryParameterException }
+     */
+    public QueryParameterException createQueryParameterException() {
+        return new QueryParameterException();
     }
 
     /**
@@ -678,10 +356,332 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link VocabularyElementType }
+     * Create an instance of {@link SubscriptionControlsException }
      */
-    public VocabularyElementType createVocabularyElementType() {
-        return new VocabularyElementType();
+    public SubscriptionControlsException createSubscriptionControlsException() {
+        return new SubscriptionControlsException();
+    }
+
+    /**
+     * Create an instance of {@link QueryParams }
+     */
+    public QueryParams createQueryParams() {
+        return new QueryParams();
+    }
+
+    /**
+     * Create an instance of {@link BusinessTransactionListType }
+     */
+    public BusinessTransactionListType createBusinessTransactionListType() {
+        return new BusinessTransactionListType();
+    }
+
+    /**
+     * Create an instance of {@link EmptyParms }
+     */
+    public EmptyParms createEmptyParms() {
+        return new EmptyParms();
+    }
+
+    /**
+     * Create an instance of {@link CorrelationInformation }
+     */
+    public CorrelationInformation createCorrelationInformation() {
+        return new CorrelationInformation();
+    }
+
+    /**
+     * Create an instance of {@link Manifest }
+     */
+    public Manifest createManifest() {
+        return new Manifest();
+    }
+
+    /**
+     * Create an instance of {@link EPCISBodyExtensionType }
+     */
+    public EPCISBodyExtensionType createEPCISBodyExtensionType() {
+        return new EPCISBodyExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link StandardBusinessDocumentHeader }
+     */
+    public StandardBusinessDocumentHeader createStandardBusinessDocumentHeader() {
+        return new StandardBusinessDocumentHeader();
+    }
+
+    /**
+     * Create an instance of {@link GetSubscriptionIDs }
+     */
+    public GetSubscriptionIDs createGetSubscriptionIDs() {
+        return new GetSubscriptionIDs();
+    }
+
+    /**
+     * Create an instance of {@link EPCListType }
+     */
+    public EPCListType createEPCListType() {
+        return new EPCListType();
+    }
+
+    /**
+     * Create an instance of {@link QueryTooLargeException }
+     */
+    public QueryTooLargeException createQueryTooLargeException() {
+        return new QueryTooLargeException();
+    }
+
+    /**
+     * Create an instance of {@link ManifestItem }
+     */
+    public ManifestItem createManifestItem() {
+        return new ManifestItem();
+    }
+
+    /**
+     * Create an instance of {@link ObjectEventExtensionType }
+     */
+    public ObjectEventExtensionType createObjectEventExtensionType() {
+        return new ObjectEventExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link AggregationEventType }
+     */
+    public AggregationEventType createAggregationEventType() {
+        return new AggregationEventType();
+    }
+
+    /**
+     * Create an instance of {@link VoidHolder }
+     */
+    public VoidHolder createVoidHolder() {
+        return new VoidHolder();
+    }
+
+    /**
+     * Create an instance of {@link Subscribe }
+     */
+    public Subscribe createSubscribe() {
+        return new Subscribe();
+    }
+
+    /**
+     * Create an instance of {@link QuantityEventExtensionType }
+     */
+    public QuantityEventExtensionType createQuantityEventExtensionType() {
+        return new QuantityEventExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link StandardBusinessDocument }
+     */
+    public StandardBusinessDocument createStandardBusinessDocument() {
+        return new StandardBusinessDocument();
+    }
+
+    /**
+     * Create an instance of {@link DocumentIdentification }
+     */
+    public DocumentIdentification createDocumentIdentification() {
+        return new DocumentIdentification();
+    }
+
+    /**
+     * Create an instance of {@link QueryResults }
+     */
+    public QueryResults createQueryResults() {
+        return new QueryResults();
+    }
+
+    /**
+     * Create an instance of {@link BusinessLocationType }
+     */
+    public BusinessLocationType createBusinessLocationType() {
+        return new BusinessLocationType();
+    }
+
+    /**
+     * Create an instance of {@link AggregationEventExtensionType }
+     */
+    public AggregationEventExtensionType createAggregationEventExtensionType() {
+        return new AggregationEventExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link EPCISHeaderType }
+     */
+    public EPCISHeaderType createEPCISHeaderType() {
+        return new EPCISHeaderType();
+    }
+
+    /**
+     * Create an instance of {@link ImplementationException }
+     */
+    public ImplementationException createImplementationException() {
+        return new ImplementationException();
+    }
+
+    /**
+     * Create an instance of {@link BusinessScope }
+     */
+    public BusinessScope createBusinessScope() {
+        return new BusinessScope();
+    }
+
+    /**
+     * Create an instance of {@link SecurityException }
+     */
+    public SecurityException createSecurityException() {
+        return new SecurityException();
+    }
+
+    /**
+     * Create an instance of {@link QueryTooComplexException }
+     */
+    public QueryTooComplexException createQueryTooComplexException() {
+        return new QueryTooComplexException();
+    }
+
+    /**
+     * Create an instance of {@link EPCISMasterDataBodyType }
+     */
+    public EPCISMasterDataBodyType createEPCISMasterDataBodyType() {
+        return new EPCISMasterDataBodyType();
+    }
+
+    /**
+     * Create an instance of {@link EPCISQueryDocumentExtensionType }
+     */
+    public EPCISQueryDocumentExtensionType createEPCISQueryDocumentExtensionType() {
+        return new EPCISQueryDocumentExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link QueryResultsExtensionType }
+     */
+    public QueryResultsExtensionType createQueryResultsExtensionType() {
+        return new QueryResultsExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link BusinessLocationExtensionType }
+     */
+    public BusinessLocationExtensionType createBusinessLocationExtensionType() {
+        return new BusinessLocationExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link SubscriptionControlsExtensionType }
+     */
+    public SubscriptionControlsExtensionType createSubscriptionControlsExtensionType() {
+        return new SubscriptionControlsExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link EPCISException }
+     */
+    public EPCISException createEPCISException() {
+        return new EPCISException();
+    }
+
+    /**
+     * Create an instance of {@link NoSuchSubscriptionException }
+     */
+    public NoSuchSubscriptionException createNoSuchSubscriptionException() {
+        return new NoSuchSubscriptionException();
+    }
+
+    /**
+     * Create an instance of {@link ArrayOfString }
+     */
+    public ArrayOfString createArrayOfString() {
+        return new ArrayOfString();
+    }
+
+    /**
+     * Create an instance of {@link EPCISQueryBodyType }
+     */
+    public EPCISQueryBodyType createEPCISQueryBodyType() {
+        return new EPCISQueryBodyType();
+    }
+
+    /**
+     * Create an instance of {@link EPCISMasterDataDocumentType }
+     */
+    public EPCISMasterDataDocumentType createEPCISMasterDataDocumentType() {
+        return new EPCISMasterDataDocumentType();
+    }
+
+    /**
+     * Create an instance of {@link SubscribeNotPermittedException }
+     */
+    public SubscribeNotPermittedException createSubscribeNotPermittedException() {
+        return new SubscribeNotPermittedException();
+    }
+
+    /**
+     * Create an instance of {@link QueryScheduleExtensionType }
+     */
+    public QueryScheduleExtensionType createQueryScheduleExtensionType() {
+        return new QueryScheduleExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link EventListType }
+     */
+    public EventListType createEventListType() {
+        return new EventListType();
+    }
+
+    /**
+     * Create an instance of {@link ReadPointType }
+     */
+    public ReadPointType createReadPointType() {
+        return new ReadPointType();
+    }
+
+    /**
+     * Create an instance of {@link EPCISMasterDataBodyExtensionType }
+     */
+    public EPCISMasterDataBodyExtensionType createEPCISMasterDataBodyExtensionType() {
+        return new EPCISMasterDataBodyExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link TransactionEventExtensionType }
+     */
+    public TransactionEventExtensionType createTransactionEventExtensionType() {
+        return new TransactionEventExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link EPCISMasterDataHeaderExtensionType }
+     */
+    public EPCISMasterDataHeaderExtensionType createEPCISMasterDataHeaderExtensionType() {
+        return new EPCISMasterDataHeaderExtensionType();
+    }
+
+    /**
+     * Create an instance of {@link VocabularyListType }
+     */
+    public VocabularyListType createVocabularyListType() {
+        return new VocabularyListType();
+    }
+
+    /**
+     * Create an instance of {@link ContactInformation }
+     */
+    public ContactInformation createContactInformation() {
+        return new ContactInformation();
+    }
+
+    /**
+     * Create an instance of {@link Scope }
+     */
+    public Scope createScope() {
+        return new Scope();
     }
 
     /**
@@ -1042,22 +1042,22 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}
-     * {@link TransactionEventType }{@code >}
-     */
-    @XmlElementDecl(namespace = "", name = "TransactionEvent", scope = EventListType.class)
-    public JAXBElement<TransactionEventType> createEventListTypeTransactionEvent(TransactionEventType value) {
-        return new JAXBElement<TransactionEventType>(_EventListTypeTransactionEvent_QNAME, TransactionEventType.class,
-                EventListType.class, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ObjectEventType }
      * {@code >}
      */
     @XmlElementDecl(namespace = "", name = "ObjectEvent", scope = EventListType.class)
     public JAXBElement<ObjectEventType> createEventListTypeObjectEvent(ObjectEventType value) {
         return new JAXBElement<ObjectEventType>(_EventListTypeObjectEvent_QNAME, ObjectEventType.class,
+                EventListType.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}
+     * {@link TransactionEventType }{@code >}
+     */
+    @XmlElementDecl(namespace = "", name = "TransactionEvent", scope = EventListType.class)
+    public JAXBElement<TransactionEventType> createEventListTypeTransactionEvent(TransactionEventType value) {
+        return new JAXBElement<TransactionEventType>(_EventListTypeTransactionEvent_QNAME, TransactionEventType.class,
                 EventListType.class, value);
     }
 

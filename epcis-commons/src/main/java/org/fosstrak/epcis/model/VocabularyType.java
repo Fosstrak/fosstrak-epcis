@@ -48,7 +48,7 @@ public class VocabularyType {
     protected VocabularyExtensionType extension;
     @XmlAnyElement(lax = true)
     protected List<Object> any;
-    @XmlAttribute(required = true)
+    @XmlAttribute(name = "type", required = true)
     @XmlSchemaType(name = "anyURI")
     protected String type;
     @XmlAnyAttribute

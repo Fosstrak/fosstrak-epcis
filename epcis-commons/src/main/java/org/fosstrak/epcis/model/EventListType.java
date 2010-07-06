@@ -40,11 +40,11 @@ import org.w3c.dom.Element;
 public class EventListType {
 
     @XmlElementRefs( {
-            @XmlElementRef(name = "TransactionEvent", type = JAXBElement.class),
-            @XmlElementRef(name = "AggregationEvent", type = JAXBElement.class),
+            @XmlElementRef(name = "ObjectEvent", type = JAXBElement.class),
             @XmlElementRef(name = "extension", type = JAXBElement.class),
+            @XmlElementRef(name = "TransactionEvent", type = JAXBElement.class),
             @XmlElementRef(name = "QuantityEvent", type = JAXBElement.class),
-            @XmlElementRef(name = "ObjectEvent", type = JAXBElement.class) })
+            @XmlElementRef(name = "AggregationEvent", type = JAXBElement.class) })
     @XmlAnyElement(lax = true)
     protected List<Object> objectEventOrAggregationEventOrQuantityEvent;
 
@@ -65,12 +65,12 @@ public class EventListType {
      * </pre>
      * <p>
      * Objects of the following type(s) are allowed in the list
+     * {@link JAXBElement }{@code <}{@link ObjectEventType }{@code >}
+     * {@link JAXBElement }{@code <}{@link EPCISEventListExtensionType }{@code >}
      * {@link JAXBElement }{@code <}{@link TransactionEventType }{@code >}
-     * {@link Object } {@link JAXBElement }{@code <}{@link AggregationEventType }
-     * {@code >} {@link Element } {@link JAXBElement }{@code <}
-     * {@link EPCISEventListExtensionType }{@code >} {@link JAXBElement }{@code <}
-     * {@link QuantityEventType }{@code >} {@link JAXBElement }{@code <}
-     * {@link ObjectEventType }{@code >}
+     * {@link Object } {@link JAXBElement }{@code <}{@link QuantityEventType }
+     * {@code >} {@link JAXBElement }{@code <}{@link AggregationEventType }{@code
+     * >} {@link Element }
      */
     public List<Object> getObjectEventOrAggregationEventOrQuantityEvent() {
         if (objectEventOrAggregationEventOrQuantityEvent == null) {

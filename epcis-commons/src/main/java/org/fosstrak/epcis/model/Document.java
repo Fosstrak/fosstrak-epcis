@@ -33,30 +33,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @XmlSeeAlso( { EPCISDocumentType.class, EPCISMasterDataDocumentType.class, EPCISQueryDocumentType.class })
 public abstract class Document {
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(name = "schemaVersion", required = true)
     protected BigDecimal schemaVersion;
-    @XmlAttribute(required = true)
+    @XmlAttribute(name = "creationDate", required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar creationDate;
-
-    /**
-     * Gets the value of the creationDate property.
-     * 
-     * @return possible object is {@link XMLGregorianCalendar }
-     */
-    public XMLGregorianCalendar getCreationDate() {
-        return creationDate;
-    }
-
-    /**
-     * Sets the value of the creationDate property.
-     * 
-     * @param value
-     *            allowed object is {@link XMLGregorianCalendar }
-     */
-    public void setCreationDate(XMLGregorianCalendar value) {
-        this.creationDate = value;
-    }
 
     /**
      * Gets the value of the schemaVersion property.
@@ -75,6 +56,25 @@ public abstract class Document {
      */
     public void setSchemaVersion(BigDecimal value) {
         this.schemaVersion = value;
+    }
+
+    /**
+     * Gets the value of the creationDate property.
+     * 
+     * @return possible object is {@link XMLGregorianCalendar }
+     */
+    public XMLGregorianCalendar getCreationDate() {
+        return creationDate;
+    }
+
+    /**
+     * Sets the value of the creationDate property.
+     * 
+     * @param value
+     *            allowed object is {@link XMLGregorianCalendar }
+     */
+    public void setCreationDate(XMLGregorianCalendar value) {
+        this.creationDate = value;
     }
 
 }

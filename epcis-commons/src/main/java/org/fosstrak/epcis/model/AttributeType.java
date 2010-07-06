@@ -40,7 +40,7 @@ public class AttributeType {
     @XmlMixed
     @XmlAnyElement
     protected List<Object> content;
-    @XmlAttribute(required = true)
+    @XmlAttribute(name = "id", required = true)
     @XmlSchemaType(name = "anyURI")
     protected String id;
     @XmlAnyAttribute

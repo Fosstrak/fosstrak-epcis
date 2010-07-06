@@ -29,7 +29,7 @@ public class BusinessTransactionType {
 
     @XmlValue
     protected String value;
-    @XmlAttribute
+    @XmlAttribute(name = "type")
     protected String type;
 
     /**
