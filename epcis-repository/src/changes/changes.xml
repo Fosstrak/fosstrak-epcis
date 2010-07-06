@@ -5,6 +5,9 @@
     </properties>
     <body>
         <release version="0.5" date="2009-??-??" description="Bug fix and feature release">
+            <action dev="steybem" date="2010-07-06" type="update">
+                Updated CXF dependencies to 2.2.9 and JAXB to 2.2
+            </action>
             <action dev="steybem" date="2010-05-21" type="update" due-to="Adrien Laurence">
                 Added support for storing milliseconds of eventTime and recordTime
                 to the repository. Fixes issues with fine-grained time queries
