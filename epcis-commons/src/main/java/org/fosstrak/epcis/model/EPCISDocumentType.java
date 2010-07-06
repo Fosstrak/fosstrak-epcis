@@ -1,14 +1,16 @@
 package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
+import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 /**
@@ -20,18 +22,19 @@ import org.w3c.dom.Element;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;EPCISDocumentType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base=&quot;{urn:epcglobal:xsd:1}Document&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;EPCISHeader&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}EPCISHeaderType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;EPCISBody&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}EPCISBodyType&quot;/&gt;
- *         &lt;element name=&quot;extension&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}EPCISDocumentExtensionType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;any/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="EPCISDocumentType">
+ *   &lt;complexContent>
+ *     &lt;extension base="{urn:epcglobal:xsd:1}Document">
+ *       &lt;sequence>
+ *         &lt;element name="EPCISHeader" type="{urn:epcglobal:epcis:xsd:1}EPCISHeaderType" minOccurs="0"/>
+ *         &lt;element name="EPCISBody" type="{urn:epcglobal:epcis:xsd:1}EPCISBodyType"/>
+ *         &lt;element name="extension" type="{urn:epcglobal:epcis:xsd:1}EPCISDocumentExtensionType" minOccurs="0"/>
+ *         &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *       &lt;anyAttribute processContents='lax'/>
+ *     &lt;/extension>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -46,6 +49,8 @@ public class EPCISDocumentType extends Document {
     protected EPCISDocumentExtensionType extension;
     @XmlAnyElement(lax = true)
     protected List<Object> any;
+    @XmlAnyAttribute
+    private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
     /**
      * Gets the value of the epcisHeader property.
@@ -117,7 +122,6 @@ public class EPCISDocumentType extends Document {
      * <pre>
      * getAny().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link Element }
      * {@link Object }
@@ -127,6 +131,21 @@ public class EPCISDocumentType extends Document {
             any = new ArrayList<Object>();
         }
         return this.any;
+    }
+
+    /**
+     * Gets a map that contains attributes that aren't bound to any typed
+     * property on this class.
+     * <p>
+     * the map is keyed by the name of the attribute and the value is the string
+     * value of the attribute. the map returned by this method is live, and you
+     * can add new attribute by updating the map directly. Because of this
+     * design, there's no setter.
+     * 
+     * @return always non-null
+     */
+    public Map<QName, String> getOtherAttributes() {
+        return otherAttributes;
     }
 
 }

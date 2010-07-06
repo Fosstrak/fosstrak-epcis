@@ -2,14 +2,11 @@ package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
 import org.w3c.dom.Element;
 
 /**
@@ -22,26 +19,26 @@ import org.w3c.dom.Element;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;QuantityEventType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base=&quot;{urn:epcglobal:epcis:xsd:1}EPCISEventType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;epcClass&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}EPCClassType&quot;/&gt;
- *         &lt;element name=&quot;quantity&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}int&quot;/&gt;
- *         &lt;element name=&quot;bizStep&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}BusinessStepIDType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;disposition&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}DispositionIDType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;readPoint&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}ReadPointType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;bizLocation&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}BusinessLocationType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;bizTransactionList&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}BusinessTransactionListType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;extension&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}QuantityEventExtensionType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;any/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="QuantityEventType">
+ *   &lt;complexContent>
+ *     &lt;extension base="{urn:epcglobal:epcis:xsd:1}EPCISEventType">
+ *       &lt;sequence>
+ *         &lt;element name="epcClass" type="{urn:epcglobal:epcis:xsd:1}EPCClassType"/>
+ *         &lt;element name="quantity" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="bizStep" type="{urn:epcglobal:epcis:xsd:1}BusinessStepIDType" minOccurs="0"/>
+ *         &lt;element name="disposition" type="{urn:epcglobal:epcis:xsd:1}DispositionIDType" minOccurs="0"/>
+ *         &lt;element name="readPoint" type="{urn:epcglobal:epcis:xsd:1}ReadPointType" minOccurs="0"/>
+ *         &lt;element name="bizLocation" type="{urn:epcglobal:epcis:xsd:1}BusinessLocationType" minOccurs="0"/>
+ *         &lt;element name="bizTransactionList" type="{urn:epcglobal:epcis:xsd:1}BusinessTransactionListType" minOccurs="0"/>
+ *         &lt;element name="extension" type="{urn:epcglobal:epcis:xsd:1}QuantityEventExtensionType" minOccurs="0"/>
+ *         &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *       &lt;anyAttribute processContents='lax'/>
+ *     &lt;/extension>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
-@XmlRootElement(name = "QuantityEvent", namespace = "")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "QuantityEventType", namespace = "urn:epcglobal:epcis:xsd:1", propOrder = {
         "epcClass", "quantity", "bizStep", "disposition", "readPoint", "bizLocation", "bizTransactionList",
@@ -220,7 +217,6 @@ public class QuantityEventType extends EPCISEventType {
      * <pre>
      * getAny().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link Element }
      * {@link Object }

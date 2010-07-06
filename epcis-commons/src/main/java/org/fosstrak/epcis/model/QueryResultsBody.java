@@ -13,16 +13,16 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;QueryResultsBody&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;choice&gt;
- *         &lt;element name=&quot;EventList&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}EventListType&quot;/&gt;
- *         &lt;element name=&quot;VocabularyList&quot; type=&quot;{urn:epcglobal:epcis-masterdata:xsd:1}VocabularyListType&quot;/&gt;
- *       &lt;/choice&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="QueryResultsBody">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;choice>
+ *         &lt;element name="EventList" type="{urn:epcglobal:epcis:xsd:1}EventListType"/>
+ *         &lt;element name="VocabularyList" type="{urn:epcglobal:epcis-masterdata:xsd:1}VocabularyListType"/>
+ *       &lt;/choice>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)

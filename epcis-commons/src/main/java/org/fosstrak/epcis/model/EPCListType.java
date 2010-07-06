@@ -2,10 +2,8 @@ package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -16,22 +14,21 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;EPCListType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;epc&quot; type=&quot;{urn:epcglobal:xsd:1}EPC&quot; maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="EPCListType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="epc" type="{urn:epcglobal:xsd:1}EPC" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EPCListType", namespace = "urn:epcglobal:epcis:xsd:1", propOrder = { "epc" })
 public class EPCListType {
 
-    @XmlElement(required = true)
     protected List<EPC> epc;
 
     /**
@@ -47,7 +44,6 @@ public class EPCListType {
      * <pre>
      * getEpc().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link EPC }
      */

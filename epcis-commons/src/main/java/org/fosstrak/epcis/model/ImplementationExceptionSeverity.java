@@ -1,6 +1,7 @@
 package org.fosstrak.epcis.model;
 
 import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>
@@ -11,14 +12,15 @@ import javax.xml.bind.annotation.XmlEnum;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name=&quot;ImplementationExceptionSeverity&quot;&gt;
- *   &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}NCName&quot;&gt;
- *     &lt;enumeration value=&quot;ERROR&quot;/&gt;
- *     &lt;enumeration value=&quot;SEVERE&quot;/&gt;
- *   &lt;/restriction&gt;
- * &lt;/simpleType&gt;
+ * &lt;simpleType name="ImplementationExceptionSeverity">
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}NCName">
+ *     &lt;enumeration value="ERROR"/>
+ *     &lt;enumeration value="SEVERE"/>
+ *   &lt;/restriction>
+ * &lt;/simpleType>
  * </pre>
  */
+@XmlType(name = "ImplementationExceptionSeverity")
 @XmlEnum
 public enum ImplementationExceptionSeverity {
 

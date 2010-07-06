@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
 
 /**
@@ -24,19 +22,20 @@ import org.w3c.dom.Element;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;VocabularyElementType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;attribute&quot; type=&quot;{urn:epcglobal:epcis-masterdata:xsd:1}AttributeType&quot; maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;children&quot; type=&quot;{urn:epcglobal:epcis-masterdata:xsd:1}IDListType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;extension&quot; type=&quot;{urn:epcglobal:epcis-masterdata:xsd:1}VocabularyElementExtensionType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;any/&gt;
- *       &lt;/sequence&gt;
- *       &lt;attribute name=&quot;id&quot; use=&quot;required&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}anyURI&quot; /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="VocabularyElementType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="attribute" type="{urn:epcglobal:epcis-masterdata:xsd:1}AttributeType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="children" type="{urn:epcglobal:epcis-masterdata:xsd:1}IDListType" minOccurs="0"/>
+ *         &lt;element name="extension" type="{urn:epcglobal:epcis-masterdata:xsd:1}VocabularyElementExtensionType" minOccurs="0"/>
+ *         &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *       &lt;anyAttribute processContents='lax'/>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -44,13 +43,13 @@ import org.w3c.dom.Element;
         "attribute", "children", "extension", "any" })
 public class VocabularyElementType {
 
-    @XmlElement(required = true)
     protected List<AttributeType> attribute;
     protected IDListType children;
     protected VocabularyElementExtensionType extension;
     @XmlAnyElement(lax = true)
     protected List<Object> any;
     @XmlAttribute(required = true)
+    @XmlSchemaType(name = "anyURI")
     protected String id;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
@@ -68,7 +67,6 @@ public class VocabularyElementType {
      * <pre>
      * getAttribute().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link AttributeType }
@@ -131,7 +129,6 @@ public class VocabularyElementType {
      * <pre>
      * getAny().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link Element }
      * {@link Object }

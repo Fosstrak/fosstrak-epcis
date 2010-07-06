@@ -2,7 +2,6 @@ package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -16,15 +15,15 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;BusinessTransactionListType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;bizTransaction&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}BusinessTransactionType&quot; maxOccurs=&quot;unbounded&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="BusinessTransactionListType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="bizTransaction" type="{urn:epcglobal:epcis:xsd:1}BusinessTransactionType" maxOccurs="unbounded"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -47,7 +46,6 @@ public class BusinessTransactionListType {
      * <pre>
      * getBizTransaction().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link BusinessTransactionType }

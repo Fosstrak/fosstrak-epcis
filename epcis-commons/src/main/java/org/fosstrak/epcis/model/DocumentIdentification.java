@@ -3,6 +3,7 @@ package org.fosstrak.epcis.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -14,20 +15,20 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;DocumentIdentification&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;Standard&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *         &lt;element name=&quot;TypeVersion&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *         &lt;element name=&quot;InstanceIdentifier&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *         &lt;element name=&quot;Type&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *         &lt;element name=&quot;MultipleType&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}boolean&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;CreationDateAndTime&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}dateTime&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="DocumentIdentification">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="Standard" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="TypeVersion" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="InstanceIdentifier" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="Type" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="MultipleType" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
+ *         &lt;element name="CreationDateAndTime" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -46,6 +47,7 @@ public class DocumentIdentification {
     @XmlElement(name = "MultipleType", namespace = "http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader")
     protected Boolean multipleType;
     @XmlElement(name = "CreationDateAndTime", namespace = "http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader", required = true)
+    @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar creationDateAndTime;
 
     /**

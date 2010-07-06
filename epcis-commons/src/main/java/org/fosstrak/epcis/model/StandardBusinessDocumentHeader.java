@@ -2,7 +2,6 @@ package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -16,20 +15,20 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;StandardBusinessDocumentHeader&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;HeaderVersion&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *         &lt;element name=&quot;Sender&quot; type=&quot;{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}Partner&quot; maxOccurs=&quot;unbounded&quot;/&gt;
- *         &lt;element name=&quot;Receiver&quot; type=&quot;{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}Partner&quot; maxOccurs=&quot;unbounded&quot;/&gt;
- *         &lt;element name=&quot;DocumentIdentification&quot; type=&quot;{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}DocumentIdentification&quot;/&gt;
- *         &lt;element name=&quot;Manifest&quot; type=&quot;{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}Manifest&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;BusinessScope&quot; type=&quot;{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}BusinessScope&quot; minOccurs=&quot;0&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="StandardBusinessDocumentHeader">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="HeaderVersion" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="Sender" type="{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}Partner" maxOccurs="unbounded"/>
+ *         &lt;element name="Receiver" type="{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}Partner" maxOccurs="unbounded"/>
+ *         &lt;element name="DocumentIdentification" type="{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}DocumentIdentification"/>
+ *         &lt;element name="Manifest" type="{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}Manifest" minOccurs="0"/>
+ *         &lt;element name="BusinessScope" type="{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}BusinessScope" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -82,7 +81,6 @@ public class StandardBusinessDocumentHeader {
      * <pre>
      * getSender().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link Partner }
      */
@@ -106,7 +104,6 @@ public class StandardBusinessDocumentHeader {
      * <pre>
      * getReceiver().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link Partner }
      */

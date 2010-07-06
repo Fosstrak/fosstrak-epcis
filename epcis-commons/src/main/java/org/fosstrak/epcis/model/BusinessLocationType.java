@@ -2,13 +2,11 @@ package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
 import org.w3c.dom.Element;
 
 /**
@@ -19,17 +17,17 @@ import org.w3c.dom.Element;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;BusinessLocationType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;id&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}BusinessLocationIDType&quot;/&gt;
- *         &lt;element name=&quot;extension&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}BusinessLocationExtensionType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;any/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="BusinessLocationType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="id" type="{urn:epcglobal:epcis:xsd:1}BusinessLocationIDType"/>
+ *         &lt;element name="extension" type="{urn:epcglobal:epcis:xsd:1}BusinessLocationExtensionType" minOccurs="0"/>
+ *         &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -93,7 +91,6 @@ public class BusinessLocationType {
      * <pre>
      * getAny().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link Element }
      * {@link Object }

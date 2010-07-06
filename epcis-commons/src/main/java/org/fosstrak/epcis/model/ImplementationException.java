@@ -13,17 +13,17 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;ImplementationException&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base=&quot;{urn:epcglobal:epcis-query:xsd:1}EPCISException&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;severity&quot; type=&quot;{urn:epcglobal:epcis-query:xsd:1}ImplementationExceptionSeverity&quot;/&gt;
- *         &lt;element name=&quot;queryName&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;subscriptionID&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot; minOccurs=&quot;0&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="ImplementationException">
+ *   &lt;complexContent>
+ *     &lt;extension base="{urn:epcglobal:epcis-query:xsd:1}EPCISException">
+ *       &lt;sequence>
+ *         &lt;element name="severity" type="{urn:epcglobal:epcis-query:xsd:1}ImplementationExceptionSeverity"/>
+ *         &lt;element name="queryName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="subscriptionID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/extension>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)

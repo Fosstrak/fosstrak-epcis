@@ -2,6 +2,7 @@ package org.fosstrak.epcis.model;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>
@@ -12,14 +13,15 @@ import javax.xml.bind.annotation.XmlEnumValue;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name=&quot;TypeOfServiceTransaction&quot;&gt;
- *   &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;&gt;
- *     &lt;enumeration value=&quot;RequestingServiceTransaction&quot;/&gt;
- *     &lt;enumeration value=&quot;RespondingServiceTransaction&quot;/&gt;
- *   &lt;/restriction&gt;
- * &lt;/simpleType&gt;
+ * &lt;simpleType name="TypeOfServiceTransaction">
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *     &lt;enumeration value="RequestingServiceTransaction"/>
+ *     &lt;enumeration value="RespondingServiceTransaction"/>
+ *   &lt;/restriction>
+ * &lt;/simpleType>
  * </pre>
  */
+@XmlType(name = "TypeOfServiceTransaction", namespace = "http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader")
 @XmlEnum
 public enum TypeOfServiceTransaction {
 
@@ -42,7 +44,7 @@ public enum TypeOfServiceTransaction {
                 return c;
             }
         }
-        throw new IllegalArgumentException(v.toString());
+        throw new IllegalArgumentException(v);
     }
 
 }

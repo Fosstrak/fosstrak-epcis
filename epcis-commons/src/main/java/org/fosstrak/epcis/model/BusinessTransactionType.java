@@ -14,13 +14,13 @@ import javax.xml.bind.annotation.XmlValue;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;BusinessTransactionType&quot;&gt;
- *   &lt;simpleContent&gt;
- *     &lt;extension base=&quot;&lt;urn:epcglobal:epcis:xsd:1&gt;BusinessTransactionIDType&quot;&gt;
- *       &lt;attribute name=&quot;type&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}BusinessTransactionTypeIDType&quot; /&gt;
- *     &lt;/extension&gt;
- *   &lt;/simpleContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="BusinessTransactionType">
+ *   &lt;simpleContent>
+ *     &lt;extension base="&lt;urn:epcglobal:epcis:xsd:1>BusinessTransactionIDType">
+ *       &lt;attribute name="type" type="{urn:epcglobal:epcis:xsd:1}BusinessTransactionTypeIDType" />
+ *     &lt;/extension>
+ *   &lt;/simpleContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)

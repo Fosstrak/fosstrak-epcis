@@ -2,13 +2,12 @@ package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.w3c.dom.Element;
 
 /**
@@ -19,20 +18,20 @@ import org.w3c.dom.Element;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;SubscriptionControls&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;schedule&quot; type=&quot;{urn:epcglobal:epcis-query:xsd:1}QuerySchedule&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;trigger&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}anyURI&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;initialRecordTime&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}dateTime&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;reportIfEmpty&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}boolean&quot;/&gt;
- *         &lt;element name=&quot;extension&quot; type=&quot;{urn:epcglobal:epcis-query:xsd:1}SubscriptionControlsExtensionType&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;any/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="SubscriptionControls">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="schedule" type="{urn:epcglobal:epcis-query:xsd:1}QuerySchedule" minOccurs="0"/>
+ *         &lt;element name="trigger" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
+ *         &lt;element name="initialRecordTime" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
+ *         &lt;element name="reportIfEmpty" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *         &lt;element name="extension" type="{urn:epcglobal:epcis-query:xsd:1}SubscriptionControlsExtensionType" minOccurs="0"/>
+ *         &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -41,7 +40,9 @@ import org.w3c.dom.Element;
 public class SubscriptionControls {
 
     protected QuerySchedule schedule;
+    @XmlSchemaType(name = "anyURI")
     protected String trigger;
+    @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar initialRecordTime;
     protected boolean reportIfEmpty;
     protected SubscriptionControlsExtensionType extension;
@@ -151,7 +152,6 @@ public class SubscriptionControls {
      * <pre>
      * getAny().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list {@link Element }
      * {@link Object }

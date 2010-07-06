@@ -2,7 +2,6 @@ package org.fosstrak.epcis.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -18,16 +17,16 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;Scope&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;group ref=&quot;{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}ScopeAttributes&quot;/&gt;
- *         &lt;element ref=&quot;{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}ScopeInformation&quot; maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="Scope">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;group ref="{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}ScopeAttributes"/>
+ *         &lt;element ref="{http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader}ScopeInformation" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -114,12 +113,11 @@ public class Scope {
      * <pre>
      * getScopeInformation().add(newItem);
      * </pre>
-     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link BusinessService }{@code >}
-     * {@link JAXBElement }{@code <}{@link CorrelationInformation }{@code >}
-     * {@link JAXBElement }{@code <}{@link Object }{@code >}
+     * {@link JAXBElement }{@code <}{@link Object }{@code >} {@link JAXBElement }
+     * {@code <}{@link BusinessService }{@code >} {@link JAXBElement }{@code <}
+     * {@link CorrelationInformation }{@code >}
      */
     public List<JAXBElement<?>> getScopeInformation() {
         if (scopeInformation == null) {

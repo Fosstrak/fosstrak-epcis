@@ -2,11 +2,12 @@ package org.fosstrak.epcis.model;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -20,27 +21,31 @@ import javax.xml.namespace.QName;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;EPCISEventType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;eventTime&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}dateTime&quot;/&gt;
- *         &lt;element name=&quot;recordTime&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}dateTime&quot; minOccurs=&quot;0&quot;/&gt;
- *         &lt;element name=&quot;eventTimeZoneOffset&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *         &lt;element name=&quot;baseExtension&quot; type=&quot;{urn:epcglobal:epcis:xsd:1}EPCISEventExtensionType&quot; minOccurs=&quot;0&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="EPCISEventType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="eventTime" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
+ *         &lt;element name="recordTime" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
+ *         &lt;element name="eventTimeZoneOffset" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="baseExtension" type="{urn:epcglobal:epcis:xsd:1}EPCISEventExtensionType" minOccurs="0"/>
+ *       &lt;/sequence>
+ *       &lt;anyAttribute processContents='lax'/>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EPCISEventType", namespace = "urn:epcglobal:epcis:xsd:1", propOrder = {
         "eventTime", "recordTime", "eventTimeZoneOffset", "baseExtension" })
+@XmlSeeAlso( { TransactionEventType.class, QuantityEventType.class, ObjectEventType.class, AggregationEventType.class })
 public abstract class EPCISEventType {
 
     @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar eventTime;
+    @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar recordTime;
     @XmlElement(required = true)
     protected String eventTimeZoneOffset;

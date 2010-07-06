@@ -3,6 +3,7 @@ package org.fosstrak.epcis.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -13,19 +14,25 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;EPCISException&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;reason&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="EPCISException">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="reason" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EPCISException", propOrder = { "reason" })
+@XmlSeeAlso( {
+        SecurityException.class, NoSuchNameException.class, InvalidURIException.class,
+        SubscriptionControlsException.class, SubscribeNotPermittedException.class, QueryParameterException.class,
+        QueryTooComplexException.class, QueryTooLargeException.class, DuplicateSubscriptionException.class,
+        ValidationException.class, ImplementationException.class, NoSuchSubscriptionException.class,
+        DuplicateNameException.class })
 public class EPCISException {
 
     @XmlElement(required = true)

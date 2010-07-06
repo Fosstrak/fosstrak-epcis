@@ -1,10 +1,11 @@
 package org.fosstrak.epcis.model;
 
 import java.math.BigDecimal;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -17,24 +18,26 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;Document&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;attribute name=&quot;creationDate&quot; use=&quot;required&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}dateTime&quot; /&gt;
- *       &lt;attribute name=&quot;schemaVersion&quot; use=&quot;required&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}decimal&quot; /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="Document">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;attribute name="schemaVersion" use="required" type="{http://www.w3.org/2001/XMLSchema}decimal" />
+ *       &lt;attribute name="creationDate" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Document", namespace = "urn:epcglobal:xsd:1")
+@XmlSeeAlso( { EPCISDocumentType.class, EPCISMasterDataDocumentType.class, EPCISQueryDocumentType.class })
 public abstract class Document {
 
     @XmlAttribute(required = true)
-    protected XMLGregorianCalendar creationDate;
-    @XmlAttribute(required = true)
     protected BigDecimal schemaVersion;
+    @XmlAttribute(required = true)
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar creationDate;
 
     /**
      * Gets the value of the creationDate property.

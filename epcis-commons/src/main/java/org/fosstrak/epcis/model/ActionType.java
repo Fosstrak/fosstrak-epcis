@@ -1,6 +1,7 @@
 package org.fosstrak.epcis.model;
 
 import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>
@@ -11,19 +12,20 @@ import javax.xml.bind.annotation.XmlEnum;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name=&quot;ActionType&quot;&gt;
- *   &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;&gt;
- *     &lt;enumeration value=&quot;ADD&quot;/&gt;
- *     &lt;enumeration value=&quot;OBSERVE&quot;/&gt;
- *     &lt;enumeration value=&quot;DELETE&quot;/&gt;
- *   &lt;/restriction&gt;
- * &lt;/simpleType&gt;
+ * &lt;simpleType name="ActionType">
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *     &lt;enumeration value="ADD"/>
+ *     &lt;enumeration value="OBSERVE"/>
+ *     &lt;enumeration value="DELETE"/>
+ *   &lt;/restriction>
+ * &lt;/simpleType>
  * </pre>
  */
+@XmlType(name = "ActionType", namespace = "urn:epcglobal:epcis:xsd:1")
 @XmlEnum
 public enum ActionType {
 
-    ADD, DELETE, OBSERVE;
+    ADD, OBSERVE, DELETE;
 
     public String value() {
         return name();

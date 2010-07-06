@@ -14,13 +14,13 @@ import javax.xml.bind.annotation.XmlValue;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;PartnerIdentification&quot;&gt;
- *   &lt;simpleContent&gt;
- *     &lt;extension base=&quot;&lt;http://www.w3.org/2001/XMLSchema&gt;string&quot;&gt;
- *       &lt;attribute name=&quot;Authority&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot; /&gt;
- *     &lt;/extension&gt;
- *   &lt;/simpleContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="PartnerIdentification">
+ *   &lt;simpleContent>
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
+ *       &lt;attribute name="Authority" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *     &lt;/extension>
+ *   &lt;/simpleContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)

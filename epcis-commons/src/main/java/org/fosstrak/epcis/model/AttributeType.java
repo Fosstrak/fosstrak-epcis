@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlMixed;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
 
 /**
@@ -24,13 +23,14 @@ import org.w3c.dom.Element;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;AttributeType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;attribute name=&quot;id&quot; use=&quot;required&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}anyURI&quot; /&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="AttributeType">
+ *   &lt;complexContent>
+ *     &lt;extension base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *       &lt;anyAttribute processContents='lax'/>
+ *     &lt;/extension>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -41,6 +41,7 @@ public class AttributeType {
     @XmlAnyElement
     protected List<Object> content;
     @XmlAttribute(required = true)
+    @XmlSchemaType(name = "anyURI")
     protected String id;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
@@ -58,10 +59,9 @@ public class AttributeType {
      * <pre>
      * getContent().add(newItem);
      * </pre>
-     * 
      * <p>
-     * Objects of the following type(s) are allowed in the list {@link String }
-     * {@link Element }
+     * Objects of the following type(s) are allowed in the list {@link Element }
+     * {@link String }
      */
     public List<Object> getContent() {
         if (content == null) {

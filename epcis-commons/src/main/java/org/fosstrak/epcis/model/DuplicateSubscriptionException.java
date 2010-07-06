@@ -12,14 +12,14 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;DuplicateSubscriptionException&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base=&quot;{urn:epcglobal:epcis-query:xsd:1}EPCISException&quot;&gt;
- *       &lt;sequence&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="DuplicateSubscriptionException">
+ *   &lt;complexContent>
+ *     &lt;extension base="{urn:epcglobal:epcis-query:xsd:1}EPCISException">
+ *       &lt;sequence>
+ *       &lt;/sequence>
+ *     &lt;/extension>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)

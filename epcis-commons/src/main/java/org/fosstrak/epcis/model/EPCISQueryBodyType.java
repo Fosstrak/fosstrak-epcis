@@ -13,41 +13,41 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;EPCISQueryBodyType&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;choice&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetQueryNames&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetQueryNamesResult&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}Subscribe&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}SubscribeResult&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}Unsubscribe&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}UnsubscribeResult&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetSubscriptionIDs&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetSubscriptionIDsResult&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}Poll&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetStandardVersion&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetStandardVersionResult&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetVendorVersion&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}GetVendorVersionResult&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}DuplicateNameException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}InvalidURIException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}NoSuchNameException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}NoSuchSubscriptionException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}DuplicateSubscriptionException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}QueryParameterException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}QueryTooLargeException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}QueryTooComplexException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}SubscriptionControlsException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}SubscribeNotPermittedException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}SecurityException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}ValidationException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}ImplementationException&quot;/&gt;
- *         &lt;element ref=&quot;{urn:epcglobal:epcis-query:xsd:1}QueryResults&quot;/&gt;
- *       &lt;/choice&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="EPCISQueryBodyType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;choice>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetQueryNames"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetQueryNamesResult"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}Subscribe"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}SubscribeResult"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}Unsubscribe"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}UnsubscribeResult"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetSubscriptionIDs"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetSubscriptionIDsResult"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}Poll"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetStandardVersion"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetStandardVersionResult"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetVendorVersion"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}GetVendorVersionResult"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}DuplicateNameException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}InvalidURIException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}NoSuchNameException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}NoSuchSubscriptionException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}DuplicateSubscriptionException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}QueryParameterException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}QueryTooLargeException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}QueryTooComplexException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}SubscriptionControlsException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}SubscribeNotPermittedException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}SecurityException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}ValidationException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}ImplementationException"/>
+ *         &lt;element ref="{urn:epcglobal:epcis-query:xsd:1}QueryResults"/>
+ *       &lt;/choice>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)

@@ -3,6 +3,7 @@ package org.fosstrak.epcis.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -13,19 +14,19 @@ import javax.xml.bind.annotation.XmlType;
  * this class.
  * 
  * <pre>
- * &lt;complexType name=&quot;Subscribe&quot;&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base=&quot;{http://www.w3.org/2001/XMLSchema}anyType&quot;&gt;
- *       &lt;sequence&gt;
- *         &lt;element name=&quot;queryName&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *         &lt;element name=&quot;params&quot; type=&quot;{urn:epcglobal:epcis-query:xsd:1}QueryParams&quot;/&gt;
- *         &lt;element name=&quot;dest&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}anyURI&quot;/&gt;
- *         &lt;element name=&quot;controls&quot; type=&quot;{urn:epcglobal:epcis-query:xsd:1}SubscriptionControls&quot;/&gt;
- *         &lt;element name=&quot;subscriptionID&quot; type=&quot;{http://www.w3.org/2001/XMLSchema}string&quot;/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
+ * &lt;complexType name="Subscribe">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="queryName" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="params" type="{urn:epcglobal:epcis-query:xsd:1}QueryParams"/>
+ *         &lt;element name="dest" type="{http://www.w3.org/2001/XMLSchema}anyURI"/>
+ *         &lt;element name="controls" type="{urn:epcglobal:epcis-query:xsd:1}SubscriptionControls"/>
+ *         &lt;element name="subscriptionID" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -37,6 +38,7 @@ public class Subscribe {
     @XmlElement(required = true)
     protected QueryParams params;
     @XmlElement(required = true)
+    @XmlSchemaType(name = "anyURI")
     protected String dest;
     @XmlElement(required = true)
     protected SubscriptionControls controls;
