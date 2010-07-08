@@ -17,6 +17,7 @@ import org.hibernate.usertype.ParameterizedType;
  * 
  * @author Gavin King
  */
+@SuppressWarnings("unchecked")
 public class EnumUserType implements EnhancedUserType, ParameterizedType {
 
     private Class<Enum> enumClass;
