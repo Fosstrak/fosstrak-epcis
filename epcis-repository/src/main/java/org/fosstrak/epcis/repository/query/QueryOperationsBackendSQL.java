@@ -740,7 +740,10 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
         while (rs.next()) {
             AttributeType attr = new AttributeType();
             attr.setId(rs.getString(1));
-            attr.getContent().add(rs.getString(2));
+            
+			//replaced by nkef of "attr.getContent().add(rs.getString(2));" with
+			attr.getOtherAttributes().put(new QName("value"), rs.getString(2));
+
             attributes.add(attr);
         }
         rs.close();
@@ -750,6 +753,21 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
      * Retrieves all children URI for the given vocabulary uri in the given
      * vocabulary table.
      * 
+	 *(nkef) The paragraphs below are taken from from the EPCIS Specs
+	 * 
+	 * "A parent identifier carries, in addition to its master data attributes, a
+	 * list of its children identifiers."
+	 * 
+	 * "The term “direct or indirect descendant” is used to refer to the set of
+	 * vocabulary elements including the children of a given vocabulary element,
+	 * the children of those children, etc. That is, the “direct or indirect
+	 * descendants” of a vocabulary element are the set of vocabulary elements
+	 * obtained by taking the transitive closure of the “children” relation
+	 * starting with the given vocabulary element."
+     * 
+	 * "A given element MAY be the child of more than one parent. This allows for
+	 * more than one way of grouping vocabulary elements;"
+	 * 
      * @param vocTableName
      *            The name of the vocabulary table in which to look for the
      *            children uris.
@@ -768,7 +786,8 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT uri FROM ").append(vocTablename).append(" AS voc WHERE voc.uri LIKE ?");
         PreparedStatement ps = session.getPreparedStatement(sql.toString());
-        String uri = vocUri + "_%";
+		// (nkef) changed "_%" to ",%"
+		String uri = vocUri + ",%";
         if (LOG.isDebugEnabled()) {
             LOG.debug("SQL: " + sql.toString());
             LOG.debug("     param1 = " + uri);

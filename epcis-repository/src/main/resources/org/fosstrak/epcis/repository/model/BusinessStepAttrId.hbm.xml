@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.fosstrak.epcis.repository.model">
+	<class name="BusinessStepAttrId" lazy="true"
+		proxy="org.fosstrak.epcis.repository.model.BusinessStepAttrId"
+		dynamic-update="false" dynamic-insert="false" select-before-update="false"
+		table="voc_bizStep_attr">
+		<composite-id name="VocabularyAttrCiD"
+			class="org.fosstrak.epcis.repository.model.VocabularyAttrCiD" > <!-- mapped="true" -->
+			<key-property name="attribute" column="attribute" type="java.lang.String"></key-property>
+			<key-property name="id" column="id" type="java.lang.Long"></key-property>
+		</composite-id>
+			<!-- 
+			<key-many-to-one name="id"
+				class="org.fosstrak.epcis.repository.model.BusinessStepId">  comment (column="id" type="java.lang.Long")
+				<column name="id" />
+			</key-many-to-one>
+			 -->
+			
+		
+		<!-- 
+		<set name="vocabularyAttrCiDset" table="tb_hl7OBR" lazy="true" cascade="all">
+			<key>
+				<column name="attribute" />
+				<column name="id" />
+			</key>
+			<one-to-many class="com.sql.Hl7OBRData" />
+		</set>
+		 -->
+		<property name="value" type="java.lang.String" not-null="true"
+			insert="true" update="true"></property>
+	</class>
+</hibernate-mapping>

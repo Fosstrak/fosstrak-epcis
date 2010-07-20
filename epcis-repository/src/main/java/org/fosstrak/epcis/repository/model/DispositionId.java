@@ -30,6 +30,12 @@ import org.fosstrak.epcis.repository.EpcisConstants;
  */
 public class DispositionId extends VocabularyElement {
 
+	
+    /**
+	 * added by nkef
+	 */
+	private static final long serialVersionUID = 5215045123069959092L;
+	
     @Override
     public String getVocabularyType() {
         return EpcisConstants.DISPOSITION_ID;

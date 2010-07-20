@@ -30,6 +30,11 @@ import org.fosstrak.epcis.repository.EpcisConstants;
  */
 public class BusinessTransactionId extends VocabularyElement {
 
+    /**
+	 * added by nkef
+	 */
+	private static final long serialVersionUID = -2863683720702117039L;
+	
     @Override
     public String getVocabularyType() {
         return EpcisConstants.BUSINESS_TRANSACTION_ID;

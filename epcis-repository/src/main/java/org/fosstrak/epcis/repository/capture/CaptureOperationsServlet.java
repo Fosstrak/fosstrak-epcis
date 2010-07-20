@@ -61,6 +61,9 @@ public class CaptureOperationsServlet extends HttpServlet {
     private static final String PROP_DB_RESET_ALLOWED = "dbResetAllowed";
     private static final String PROP_DB_RESET_SCRIPT = "dbResetScript";
     private static final String PROP_EPCIS_SCHEMA_FILE = "epcisSchemaFile";
+    
+    //added by nkef
+    private static final String PROP_EPCIS_MASTER_DATA_SCHEMA_FILE = "epcisMasterDataSchemaFile";
 
     private static final String PAGE_CAPTURE_INTERFACE = "/WEB-INF/jsp/capture.jsp";
     private static final String PAGE_CAPTURE_FORM = "/WEB-INF/jsp/captureForm.jsp";
@@ -95,6 +98,8 @@ public class CaptureOperationsServlet extends HttpServlet {
                     "false")));
             captureOperationsModule.setDbResetScript(props.getProperty(PROP_DB_RESET_SCRIPT));
             captureOperationsModule.setEpcisSchemaFile(props.getProperty(PROP_EPCIS_SCHEMA_FILE));
+            //added by nkef
+            captureOperationsModule.setEpcisSchemaFile(props.getProperty(PROP_EPCIS_MASTER_DATA_SCHEMA_FILE));        
         } else {
             LOG.debug("Capture operations module found");
         }

@@ -23,23 +23,23 @@ package org.fosstrak.epcis.repository.model;
 import org.fosstrak.epcis.repository.EpcisConstants;
 
 /**
- * A vocabulary type for representing business location identifiers, per section
- * 7.2.3 of the spec.
+ * A vocabulary type for representing business step identifiers Attributes
  * 
- * @author Sean Wellington
+ * @author Nikos Kefalakis (nkef)
  */
-public class BusinessLocationId extends VocabularyElement {
+public class BusinessTransactionAttrId extends VocabularyAttributeElement {
 
-	
-    /**
-	 * added by nkef
+
+
+	/**
+	 * 
 	 */
-	private static final long serialVersionUID = 1493903119230059528L;
-	
-	
-    @Override
+	private static final long serialVersionUID = -8513258276091625583L;
+
+
+	@Override
     public String getVocabularyType() {
-        return EpcisConstants.BUSINESS_LOCATION_ID;
+        return EpcisConstants.BUSINESS_TRANSACTION_ID;
     }
 
 }

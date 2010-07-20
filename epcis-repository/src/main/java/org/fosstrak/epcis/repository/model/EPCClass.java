@@ -30,6 +30,12 @@ import org.fosstrak.epcis.repository.EpcisConstants;
  */
 public class EPCClass extends VocabularyElement {
 
+    /**
+	 * added by nkef
+	 */
+	private static final long serialVersionUID = 4395929705530278035L;
+	
+	
     @Override
     public String getVocabularyType() {
         return EpcisConstants.EPC_CLASS_ID;

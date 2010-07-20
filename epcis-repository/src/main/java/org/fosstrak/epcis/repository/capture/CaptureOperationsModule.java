@@ -26,12 +26,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import java.security.Principal;
 import java.sql.SQLException;
 import java.text.ParseException;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -58,8 +61,11 @@ import javax.xml.validation.Validator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.fosstrak.epcis.repository.EpcisConstants;
 import org.fosstrak.epcis.repository.InvalidFormatException;
+import org.fosstrak.epcis.utils.TimeParser;
+
 import org.fosstrak.epcis.repository.model.Action;
 import org.fosstrak.epcis.repository.model.AggregationEvent;
 import org.fosstrak.epcis.repository.model.BaseEvent;
@@ -76,18 +82,29 @@ import org.fosstrak.epcis.repository.model.QuantityEvent;
 import org.fosstrak.epcis.repository.model.ReadPointId;
 import org.fosstrak.epcis.repository.model.TransactionEvent;
 import org.fosstrak.epcis.repository.model.VocabularyElement;
-import org.fosstrak.epcis.utils.TimeParser;
+import org.fosstrak.epcis.repository.model.VocabularyAttrCiD;
+import org.fosstrak.epcis.repository.model.VocabularyAttributeElement;
+import org.fosstrak.epcis.repository.model.BusinessLocationAttrId;
+import org.fosstrak.epcis.repository.model.BusinessStepAttrId;
+import org.fosstrak.epcis.repository.model.BusinessTransactionAttrId;
+import org.fosstrak.epcis.repository.model.BusinessTransactionTypeAttrId;
+import org.fosstrak.epcis.repository.model.DispositionAttrId;
+import org.fosstrak.epcis.repository.model.EPCClassAttrId;
+import org.fosstrak.epcis.repository.model.ReadPointAttrId;
+
 import org.hibernate.Criteria;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -103,6 +120,7 @@ import org.xml.sax.SAXParseException;
  * @author David Gubler
  * @author Alain Remund
  * @author Marco Steybe
+ * @author Nikos Kefalakis (nkef)
  */
 public class CaptureOperationsModule {
 
@@ -119,12 +137,51 @@ public class CaptureOperationsModule {
         vocClassMap.put(EpcisConstants.EPC_CLASS_ID, EPCClass.class);
         vocClassMap.put(EpcisConstants.READ_POINT_ID, ReadPointId.class);
     }
+    
+	// (nkef) Added to support the Master Data Capture I/F
+	private static final Map<String, Class<?>> vocAttributeClassMap = new HashMap<String, Class<?>>();
+	private static final Map<String, String> vocAttributeTablesMap = new HashMap<String, String>();
+	private static Map<String, String> vocabularyTablenameMap = new HashMap<String, String>();
+    
+	
+	static {
+		vocAttributeClassMap.put(EpcisConstants.BUSINESS_LOCATION_ID, BusinessLocationAttrId.class);
+		vocAttributeClassMap.put(EpcisConstants.BUSINESS_STEP_ID, BusinessStepAttrId.class);
+		vocAttributeClassMap.put(EpcisConstants.BUSINESS_TRANSACTION_ID, BusinessTransactionAttrId.class);
+		vocAttributeClassMap.put(EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, BusinessTransactionTypeAttrId.class);
+		vocAttributeClassMap.put(EpcisConstants.DISPOSITION_ID, DispositionAttrId.class);
+		vocAttributeClassMap.put(EpcisConstants.EPC_CLASS_ID, EPCClassAttrId.class);
+		vocAttributeClassMap.put(EpcisConstants.READ_POINT_ID, ReadPointAttrId.class);
+
+		vocAttributeTablesMap.put(EpcisConstants.BUSINESS_LOCATION_ID, "voc_BizLoc_attr");
+		vocAttributeTablesMap.put(EpcisConstants.BUSINESS_STEP_ID, "voc_BizStep_attr");
+		vocAttributeTablesMap.put(EpcisConstants.BUSINESS_TRANSACTION_ID, "voc_BizTrans_attr");
+		vocAttributeTablesMap.put(EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, "voc_BizTransType_attr");
+		vocAttributeTablesMap.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition_attr");
+		vocAttributeTablesMap.put(EpcisConstants.EPC_CLASS_ID, "voc_EPCClass_attr");
+		vocAttributeTablesMap.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint_attr");
+
+		vocabularyTablenameMap.put(EpcisConstants.BUSINESS_STEP_ID, "voc_BizStep");
+		vocabularyTablenameMap.put(EpcisConstants.BUSINESS_LOCATION_ID, "voc_BizLoc");
+		vocabularyTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION_ID, "voc_BizTrans");
+		vocabularyTablenameMap.put(EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, "voc_BizTransType");
+		vocabularyTablenameMap.put(EpcisConstants.DISPOSITION_ID, "voc_Disposition");
+		vocabularyTablenameMap.put(EpcisConstants.EPC_CLASS_ID, "voc_EPCClass");
+		vocabularyTablenameMap.put(EpcisConstants.READ_POINT_ID, "voc_ReadPoint");
+
+	}
+    
 
     /**
      * The XSD schema which validates the incoming messages.
      */
     private Schema schema;
 
+	/**
+	 * The XSD schema which validates the MasterData incoming messages.(nkef)
+	 */
+	private Schema masterDataSchema;
+    
     /**
      * Whether we should insert new vocabulary or throw an error message.
      */
@@ -268,29 +325,41 @@ public class CaptureOperationsModule {
                     // never mind ... do not log
                 }
             }
+			// validate incoming document against its! schema(changed by nkef)
+			if (isEPCISDocument(document)) {
+				// validate the XML document against the EPCISDocument schema
+				if (schema != null) {
+					Validator validator = schema.newValidator();
+					try {
+						validator.validate(new DOMSource(document), null);
+					}
+					catch (SAXParseException e) {
+						// TODO: we need to ignore XML element order, the
+						// following
+						// is only a hack to pass some of the conformance tests
+						if (e.getMessage().contains("parentID")) {
+							LOG.warn("Ignoring XML validation exception: " + e.getMessage());
+						}
+						else {
+							throw e;
+						}
+					}
+					LOG.info("Incoming capture request was successfully validated against the EPCISDocument schema");
+				}
+				else {
+					LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
+				}
+			}
+			else if (isEPCISMasterDataDocument(document)) {
 
-            // validate the XML document against the EPCISDocument schema
-            if (schema != null) {
-                Validator validator = schema.newValidator();
-                try {
-                    validator.validate(new DOMSource(document), null);
-                } catch (SAXParseException e) {
-                    // TODO: we need to ignore XML element order, the following
-                    // is only a hack to pass some of the conformance tests
-                    if (e.getMessage().contains("parentID")) {
-                        LOG.warn("Ignoring XML validation exception: " + e.getMessage());
-                    } else {
-                        throw e;
-                    }
-                }
-                LOG.info("Incoming capture request was successfully validated against the EPCISDocument schema");
-            } else {
-                LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
-            }
+				// TODO: Validate EPCIS Master Data incoming Document
 
-        } catch (ParserConfigurationException e) {
-            throw new SAXException(e);
-        }
+			}
+
+		}
+		catch (ParserConfigurationException e) {
+			throw new SAXException(e);
+		}
 
         // handle the capture operation
         Session session = null;
@@ -298,12 +367,17 @@ public class CaptureOperationsModule {
             session = sessionFactory.openSession();
             Transaction tx = null;
             try {
-                tx = session.beginTransaction();
-                LOG.debug("DB connection opened.");
-                handleDocument(session, document);
-                tx.commit();
-                // return OK
-                LOG.info("EPCIS Capture Interface request succeeded");
+				tx = session.beginTransaction();
+				LOG.debug("DB connection opened.");
+				if (isEPCISDocument(document)) {
+					handleEventDocument(session, document);
+				}
+				else if (isEPCISMasterDataDocument(document)) {
+					handleMasterDataDocument(session, document);
+				}
+				tx.commit();
+				// return OK
+				LOG.info("EPCIS Capture Interface request succeeded");
             } catch (SAXException e) {
                 LOG.error("EPCIS Capture Interface request failed: " + e.toString());
                 if (tx != null) {
@@ -334,13 +408,30 @@ public class CaptureOperationsModule {
         }
     }
 
+    
+	/**
+	 * @param document
+	 * @return
+	 */
+	private boolean isEPCISDocument(Document document) {
+		return document.getDocumentElement().getLocalName().equals("EPCISDocument");
+	}
+    
+	/**
+	 * @param document
+	 * @return
+	 */
+	private boolean isEPCISMasterDataDocument(Document document) {
+		return document.getDocumentElement().getLocalName().equals("EPCISMasterDataDocument");
+	}
+    
     /**
      * Parses the entire document and handles the supplied events.
      * 
      * @throws Exception
      * @throws DOMException
      */
-    private void handleDocument(Session session, Document document) throws DOMException, SAXException,
+    private void handleEventDocument(Session session, Document document) throws DOMException, SAXException,
             InvalidFormatException {
         NodeList eventList = document.getElementsByTagName("EventList");
         NodeList events = eventList.item(0).getChildNodes();
@@ -489,18 +580,19 @@ public class CaptureOperationsModule {
                 throw new InvalidFormatException("'parentID' is required if 'action' is ADD or DELETE");
             }
         }
-
-        String nodeName = eventNode.getNodeName();
-        VocabularyElement bizStep = bizStepUri != null ? getOrInsertVocabularyElement(session,
-                EpcisConstants.BUSINESS_STEP_ID, String.valueOf(bizStepUri)) : null;
-        VocabularyElement disposition = dispositionUri != null ? getOrInsertVocabularyElement(session,
-                EpcisConstants.DISPOSITION_ID, String.valueOf(dispositionUri)) : null;
-        VocabularyElement readPoint = readPointUri != null ? getOrInsertVocabularyElement(session,
-                EpcisConstants.READ_POINT_ID, String.valueOf(readPointUri)) : null;
-        VocabularyElement bizLocation = bizLocationUri != null ? getOrInsertVocabularyElement(session,
-                EpcisConstants.BUSINESS_LOCATION_ID, String.valueOf(bizLocationUri)) : null;
-        VocabularyElement epcClass = epcClassUri != null ? getOrInsertVocabularyElement(session,
-                EpcisConstants.EPC_CLASS_ID, String.valueOf(epcClassUri)) : null;
+        
+        //Changed by nkef (use "getOrEditVocabularyElement" instead of "getOrInsertVocabularyElement")
+		String nodeName = eventNode.getNodeName();
+		VocabularyElement bizStep = bizStepUri != null ? getOrEditVocabularyElement(session, EpcisConstants.BUSINESS_STEP_ID, String
+				.valueOf(bizStepUri), "1") : null;
+		VocabularyElement disposition = dispositionUri != null ? getOrEditVocabularyElement(session, EpcisConstants.DISPOSITION_ID, String
+				.valueOf(dispositionUri), "1") : null;
+		VocabularyElement readPoint = readPointUri != null ? getOrEditVocabularyElement(session, EpcisConstants.READ_POINT_ID, String
+				.valueOf(readPointUri), "1") : null;
+		VocabularyElement bizLocation = bizLocationUri != null ? getOrEditVocabularyElement(session, EpcisConstants.BUSINESS_LOCATION_ID, String
+				.valueOf(bizLocationUri), "1") : null;
+		VocabularyElement epcClass = epcClassUri != null ? getOrEditVocabularyElement(session, EpcisConstants.EPC_CLASS_ID, String
+				.valueOf(epcClassUri), "1") : null;
 
         BaseEvent be;
         if (nodeName.equals(EpcisConstants.AGGREGATION_EVENT)) {
@@ -550,6 +642,166 @@ public class CaptureOperationsModule {
         session.save(be);
     }
 
+	/**
+	 * (nkef) Parses the entire document and handles the supplied Master Data.
+	 * 
+	 * 
+	 * @throws Exception
+	 * @throws DOMException
+	 */
+	private void handleMasterDataDocument(Session session, Document document) throws DOMException, SAXException, InvalidFormatException {
+
+		// Handle Vocabulary List
+		NodeList vocabularyList = document.getElementsByTagName("VocabularyList");
+		if (vocabularyList.item(0).hasChildNodes()) {
+			NodeList vocabularys = vocabularyList.item(0).getChildNodes();
+
+			// walk through all supplied vocabularies
+			int vocabularyCount = 0;
+			for (int i = 0; i < vocabularys.getLength(); i++) {
+				Node vocabularyNode = vocabularys.item(i);
+				String nodeName = vocabularyNode.getNodeName();
+				if (nodeName.equals("Vocabulary")) {
+
+					String vocabularyType = vocabularyNode.getAttributes().getNamedItem("type").getNodeValue();
+
+					if (EpcisConstants.VOCABULARY_TYPES.contains(vocabularyType)) {
+
+						LOG.debug("processing " + i + ": '" + nodeName + "':" + vocabularyType + ".");
+						handleVocabulary(session, vocabularyNode, vocabularyType);
+						vocabularyCount++;
+						if (vocabularyCount % 50 == 0) {
+							session.flush();
+							session.clear();
+						}
+					}
+				}
+				else if (!nodeName.equals("#text") && !nodeName.equals("#comment")) {
+					throw new SAXException("Encountered unknown vocabulary '" + nodeName + "'.");
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * (nkef) Takes an XML document node, parses it as EPCIS Master Data and
+	 * inserts the data into the database. The parse routine is generic for all
+	 * Vocabulary types;
+	 * 
+	 * @param vocabularyNode
+	 *            The current vocabulary node.
+	 * @param vocabularyType
+	 *            The current vocabulary type.
+	 * @throws Exception
+	 * @throws DOMException
+	 */
+	private void handleVocabulary(Session session, final Node vocabularyNode, final String vocabularyType) throws DOMException, SAXException,
+			InvalidFormatException {
+		if (vocabularyNode == null) {
+			// nothing to do
+			return;
+		}
+		else if (vocabularyNode.getChildNodes().getLength() == 0) {
+			throw new SAXException("Vocabulary element '" + vocabularyNode.getNodeName() + "' has no children elements.");
+		}
+		Node curVocabularyNode = null;
+		Node curVocabularyElementNode = null;
+		Node curVocabularyAttributeNode = null;
+		String curVocabularyURI = null;
+		String curVocabularyAttribute = null;
+		String curVocabularyAttributeValue = null;
+		VocabularyElement curVocabularyElement = null;
+
+		for (int i = 0; i < vocabularyNode.getChildNodes().getLength(); i++) {
+			curVocabularyNode = vocabularyNode.getChildNodes().item(i);
+			String curVocabularyNodeName = curVocabularyNode.getNodeName();
+
+			if (curVocabularyNodeName.equals("#text") || curVocabularyNodeName.equals("#comment")) {
+				// ignore text or comments
+				LOG.debug("  ignoring text or comment: '" + curVocabularyNode.getTextContent().trim() + "'");
+				continue;
+			}
+
+			for (int j = 0; j < curVocabularyNode.getChildNodes().getLength(); j++) {
+				curVocabularyElementNode = curVocabularyNode.getChildNodes().item(j);
+				String curVocabularyElementNodeName = curVocabularyElementNode.getNodeName();
+
+				if (curVocabularyElementNodeName.equals("#text") || curVocabularyElementNodeName.equals("#comment")) {
+					// ignore text or comments
+					LOG.debug("  ignoring text or comment: '" + curVocabularyElementNode.getTextContent().trim() + "'");
+					continue;
+				}
+
+				LOG.debug("  handling vocabulary field: '" + curVocabularyElementNodeName + "'");
+				curVocabularyURI = curVocabularyElementNode.getAttributes().getNamedItem("id").getNodeValue();
+				/*
+				 * vocabularyElementEditMode
+				 * 1: insert((it can be anything except 2,3,4)) 
+				 * 2: alterURI 
+				 * 3: singleDelete
+				 * 4: Delete element with it's direct or indirect
+				 *    descendants
+				 */				
+				String vocabularyElementEditMode = "";
+
+				if (!(curVocabularyElementNode.getAttributes().getNamedItem("mode") == null)) {
+					vocabularyElementEditMode = curVocabularyElementNode.getAttributes().getNamedItem("mode").getNodeValue();
+				}
+				else {
+					vocabularyElementEditMode = "1";
+				}
+
+				curVocabularyElement = getOrEditVocabularyElement(session, vocabularyType, curVocabularyURI, vocabularyElementEditMode);
+
+				// *****************************************
+				if (curVocabularyElement != null) {
+					for (int k = 0; k < curVocabularyElementNode.getChildNodes().getLength(); k++) {
+						curVocabularyAttributeNode = curVocabularyElementNode.getChildNodes().item(k);
+						String curVocabularyAttributeElementNodeName = curVocabularyAttributeNode.getNodeName();
+
+						if (curVocabularyAttributeElementNodeName.equals("#text") || curVocabularyAttributeElementNodeName.equals("#comment")) {
+							// ignore text or comments
+							LOG.debug("  ignoring text or comment: '" + curVocabularyAttributeNode.getTextContent().trim() + "'");
+							continue;
+						}
+
+						LOG.debug("  handling vocabulary field: '" + curVocabularyAttributeElementNodeName + "'");
+						curVocabularyAttribute = curVocabularyAttributeNode.getAttributes().getNamedItem("id").getNodeValue();
+
+						curVocabularyAttributeValue = curVocabularyAttributeNode.getAttributes().getNamedItem("value").getNodeValue();//.getFirstChild().getNodeValue();
+
+						/*
+						 * vocabularyAttributeEditMode
+						 * 1: Insert (it can be anything except 3)) 
+						 * 2: Alter Attribute Value (it can be anything except 3)
+						 * 3: Delete Attribute (required)
+						 */
+						String vocabularyAttributeEditMode = "";
+						if (!(curVocabularyAttributeNode.getAttributes().getNamedItem("mode") == null)) {
+							vocabularyAttributeEditMode = curVocabularyAttributeNode.getAttributes().getNamedItem("mode").getNodeValue();
+						}
+						else {
+							vocabularyAttributeEditMode = "add/alter";
+						}
+
+						getOrEditVocabularyAttributeElement(session, vocabularyType, curVocabularyElement.getId(), curVocabularyAttribute,
+								curVocabularyAttributeValue, vocabularyAttributeEditMode);
+					}
+				}
+				// *****************************************
+
+			}
+
+		}
+
+		if (vocabularyType.equals(EpcisConstants.BUSINESS_LOCATION_ID)) {
+
+		}
+
+	}
+    
+    
     /**
      * Parses the xml tree for epc nodes and returns a list of EPC URIs.
      * 
@@ -642,12 +894,14 @@ public class CaptureOperationsModule {
         for (int i = 0; i < bizNode.getChildNodes().getLength(); i++) {
             Node curNode = bizNode.getChildNodes().item(i);
             if (curNode.getNodeName().equals("bizTransaction")) {
-                String bizTransTypeUri = curNode.getAttributes().item(0).getTextContent();
-                String bizTransUri = curNode.getTextContent();
-                BusinessTransactionId bizTrans = (BusinessTransactionId) getOrInsertVocabularyElement(session,
-                        EpcisConstants.BUSINESS_TRANSACTION_ID, bizTransUri.toString());
-                BusinessTransactionTypeId type = (BusinessTransactionTypeId) getOrInsertVocabularyElement(session,
-                        EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, bizTransTypeUri.toString());
+            	
+            	//Changed by nkef (use "getOrEditVocabularyElement" instead of "getOrInsertVocabularyElement")
+				String bizTransTypeUri = curNode.getAttributes().item(0).getTextContent();
+				String bizTransUri = curNode.getTextContent();
+				BusinessTransactionId bizTrans = (BusinessTransactionId) getOrEditVocabularyElement(session, EpcisConstants.BUSINESS_TRANSACTION_ID,
+						bizTransUri.toString(), "1");
+				BusinessTransactionTypeId type = (BusinessTransactionTypeId) getOrEditVocabularyElement(session,
+						EpcisConstants.BUSINESS_TRANSACTION_TYPE_ID, bizTransTypeUri.toString(), "1");
 
                 Criteria c0 = session.createCriteria(BusinessTransaction.class);
                 c0.add(Restrictions.eq("bizTransaction", bizTrans));
@@ -673,6 +927,7 @@ public class CaptureOperationsModule {
     }
 
     /**
+     * (depricated)
      * Inserts vocabulary into the database by searching for already existing
      * entries; if found, the corresponding ID is returned. If not found, the
      * vocabulary is extended if "insertmissingvoc" is true; otherwise an
@@ -724,6 +979,242 @@ public class CaptureOperationsModule {
         }
         return ve;
     }
+    
+    
+	/**
+	 * (changed by nkef to support MasterDataCapture. Previusly known 
+	 * as "getOrInsertVocabularyElement")
+	 * Inserts vocabulary into the database by searching for
+	 * already existing entries; if found, the corresponding ID is returned. If
+	 * not found, the vocabulary is extended if "insertmissingvoc" is true;
+	 * otherwise an SQLException is thrown
+	 * 
+	 * @param tableName
+	 *            The name of the vocabulary table.
+	 * @param uri
+	 *            The vocabulary adapting the URI to be inserted into the
+	 *            vocabulary table.
+	 * @return The ID of an already existing vocabulary table with the given
+	 *         uri.
+	 * @throws UnsupportedOperationException
+	 *             If we are not allowed to insert a missing vocabulary.
+	 */
+	public VocabularyElement getOrEditVocabularyElement(Session session, String vocabularyType, String vocabularyElementURI, String mode)
+			throws SAXException {
+		boolean alterURI = false;
+		boolean singleDelete = false;
+		boolean wdDelete = false;
+		Long vocabularyElementID = null;
+
+		if (mode.equals("2")) {
+			alterURI = true;
+		}
+		else if (mode.equals("3")) {
+			singleDelete = true;
+		}
+		else if (mode.equals("4")) {
+			wdDelete = true;
+		}
+
+		Class<?> c = vocClassMap.get(vocabularyType);
+		Criteria c0 = session.createCriteria(c);
+		c0.setCacheable(true);
+		c0.add(Restrictions.eq("uri", alterURI ? vocabularyElementURI.split("#")[0] : vocabularyElementURI));
+		VocabularyElement ve;
+		try {
+			ve = (VocabularyElement) c0.uniqueResult();
+		}
+		catch (ObjectNotFoundException e) {
+			ve = null;
+		}
+		if (ve != null) {
+			vocabularyElementID = ve.getId();
+		}
+
+		if (ve == null || ((singleDelete || alterURI || wdDelete) && ve != null)) {
+			// the uri does not yet exist: insert it if allowed. According to
+			// the specs, some vocabulary is not allowed to be extended; this is
+			// currently ignored here
+			if (!insertMissingVoc) {
+				throw new UnsupportedOperationException("Not allowed to add new vocabulary - use existing vocabulary");
+			}
+			else {
+				// VocabularyElement subclasses should always have public
+				// zero-arg constructor to avoid problems here
+
+				if (alterURI) {
+					ve.setUri(vocabularyElementURI.split("#")[1]);
+					session.update(ve);
+					session.flush();
+					return ve;
+
+				}
+				else if (singleDelete) {
+					Object vocabularyElementObject = session.get(c, vocabularyElementID);
+					if (vocabularyElementObject != null)
+						session.delete(vocabularyElementObject);
+					deleteVocabularyElementAttributes(session, vocabularyType, vocabularyElementID);
+					session.flush();
+					return null;
+				}
+				else if (wdDelete) {
+					Object vocabularyElementObject = session.get(c, vocabularyElementID);
+					if (vocabularyElementObject != null)
+						session.delete(vocabularyElementObject);
+					deleteVocabularyElementAttributes(session, vocabularyType, vocabularyElementID);
+					deleteVocabularyElementDescendants(session, vocabularyType, vocabularyElementURI);
+					session.flush();
+					return null;
+
+				}
+				else {
+
+					try {
+						ve = (VocabularyElement) c.newInstance();
+					}
+					catch (InstantiationException e) {
+						throw new RuntimeException(e);
+					}
+					catch (IllegalAccessException e) {
+						throw new RuntimeException(e);
+					}
+
+					ve.setUri(vocabularyElementURI);
+					session.save(ve);
+				}
+
+				session.flush();
+			}
+		}
+		return ve;
+	}
+
+	/**
+	 * (nkef) Delete the a vocabulary's Element Descendants and all of their
+	 * Attributes
+	 * 
+	 * @param session
+	 * @param vocabularyType
+	 * @param vocabularyElementURI
+	 */
+	private void deleteVocabularyElementDescendants(Session session, String vocabularyType, String vocabularyElementURI) {
+		Class<?> c = vocClassMap.get(vocabularyType);
+		List vocElementChildrens = session.createSQLQuery(
+				"SELECT * FROM " + vocabularyTablenameMap.get(vocabularyType) + " WHERE uri LIKE '" + vocabularyElementURI + ",%'").addEntity(c)
+				.list();
+		for (int i = 0; i < vocElementChildrens.size(); i++) {
+			session.delete((VocabularyElement) vocElementChildrens.get(i));
+			deleteVocabularyElementAttributes(session, vocabularyType, ((VocabularyElement) vocElementChildrens.get(i)).getId());
+		}
+		session.flush();
+	}
+
+	/**
+	 * (nkef) Delete selected id vocabulary elements attributes
+	 * 
+	 * @param session
+	 * @param vocabularyType
+	 * @param vocabularyElementID
+	 */
+	private void deleteVocabularyElementAttributes(Session session, String vocabularyType, Long vocabularyElementID) {
+		Class<?> c = vocAttributeClassMap.get(vocabularyType);
+		List vocAttributeElements = session.createSQLQuery(
+				"select * FROM " + vocAttributeTablesMap.get(vocabularyType) + " where id = '" + vocabularyElementID + "'").addEntity(c).list();
+		for (int i = 0; i < vocAttributeElements.size(); i++) {
+			session.delete((VocabularyAttributeElement) vocAttributeElements.get(i));
+		}
+		session.flush();
+
+	}
+
+	/**
+	 * (nkef) Inserts vocabulary attribute into the database by searching for
+	 * already existing entries; if found, the corresponding ID is returned. If
+	 * not found, the vocabulary is extended if "insertmissingvoc" is true;
+	 * otherwise an SQLException is thrown
+	 * 
+	 * @param tableName
+	 *            The name of the vocabulary table.
+	 * @param uri
+	 *            The vocabulary adapting the URI to be inserted into the
+	 *            vocabulary table.
+	 * @return The ID of an already existing vocabulary table with the given
+	 *         uri.
+	 * @throws UnsupportedOperationException
+	 *             If we are not allowed to insert a missing vocabulary.
+	 */
+	public VocabularyAttributeElement getOrEditVocabularyAttributeElement(Session session, String vocabularyType, Long vocabularyElementID,
+			String vocabularyAttributeElement, String vocabularyAttributeElementValue, String mode) throws SAXException {
+
+		boolean deleteAttribute = false;
+
+		if (mode.equals("3")) {
+			deleteAttribute = true;
+		}
+		Class<?> c = vocAttributeClassMap.get(vocabularyType);
+		Criteria c0 = session.createCriteria(c);
+		c0.setCacheable(true);
+
+		VocabularyAttrCiD vocabularyAttrCiD = new VocabularyAttrCiD();
+		vocabularyAttrCiD.setAttribute(vocabularyAttributeElement);
+		vocabularyAttrCiD.setId(vocabularyElementID);
+
+		c0.add(Restrictions.idEq(vocabularyAttrCiD));
+
+		VocabularyAttributeElement vocAttributeElement = null;
+
+		try {
+			vocAttributeElement = (VocabularyAttributeElement) c0.uniqueResult();
+		}
+		catch (ObjectNotFoundException e) {
+			vocAttributeElement = null;
+			e.printStackTrace();
+		}
+
+		if(vocAttributeElement == null || (deleteAttribute && (vocAttributeElement != null)) || vocAttributeElement!=null){
+			// the uri does not yet exist: insert it if allowed. According to
+			// the specs, some vocabulary is not allowed to be extended; this is
+			// currently ignored here
+			if (!insertMissingVoc) {
+				throw new UnsupportedOperationException("Not allowed to add new vocabulary - use existing vocabulary");
+			}
+			else {
+				// VocabularyAttributeElement subclasses should always have
+				// public
+				// zero-arg constructor to avoid problems here
+				try {
+					vocAttributeElement = (VocabularyAttributeElement) c.newInstance();
+				}
+				catch (InstantiationException e) {
+					throw new RuntimeException(e);
+				}
+				catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+				vocAttributeElement.setVocabularyAttrCiD(vocabularyAttrCiD);
+				vocAttributeElement.setValue(vocabularyAttributeElementValue);
+
+				if (vocAttributeElement == null) {
+					session.save(vocAttributeElement);
+				}
+
+				else if (deleteAttribute) {
+					Object vocabularyAttr = session.get(c, vocabularyAttrCiD);
+					if (vocabularyAttr != null)
+						session.delete(vocabularyAttr);
+					session.flush();
+					return null;
+				}
+				else {
+					session.merge(vocAttributeElement);
+				}
+
+				session.flush();
+			}
+		}
+
+		return vocAttributeElement;
+	}
 
     /**
      * TODO: javadoc!
@@ -905,4 +1396,14 @@ public class CaptureOperationsModule {
         Schema schema = initEpcisSchema(epcisSchemaFile);
         setSchema(schema);
     }
+    
+	// (nkef)
+	public Schema getMasterDataSchema() {
+		return masterDataSchema;
+	}
+
+	// (nkef)
+	public void setMasterDataSchema(Schema masterDataSchema) {
+		this.masterDataSchema = masterDataSchema;
+	}
 }

@@ -30,6 +30,12 @@ import org.fosstrak.epcis.repository.EpcisConstants;
  */
 public class ReadPointId extends VocabularyElement {
 
+    /**
+	 * added by nkef
+	 */
+	private static final long serialVersionUID = -8794325182911414868L;
+	
+	
     @Override
     public String getVocabularyType() {
         return EpcisConstants.READ_POINT_ID;

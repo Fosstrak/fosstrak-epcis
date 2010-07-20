@@ -13,9 +13,9 @@
 			<generator class="native" />
 		</id>
 		
-		<natural-id>
+		<natural-id  mutable="true">
 			<property name="uri" type="java.lang.String" not-null="true" 
-				insert="true" update="false" index="voc_BizLoc_uri_ix"/>
+				insert="true" update="true" index="voc_BizLoc_uri_ix"/>
 		</natural-id>
 
 	</class>

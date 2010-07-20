@@ -35,12 +35,28 @@ PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
     <mapping resource="org/fosstrak/epcis/repository/model/ReadPointId.hbm.xml"/>
     <mapping resource="org/fosstrak/epcis/repository/model/TransactionEvent.hbm.xml"/>
     
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessLocationAttrId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessStepAttrId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessTransactionAttrId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/BusinessTransactionTypeAttrId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/DispositionAttrId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/EPCClassAttrId.hbm.xml"/>
+    <mapping resource="org/fosstrak/epcis/repository/model/ReadPointAttrId.hbm.xml"/>
+    
     <class-cache class="org.fosstrak.epcis.repository.model.BusinessLocationId" usage="read-write"/>
     <class-cache class="org.fosstrak.epcis.repository.model.BusinessStepId" usage="read-write"/>
     <class-cache class="org.fosstrak.epcis.repository.model.BusinessTransactionTypeId" usage="read-write"/>
     <class-cache class="org.fosstrak.epcis.repository.model.DispositionId" usage="read-write"/>
     <class-cache class="org.fosstrak.epcis.repository.model.EPCClass" usage="read-write"/>
     <class-cache class="org.fosstrak.epcis.repository.model.ReadPointId" usage="read-write"/>
+    
+    <class-cache class="org.fosstrak.epcis.repository.model.BusinessLocationAttrId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.BusinessStepAttrId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.BusinessTransactionAttrId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.BusinessTransactionTypeAttrId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.DispositionAttrId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.EPCClassAttrId" usage="read-write"/>
+    <class-cache class="org.fosstrak.epcis.repository.model.ReadPointAttrId" usage="read-write"/>
 
   </session-factory>
 </hibernate-configuration>
