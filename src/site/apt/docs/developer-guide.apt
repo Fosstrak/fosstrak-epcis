@@ -3,7 +3,6 @@
               -------------------
               Marco Steybe, Andrea Groessbauer
               -------------------
-              03/19/2008
               -------------------
 
 Developer Guide
@@ -144,7 +143,7 @@ mvn compile
 ---------------------------------------------------------------------------
 
    In order to deploy and undeploy the application to and from Tomcat, we use
-   the Maven Tomcat plugin. This plugin communicates with the Tomcat Manager
+   the tomcat-maven-plugin. This plugin communicates with the Tomcat Manager
    and thus needs to know the username and password to access the Manager
    application. Add the following block to your <<<M2_HOME/conf/settings.xml>>>
    file and specify the correct username and password:
@@ -157,16 +156,21 @@ mvn compile
 </server>
 ---------------------------------------------------------------------------
 
-   Now, you can use the following commands to deploy or undeploy the
-   application. Make sure you run these commands from the
+   Now, you can use the following commands to deploy, undeploy, or redeploy
+   the application. Make sure you run these commands from the
    <<<EPCIS_HOME/epcis-repository>>> directory because the maven-tomcat-plugin
    is only available to the epcis-repository sub-module.
 
 ---------------------------------------------------------------------------
 mvn tomcat:deploy
-
 mvn tomcat:undeploy
+mvn tomcat:redeploy
 ---------------------------------------------------------------------------
+
+   Note: if you use Tomcat 7, then you need to adjust the URL to the manager
+   application in the tomcat-maven-plugin configuration to match the required
+   path for Tomcat 7. Just un-comment the <<<\<url\>>>> element in the
+   corresponding plugin section in <<<EPCIS_HOME/epcis-repository/pom.xml>>>.
 
    You can also manually deploy the application by placing the WAR file
    directly into Tomcat's <<<webapps>>> directory. Run the following command
@@ -227,8 +231,6 @@ mvn package
 
 ---------------------------------------------------------------------------
 +- pom.xml                             -> top-level POM file
-+- LICENSE.txt, README.txt
-|
 +- src/
 |   +- config/                         -> top-level configuration files, e.g., checkstyle configs
 |   +- main/
@@ -238,25 +240,22 @@ mvn package
 |
 +- epcis-captureclient/
 +- epcis-commons/
-+- epcis-interop-test/
 +- epcis-queryclient/
-|
 +- epcis-repository/
-|   +- pom.xml                                    -> module POM file
-|   `- src/
-|       +- main/
-|       |   +- assembly/                          -> assembly descriptor for the binary distribution
-|       |   +- java/                              -> Java source files
-|       |   +- resources/                         -> class path resources, e.g., properties files
-|       |   +- sql/                               -> database scripts
-|       |   `- webapp/
-|       |       +- META-INF/                      -> webapp context configurations
-|       |       `- WEB-INF/                       -> deployment descriptor
-|       |
-|       +- site/                                  -> module documentation
-|       `- test/                                  -> Test resources and source files
-|
-`- target/                                        -> generated contents
+    +- pom.xml                         -> module POM file
+    `- src/
+        +- changes/                    -> documentation for all changes
+        +- main/
+        |   +- assembly/               -> assembly descriptor for the binary distribution
+        |   +- java/                   -> Java source files
+        |   +- resources/              -> class path resources, e.g., config files, hibernate mappings, WSDLs, XSDs
+        |   +- sql/                    -> database scripts
+        |   `- webapp/
+        |       +- META-INF/           -> webapp context configurations
+        |       `- static/             -> static web content, e.g., images, CSS
+        |       `- WEB-INF/            -> deployment descriptor, JSPs
+        +- site/                       -> module documentation
+        `- test/                       -> Test resources and source files
 ---------------------------------------------------------------------------
 
 
@@ -281,7 +280,6 @@ mvn package
 
 ---------------------------------------------------------------------------
 mvn compile -Penv-dev
-
 mvn compile -Denv=dev
 ---------------------------------------------------------------------------
 
