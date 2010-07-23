@@ -159,6 +159,9 @@
         <artifactId>tomcat-maven-plugin</artifactId>
         <configuration>
           <server>tomcat-manager</server>
+          <!-- uncomment if you use Tomcat 7
+          <url>http://localhost:8080/manager/html</url>
+          -->
         </configuration>
       </plugin>
       <plugin>
