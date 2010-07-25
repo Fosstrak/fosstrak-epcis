@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<epcis:EPCISDocument xmlns:epcis="urn:epcglobal:epcis:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" creationDate="2008-03-06T11:42:15.016+01:00" schemaVersion="1.0" xmlns:my_ns="http://my.unique.namespace">
+<epcis:EPCISDocument xmlns:epcis="urn:epcglobal:epcis:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" creationDate="2008-03-06T11:42:15.016+01:00" schemaVersion="1.0" xmlns:myNs="http://my.unique.namespace">
   <EPCISBody>
     <EventList>
       <ObjectEvent>
