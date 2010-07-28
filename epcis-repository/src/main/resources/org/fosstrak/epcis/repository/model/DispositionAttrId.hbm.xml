@@ -7,7 +7,7 @@
 	<class name="DispositionAttrId" lazy="true" 
 		proxy="org.fosstrak.epcis.repository.model.DispositionAttrId"
 		dynamic-update="false" dynamic-insert="false"
-		select-before-update="false" table="voc_disposition_attr">
+		select-before-update="false" table="voc_Disposition_attr">
 
 		<composite-id name="VocabularyAttrCiD"
 			class="org.fosstrak.epcis.repository.model.VocabularyAttrCiD" > 

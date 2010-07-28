@@ -7,7 +7,7 @@
 	<class name="ReadPointAttrId" lazy="true" 
 		proxy="org.fosstrak.epcis.repository.model.ReadPointAttrId"
 		dynamic-update="false" dynamic-insert="false"
-		select-before-update="false" table="voc_readPoint_attr">
+		select-before-update="false" table="voc_ReadPoint_attr">
 
 		<composite-id name="VocabularyAttrCiD"
 			class="org.fosstrak.epcis.repository.model.VocabularyAttrCiD" > 

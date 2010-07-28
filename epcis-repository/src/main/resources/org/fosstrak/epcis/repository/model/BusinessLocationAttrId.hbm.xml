@@ -7,7 +7,7 @@
 	<class name="BusinessLocationAttrId" lazy="true" 
 		proxy="org.fosstrak.epcis.repository.model.BusinessLocationAttrId"
 		dynamic-update="false" dynamic-insert="false"
-		select-before-update="false" table="voc_bizLoc_attr">
+		select-before-update="false" table="voc_BizLoc_attr">
 
 		<composite-id name="VocabularyAttrCiD"
 			class="org.fosstrak.epcis.repository.model.VocabularyAttrCiD" > 

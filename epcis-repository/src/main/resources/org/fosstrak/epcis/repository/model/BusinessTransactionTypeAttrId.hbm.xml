@@ -7,7 +7,7 @@
 	<class name="BusinessTransactionTypeAttrId" lazy="true" 
 		proxy="org.fosstrak.epcis.repository.model.BusinessTransactionTypeAttrId"
 		dynamic-update="false" dynamic-insert="false"
-		select-before-update="false" table="voc_bizTransType_attr">
+		select-before-update="false" table="voc_BizTransType_attr">
 
 		<composite-id name="VocabularyAttrCiD"
 			class="org.fosstrak.epcis.repository.model.VocabularyAttrCiD" > 

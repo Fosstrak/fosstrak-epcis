@@ -7,7 +7,7 @@
 	<class name="EPCClassAttrId" lazy="true" 
 		proxy="org.fosstrak.epcis.repository.model.EPCClassAttrId"
 		dynamic-update="false" dynamic-insert="false"
-		select-before-update="false" table="voc_epcClass_attr">
+		select-before-update="false" table="voc_EPCClass_attr">
 
 		<composite-id name="VocabularyAttrCiD"
 			class="org.fosstrak.epcis.repository.model.VocabularyAttrCiD" > 
