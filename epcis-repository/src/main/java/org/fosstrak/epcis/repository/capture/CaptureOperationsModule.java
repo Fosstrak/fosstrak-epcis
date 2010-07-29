@@ -769,7 +769,13 @@ public class CaptureOperationsModule {
 						LOG.debug("  handling vocabulary field: '" + curVocabularyAttributeElementNodeName + "'");
 						curVocabularyAttribute = curVocabularyAttributeNode.getAttributes().getNamedItem("id").getNodeValue();
 
-						curVocabularyAttributeValue = curVocabularyAttributeNode.getAttributes().getNamedItem("value").getNodeValue();//.getFirstChild().getNodeValue();
+						if (curVocabularyAttributeNode.getAttributes().getNamedItem("value")!=null) {
+							curVocabularyAttributeValue = curVocabularyAttributeNode.getAttributes().getNamedItem("value").getNodeValue();
+						} else if (curVocabularyAttributeNode.getFirstChild()!=null) {
+							curVocabularyAttributeValue = curVocabularyAttributeNode.getFirstChild().getNodeValue();
+						} else {
+							curVocabularyAttributeValue = "";
+						}
 
 						/*
 						 * vocabularyAttributeEditMode
