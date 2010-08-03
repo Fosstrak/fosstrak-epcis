@@ -81,6 +81,7 @@ import org.fosstrak.epcis.soap.SecurityExceptionResponse;
 import org.fosstrak.epcis.soap.ValidationExceptionResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 /**
  * Implements a subscription to a query. Created upon using subscribe() on the
@@ -322,17 +323,17 @@ public class QuerySubscription implements EpcisQueryCallbackInterface, Serializa
             QueryTooComplexExceptionResponse, QueryTooLargeExceptionResponse, SecurityExceptionResponse,
             ValidationExceptionResponse, NoSuchNameExceptionResponse, QueryParameterExceptionResponse {
         // we use CXF's local transport feature here
-        EPCglobalEPCISService service = new EPCglobalEPCISService();
-        QName portName = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePortLocal");
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://query");
-        EPCISServicePortType servicePort = service.getPort(portName, EPCISServicePortType.class);
+//        EPCglobalEPCISService service = new EPCglobalEPCISService();
+//        QName portName = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePortLocal");
+//        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://query");
+//        EPCISServicePortType servicePort = service.getPort(portName, EPCISServicePortType.class);
 
         // the same using CXF API
-        // JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        // factory.setAddress("local://query");
-        // factory.setServiceClass(EPCISServicePortType.class);
-        // EPCISServicePortType servicePort = (EPCISServicePortType)
-        // factory.create();
+         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+         factory.setAddress("local://query");
+         factory.setServiceClass(EPCISServicePortType.class);
+         EPCISServicePortType servicePort = (EPCISServicePortType)
+         factory.create();
 
         return servicePort.poll(poll);
     }
