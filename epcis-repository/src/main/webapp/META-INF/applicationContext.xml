@@ -100,8 +100,8 @@
   <!--  CXF (Web service) configuration                            -->
   <!-- =========================================================== -->
 
-  <!-- publish the Web service endpoint and it's implementing bean -->
-  <jaxws:endpoint id="EpcisQueryEndpoint" implementor="#queryOperationsWebService" address="/query" />
+  <!-- publish the Web service endpoint and its implementing bean -->
+  <jaxws:endpoint id="EpcisQueryEndpoint" implementor="#queryOperationsWebService" address="/" />
   <jaxws:endpoint id="EpcisQueryLocalEndpoint" implementor="#queryOperationsWebService" address="local://query" />
   
   <!-- register local transport -->

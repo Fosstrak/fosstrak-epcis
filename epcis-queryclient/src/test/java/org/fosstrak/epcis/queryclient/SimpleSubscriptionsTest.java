@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class SimpleSubscriptionsTest {
 
-    protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query/query";
+    protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query";
     protected static final String DEMO_EPCIS_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
 
     // Note: keep the methods in this class static in order to prevent them from
@@ -39,7 +39,7 @@ public class SimpleSubscriptionsTest {
 
     public static void main(String[] args) throws Exception {
         // configure the query service
-        String queryUrl = DEMO_EPCIS_QUERY_URL;
+        String queryUrl = LOCAL_EPCIS_QUERY_URL;
         QueryControlClient client = new QueryControlClient();
         client.configureService(new URL(queryUrl), null);
 

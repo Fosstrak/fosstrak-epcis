@@ -37,7 +37,7 @@ import org.fosstrak.epcis.utils.QueryResultsParser;
  */
 public class SimpleEventQueryTest {
 
-	protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query/query";
+	protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query";
 	protected static final String DEMO_EPCIS_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
 
     // Note: keep the methods in this class static in order to prevent them from
@@ -110,7 +110,7 @@ public class SimpleEventQueryTest {
         sb.append("  <param>\n");
         sb.append("    <name>MATCH_epc</name>\n");
         sb.append("    <value>\n");
-        sb.append("      <string>urn:epc:id:sgtin:0057000.123780.3167</string>\n");
+        sb.append("      <string>urn:epc:id:sgtin:0057000.123780.9999</string>\n");
         sb.append("    </value>\n");
         sb.append("  </param>\n");
 //        sb.append("  <param>\n");

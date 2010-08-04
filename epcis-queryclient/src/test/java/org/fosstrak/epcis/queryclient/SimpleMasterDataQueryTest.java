@@ -33,12 +33,15 @@ import org.fosstrak.epcis.utils.QueryResultsParser;
  */
 public class SimpleMasterDataQueryTest {
 
+    protected static final String LOCAL_EPCIS_QUERY_URL = "http://localhost:8080/epcis-repository/query";
+    protected static final String DEMO_EPCIS_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
+    
     // Note: keep the methods in this class static in order to prevent them from
     // being executed when building the project with Maven.
 
     public static void main(String[] args) throws Exception {
         // configure the query service
-        String queryUrl = "http://demo.fosstrak.org/epcis/query";
+        String queryUrl = LOCAL_EPCIS_QUERY_URL;
         QueryControlClient client = new QueryControlClient();
         client.configureService(new URL(queryUrl), null);
 
