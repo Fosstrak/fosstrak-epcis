@@ -15,7 +15,7 @@
 		<br />
 		<ul>
 			<li><a href="capture">Fosstrak EPCIS Capture interface</a> (HTTP POST)</li>
-			<li><a href="query">Fosstrak EPCIS Query interface</a> (Web service)</li>
+			<li><a href="query/services">Fosstrak EPCIS Query interface</a> (Web service, <a href="query/?wsdl">WSDL</a>)</li>
 		</ul>
 	</div>
 </body>

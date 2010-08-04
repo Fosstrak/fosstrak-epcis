@@ -64,10 +64,6 @@
   	<servlet-name>StaticContent</servlet-name>
   	<servlet-class>org.fosstrak.epcis.repository.StaticContentServlet</servlet-class>
   </servlet>
-  <servlet>
-  	<servlet-name>WelcomePage</servlet-name>
-  	<jsp-file>/WEB-INF/jsp/index.jsp</jsp-file>
-  </servlet>
   <!--
   <servlet>
     <servlet-name>epcisRepository</servlet-name>
@@ -88,10 +84,6 @@
     <servlet-name>StaticContent</servlet-name>
     <url-pattern>/static/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>WelcomePage</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
 
   <session-config>
     <session-timeout>5</session-timeout>
@@ -107,7 +99,7 @@
   </mime-mapping>
 
   <welcome-file-list id="WelcomeFileList">
-    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>/WEB-INF/jsp/index.jsp</welcome-file>
   </welcome-file-list>
  
   <resource-ref>
