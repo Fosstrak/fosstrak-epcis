@@ -192,6 +192,8 @@ public class CaptureOperationsServlet extends HttpServlet {
         } else {
 	        String showCaptureForm = req.getParameter("showCaptureForm");
 	        if (showCaptureForm != null && "true".equals(showCaptureForm)) {
+	            req.setAttribute("responseMsg", "");
+	            req.setAttribute("detailedMsg", "");
 	            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_FORM);
 	        } else {
 	            dispatcher = getServletContext().getRequestDispatcher(PAGE_CAPTURE_INTERFACE);
@@ -241,8 +243,8 @@ public class CaptureOperationsServlet extends HttpServlet {
         }
         
         // do the capture operation and handle exceptions
-        String responseMsg = null;
-        String detailedMsg = null;
+        String responseMsg = "";
+        String detailedMsg = "";
         try {
             captureOperationsModule.doCapture(is, req.getUserPrincipal());
             rsp.setStatus(HttpServletResponse.SC_OK);
