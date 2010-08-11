@@ -4,10 +4,14 @@
         <title>Changes epcis-repository</title>
     </properties>
     <body>
-        <release version="0.5" date="2009-??-??" description="Bug fix and feature release">
+        <release version="0.5" date="2010-??-??" description="Bug fix and feature release">
             <action dev="steybem" date="2010-08-11" type="fix">
-                Fixed parsing of query parameter when querying for extension fields
-                (e.g., EQ_fieldname) with more than one string.
+                Fixed parsing of query parameter with more than one value in the list
+                of strings when querying for extension fields (e.g., EQ_fieldname).
+            </action>
+            <action dev="kefalakis" date="2010-07-20" type="add" due-to="Nikos Kefalakis">
+                Added support for capturing EPCIS MasterData. Please see the user-guide
+                or the mailing list for details on how to use the new interface.
             </action>
             <action dev="steybem" date="2010-07-06" type="update">
                 Updated CXF dependencies to 2.2.9 and JAXB to 2.2
