@@ -5,6 +5,10 @@
     </properties>
     <body>
         <release version="0.5" date="2009-??-??" description="Bug fix and feature release">
+            <action dev="steybem" date="2010-08-11" type="fix">
+                Fixed parsing of query parameter when querying for extension fields
+                (e.g., EQ_fieldname) with more than one string.
+            </action>
             <action dev="steybem" date="2010-07-06" type="update">
                 Updated CXF dependencies to 2.2.9 and JAXB to 2.2
             </action>
