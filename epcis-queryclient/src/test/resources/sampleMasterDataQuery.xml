@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <queryName>SimpleMasterDataQuery</queryName>
+    <params>
+        <param>
+            <name>includeAttributes</name>
+            <value>true</value>
+        </param>
+        <param>
+            <name>includeChildren</name>
+            <value>true</value>
+        </param>
+        <param>
+            <name>EQ_name</name>
+            <value>
+                <string>urn:epc:id:sgln:0614141.00729.shipping</string>
+            </value>
+        </param>
+    </params>
+</epcisq:Poll>

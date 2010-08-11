@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epcisq:Poll xmlns:epcisq="urn:epcglobal:epcis-query:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <queryName>SimpleEventQuery</queryName>
+    <params>
+        <param>
+            <name>eventType</name>
+            <value>
+                <string>ObjectEvent</string>
+            </value>
+        </param>
+        <param>
+            <name>MATCH_epc</name>
+            <value>
+                <string>urn:epc:id:sgtin:0057000.123780.7788</string>
+                <string>urn:epc:id:sgtin:0057000.123780.3167</string>
+            </value>
+        </param>
+        <!--
+        <param>
+            <name>EQ_http://my.unique.namespace#myExtensionField</name>
+            <value>
+                <string>My Extension Value</string>
+            </value>
+        </param>
+        -->
+    </params>
+</epcisq:Poll>

@@ -40,7 +40,8 @@ public class SimpleCaptureApp {
 
 	protected static final String LOCAL_EPCIS_CAPTURE_URL = "http://localhost:8080/epcis-repository/capture";
 	protected static final String DEMO_EPCIS_CAPTURE_URL = "http://demo.fosstrak.org/epcis/capture";
-	private static final String SAMPLE_CAPTURE_REQUEST_XML = "src/test/resources/sampleCaptureRequest.xml";
+	protected static final String SAMPLE_CAPTURE_REQUEST_XML = "src/test/resources/sampleCaptureRequest.xml";
+	protected static final String SAMPLE_MASTERDATA_CAPTURE_REQUEST_XML = "src/test/resources/sampleMasterDataCaptureRequest.xml";
 
 	/**
 	 * Reads a sample EPCIS capture request and submits it to an EPCIS
@@ -74,6 +75,7 @@ public class SimpleCaptureApp {
 		// configure the capture client and send the request
 		CaptureClient client = new CaptureClient(captureUrl);
 		InputStream xmlStream = getInputStream(xmlFile);
+		System.out.println("sending capture request (" + xmlStream.available() + " bytes) ...");
 		int httpResponseCode = client.capture(xmlStream);
 
 		if (httpResponseCode == 200) {
