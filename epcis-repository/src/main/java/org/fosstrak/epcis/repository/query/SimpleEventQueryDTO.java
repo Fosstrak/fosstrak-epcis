@@ -56,6 +56,10 @@ public class SimpleEventQueryDTO {
         eventQueryParams.add(new EventQueryParam(eventField, op, value));
     }
 
+    public void addEventQueryParam(EventQueryParam queryParam) {
+        eventQueryParams.add(queryParam);
+    }
+
     public String getEventType() {
         return eventType;
     }
@@ -113,7 +117,7 @@ public class SimpleEventQueryDTO {
         isAnyEpc = false;
     }
 
-    public class EventQueryParam {
+    public static class EventQueryParam {
         private String eventField;
         private Operation op;
         private Object value;

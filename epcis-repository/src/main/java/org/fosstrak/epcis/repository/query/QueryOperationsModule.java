@@ -61,6 +61,7 @@ import org.fosstrak.epcis.model.ValidationException;
 import org.fosstrak.epcis.model.VocabularyListType;
 import org.fosstrak.epcis.repository.EpcisConstants;
 import org.fosstrak.epcis.repository.EpcisQueryControlInterface;
+import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.EventQueryParam;
 import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.Operation;
 import org.fosstrak.epcis.repository.query.SimpleEventQueryDTO.OrderDirection;
 import org.fosstrak.epcis.soap.DuplicateSubscriptionExceptionResponse;
@@ -377,30 +378,11 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
                     }
                     nofEventFieldExtensions++;
                     String eventFieldExtBase = "extension" + nofEventFieldExtensions;
-                    Operation op = Operation.valueOf(paramName.substring(0, 2));
-                    String eventField;
-                    Object value;
-                    try {
-                        value = parseAsInteger(paramValue);
-                        eventField = eventFieldExtBase + ".intValue";
-                    } catch (NumberFormatException e1) {
-                        try {
-                            value = parseAsFloat(paramValue);
-                            eventField = eventFieldExtBase + ".floatValue";
-                        } catch (NumberFormatException e2) {
-                            try {
-                                value = parseAsCalendar(paramValue, paramName);
-                                eventField = eventFieldExtBase + ".dateValue";
-                            } catch (QueryParameterExceptionResponse e) {
-                                value = parseAsString(paramValue);
-                                eventField = eventFieldExtBase + ".strValue";
-                            }
-                        }
-                    }
-                    aggrEventQuery.addEventQueryParam(eventField, op, value);
-                    objEventQuery.addEventQueryParam(eventField, op, value);
-                    quantEventQuery.addEventQueryParam(eventField, op, value);
-                    transEventQuery.addEventQueryParam(eventField, op, value);
+                    EventQueryParam queryParam = parseExtensionField(eventFieldExtBase, paramName, paramValue);
+                    aggrEventQuery.addEventQueryParam(queryParam);
+                    objEventQuery.addEventQueryParam(queryParam);
+                    quantEventQuery.addEventQueryParam(queryParam);
+                    transEventQuery.addEventQueryParam(queryParam);
                     String eventFieldExt = eventFieldExtBase + ".fieldname";
                     aggrEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
                     objEventQuery.addEventQueryParam(eventFieldExt, Operation.EQ, fieldname);
@@ -577,6 +559,53 @@ public class QueryOperationsModule implements EpcisQueryControlInterface {
             eventQueries.add(transEventQuery);
         }
         return eventQueries;
+    }
+
+    /**
+     * Parses the given parameter value as an extension field. The type of the
+     * extension field value which can be integer, float, date, or list of
+     * string.
+     */
+    private EventQueryParam parseExtensionField(String eventFieldExtBase, String paramName, Object paramValue) {
+        Operation op = Operation.valueOf(paramName.substring(0, 2));
+        String eventField;
+        Object value;
+
+        // 1. try to parse the value as int
+        try {
+            value = parseAsInteger(paramValue);
+            eventField = eventFieldExtBase + ".intValue";
+            return new EventQueryParam(eventField, op, value);
+        } catch (NumberFormatException e) {}
+
+        // 2. try to parse the value as float
+        try {
+            value = parseAsFloat(paramValue);
+            eventField = eventFieldExtBase + ".floatValue";
+            return new EventQueryParam(eventField, op, value);
+        } catch (NumberFormatException e) {}
+
+        // 3. try to parse the value as date
+        try {
+            value = parseAsCalendar(paramValue, paramName);
+            eventField = eventFieldExtBase + ".dateValue";
+            return new EventQueryParam(eventField, op, value);
+        } catch (QueryParameterExceptionResponse e) {}
+
+        // 4. try to parse the value as array of string
+        try {
+            ArrayOfString aos = parseAsArrayOfString(paramValue);
+            if (!aos.getString().isEmpty()) {
+                value = aos.getString();
+                eventField = eventFieldExtBase + ".strValue";
+                return new EventQueryParam(eventField, op, value);
+            }
+        } catch (Throwable t) {}
+
+        // last effort: parse the value as string
+        value = parseAsString(paramValue);
+        eventField = eventFieldExtBase + ".strValue";
+        return new EventQueryParam(eventField, op, value);
     }
 
     /**
