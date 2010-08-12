@@ -26,15 +26,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import java.security.Principal;
 import java.sql.SQLException;
 import java.text.ParseException;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -48,6 +45,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -61,50 +59,47 @@ import javax.xml.validation.Validator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.fosstrak.epcis.repository.EpcisConstants;
+import org.fosstrak.epcis.repository.InternalBusinessException;
 import org.fosstrak.epcis.repository.InvalidFormatException;
-import org.fosstrak.epcis.utils.TimeParser;
-
 import org.fosstrak.epcis.repository.model.Action;
 import org.fosstrak.epcis.repository.model.AggregationEvent;
 import org.fosstrak.epcis.repository.model.BaseEvent;
+import org.fosstrak.epcis.repository.model.BusinessLocationAttrId;
 import org.fosstrak.epcis.repository.model.BusinessLocationId;
+import org.fosstrak.epcis.repository.model.BusinessStepAttrId;
 import org.fosstrak.epcis.repository.model.BusinessStepId;
 import org.fosstrak.epcis.repository.model.BusinessTransaction;
+import org.fosstrak.epcis.repository.model.BusinessTransactionAttrId;
 import org.fosstrak.epcis.repository.model.BusinessTransactionId;
+import org.fosstrak.epcis.repository.model.BusinessTransactionTypeAttrId;
 import org.fosstrak.epcis.repository.model.BusinessTransactionTypeId;
+import org.fosstrak.epcis.repository.model.DispositionAttrId;
 import org.fosstrak.epcis.repository.model.DispositionId;
 import org.fosstrak.epcis.repository.model.EPCClass;
+import org.fosstrak.epcis.repository.model.EPCClassAttrId;
 import org.fosstrak.epcis.repository.model.EventFieldExtension;
 import org.fosstrak.epcis.repository.model.ObjectEvent;
 import org.fosstrak.epcis.repository.model.QuantityEvent;
+import org.fosstrak.epcis.repository.model.ReadPointAttrId;
 import org.fosstrak.epcis.repository.model.ReadPointId;
 import org.fosstrak.epcis.repository.model.TransactionEvent;
-import org.fosstrak.epcis.repository.model.VocabularyElement;
 import org.fosstrak.epcis.repository.model.VocabularyAttrCiD;
 import org.fosstrak.epcis.repository.model.VocabularyAttributeElement;
-import org.fosstrak.epcis.repository.model.BusinessLocationAttrId;
-import org.fosstrak.epcis.repository.model.BusinessStepAttrId;
-import org.fosstrak.epcis.repository.model.BusinessTransactionAttrId;
-import org.fosstrak.epcis.repository.model.BusinessTransactionTypeAttrId;
-import org.fosstrak.epcis.repository.model.DispositionAttrId;
-import org.fosstrak.epcis.repository.model.EPCClassAttrId;
-import org.fosstrak.epcis.repository.model.ReadPointAttrId;
-
+import org.fosstrak.epcis.repository.model.VocabularyElement;
+import org.fosstrak.epcis.utils.TimeParser;
 import org.hibernate.Criteria;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -296,65 +291,24 @@ public class CaptureOperationsModule {
      *             If the XML document is malformed or invalid
      * @throws InvalidFormatException
      */
-    public void doCapture(InputStream in, Principal principal) throws SAXException, IOException, InvalidFormatException {
-
-        // parse the payload as XML document
-        Document document;
+    public void doCapture(InputStream in, Principal principal) throws SAXException, InternalBusinessException,
+            InvalidFormatException {
+        Document document = null;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(in);
-            LOG.debug("Payload successfully parsed as XML document");
-            if (LOG.isDebugEnabled()) {
-                try {
-                    TransformerFactory tfFactory = TransformerFactory.newInstance();
-                    Transformer transformer = tfFactory.newTransformer();
-                    StringWriter writer = new StringWriter();
-                    transformer.transform(new DOMSource(document), new StreamResult(writer));
-                    String xml = writer.toString();
-                    if (xml.length() > 100 * 1024) {
-                        // too large, do not log
-                        xml = null;
-                    } else {
-                        LOG.debug("Incoming contents:\n\n" + writer.toString() + "\n");
-                    }
-                } catch (Exception e) {
-                    // never mind ... do not log
-                }
-            }
-            // validate incoming document against its! schema(changed by nkef)
+            // parse the input into a DOM
+            document = parseInput(in, null);
+
+            // validate incoming document against its schema
             if (isEPCISDocument(document)) {
-                // validate the XML document against the EPCISDocument schema
-                if (schema != null) {
-                    Validator validator = schema.newValidator();
-                    try {
-                        validator.validate(new DOMSource(document), null);
-                    } catch (SAXParseException e) {
-                        // TODO: we need to ignore XML element order, the
-                        // following
-                        // is only a hack to pass some of the conformance tests
-                        if (e.getMessage().contains("parentID")) {
-                            LOG.warn("Ignoring XML validation exception: " + e.getMessage());
-                        } else {
-                            throw e;
-                        }
-                    }
-                    LOG.info("Incoming capture request was successfully validated against the EPCISDocument schema");
-                } else {
-                    LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
-                }
+                validateDocument(document, getSchema());
             } else if (isEPCISMasterDataDocument(document)) {
-
-                // TODO: Validate EPCIS Master Data incoming Document
-
+                validateDocument(document, getMasterDataSchema());
             }
-
-        } catch (ParserConfigurationException e) {
-            throw new SAXException(e);
+        } catch (IOException e) {
+            throw new InternalBusinessException("unable to read from input: " + e.getMessage(), e);
         }
 
-        // handle the capture operation
+        // start the capture operation
         Session session = null;
         try {
             session = sessionFactory.openSession();
@@ -363,9 +317,9 @@ public class CaptureOperationsModule {
                 tx = session.beginTransaction();
                 LOG.debug("DB connection opened.");
                 if (isEPCISDocument(document)) {
-                    handleEventDocument(session, document);
+                    processEvents(session, document);
                 } else if (isEPCISMasterDataDocument(document)) {
-                    handleMasterDataDocument(session, document);
+                    processMasterData(session, document);
                 }
                 tx.commit();
                 // return OK
@@ -389,7 +343,7 @@ public class CaptureOperationsModule {
                 if (tx != null) {
                     tx.rollback();
                 }
-                throw new IOException(e.toString());
+                throw new InternalBusinessException(e.toString());
             }
         } finally {
             if (session != null) {
@@ -401,28 +355,99 @@ public class CaptureOperationsModule {
     }
 
     /**
-     * @param document
-     * @return
+     * Validates the given document against the given schema.
+     */
+    private void validateDocument(Document document, Schema schema) throws SAXException, IOException {
+        if (schema != null) {
+            Validator validator = schema.newValidator();
+            validator.validate(new DOMSource(document));
+            LOG.info("Incoming capture request was successfully validated against the EPCISDocument schema");
+        } else {
+            LOG.warn("Schema validator unavailable. Unable to validate EPCIS capture event against schema!");
+        }
+    }
+
+    /**
+     * Parses the input into a DOM. If a schema is given, the input is also
+     * validated against this schema. The schema may be null.
+     */
+    private Document parseInput(InputStream in, Schema schema) throws InternalBusinessException, SAXException,
+            IOException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        factory.setIgnoringComments(true);
+        factory.setIgnoringElementContentWhitespace(true);
+        factory.setSchema(schema);
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new ErrorHandler() {
+                public void warning(SAXParseException e) throws SAXException {
+                    LOG.warn("warning while parsing XML input: " + e.getMessage());
+                }
+
+                public void fatalError(SAXParseException e) throws SAXException {
+                    LOG.error("non-recovarable error while parsing XML input: " + e.getMessage());
+                    throw e;
+                }
+
+                public void error(SAXParseException e) throws SAXException {
+                    LOG.error("error while parsing XML input: " + e.getMessage());
+                    throw e;
+                }
+            });
+            Document document = builder.parse(in);
+            LOG.debug("payload successfully parsed as XML document");
+            if (LOG.isDebugEnabled()) {
+                logDocument(document);
+            }
+            return document;
+        } catch (ParserConfigurationException e) {
+            throw new InternalBusinessException("unable to configure document builder to parse XML input", e);
+        }
+    }
+
+    /**
+     * prints the given Document to the log file if it does not exceed a
+     * specified size.
+     */
+    private void logDocument(Document document) {
+        try {
+            TransformerFactory tfFactory = TransformerFactory.newInstance();
+            Transformer transformer = tfFactory.newTransformer();
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
+            String xml = writer.toString();
+            if (xml.length() > 100 * 1024) {
+                // too large, do not log
+                xml = null;
+            } else {
+                LOG.debug("Incoming contents:\n\n" + writer.toString() + "\n");
+            }
+        } catch (Throwable t) {
+            // never mind ... do not log
+        }
+    }
+
+    /**
+     * @return <code>true</code> if the given Document is an
+     *         <i>EPCISDocument</i>.
      */
     private boolean isEPCISDocument(Document document) {
         return document.getDocumentElement().getLocalName().equals("EPCISDocument");
     }
 
     /**
-     * @param document
-     * @return
+     * @return <code>true</code> if the given Document is an
+     *         <i>EPCISMasterDataDocument</i>.
      */
     private boolean isEPCISMasterDataDocument(Document document) {
         return document.getDocumentElement().getLocalName().equals("EPCISMasterDataDocument");
     }
 
     /**
-     * Parses the entire document and handles the supplied events.
-     * 
-     * @throws Exception
-     * @throws DOMException
+     * Processes the given document and stores the events to db.
      */
-    private void handleEventDocument(Session session, Document document) throws DOMException, SAXException,
+    private void processEvents(Session session, Document document) throws DOMException, SAXException,
             InvalidFormatException {
         NodeList eventList = document.getElementsByTagName("EventList");
         NodeList events = eventList.item(0).getChildNodes();
@@ -635,12 +660,9 @@ public class CaptureOperationsModule {
     }
 
     /**
-     * (nkef) Parses the entire document and handles the supplied Master Data.
-     * 
-     * @throws Exception
-     * @throws DOMException
+     * Processes the given document and stores the masterdata to db.
      */
-    private void handleMasterDataDocument(Session session, Document document) throws DOMException, SAXException,
+    private void processMasterData(Session session, Document document) throws DOMException, SAXException,
             InvalidFormatException {
 
         // Handle Vocabulary List
@@ -680,93 +702,61 @@ public class CaptureOperationsModule {
      * inserts the data into the database. The parse routine is generic for all
      * Vocabulary types;
      * 
-     * @param vocabularyNode
+     * @param vocNode
      *            The current vocabulary node.
-     * @param vocabularyType
+     * @param vocType
      *            The current vocabulary type.
      * @throws Exception
      * @throws DOMException
      */
-    private void handleVocabulary(Session session, final Node vocabularyNode, final String vocabularyType)
-            throws DOMException, SAXException, InvalidFormatException {
-        if (vocabularyNode == null) {
+    private void handleVocabulary(Session session, final Node vocNode, final String vocType) throws DOMException,
+            SAXException, InvalidFormatException {
+        if (vocNode == null) {
             // nothing to do
             return;
-        } else if (vocabularyNode.getChildNodes().getLength() == 0) {
-            throw new SAXException("Vocabulary element '" + vocabularyNode.getNodeName()
-                    + "' has no children elements.");
+        } else if (vocNode.getChildNodes().getLength() == 0) {
+            throw new SAXException("Vocabulary element '" + vocNode.getNodeName() + "' has no children elements.");
         }
-        Node curVocabularyNode = null;
-        Node curVocabularyElementNode = null;
-        Node curVocabularyAttributeNode = null;
-        String curVocabularyURI = null;
-        String curVocabularyAttribute = null;
-        String curVocabularyAttributeValue = null;
-        VocabularyElement curVocabularyElement = null;
 
-        for (int i = 0; i < vocabularyNode.getChildNodes().getLength(); i++) {
-            curVocabularyNode = vocabularyNode.getChildNodes().item(i);
-            String curVocabularyNodeName = curVocabularyNode.getNodeName();
-
-            if (curVocabularyNodeName.equals("#text") || curVocabularyNodeName.equals("#comment")) {
-                // ignore text or comments
-                LOG.debug("  ignoring text or comment: '" + curVocabularyNode.getTextContent().trim() + "'");
+        for (int i = 0; i < vocNode.getChildNodes().getLength(); i++) {
+            Node curVocNode = vocNode.getChildNodes().item(i);
+            if (isTextOrComment(curVocNode)) {
                 continue;
             }
-
-            for (int j = 0; j < curVocabularyNode.getChildNodes().getLength(); j++) {
-                curVocabularyElementNode = curVocabularyNode.getChildNodes().item(j);
-                String curVocabularyElementNodeName = curVocabularyElementNode.getNodeName();
-
-                if (curVocabularyElementNodeName.equals("#text") || curVocabularyElementNodeName.equals("#comment")) {
-                    // ignore text or comments
-                    LOG.debug("  ignoring text or comment: '" + curVocabularyElementNode.getTextContent().trim() + "'");
+            for (int j = 0; j < curVocNode.getChildNodes().getLength(); j++) {
+                Node curVocElemNode = curVocNode.getChildNodes().item(j);
+                if (isTextOrComment(curVocElemNode)) {
                     continue;
                 }
-
-                LOG.debug("  handling vocabulary field: '" + curVocabularyElementNodeName + "'");
-                curVocabularyURI = curVocabularyElementNode.getAttributes().getNamedItem("id").getNodeValue();
+                LOG.debug("  processing vocabulary '" + curVocElemNode.getNodeName() + "'");
+                String curVocElemId = curVocElemNode.getAttributes().getNamedItem("id").getNodeValue();
                 /*
                  * vocabularyElementEditMode 1: insert((it can be anything
                  * except 2,3,4)) 2: alterURI 3: singleDelete 4: Delete element
                  * with it's direct or indirect descendants
                  */
-                String vocabularyElementEditMode = "";
+                String vocElemEditMode = "";
 
-                if (!(curVocabularyElementNode.getAttributes().getNamedItem("mode") == null)) {
-                    vocabularyElementEditMode = curVocabularyElementNode.getAttributes().getNamedItem("mode").getNodeValue();
+                if (!(curVocElemNode.getAttributes().getNamedItem("mode") == null)) {
+                    vocElemEditMode = curVocElemNode.getAttributes().getNamedItem("mode").getNodeValue();
                 } else {
-                    vocabularyElementEditMode = "1";
+                    vocElemEditMode = "1";
                 }
 
-                curVocabularyElement = getOrEditVocabularyElement(session, vocabularyType, curVocabularyURI,
-                        vocabularyElementEditMode);
+                VocabularyElement curVocElem = getOrEditVocabularyElement(session, vocType, curVocElemId,
+                        vocElemEditMode);
 
                 // *****************************************
-                if (curVocabularyElement != null) {
-                    for (int k = 0; k < curVocabularyElementNode.getChildNodes().getLength(); k++) {
-                        curVocabularyAttributeNode = curVocabularyElementNode.getChildNodes().item(k);
-                        String curVocabularyAttributeElementNodeName = curVocabularyAttributeNode.getNodeName();
-
-                        if (curVocabularyAttributeElementNodeName.equals("#text")
-                                || curVocabularyAttributeElementNodeName.equals("#comment")) {
-                            // ignore text or comments
-                            LOG.debug("  ignoring text or comment: '"
-                                    + curVocabularyAttributeNode.getTextContent().trim() + "'");
+                if (curVocElem != null) {
+                    for (int k = 0; k < curVocElemNode.getChildNodes().getLength(); k++) {
+                        Node curVocAttrNode = curVocElemNode.getChildNodes().item(k);
+                        if (isTextOrComment(curVocAttrNode)) {
                             continue;
                         }
 
-                        LOG.debug("  handling vocabulary field: '" + curVocabularyAttributeElementNodeName + "'");
-                        curVocabularyAttribute = curVocabularyAttributeNode.getAttributes().getNamedItem("id").getNodeValue();
-
-                        if (curVocabularyAttributeNode.getAttributes().getNamedItem("value") != null) {
-                            curVocabularyAttributeValue = curVocabularyAttributeNode.getAttributes().getNamedItem(
-                                    "value").getNodeValue();
-                        } else if (curVocabularyAttributeNode.getFirstChild() != null) {
-                            curVocabularyAttributeValue = curVocabularyAttributeNode.getFirstChild().getNodeValue();
-                        } else {
-                            curVocabularyAttributeValue = "";
-                        }
+                        LOG.debug("  processing vocabulary attribute '" + curVocAttrNode.getNodeName() + "'");
+                        String curVocAttrId = curVocAttrNode.getAttributes().getNamedItem("id").getNodeValue();
+                        String curVocAttrValue = parseVocAttributeValue(curVocAttrNode);
 
                         /*
                          * vocabularyAttributeEditMode 1: Insert (it can be
@@ -774,27 +764,75 @@ public class CaptureOperationsModule {
                          * be anything except 3) 3: Delete Attribute (required)
                          */
                         String vocabularyAttributeEditMode = "";
-                        if (!(curVocabularyAttributeNode.getAttributes().getNamedItem("mode") == null)) {
-                            vocabularyAttributeEditMode = curVocabularyAttributeNode.getAttributes().getNamedItem(
-                                    "mode").getNodeValue();
+                        if (!(curVocAttrNode.getAttributes().getNamedItem("mode") == null)) {
+                            vocabularyAttributeEditMode = curVocAttrNode.getAttributes().getNamedItem("mode").getNodeValue();
                         } else {
                             vocabularyAttributeEditMode = "add/alter";
                         }
 
-                        getOrEditVocabularyAttributeElement(session, vocabularyType, curVocabularyElement.getId(),
-                                curVocabularyAttribute, curVocabularyAttributeValue, vocabularyAttributeEditMode);
+                        getOrEditVocabularyAttributeElement(session, vocType, curVocElem.getId(), curVocAttrId,
+                                curVocAttrValue, vocabularyAttributeEditMode);
                     }
                 }
                 // *****************************************
-
             }
-
         }
+    }
 
-        if (vocabularyType.equals(EpcisConstants.BUSINESS_LOCATION_ID)) {
+    private boolean isTextOrComment(Node node) {
+        return node.getNodeType() == Node.TEXT_NODE || node.getNodeType() == Node.COMMENT_NODE;
+    }
 
+    /**
+     * Parses the attribute <b>value</b> of a VocabularyElement. The value can
+     * be null in which case an empty String is returned. Otherwise, the value
+     * is either given as XML attribute named 'value' or as inline text, see the
+     * sample below. <br>
+     * 
+     * <pre>
+     * {@code
+     * <VocabularyElement id="urn:epc:id:sgln:0037000.00729.0">
+     *   <attribute id="urn:epcglobal:fmcg:mda:slt:retail"/>
+     *   <attribute id="urn:epcglobal:fmcg:mda:location">Warehouse 1</attribute>
+     *   <attribute id="urn:epcglobal:fmcg:mda:room" value="22b"/>
+     *   <attribute id="urn:epcglobal:fmcg:mda:address">
+     *     <sample:Address xmlns:sample="http://sample.com/ComplexTypeExample">
+     *       <Street>100 Nowhere Street</Street>
+     *       <City>Fancy</City>
+     *     </sample:Address>
+     *   </attribute>
+     * </VocabularyElement>
+     * }
+     * </pre>
+     * 
+     * @return the attribute value as String.
+     */
+    private String parseVocAttributeValue(Node vocAttrNode) {
+        String vocAttrValue;
+        if (vocAttrNode.getAttributes().getNamedItem("value") != null) {
+            // the value is given as attribute 'value'
+            vocAttrValue = vocAttrNode.getAttributes().getNamedItem("value").getNodeValue();
+        } else if (vocAttrNode.getChildNodes().getLength() > 1) {
+            // the value is given as DOM-tree
+            TransformerFactory transFactory = TransformerFactory.newInstance();
+            StringWriter buffer = new StringWriter();
+            try {
+                Transformer transformer = transFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                transformer.setOutputProperty(OutputKeys.INDENT, "no");
+                transformer.transform(new DOMSource(vocAttrNode.getChildNodes().item(1)), new StreamResult(buffer));
+                vocAttrValue = buffer.toString();
+            } catch (Throwable t) {
+                LOG.warn("unable to transform vocabulary attribute value (XML) into a string", t);
+                vocAttrValue = vocAttrNode.getTextContent();
+            }
+        } else if (vocAttrNode.getFirstChild() != null) {
+            // the value is given as text
+            vocAttrValue = vocAttrNode.getFirstChild().getNodeValue();
+        } else {
+            vocAttrValue = "";
         }
-
+        return vocAttrValue;
     }
 
     /**
@@ -1164,8 +1202,7 @@ public class CaptureOperationsModule {
                 throw new UnsupportedOperationException("Not allowed to add new vocabulary - use existing vocabulary");
             } else {
                 // VocabularyAttributeElement subclasses should always have
-                // public
-                // zero-arg constructor to avoid problems here
+                // public zero-arg constructor to avoid problems here
                 try {
                     vocAttributeElement = (VocabularyAttributeElement) c.newInstance();
                 } catch (InstantiationException e) {
@@ -1377,12 +1414,15 @@ public class CaptureOperationsModule {
         setSchema(schema);
     }
 
-    // (nkef)
+    public void setEpcisMasterdataSchemaFile(String epcisMasterdataSchemaFile) {
+        Schema schema = initEpcisSchema(epcisMasterdataSchemaFile);
+        setMasterDataSchema(schema);
+    }
+
     public Schema getMasterDataSchema() {
         return masterDataSchema;
     }
 
-    // (nkef)
     public void setMasterDataSchema(Schema masterDataSchema) {
         this.masterDataSchema = masterDataSchema;
     }
