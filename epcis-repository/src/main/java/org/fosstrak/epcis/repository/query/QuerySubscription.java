@@ -57,7 +57,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 
 import org.fosstrak.epcis.model.EPCISQueryBodyType;
 import org.fosstrak.epcis.model.EPCISQueryDocumentType;
@@ -71,7 +70,6 @@ import org.fosstrak.epcis.model.QueryResults;
 import org.fosstrak.epcis.model.QueryTooLargeException;
 import org.fosstrak.epcis.repository.EpcisQueryCallbackInterface;
 import org.fosstrak.epcis.soap.EPCISServicePortType;
-import org.fosstrak.epcis.soap.EPCglobalEPCISService;
 import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
 import org.fosstrak.epcis.soap.NoSuchNameExceptionResponse;
 import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
