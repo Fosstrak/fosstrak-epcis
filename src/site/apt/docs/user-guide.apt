@@ -23,7 +23,7 @@ User Guide
 
          [[i]] {{{#How to Capture EPCIS Events}How to Capture EPCIS Events}}
 
-         [[i]] {{{#How to Query an EPCIS Repository}How to Query an EPCIS Repository}}
+         [[i]] {{{#How to Query for EPCIS Events}How to Query for EPCIS Events}}
 
          [[i]] {{{#How to Use a Query Schedule}How to Use a Query Schedule}}
 
@@ -34,6 +34,10 @@ User Guide
          [[i]] {{{#How to Use the Query Callback Interface}How to Use the Query Callback Interface}}
 
          [[i]] {{{#How to Use Event Field Extensions}How to Use Event Field Extensions}}
+
+         [[i]] {{{#How to Capture and Modify EPCIS Masterdata}How to Capture and Modify EPCIS Masterdata}}
+
+         [[i]] {{{#How to Query for EPCIS Masterdata}How to Query for EPCIS Masterdata}}
 
    [[1]] {{{#Securing your Repository}Securing your Repository}}
 
@@ -221,7 +225,7 @@ java -jar epcis-captureclient-<version>.jar
 
    If you intend to use our query client API library in your own Java project,
    you should refer to the
-   {{{#How to Query an EPCIS Repository}How to Query an EPCIS Repository}}
+   {{{#How to Query for EPCIS Events}How to Query for EPCIS Events}}
    section below.
 
 
@@ -370,7 +374,7 @@ epcisDoc.setCreationDate(now);
   <<<org.fosstrak.epcis.model>>> package.
 
 
-** {How to Query an EPCIS Repository}
+** {How to Query for EPCIS Events}
 
    The Fosstrak EPCIS repository implements the SOAP/HTTP binding for the query
    interface, thus, you need to send queries inside a valid SOAP request to the
@@ -708,6 +712,209 @@ String response = listener.fetchResponse();
   You can also use "LT_", "LE_", "GT_", or "GE_" query parameters to retrieve
   the corresponding events. Of course this would only make sense if the value
   of your custom event field was of type integer, floating point, or date/time.
+
+
+
+
+** {How to Capture and Modify EPCIS Masterdata}
+
+   Master data is additional data that provides the necessary context for
+   interpreting the event data. The following example shows master data for a
+   business location and read ponints:
+
+---------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<epcismd:EPCISMasterDataDocument xmlns:epcismd="urn:epcglobal:epcis-masterdata:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1" creationDate="2005-07-11T11:30:47.0Z">
+<EPCISBody>
+  <VocabularyList>
+    <Vocabulary type="urn:epcglobal:epcis:vtype:BusinessLocation">
+      <VocabularyElementList>
+        <VocabularyElement id="urn:epc:id:sgln:0037000.00729.0">
+          <attribute id="urn:epcglobal:fmcg:mda:slt:retail"/>
+          <attribute id="urn:epcglobal:fmcg:mda:latitude" value="+18.0000"/>
+          <attribute id="urn:epcglobal:fmcg:mda:longitude" value="-70.0000"/>
+          <attribute id="urn:epcglobal:fmcg:mda:address">100 Nowhere Street, FancyCity 99999</attribute>
+        </VocabularyElement>
+        <VocabularyElement id="urn:epcglobal:fmcg:ssl:0037000.00729.201">
+          <attribute id="urn:epcglobal:fmcg:mda:sslt:201"/>
+        </VocabularyElement>
+        <VocabularyElement id="urn:epcglobal:fmcg:ssl:0037000.00729.202">
+          <attribute id="urn:epcglobal:fmcg:mda:sslt:202"/>
+        </VocabularyElement>
+        <VocabularyElement id="urn:epcglobal:fmcg:ssl:0037000.00729.202,402">
+          <attribute id="urn:epcglobal:fmcg:mda:sslt:202"/>
+          <attribute id="urn:epcglobal:fmcg:mda:sslta:402"/>
+        </VocabularyElement>
+      </VocabularyElementList>
+    </Vocabulary>
+    <Vocabulary type="urn:epcglobal:epcis:vtype:ReadPoint">
+      <VocabularyElementList>
+        <VocabularyElement id="urn:epcglobal:fmcg:ssl:0037000.00729.201">
+          <attribute id="urn:epcglobal:epcis:mda:site">urn:epc:id:sgln:0037000.00729.0</attribute>
+          <attribute id="urn:epcglobal:fmcg:mda:sslt:201"/>
+        </VocabularyElement>
+        <VocabularyElement id="urn:epcglobal:fmcg:ssl:0037000.00729.202">
+          <attribute id="urn:epcglobal:epcis:mda:site">urn:epc:id:sgln:0037000.00729.0</attribute>
+          <attribute id="urn:epcglobal:fmcg:mda:sslt:202"/>
+        </VocabularyElement>
+        <VocabularyElement id="urn:epcglobal:fmcg:ssl:0037000.00729.203">
+          <attribute id="urn:epcglobal:epcis:mda:site">urn:epc:id:sgln:0037000.00729.0</attribute>
+          <attribute id="urn:epcglobal:fmcg:mda:sslt:203"/>
+        </VocabularyElement>
+      </VocabularyElementList>
+    </Vocabulary>
+  </VocabularyList>
+</EPCISBody>
+</epcismd:EPCISMasterDataDocument>
+---------------------------------------------------------------------------
+
+   Master data is available for query through the EPCIS Query Control Interface,
+   but the means by which master data enters the system is not specified in the
+   EPCIS 1.0 specification. Nevertheless, the Fosstrak EPCIS implementation does
+   support adding, modifying, and deleting master data via its capture interface.
+   For example, to add the vocabulary elements given above to the repository, the
+   EPCISMasterDataDocument can be sent to the capture interface.
+
+   The following code shows how to capture master data programmatically:
+
+---------------------------------------------------------------------------
+// create a <VocabularyElement> which contains two <attribute> elements
+VocabularyElementType vocElem = new VocabularyElementType();
+vocElem.setId("urn:epc:id:sgln:0037000.00729.0");
+AttributeType attr1 = new AttributeType();
+attr1.setId("urn:epcglobal:fmcg:mda:latitude");
+attr1.getContent().add("+18.0000");
+AttributeType attr2 = new AttributeType();
+attr2.setId("urn:epcglobal:fmcg:mda:longitude");
+attr2.getContent().add("-70.0000");
+vocElem.getAttribute().add(attr1);
+vocElem.getAttribute().add(attr2);
+
+// create a <Vocabulary> element of type 'BusinessLocation' and add a list of vocabulary elements
+VocabularyType voc = new VocabularyType();
+voc.setType("urn:epcglobal:epcis:vtype:BusinessLocation");
+VocabularyElementListType vocElemList = new VocabularyElementListType();
+vocElemList.getVocabularyElement().add(vocElem);
+voc.setVocabularyElementList(vocElemList);
+VocabularyListType vocList = new VocabularyListType();
+vocList.getVocabulary().add(voc);
+
+// create the EPCISMasterDataDocument
+EPCISMasterDataDocumentType masterDataDoc = new EPCISMasterDataDocumentType();
+masterDataDoc.setSchemaVersion(new BigDecimal("1.0"));
+masterDataDoc.setCreationDate(getCurrentDateTime());
+EPCISMasterDataBodyType masterDataBody = new EPCISMasterDataBodyType();
+masterDataBody.setVocabularyList(vocList);
+masterDataDoc.setEPCISBody(masterDataBody);
+
+// get the capture client and capture the event
+String captureUrl = new String("http://localhost:8080/epcis-repository/capture");
+CaptureClient client = new CaptureClient(captureUrl);
+int httpResponseCode = client.capture(masterDataDoc);
+if (httpResponseCode != 200) {
+    System.out.println("The event could NOT be captured!");
+}
+---------------------------------------------------------------------------
+
+   In order to rename or delete it, the vocabulary element can be sent to the
+   capture interface accompanied by a non-standardized parameter called <mode>.
+   The following modes are supported by the Fosstrak master data capture
+   interface:
+
+*------+---------------------+
+| <<mode>> | <<description>> |
+*------+---------------------+
+|  1 (default) | insert a new vocabulary element |
+*------+---------------------+
+|  2   | change a vocabulary element's URI |
+*------+---------------------+
+|  3   | delete a single vocabulary element |
+*------+---------------------+
+|  4   | delete a vocabulary element including all its descendants |
+*------+---------------------+
+
+   So, in order to delete the vocabulary with id <urn:epc:id:sgln:0037000.00729.0>
+   which has been previously added, the following EPCISMasterDataDocument should
+   be sent to the repository (note the attribute <<<mode="3">>> in the
+   <<<\<VocabularyElement\>>>> element):
+
+---------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<epcismd:EPCISMasterDataDocument xmlns:epcismd="urn:epcglobal:epcis-masterdata:xsd:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1">
+    <EPCISBody>
+        <VocabularyList>
+            <Vocabulary type="urn:epcglobal:epcis:vtype:BusinessLocation">
+                <VocabularyElementList>
+                    <VocabularyElement id="urn:epc:id:sgln:0037000.00729.0" mode="3" />
+                </VocabularyElementList>
+            </Vocabulary>
+        </VocabularyList>
+    </EPCISBody>
+</epcismd:EPCISMasterDataDocument>
+---------------------------------------------------------------------------
+
+
+
+
+** {How to Query for EPCIS Masterdata}
+
+   Querying masterdata from an EPCIS repository is analog to querying events,
+   except that the queryName must be "SimpleMasterDataQuery". Here is a sample
+   of such a query:
+
+---------------------------------------------------------------------------
+<epcisq:Poll xmlns:epcisq=\"urn:epcglobal:epcis-query:xsd:1\">
+  <queryName>SimpleMasterDataQuery</queryName>
+  <params>
+    <param>
+      <name>includeAttributes</name>
+      <value>true</value>
+    </param>
+    <param>
+      <name>includeChildren</name>
+      <value>true</value>
+    </param>
+    <param>
+      <name>EQ_name</name>
+      <value><string>urn:epc:id:sgln:0614141.00729.shipping</string></value>
+    </param>
+  </params>
+</epcisq:Poll>
+---------------------------------------------------------------------------
+
+   This XML query can also be constructed programmatically and sent to an EPCIS
+   repository using the <<<QueryControlClient>>> as follows:
+
+---------------------------------------------------------------------------
+// construct the query parameters
+QueryParam queryParam1 = new QueryParam();
+queryParam1.setName("includeAttributes");
+queryParam1.setValue("true");
+
+QueryParam queryParam2 = new QueryParam();
+queryParam2.setName("includeChildren");
+queryParam2.setValue("true");
+
+QueryParam queryParam3 = new QueryParam();
+queryParam3.setName("EQ_name");
+ArrayOfString queryParamValue3 = new ArrayOfString();
+queryParamValue3.getString().add("urn:epc:id:sgln:0614141.00729.shipping");
+queryParam3.setValue(queryParamValue3);
+
+// add the query parameters to the list of parameters
+QueryParams queryParams = new QueryParams();
+queryParams.getParam().add(queryParam1);
+queryParams.getParam().add(queryParam2);
+queryParams.getParam().add(queryParam3);
+
+// create the Poll object and send it to the query service
+Poll poll = new Poll();
+poll.setQueryName("SimpleMasterDataQuery");
+poll.setParams(queryParams);
+
+QueryResults results = client.poll(poll);
+---------------------------------------------------------------------------
+
 
 
 
