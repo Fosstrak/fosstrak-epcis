@@ -42,6 +42,7 @@ public class SimpleCaptureApp {
 	protected static final String DEMO_EPCIS_CAPTURE_URL = "http://demo.fosstrak.org/epcis/capture";
 	protected static final String SAMPLE_CAPTURE_REQUEST_XML = "src/test/resources/sampleCaptureRequest.xml";
 	protected static final String SAMPLE_MASTERDATA_CAPTURE_REQUEST_XML = "src/test/resources/sampleMasterDataCaptureRequest.xml";
+    protected static final String SAMPLE_MASTERDATA_DELETE_REQUEST_XML = "src/test/resources/sampleMasterDataDeleteRequest.xml";
 
 	/**
 	 * Reads a sample EPCIS capture request and submits it to an EPCIS

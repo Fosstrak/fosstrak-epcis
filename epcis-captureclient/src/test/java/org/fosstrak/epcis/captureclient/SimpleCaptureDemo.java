@@ -36,15 +36,23 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.fosstrak.epcis.model.ActionType;
+import org.fosstrak.epcis.model.AttributeType;
 import org.fosstrak.epcis.model.BusinessLocationType;
+import org.fosstrak.epcis.model.Document;
 import org.fosstrak.epcis.model.EPC;
 import org.fosstrak.epcis.model.EPCISBodyType;
 import org.fosstrak.epcis.model.EPCISDocumentType;
+import org.fosstrak.epcis.model.EPCISMasterDataBodyType;
+import org.fosstrak.epcis.model.EPCISMasterDataDocumentType;
 import org.fosstrak.epcis.model.EPCListType;
 import org.fosstrak.epcis.model.EventListType;
 import org.fosstrak.epcis.model.ObjectEventType;
 import org.fosstrak.epcis.model.ObjectFactory;
 import org.fosstrak.epcis.model.ReadPointType;
+import org.fosstrak.epcis.model.VocabularyElementListType;
+import org.fosstrak.epcis.model.VocabularyElementType;
+import org.fosstrak.epcis.model.VocabularyListType;
+import org.fosstrak.epcis.model.VocabularyType;
 import org.w3c.dom.Element;
 
 /**
@@ -80,15 +88,11 @@ public class SimpleCaptureDemo {
 			}
 		}
 		System.out.println("using capture URL: " + captureUrl);
+        CaptureClient client = new CaptureClient(captureUrl);
 
-		// create the EPCIS capture request document
-		EPCISDocumentType requestDoc = createCaptureRequestDocument();
-
-		// for debugging purposes you may want to uncomment this
+		// create and send the EPCIS capture request document
+		EPCISDocumentType requestDoc = createEpcisDocument();
 		printDoc(requestDoc);
-
-		// initialize the capture client and send the request
-		CaptureClient client = new CaptureClient(captureUrl);
 		int httpResponseCode = client.capture(requestDoc);
 
 		if (httpResponseCode == 200) {
@@ -96,13 +100,24 @@ public class SimpleCaptureDemo {
 		} else {
 			System.err.println("HTTP response " + httpResponseCode);
 		}
+
+        // create and send an EPCIS MasterData capture request document
+        EPCISMasterDataDocumentType masterDataDoc = createEpcisMasterDataDocument();
+        printDoc(masterDataDoc);
+        httpResponseCode = client.capture(masterDataDoc);
+
+        if (httpResponseCode == 200) {
+            System.out.println("capture of events successful");
+        } else {
+            System.err.println("HTTP response " + httpResponseCode);
+        }
 	}
 
 	/**
 	 * Creates a simple EPCIS object event using the API objects from the EPCIS
 	 * schema.
 	 */
-	private static EPCISDocumentType createCaptureRequestDocument() {
+	private static EPCISDocumentType createEpcisDocument() {
 		ObjectEventType objEvent = new ObjectEventType();
 
 		// set the eventTime and eventTimeZoneOffset
@@ -196,11 +211,18 @@ public class SimpleCaptureDemo {
 	/**
 	 * Marshals the given EPCIS document into its XML representation and prints it to System.out.
 	 */
-	protected static void printDoc(EPCISDocumentType epcisDoc) {
+	protected static void printDoc(Document epcisDoc) {
 		try {
 			ObjectFactory factory = new ObjectFactory();
-			JAXBElement<EPCISDocumentType> item = factory.createEPCISDocument(epcisDoc);
-			JAXBContext context = JAXBContext.newInstance(EPCISDocumentType.class);
+			JAXBElement<? extends Document> item;
+			JAXBContext context;
+			if (epcisDoc instanceof EPCISDocumentType) {
+			    item = factory.createEPCISDocument((EPCISDocumentType) epcisDoc);
+	            context = JAXBContext.newInstance(EPCISDocumentType.class);
+			} else {
+                item = factory.createEPCISMasterDataDocument((EPCISMasterDataDocumentType) epcisDoc);
+                context = JAXBContext.newInstance(EPCISMasterDataDocumentType.class);
+			}
 			Marshaller marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
@@ -212,4 +234,35 @@ public class SimpleCaptureDemo {
 		}
 	}
 
+    private static EPCISMasterDataDocumentType createEpcisMasterDataDocument() {
+        // create a <VocabularyElement> which contains two <attribute> elements
+        VocabularyElementType vocElem = new VocabularyElementType();
+        vocElem.setId("urn:epc:id:sgln:0037000.00729.0");
+        AttributeType attr1 = new AttributeType();
+        attr1.setId("urn:epcglobal:fmcg:mda:latitude");
+        attr1.getContent().add("+18.0000");
+        AttributeType attr2 = new AttributeType();
+        attr2.setId("urn:epcglobal:fmcg:mda:longitude");
+        attr2.getContent().add("-70.0000");
+        vocElem.getAttribute().add(attr1);
+        vocElem.getAttribute().add(attr2);
+
+        // create a <Vocabulary> element of type 'BusinessLocation' and add a list of vocabulary elements
+        VocabularyType voc = new VocabularyType();
+        voc.setType("urn:epcglobal:epcis:vtype:BusinessLocation");
+        VocabularyElementListType vocElemList = new VocabularyElementListType();
+        vocElemList.getVocabularyElement().add(vocElem);
+        voc.setVocabularyElementList(vocElemList);
+        VocabularyListType vocList = new VocabularyListType();
+        vocList.getVocabulary().add(voc);
+        
+        // create the EPCISMasterDataDocument
+        EPCISMasterDataDocumentType masterDataDoc = new EPCISMasterDataDocumentType();
+        masterDataDoc.setSchemaVersion(new BigDecimal("1.0"));
+        masterDataDoc.setCreationDate(getCurrentDateTime());
+        EPCISMasterDataBodyType masterDataBody = new EPCISMasterDataBodyType();
+        masterDataBody.setVocabularyList(vocList);
+        masterDataDoc.setEPCISBody(masterDataBody);
+        return masterDataDoc;
+    }
 }

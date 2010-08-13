@@ -6,16 +6,9 @@
                 <VocabularyElementList>
                     <VocabularyElement id="urn:epc:id:sgln:0037000.00729.0">
                         <attribute id="urn:epcglobal:fmcg:mda:slt:retail"/>
-                        <attribute id="urn:epcglobal:fmcg:mda:latitude">+18.0000</attribute>
-                        <attribute id="urn:epcglobal:fmcg:mda:longitude">-70.0000</attribute>
-                        <attribute id="urn:epcglobal:fmcg:mda:address">
-                            <sample:Address xmlns:sample="http://sample.com/ComplexTypeExample">
-                                <Street>100 Nowhere Street</Street>
-                                <City>Fancy</City>
-                                <State>FiftyOne</State>
-                                <Zip>99999</Zip>
-                            </sample:Address>
-                        </attribute>
+                        <attribute id="urn:epcglobal:fmcg:mda:latitude" value="+18.0000"/>
+                        <attribute id="urn:epcglobal:fmcg:mda:longitude" value="-70.0000"/>
+                        <attribute id="urn:epcglobal:fmcg:mda:address">100 Nowhere Street, FancyCity 99999</attribute>
                         <!-- capturing <children> is not supported yet -->
                         <!-- 
                         <children>
