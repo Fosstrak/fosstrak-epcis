@@ -49,7 +49,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.fosstrak.epcis.model.Document;
 import org.fosstrak.epcis.model.EPCISDocumentType;
+import org.fosstrak.epcis.model.EPCISMasterDataDocumentType;
 import org.fosstrak.epcis.model.ObjectFactory;
 import org.fosstrak.epcis.utils.AuthenticationType;
 
@@ -193,11 +195,16 @@ public class CaptureClient implements X509TrustManager, HostnameVerifier {
      * @throws JAXBException
      *             If an error serializing the given document into XML occurred.
      */
-    public int capture(final EPCISDocumentType epcisDoc) throws Exception {
+    public int capture(final Document epcisDoc) throws Exception {
         StringWriter writer = new StringWriter();
         ObjectFactory objectFactory = new ObjectFactory();
         JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
-        JAXBElement<EPCISDocumentType> item = objectFactory.createEPCISDocument(epcisDoc);
+        JAXBElement<? extends Document> item;
+        if (epcisDoc instanceof EPCISDocumentType) {
+            item = objectFactory.createEPCISDocument((EPCISDocumentType) epcisDoc);
+        } else {
+            item = objectFactory.createEPCISMasterDataDocument((EPCISMasterDataDocumentType) epcisDoc);
+        }
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
