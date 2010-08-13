@@ -29,7 +29,9 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -56,9 +58,10 @@ import org.fosstrak.epcis.model.ObjectFactory;
 import org.fosstrak.epcis.utils.AuthenticationType;
 
 /**
- * This client provides access to the repository's Capture Operations Module
- * through the capture interface. EPCISEvents will be sent to the module using
- * HTTP POST requests.
+ * This client provides access to an EPCIS Capture Interface. EPCIS events will
+ * be sent to the capture interface using HTTP POST requests. This client
+ * supports the following authentication options: HTTP BASIC AUTH and HTTPS with
+ * client certificate.
  * 
  * @author Marco Steybe
  */
@@ -69,162 +72,182 @@ public class CaptureClient implements X509TrustManager, HostnameVerifier {
     private static final String DEFAULT_CAPTURE_URL = "http://demo.fosstrak.org/epcis/capture";
 
     /**
-     * The URL String at which the Capture Operations Module listens.
+     * The URL String of the EPCIS Capture Interface.
      */
     private String captureUrl;
-    
+
     private Object[] authOptions;
 
     /**
-     * Constructs a new CaptureClient which connects to the Capture Operations
-     * Module listening at the default URL, with no authentication.
+     * Constructs a new CaptureClient using a default URL and no authentication.
      */
     public CaptureClient() {
         this(null, null);
     }
 
     /**
-     * Constructs a new CaptureClient which connects to the Capture Operations
-     * Module listening at the specified URL, with no authentication.
+     * Constructs a new CaptureClient using the given URL and no authentication.
+     * 
+     * @param url
+     *            The URL to the EPCIS Capture Interface.
      */
     public CaptureClient(String url) {
-    	this(url, null);
-    }
-    
-    /**
-     * Constructs a new CaptureClient which connects to the Capture Operations
-     * Module listening at the given URL.
-     * 
-     * @param url The URL at which the capture service listens.
-     * @param authOptions The authentication options:
-     *            <p>
-     *            <table border="1">
-     *            <tr>
-     *            <td><code>authenticationOptions[0]</code></td>
-     *            <td><code>[1]</code></td>
-     *            <td><code>[2]</code></td>
-     *            </tr>
-     *            <tr>
-     *            <td><code>AuthenticationType.BASIC</code></td>
-     *            <td>username</td>
-     *            <td>password</td>
-     *            </tr>
-     *            <tr>
-     *            <td><code>AuthenticationType.HTTPS_WITH_CLIENT_CERT</code></td>
-     *            <td>keystore file</td>
-     *            <td>password</td>
-     *            </tr>
-     *            </table>
-     */
-    public CaptureClient(final String url, Object[] authOptions) {
-    	// set the URL
-    	if (url != null) {
-    		captureUrl = url;
-    	} else {
-    		Properties props = loadProperties();
-    		if (props != null) {
-    			captureUrl = props.getProperty(PROPERTY_CAPTURE_URL);
-    		}
-    		if (captureUrl == null) {
-    			captureUrl = DEFAULT_CAPTURE_URL;
-    		}
-    	}
-    	this.authOptions = authOptions;
+        this(url, null);
     }
 
     /**
-     * @return The query client properties.
+     * Constructs a new CaptureClient using the given URL and authentication
+     * options. The following authentication options are supported:
+     * <p>
+     * <table border="1">
+     * <tr>
+     * <td><b><code>authOptions[0]</code></b></td>
+     * <td><b><code>authOptions[1]</code></b></td>
+     * <td><b><code>authOptions[2]</code></b></td>
+     * </tr>
+     * <tr>
+     * <td><code>AuthenticationType.BASIC</code></td>
+     * <td>username</td>
+     * <td>password</td>
+     * </tr>
+     * <tr>
+     * <td><code>AuthenticationType.HTTPS_WITH_CLIENT_CERT</code></td>
+     * <td>keystore file</td>
+     * <td>password</td>
+     * </tr>
+     * </table>
+     * 
+     * @param url
+     *            The URL to the EPCIS Capture Interface.
+     * @param authOptions
+     *            The authentication options as described above.
+     */
+    public CaptureClient(final String url, Object[] authOptions) {
+        // set the URL
+        if (url != null) {
+            captureUrl = url;
+        } else {
+            Properties props = loadProperties();
+            if (props != null) {
+                captureUrl = props.getProperty(PROPERTY_CAPTURE_URL);
+            }
+            if (captureUrl == null) {
+                captureUrl = DEFAULT_CAPTURE_URL;
+            }
+        }
+        this.authOptions = authOptions;
+    }
+
+    /**
+     * @return The capture client properties.
      */
     private Properties loadProperties() {
         Properties props = new Properties();
         InputStream is = getClass().getResourceAsStream(PROPERTY_FILE);
         if (is != null) {
-	        try {
-	            props.load(is);
-	            is.close();
-	        } catch (IOException e) {
-	            System.out.println("Unable to load properties from "
-	                    + PROPERTY_FILE + ". Using defaults.");
-	        }
-        }
-        else {
-            System.out.println("Unable to load properties from file "
-                    + PROPERTY_FILE + ". Using defaults.");
+            try {
+                props.load(is);
+                is.close();
+            } catch (IOException e) {
+                System.out.println("Unable to load properties from " + PROPERTY_FILE + ". Using defaults.");
+            }
+        } else {
+            System.out.println("Unable to load properties from file " + PROPERTY_FILE + ". Using defaults.");
         }
         return props;
     }
 
     /**
-     * Send the XML available from the given InputStream to the repository for
-     * capturing.
+     * Sends the XML available from the given InputStream to the EPCIS capture
+     * interface. Please see the <a
+     * href="http://www.fosstrak.org/epcis/docs/user-guide.html">Fosstrak
+     * User-Guide</a> for more information and code samples.
      * 
      * @param xmlStream
-     *            A stream providing an EPCISDocument which contains a list of
-     *            events inside the EPCISBody element.
+     *            An input stream providing an EPCISDocument with a list of
+     *            events.
      * @return The HTTP response code from the repository.
-     * @throws IOException
+     * @throws CaptureClientException
      *             If an error sending the document occurred.
      */
-    public int capture(final InputStream xmlStream) throws Exception {
-        return doPost(xmlStream, "text/xml");
+    public int capture(final InputStream xmlStream) throws CaptureClientException {
+        try {
+            return doPost(xmlStream, "text/xml");
+        } catch (IOException e) {
+            throw new CaptureClientException("error communicating with EPCIS cpature interface: " + e.getMessage(), e);
+        }
     }
 
     /**
-     * Send the given XML String to the repository for capturing.
+     * Sends the given XML String to the EPCIS capture interface. Please see the
+     * <a href="http://www.fosstrak.org/epcis/docs/user-guide.html">Fosstrak
+     * User-Guide</a> for more information and code samples.
      * 
      * @param eventXml
-     *            The XML String consisting of an EPCISDocument which in turn
-     *            contains a list of events inside the EPCISBody element.
+     *            The XML String with the EPCISDocument and a list of events.
      * @return The HTTP response code from the repository.
-     * @throws IOException
+     * @throws CaptureClientException
      *             If an error sending the document occurred.
      */
-    public int capture(final String eventXml) throws Exception {
-        return doPost(eventXml, "text/xml");
+    public int capture(final String eventXml) throws CaptureClientException {
+        try {
+            return doPost(eventXml, "text/xml");
+        } catch (IOException e) {
+            throw new CaptureClientException("error communicating with EPCIS cpature interface: " + e.getMessage(), e);
+        }
     }
 
     /**
-     * Send the given EPCISDocumentType to the repository for capturing.
+     * Sends the given EPCIS Document to the EPCIS capture interface. Please see
+     * the <a href="http://www.fosstrak.org/epcis/docs/user-guide.html">Fosstrak
+     * User-Guide</a> for more information and code samples.
      * 
      * @param epcisDoc
-     *            The EPCISDocument containing a list of events inside the
-     *            EPCISBody element.
+     *            The EPCIS Document with a list of events.
      * @return The HTTP response code from the repository.
      * @throws IOException
      *             If an error sending the document occurred.
      * @throws JAXBException
      *             If an error serializing the given document into XML occurred.
      */
-    public int capture(final Document epcisDoc) throws Exception {
+    public int capture(final Document epcisDoc) throws CaptureClientException {
         StringWriter writer = new StringWriter();
         ObjectFactory objectFactory = new ObjectFactory();
-        JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
-        JAXBElement<? extends Document> item;
-        if (epcisDoc instanceof EPCISDocumentType) {
-            item = objectFactory.createEPCISDocument((EPCISDocumentType) epcisDoc);
-        } else {
-            item = objectFactory.createEPCISMasterDataDocument((EPCISMasterDataDocumentType) epcisDoc);
+        try {
+            JAXBContext context = JAXBContext.newInstance("org.fosstrak.epcis.model");
+            JAXBElement<? extends Document> item;
+            if (epcisDoc instanceof EPCISDocumentType) {
+                item = objectFactory.createEPCISDocument((EPCISDocumentType) epcisDoc);
+            } else {
+                item = objectFactory.createEPCISMasterDataDocument((EPCISMasterDataDocumentType) epcisDoc);
+            }
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(item, writer);
+        } catch (JAXBException e) {
+            throw new CaptureClientException("error serializing EPCIS Document: " + e.getMessage(), e);
         }
-        Marshaller marshaller = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.marshal(item, writer);
         return capture(writer.toString());
     }
 
     /**
-     * Invokes the dbReset operation in the Capture Module deleting all event
-     * data in the EPCIS database. This operation is only allowed if the
-     * corresponding property is set in the repository's configuration.
+     * Invokes the non-standardized <code>dbReset</code> operation in the
+     * Fosstrak EPCIS capture interface. It deletes all event data in the EPCIS
+     * database. This operation is only allowed if the corresponding property is
+     * set in the repository's configuration.
      * 
      * @return The response from the capture module.
-     * @throws IOException
+     * @throws CaptureClientException
      *             If a communication error occurred.
      */
-    public int dbReset() throws Exception {
+    public int dbReset() throws CaptureClientException {
         String formParam = "dbReset=true";
-        return doPost(formParam, "application/x-www-form-urlencoded");
-
+        try {
+            return doPost(formParam, "application/x-www-form-urlencoded");
+        } catch (IOException e) {
+            throw new CaptureClientException("error communicating with EPCIS cpature interface: " + e.getMessage(), e);
+        }
     }
 
     private boolean isEmpty(String s) {
@@ -232,86 +255,95 @@ public class CaptureClient implements X509TrustManager, HostnameVerifier {
     }
 
     /**
-     * Opens a connection to the capture module.
+     * Opens a connection to the EPCIS capture interface.
      * 
      * @param contentType
      *            The HTTP content-type, e.g., <code>text/xml</code>
      * @return The HTTP connection object.
-     * @throws IOException
      */
-    private HttpURLConnection getConnection(final String contentType) throws Exception {
+    private HttpURLConnection getConnection(final String contentType) throws CaptureClientException, IOException {
+        URL serviceUrl;
+        try {
+            serviceUrl = new URL(captureUrl);
+        } catch (MalformedURLException e) {
+            throw new CaptureClientException(captureUrl + " is not an URL", e);
+        }
+        HttpURLConnection connection;
+        SSLContext sslContext = null;
 
-    	URL serviceUrl = new URL(captureUrl);
-    	HttpURLConnection connection;
-    	SSLContext sslContext = null;
-    	
-    	if (authOptions != null) {
+        if (authOptions != null) {
 
-    		if (AuthenticationType.BASIC.equals(authOptions[0])) {
+            if (AuthenticationType.BASIC.equals(authOptions[0])) {
 
-    			// logger.debug("Authenticating via Basic as: " +
-    			// authenticationOptions[1]);
+                // logger.debug("Authenticating via Basic as: " +
+                // authenticationOptions[1]);
 
-    			final String username = (String)authOptions[1];
-    			final String password = (String)authOptions[2];
-    			
-    			if (isEmpty(username) || isEmpty(password)) {
-    				throw new Exception("Authentication method " + authOptions[0] + " requires a valid user name and password");
-    			}
+                final String username = (String) authOptions[1];
+                final String password = (String) authOptions[2];
 
-    			Authenticator.setDefault(new Authenticator() {
-    				@Override
-    				protected PasswordAuthentication getPasswordAuthentication() {
-    					return new PasswordAuthentication(username, password.toCharArray());
-    				}
-    			});
-    			
-    		}
-    		else if (AuthenticationType.HTTPS_WITH_CLIENT_CERT.equals(authOptions[0])) {
+                if (isEmpty(username) || isEmpty(password)) {
+                    throw new CaptureClientException("Authentication method " + authOptions[0]
+                            + " requires a valid user name and password");
+                }
 
-    			// logger.debug("Authenticating with certificate in file: " +
-    			// authenticationOptions[1]);
+                Authenticator.setDefault(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password.toCharArray());
+                    }
+                });
 
-    			if (!"HTTPS".equalsIgnoreCase(serviceUrl.getProtocol())) {
-    				throw new Exception("Authentication method " + authOptions[0] + " requires the use of HTTPS");
-    			}
+            } else if (AuthenticationType.HTTPS_WITH_CLIENT_CERT.equals(authOptions[0])) {
 
-    			String keyStoreFile = (String)authOptions[1];
-    			String password = (String)authOptions[2];
-    			
-    			if (isEmpty(keyStoreFile) || isEmpty(password)) {
-    				throw new Exception("Authentication method " + authOptions[0] + " requires a valid keystore (PKCS12 or JKS) and password");
-    			}
+                // logger.debug("Authenticating with certificate in file: " +
+                // authenticationOptions[1]);
 
-    			KeyStore keyStore = KeyStore.getInstance(keyStoreFile.endsWith(".p12") ? "PKCS12" : "JKS");
-    			keyStore.load(new FileInputStream(new File(keyStoreFile)), password.toCharArray());
+                if (!"HTTPS".equalsIgnoreCase(serviceUrl.getProtocol())) {
+                    throw new CaptureClientException("Authentication method " + authOptions[0]
+                            + " requires the use of HTTPS");
+                }
 
-    			Authenticator.setDefault(null);
-    	    	sslContext = getSSLContext(keyStore, password.toCharArray());
-    	    	
-    		}
-    		else {
-    			Authenticator.setDefault(null);
-    		}
-    	}
-    	else {
-    		Authenticator.setDefault(null);
-    	}
+                String keyStoreFile = (String) authOptions[1];
+                String password = (String) authOptions[2];
 
-    	connection = (HttpURLConnection)serviceUrl.openConnection();
-    	if (sslContext != null && connection instanceof HttpsURLConnection) {
-    		HttpsURLConnection httpsConnection = (HttpsURLConnection)connection;
-    		httpsConnection.setHostnameVerifier(this);
-			httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
-    	}
-    	connection.setRequestProperty("content-type", contentType);
-    	connection.setRequestMethod("POST");
-    	connection.setDoInput(true);
-    	connection.setDoOutput(true);
-    	
-    	return connection;
+                if (isEmpty(keyStoreFile) || isEmpty(password)) {
+                    throw new CaptureClientException("Authentication method " + authOptions[0]
+                            + " requires a valid keystore (PKCS12 or JKS) and password");
+                }
+
+                try {
+                    KeyStore keyStore = KeyStore.getInstance(keyStoreFile.endsWith(".p12") ? "PKCS12" : "JKS");
+                    keyStore.load(new FileInputStream(new File(keyStoreFile)), password.toCharArray());
+
+                    Authenticator.setDefault(null);
+                    sslContext = getSSLContext(keyStore, password.toCharArray());
+                } catch (Throwable t) {
+                    throw new CaptureClientException("unable to load keystore or set up SSL context", t);
+                }
+            } else {
+                Authenticator.setDefault(null);
+            }
+        } else {
+            Authenticator.setDefault(null);
+        }
+
+        connection = (HttpURLConnection) serviceUrl.openConnection();
+        if (sslContext != null && connection instanceof HttpsURLConnection) {
+            HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
+            httpsConnection.setHostnameVerifier(this);
+            httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+        }
+        connection.setRequestProperty("content-type", contentType);
+        try {
+            connection.setRequestMethod("POST");
+        } catch (ProtocolException e) {
+            throw new CaptureClientException("unable to set HTTP request method POST", e);
+        }
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        return connection;
     }
-        
+
     /**
      * Send data to the repository's capture operation using HTTP POST. The data
      * will be sent using the given content-type.
@@ -322,7 +354,7 @@ public class CaptureClient implements X509TrustManager, HostnameVerifier {
      * @throws IOException
      *             If an error on the HTTP layer occurred.
      */
-    private int doPost(final String data, final String contentType) throws Exception {
+    private int doPost(final String data, final String contentType) throws CaptureClientException, IOException {
         HttpURLConnection connection = getConnection(contentType);
         // write the data
         OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
@@ -342,8 +374,9 @@ public class CaptureClient implements X509TrustManager, HostnameVerifier {
      * @return The HTTP response message from the repository.
      * @throws IOException
      *             If an error on the HTTP layer occurred.
+     * @throws CaptureClientException
      */
-    private int doPost(final InputStream data, final String contentType) throws Exception {
+    private int doPost(final InputStream data, final String contentType) throws IOException, CaptureClientException {
         HttpURLConnection connection = getConnection(contentType);
         // read from input and write to output
         OutputStream os = connection.getOutputStream();
@@ -365,7 +398,7 @@ public class CaptureClient implements X509TrustManager, HostnameVerifier {
     }
 
     public Object[] getAuthOptions() {
-    	return authOptions;
+        return authOptions;
     }
 
     // X509TrustManager methods: Note that this client will trust any server
@@ -381,21 +414,20 @@ public class CaptureClient implements X509TrustManager, HostnameVerifier {
     public X509Certificate[] getAcceptedIssuers() {
         return null;
     }
-    
-    // HostnameVerifier methods: Note that this client will believe the authenticity
-    // of any DNS name it is given. Again, probably OK for the nature of this
-    // client, but generally not a good idea.
-    
-	public boolean verify(String arg0, SSLSession arg1) {
-		return true;
-	}
 
-	private SSLContext getSSLContext(KeyStore keyStore, char[] password) throws Exception {
-		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-		keyManagerFactory.init(keyStore, password);
-		SSLContext context = SSLContext.getInstance("TLS");
-		context.init(keyManagerFactory.getKeyManagers(), new TrustManager[] { this }, new SecureRandom());
-		return context;
-	}
+    // HostnameVerifier methods: Note that this client will believe the
+    // authenticity of any DNS name it is given. Again, probably OK for the
+    // nature of this client, but generally not a good idea.
 
+    public boolean verify(String arg0, SSLSession arg1) {
+        return true;
+    }
+
+    private SSLContext getSSLContext(KeyStore keyStore, char[] password) throws Exception {
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+        keyManagerFactory.init(keyStore, password);
+        SSLContext context = SSLContext.getInstance("TLS");
+        context.init(keyManagerFactory.getKeyManagers(), new TrustManager[] { this }, new SecureRandom());
+        return context;
+    }
 }

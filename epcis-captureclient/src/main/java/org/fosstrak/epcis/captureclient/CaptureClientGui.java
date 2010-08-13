@@ -28,10 +28,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -1092,18 +1090,6 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-        } catch (MalformedURLException mfue) {
-            JOptionPane.showMessageDialog(frame, mfue.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            StringWriter detailed = new StringWriter();
-            PrintWriter pw = new PrintWriter(detailed);
-            mfue.printStackTrace(pw);
-            dwOutputTextArea.append(detailed.toString());
-        } catch (IOException ioe) {
-            JOptionPane.showMessageDialog(frame, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            StringWriter detailed = new StringWriter();
-            PrintWriter pw = new PrintWriter(detailed);
-            ioe.printStackTrace(pw);
-            dwOutputTextArea.append(detailed.toString());
         } catch (TransformerException te) {
             JOptionPane.showMessageDialog(frame, te.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             StringWriter detailed = new StringWriter();
@@ -1116,7 +1102,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
             PrintWriter pw = new PrintWriter(detailed);
             pce.printStackTrace(pw);
             dwOutputTextArea.append(detailed.toString());
-        } catch (Exception e) {
+        } catch (CaptureClientException e) {
             JOptionPane.showMessageDialog(frame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             StringWriter detailed = new StringWriter();
             PrintWriter pw = new PrintWriter(detailed);
