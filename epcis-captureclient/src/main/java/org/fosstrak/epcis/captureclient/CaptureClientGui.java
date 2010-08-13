@@ -31,13 +31,9 @@ import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -68,6 +64,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.fosstrak.epcis.captureclient.CaptureClientHelper.EpcisEventType;
+import org.fosstrak.epcis.captureclient.CaptureClientHelper.ExampleEvents;
 import org.fosstrak.epcis.captureclient.CaptureEvent.BizTransaction;
 import org.fosstrak.epcis.gui.AuthenticationOptionsChangeEvent;
 import org.fosstrak.epcis.gui.AuthenticationOptionsChangeListener;
@@ -86,43 +84,10 @@ import org.w3c.dom.Element;
 public class CaptureClientGui extends WindowAdapter implements ActionListener, AuthenticationOptionsChangeListener {
 
     /**
-     * Miscellaneous numeric formats used in formatting.
-     */
-    private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
-    private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
-    private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
-
-    /**
      * The client through which the EPCISEvents will be sent to the repository's
      * Capture Operations Module.
      */
     private CaptureClient client;
-
-    /**
-     * The various tooltips.
-     */
-    private final String toolTipDate = "Format is ISO 8601, i.e. YYYY-MM-DDThh:mm:ss.SSSZ";
-    private final String toolTipUri = "URI";
-    private final String toolTipUris = "One or multiple URIs, separated by spaces";
-    private final String toolTipInteger = "Integer number";
-    private final String toolTipOptional = ". This field is optional";
-    private final String toolTipBizTransType = "Business Transaction Type";
-    private final String toolTipBizTransID = "Business Transactio ID";
-
-    /**
-     * The possible values for the "actions" parameter.
-     */
-    private final String[] actions = { "ADD", "OBSERVE", "DELETE" };
-
-    /**
-     * The four possible event types, in human readable form.
-     */
-    private final String[] eventTypes = { "Object event", "Aggregation event", "Quantity event", "Transaction event" };
-
-    /**
-     * The four possible event types, used for XML creation.
-     */
-    private final String[] xmlEventNode = { "ObjectEvent", "AggregationEvent", "QuantityEvent", "TransactionEvent" };
 
     /**
      * Holds all the examples.
@@ -324,7 +289,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         c.gridy = 2;
         mwConfigPanel.add(mwShowDebugWindowCheckBox, c);
 
-        mwEventTypeChooserComboBox = new JComboBox(eventTypes);
+        mwEventTypeChooserComboBox = new JComboBox(EpcisEventType.guiNames());
         mwEventTypeChooserComboBox.addActionListener(this);
         mwEventTypePanel.add(mwEventTypeChooserComboBox);
 
@@ -335,54 +300,54 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         // instantiate all event data input fields, their default values and
         // descriptions
         mwEventTimeLabel = new JLabel("event time");
-        mwEventTimeTextField = new JTextField(format(Calendar.getInstance()));
-        mwEventTimeTextField.setToolTipText(toolTipDate);
+        mwEventTimeTextField = new JTextField(CaptureClientHelper.format(Calendar.getInstance()));
+        mwEventTimeTextField.setToolTipText(CaptureClientHelper.toolTipDate);
 
         mwEventTimeZoneOffsetLabel = new JLabel("time zone offset");
-        mwEventTimeZoneOffsetTextField = new JTextField(getTimeZone(Calendar.getInstance()));
+        mwEventTimeZoneOffsetTextField = new JTextField(CaptureClientHelper.getTimeZone(Calendar.getInstance()));
 
         mwActionLabel = new JLabel("action");
-        mwActionComboBox = new JComboBox(actions);
+        mwActionComboBox = new JComboBox(CaptureClientHelper.ACTIONS);
 
         mwBizStepLabel = new JLabel("business step");
         mwBizStepTextField = new JTextField();
-        mwBizStepTextField.setToolTipText(toolTipUri + toolTipOptional);
+        mwBizStepTextField.setToolTipText(CaptureClientHelper.toolTipUri + CaptureClientHelper.toolTipOptional);
 
         mwDispositionLabel = new JLabel("disposition");
         mwDispositionTextField = new JTextField();
-        mwDispositionTextField.setToolTipText(toolTipUri + toolTipOptional);
+        mwDispositionTextField.setToolTipText(CaptureClientHelper.toolTipUri + CaptureClientHelper.toolTipOptional);
 
         mwReadPointLabel = new JLabel("read point");
         mwReadPointTextField = new JTextField();
-        mwReadPointTextField.setToolTipText(toolTipUri + toolTipOptional);
+        mwReadPointTextField.setToolTipText(CaptureClientHelper.toolTipUri + CaptureClientHelper.toolTipOptional);
 
         mwBizLocationLabel = new JLabel("business location");
         mwBizLocationTextField = new JTextField();
-        mwBizLocationTextField.setToolTipText(toolTipUri + toolTipOptional);
+        mwBizLocationTextField.setToolTipText(CaptureClientHelper.toolTipUri + CaptureClientHelper.toolTipOptional);
 
         mwBizTransactionLabel = new JLabel("business transaction");
         mwBizTransactionTextField = new JTextField();
-        mwBizTransactionTextField.setToolTipText(toolTipUri + toolTipOptional);
+        mwBizTransactionTextField.setToolTipText(CaptureClientHelper.toolTipUri + CaptureClientHelper.toolTipOptional);
 
         mwEpcListLabel = new JLabel("EPCs");
         mwEpcListTextField = new JTextField();
-        mwEpcListTextField.setToolTipText(toolTipUris);
+        mwEpcListTextField.setToolTipText(CaptureClientHelper.toolTipUris);
 
         mwParentIDLabel = new JLabel("parent object");
         mwParentIDTextField = new JTextField();
-        mwParentIDTextField.setToolTipText(toolTipUri);
+        mwParentIDTextField.setToolTipText(CaptureClientHelper.toolTipUri);
 
         mwChildEPCsLabel = new JLabel("child EPCs");
         mwChildEPCsTextField = new JTextField();
-        mwChildEPCsTextField.setToolTipText(toolTipUris + toolTipOptional);
+        mwChildEPCsTextField.setToolTipText(CaptureClientHelper.toolTipUris + CaptureClientHelper.toolTipOptional);
 
         mwEpcClassLabel = new JLabel("EPC class");
         mwEpcClassTextField = new JTextField();
-        mwChildEPCsTextField.setToolTipText(toolTipUri);
+        mwChildEPCsTextField.setToolTipText(CaptureClientHelper.toolTipUri);
 
         mwQuantityLabel = new JLabel("quantity");
         mwQuantityTextField = new JTextField();
-        mwChildEPCsTextField.setToolTipText(toolTipInteger);
+        mwChildEPCsTextField.setToolTipText(CaptureClientHelper.toolTipInteger);
 
         mwBizTransTypeFields = new ArrayList<JTextField>();
         mwBizTransIDFields = new ArrayList<JTextField>();
@@ -401,7 +366,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         mwEventDataPanel.add(mwEventDataInputPanel);
         mwEventDataPanel.add(mwEventDataExamplesPanel);
 
-        eventDataPanelObjectEvent();
+        drawEventDataPanel(EpcisEventType.ObjectEvent);
         mwFillInExampleButton = new JButton("Fill in example");
         mwFillInExampleButton.addActionListener(this);
         mwEventDataExamplesPanel.add(mwFillInExampleButton, BorderLayout.EAST);
@@ -411,361 +376,107 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         mainWindow.pack();
         mainWindow.setVisible(true);
 
-        createDebugWindow();
+        drawDebugWindow();
     }
 
-    /**
-     * Show user input elements for object event.
-     */
-    private void eventDataPanelObjectEvent() {
+    private void drawEventDataPanel(EpcisEventType eventType) {
         mwEventDataInputPanel.removeAll();
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(10, 5, 5, 0);
 
-        c.weightx = 0;
-        c.gridx = 0;
         c.gridy = 0;
+        c.weightx = 0; c.gridx = 0;
         mwEventDataInputPanel.add(mwEventTimeLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
+        c.weightx = 1; c.gridx = 1;
         mwEventDataInputPanel.add(mwEventTimeTextField, c);
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 1;
+        c.gridy++;
+        c.weightx = 0; c.gridx = 0;
         mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
+        c.weightx = 1; c.gridx = 1;
         mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 2;
-        mwEventDataInputPanel.add(mwEpcListLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEpcListTextField, c);
+        if (EpcisEventType.ObjectEvent == eventType || EpcisEventType.TransactionEvent == eventType) {
+            c.gridy++;
+            c.weightx = 0; c.gridx = 0;
+            mwEventDataInputPanel.add(mwEpcListLabel, c);
+            c.weightx = 1; c.gridx = 1;
+            mwEventDataInputPanel.add(mwEpcListTextField, c);
+        }
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 3;
-        mwEventDataInputPanel.add(mwActionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwActionComboBox, c);
+        if (EpcisEventType.AggregationEvent == eventType || EpcisEventType.TransactionEvent == eventType) {
+            c.gridy++;
+            c.weightx = 0; c.gridx = 0;
+            mwEventDataInputPanel.add(mwParentIDLabel, c);
+            c.weightx = 1; c.gridx = 1;
+            mwEventDataInputPanel.add(mwParentIDTextField, c);
+        }
+        
+        if (EpcisEventType.AggregationEvent == eventType) {
+            c.gridy++;
+            c.weightx = 0; c.gridx = 0;
+            mwEventDataInputPanel.add(mwChildEPCsLabel, c);
+            c.weightx = 1; c.gridx = 1;
+            mwEventDataInputPanel.add(mwChildEPCsTextField, c);
+        }
+        
+        if (EpcisEventType.QuantityEvent == eventType) {
+            c.gridy++;
+            c.weightx = 0; c.gridx = 0;
+            mwEventDataInputPanel.add(mwEpcClassLabel, c);
+            c.weightx = 1; c.gridx = 1;
+            mwEventDataInputPanel.add(mwEpcClassTextField, c);
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 4;
+            c.gridy++;
+            c.weightx = 0; c.gridx = 0;
+            mwEventDataInputPanel.add(mwQuantityLabel, c);
+            c.weightx = 1; c.gridx = 1;
+            mwEventDataInputPanel.add(mwQuantityTextField, c);
+        } else {
+            c.gridy++;
+            c.weightx = 0; c.gridx = 0;
+            mwEventDataInputPanel.add(mwActionLabel, c);
+            c.weightx = 1; c.gridx = 1;
+            mwEventDataInputPanel.add(mwActionComboBox, c);
+        }
+
+        c.gridy++;
+        c.weightx = 0; c.gridx = 0;
         mwEventDataInputPanel.add(mwBizStepLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
+        c.weightx = 1; c.gridx = 1;
         mwEventDataInputPanel.add(mwBizStepTextField, c);
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 5;
+        c.gridy++;
+        c.weightx = 0; c.gridx = 0;
         mwEventDataInputPanel.add(mwDispositionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
+        c.weightx = 1; c.gridx = 1;
         mwEventDataInputPanel.add(mwDispositionTextField, c);
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 6;
+        c.gridy++;
+        c.weightx = 0; c.gridx = 0;
         mwEventDataInputPanel.add(mwReadPointLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
+        c.weightx = 1; c.gridx = 1;
         mwEventDataInputPanel.add(mwReadPointTextField, c);
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 7;
+        c.gridy++;
+        c.weightx = 0; c.gridx = 0;
         mwEventDataInputPanel.add(mwBizLocationLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
+        c.weightx = 1; c.gridx = 1;
         mwEventDataInputPanel.add(mwBizLocationTextField, c);
 
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 8;
+        c.gridy++;
+        c.weightx = 0; c.gridx = 0;
         mwEventDataInputPanel.add(mwBizTransactionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizTransactionPanel, c);
-    }
-
-    /**
-     * Show user input elements for aggregation event.
-     */
-    private void eventDataPanelAggregationEvent() {
-        mwEventDataInputPanel.removeAll();
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10, 5, 5, 0);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 0;
-        mwEventDataInputPanel.add(mwEventTimeLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEventTimeTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 1;
-        mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 2;
-        mwEventDataInputPanel.add(mwParentIDLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwParentIDTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 3;
-        mwEventDataInputPanel.add(mwChildEPCsLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwChildEPCsTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 4;
-        mwEventDataInputPanel.add(mwActionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwActionComboBox, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 5;
-        mwEventDataInputPanel.add(mwBizStepLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizStepTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 6;
-        mwEventDataInputPanel.add(mwDispositionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwDispositionTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 7;
-        mwEventDataInputPanel.add(mwReadPointLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwReadPointTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 8;
-        mwEventDataInputPanel.add(mwBizLocationLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizLocationTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 9;
-        mwEventDataInputPanel.add(mwBizTransactionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizTransactionPanel, c);
-    }
-
-    /**
-     * Show user input elements for quantity event.
-     */
-    private void eventDataPanelQuantityEvent() {
-        mwEventDataInputPanel.removeAll();
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10, 5, 5, 0);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 0;
-        mwEventDataInputPanel.add(mwEventTimeLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEventTimeTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 1;
-        mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 2;
-        mwEventDataInputPanel.add(mwEpcClassLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEpcClassTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 3;
-        mwEventDataInputPanel.add(mwQuantityLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwQuantityTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 4;
-        mwEventDataInputPanel.add(mwBizStepLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizStepTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 5;
-        mwEventDataInputPanel.add(mwDispositionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwDispositionTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 6;
-        mwEventDataInputPanel.add(mwReadPointLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwReadPointTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 7;
-        mwEventDataInputPanel.add(mwBizLocationLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizLocationTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 8;
-        mwEventDataInputPanel.add(mwBizTransactionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizTransactionPanel, c);
-    }
-
-    /**
-     * Show user input elements for transaction events.
-     */
-    private void eventDataPanelTransactionEvent() {
-        mwEventDataInputPanel.removeAll();
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10, 5, 5, 0);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 0;
-        mwEventDataInputPanel.add(mwEventTimeLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEventTimeTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 1;
-        mwEventDataInputPanel.add(mwEventTimeZoneOffsetLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEventTimeZoneOffsetTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 2;
-        mwEventDataInputPanel.add(mwParentIDLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwParentIDTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 3;
-        mwEventDataInputPanel.add(mwEpcListLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwEpcListTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 4;
-        mwEventDataInputPanel.add(mwActionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwActionComboBox, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 5;
-        mwEventDataInputPanel.add(mwBizStepLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizStepTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 6;
-        mwEventDataInputPanel.add(mwDispositionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwDispositionTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 7;
-        mwEventDataInputPanel.add(mwReadPointLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwReadPointTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 8;
-        mwEventDataInputPanel.add(mwBizLocationLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
-        mwEventDataInputPanel.add(mwBizLocationTextField, c);
-
-        c.weightx = 0;
-        c.gridx = 0;
-        c.gridy = 9;
-        mwEventDataInputPanel.add(mwBizTransactionLabel, c);
-        c.weightx = 1;
-        c.gridx = 1;
+        c.weightx = 1; c.gridx = 1;
         mwEventDataInputPanel.add(mwBizTransactionPanel, c);
     }
 
     /**
      * Sets up the window used to show the debug output.
      */
-    private void createDebugWindow() {
+    private void drawDebugWindow() {
         debugWindow = new JFrame("Debug output");
         debugWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         debugWindow.addWindowListener(this);
@@ -788,7 +499,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
      * Sets up the window used to show the list of examples. Can only be open
      * once.
      */
-    private void createExampleWindow() {
+    private void drawExampleWindow() {
         if (exampleWindow != null) {
             exampleWindow.setVisible(true);
             return;
@@ -849,7 +560,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
             return;
         }
         if (e.getSource() == mwFillInExampleButton) {
-            createExampleWindow();
+            drawExampleWindow();
             return;
         }
         if (e.getSource() == ewOkButton) {
@@ -866,7 +577,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         if (e.getSource() == mwBizTransactionPlus) {
             addBizTransactionRow();
         }
-        // check, if it is a JButton and second, if it's name starts with
+        // check, if it is a JButton and second, if its name starts with
         // "removeBizTransNumber<Number>".
         if (((JButton) e.getSource()).getName() != null
                 && ((JButton) e.getSource()).getName().startsWith("removeBizTransNumber")) {
@@ -927,16 +638,16 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         /* show the corresponding input mask */
         switch (mwEventTypeChooserComboBox.getSelectedIndex()) {
         case 0:
-            eventDataPanelObjectEvent();
+            drawEventDataPanel(EpcisEventType.ObjectEvent);
             break;
         case 1:
-            eventDataPanelAggregationEvent();
+            drawEventDataPanel(EpcisEventType.AggregationEvent);
             break;
         case 2:
-            eventDataPanelQuantityEvent();
+            drawEventDataPanel(EpcisEventType.QuantityEvent);
             break;
         case 3:
-            eventDataPanelTransactionEvent();
+            drawEventDataPanel(EpcisEventType.TransactionEvent);
             break;
         default:
         }
@@ -969,7 +680,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
             document = impl.createDocument("urn:epcglobal:epcis:xsd:1", "epcis:EPCISDocument", null);
             Element root = document.getDocumentElement();
 
-            root.setAttribute("creationDate", format(Calendar.getInstance()));
+            root.setAttribute("creationDate", CaptureClientHelper.format(Calendar.getInstance()));
             root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
             root.setAttribute("xmlns:epcis", "urn:epcglobal:epcis:xsd:1");
             root.setAttribute("schemaVersion", "1.0");
@@ -979,7 +690,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
             element = document.createElement("EventList");
             root.appendChild(element);
             root = element;
-            element = document.createElement(xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()]);
+            element = document.createElement(EpcisEventType.values()[mwEventTypeChooserComboBox.getSelectedIndex()].name());
             root.appendChild(element);
             root = element;
 
@@ -999,7 +710,8 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
 
             // recordTime is set by the capture-Interface
 
-            if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("ObjectEvent")) {
+            int index = mwEventTypeChooserComboBox.getSelectedIndex();
+            if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.ObjectEvent) {
                 if (!addEpcList(document, root)) {
                     JOptionPane.showMessageDialog(frame, "Please specify at least one EPC", "Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -1011,7 +723,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
                 addReadPoint(document, root);
                 addBizLocation(document, root);
                 addBizTransactionList(document, root);
-            } else if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("AggregationEvent")) {
+            } else if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.AggregationEvent) {
                 if (!addParentId(document, root) && !mwActionComboBox.getSelectedItem().equals("OBSERVE")) {
                     JOptionPane.showMessageDialog(frame, "Because action is OBSERVE, it's required to "
                             + "specify a ParentID", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1028,7 +740,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
                 addReadPoint(document, root);
                 addBizLocation(document, root);
                 addBizTransactionList(document, root);
-            } else if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("QuantityEvent")) {
+            } else if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.QuantityEvent) {
                 if (!addEpcClass(document, root)) {
                     JOptionPane.showMessageDialog(frame, "Please specify an EPC class (URI)", "Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -1044,7 +756,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
                 addReadPoint(document, root);
                 addBizLocation(document, root);
                 addBizTransactionList(document, root);
-            } else if (xmlEventNode[mwEventTypeChooserComboBox.getSelectedIndex()].equals("TransactionEvent")) {
+            } else if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.TransactionEvent) {
                 if (!addBizTransactionList(document, root)) {
                     JOptionPane.showMessageDialog(frame, "Please specify at least one business "
                             + "transaction (ID, Type)", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1435,9 +1147,9 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
      */
     private void addBizTransactionRow() {
         JTextField bizTransID = new JTextField();
-        bizTransID.setToolTipText(toolTipBizTransID);
+        bizTransID.setToolTipText(CaptureClientHelper.toolTipBizTransID);
         JTextField bizTransType = new JTextField();
-        bizTransType.setToolTipText(toolTipBizTransType);
+        bizTransType.setToolTipText(CaptureClientHelper.toolTipBizTransType);
 
         ImageIcon tempDelIcon = getImageIcon("delete10.gif");
         JButton minus = new JButton(tempDelIcon);
@@ -1561,270 +1273,6 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
     }
 
     /**
-     * Implements a class that holds examples for the EPCIS Capture Interface
-     * Client. Uses class CaptureInterfaceEventExample to store them.
-     * 
-     * @author David Gubler
-     */
-    private final class ExampleEvents {
-        /**
-         * List that holds all the examples.
-         */
-        private List<CaptureEvent> examples = new ArrayList<CaptureEvent>();
-
-        /**
-         * Constructor. Sets up the examples. Add examples here if you wish.
-         */
-        private ExampleEvents() {
-            CaptureEvent ex = new CaptureEvent();
-            ex.setDescription("DEMO 1: Item is assigned a new EPC");
-            ex.setType(0);
-            ex.setEventTime("2006-09-20T06:36:17Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(0);
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:commissioning");
-            ex.setDisposition("urn:epcglobal:cbv:bizstep:active");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.00729.loc5");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.00729.rp97");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("DEMO 2: Item is inspected for QA");
-            ex.setType(0);
-            ex.setEventTime("2006-09-20T07:33:31.116Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(1);
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:inspecting");
-            ex.setDisposition("urn:epcglobal:cbv:bizstep:active");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.00729.loc5");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.00729.handheld8");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.7788");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("DEMO 3: Item is aggregated onto a pallet");
-            ex.setType(1);
-            ex.setAction(0);
-            ex.setEventTime("2006-09-20T08:55:04Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:packing");
-            ex.setDisposition("urn:epcglobal:cbv:disp:in_progress");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.00729.loc450");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.00729.rp104");
-            ex.setBizTransaction("urn:epcglobal:cbv:btt:po", "http://transaction.fosstrak.org/po/12345678");
-            ex.setParentID("urn:epc:id:sscc:0614141.1234567890");
-            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123780.7788 urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028 urn:epc:id:sgtin:0057000.123430.2029");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("DEMO 4: Pallet arrives at port of Kaohsiung");
-            ex.setType(0);
-            ex.setEventTime("2006-09-20T10:33:31.116Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(1);
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:arriving");
-            ex.setDisposition("urn:epcglobal:cbv:disp:in_progress");
-            ex.setBizLocation("http://epcis.fosstrak.org/demo/loc/china/kaohsiung");
-            ex.setReadPoint("http://epcis.fosstrak.org/demo/loc/china/kaohsiung/e62");
-            ex.setEpcList("urn:epc:id:sscc:0614141.1234567890");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("DEMO 5: Pallet departs from port of Kaohsiung");
-            ex.setType(0);
-            ex.setEventTime("2006-09-21T13:27:08.155Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(1);
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:departing");
-            ex.setDisposition("urn:epcglobal:cbv:disp:in_transit");
-            ex.setBizLocation("http://epcis.fosstrak.org/demo/loc/china/kaohsiung");
-            ex.setReadPoint("http://epcis.fosstrak.org/demo/loc/china/kaohsiung/b18");
-            ex.setEpcList("urn:epc:id:sscc:0614141.1234567890");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Item passes a reader during manufacturing process");
-            ex.setType(0);
-            ex.setEventTime("2006-04-03T20:33:31.116Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(1);
-            ex.setBizStep("http://epcis.fosstrak.org/bizstep/production");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.00101.loc210");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.00101.rp210");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.123780.3167");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Two pallets are loaded onto a truck");
-            ex.setType(0);
-            ex.setEventTime("2006-05-09T21:01:44Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(1);
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:loading");
-            ex.setDisposition("urn:epcglobal:cbv:disp:in_transit");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.00101.loc209");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.00101.rp53");
-            ex.setEpcList("urn:epc:id:sscc:0614141.2644895423 urn:epc:id:sscc:0614141.2644895424");
-            ex.setBizTransaction("urn:epcglobal:cbv:fmcg:btt:po", "http://transaction.example.com/po/12345678");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Item arrives for repair");
-            ex.setType(0);
-            ex.setEventTime("2006-05-10T04:50:35Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(1);
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:receiving");
-            ex.setDisposition("http://epcis.fosstrak.org/disp/in_repair");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.00101.repair-center");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.00101.rp77");
-            ex.setEpcList("urn:epc:id:sgtin:0034000.987650.2686");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Three items are aggregated onto a barcode-labeled pallet");
-            ex.setType(1);
-            ex.setAction(0);
-            ex.setEventTime("2006-06-01T15:55:04Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:packing");
-            ex.setDisposition("urn:epcglobal:cbv:disp:in_progress");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.00101.loc208");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.00101.rp98");
-            ex.setBizTransaction("urn:epcglobal:cbv:fmcg:btt:po", "http://transaction.example.com/po/12345678");
-            ex.setBizTransaction("urn:epcglobal:cbv:btt:asn", "http://transaction.example.com/asn/1152");
-            ex.setParentID("urn:epc:id:sscc:0614141.2644895423");
-            ex.setChildEPCs("urn:epc:id:sgtin:0057000.123430.2025 urn:epc:id:sgtin:0057000.123430.2027 "
-                    + "urn:epc:id:sgtin:0057000.123430.2028");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Aggregation ends at customer site");
-            ex.setType(1);
-            ex.setAction(2);
-            ex.setEventTime("2006-06-05T09:26:06Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.82863.loc3");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.82863.reader10");
-            ex.setBizTransaction("urn:epcglobal:cbv:fmcg:btt:po", "http://po.example.org/E58J3Q");
-            ex.setBizTransaction("urn:epcglobal:cbv:btt:asn", "http://transaction.example.com/asn/1152");
-            ex.setParentID("urn:epc:id:sscc:0614141.2644895423");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Physical inventory count: 67 items");
-            ex.setType(2);
-            ex.setEventTime("2006-01-15T16:15:31Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setBizStep("urn:epcglobal:cbv:bizstep:storing");
-            ex.setDisposition("urn:epcglobal:cbv:disp:active");
-            ex.setBizLocation("urn:epc:id:sgln:0614141.82863.loc6");
-            ex.setReadPoint("urn:epc:id:sgln:0614141.82863.loc6-virt");
-            ex.setEpcClass("urn:epc:id:sgtin:0069000.957110");
-            ex.setQuantity(67);
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Order changed by customer - two more objects added to transaction");
-            ex.setType(3);
-            ex.setEventTime("2006-08-18T11:53:01Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(0);
-            ex.setBizTransaction("urn:epcglobal:cbv:fmcg:btt:po", "http://transaction.example.com/po/6677150");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 urn:epc:id:sgtin:0057000.678930.5004");
-            examples.add(ex);
-
-            ex = new CaptureEvent();
-            ex.setDescription("Transaction is finished");
-            ex.setType(3);
-            ex.setEventTime("2006-08-20T07:03:51Z");
-            ex.setEventTimeZoneOffset("+00:00");
-            ex.setAction(2);
-            ex.setBizTransaction("urn:epcglobal:cbv:fmcg:btt:po", "http://transaction.example.com/po/6677150");
-            ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 urn:epc:id:sgtin:0057000.678930.5004");
-            examples.add(ex);
-        }
-    }
-
-    /**
-     * Formats a <code>Calendar</code> value into an ISO8601-compliant
-     * date/time string.
-     * 
-     * @param cal
-     *            The time value to be formatted into a date/time string.
-     * @return The formatted date/time string.
-     */
-    private static String format(final Calendar cal) {
-        if (cal == null) {
-            throw new IllegalArgumentException("argument can not be null");
-        }
-
-        // determine era and adjust year if necessary
-        int year = cal.get(Calendar.YEAR);
-        if (cal.isSet(Calendar.ERA) && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
-            /**
-             * calculate year using astronomical system: year n BCE =>
-             * astronomical year -n + 1
-             */
-            year = 0 - year + 1;
-        }
-
-        /**
-         * the format of the date/time string is: YYYY-MM-DDThh:mm:ss.SSSTZD
-         * note that we cannot use java.text.SimpleDateFormat for formatting
-         * because it can't handle years <= 0 and TZD's
-         */
-        StringBuilder buf = new StringBuilder();
-        // year ([-]YYYY)
-        buf.append(XXXX_FORMAT.format(year));
-        buf.append('-');
-        // month (MM)
-        buf.append(XX_FORMAT.format(cal.get(Calendar.MONTH) + 1));
-        buf.append('-');
-        // day (DD)
-        buf.append(XX_FORMAT.format(cal.get(Calendar.DAY_OF_MONTH)));
-        buf.append('T');
-        // hour (hh)
-        buf.append(XX_FORMAT.format(cal.get(Calendar.HOUR_OF_DAY)));
-        buf.append(':');
-        // minute (mm)
-        buf.append(XX_FORMAT.format(cal.get(Calendar.MINUTE)));
-        buf.append(':');
-        // second (ss)
-        buf.append(XX_FORMAT.format(cal.get(Calendar.SECOND)));
-        buf.append('.');
-        // millisecond (SSS)
-        buf.append(XXX_FORMAT.format(cal.get(Calendar.MILLISECOND)));
-        // time zone designator (+/-hh:mm)
-        buf.append(getTimeZone(cal));
-        return buf.toString();
-    }
-
-    /**
-     * Returns the time zone designator in a ISO6601-compliant format from the
-     * given <code>Calendar</code> value.
-     * 
-     * @param cal
-     *            The Calendar to be formatted.
-     * @return The time zone designator from the given Calendar.
-     */
-    private static String getTimeZone(final Calendar cal) {
-        StringBuilder buf = new StringBuilder();
-        TimeZone tz = cal.getTimeZone();
-        // determine offset of timezone from UTC (incl. daylight saving)
-        int offset = tz.getOffset(cal.getTimeInMillis());
-        int hours = Math.abs((offset / (60 * 1000)) / 60);
-        int minutes = Math.abs((offset / (60 * 1000)) % 60);
-        buf.append(offset < 0 ? '-' : '+');
-        buf.append(XX_FORMAT.format(hours));
-        buf.append(':');
-        buf.append(XX_FORMAT.format(minutes));
-        return buf.toString();
-    }
-
-    /**
      * Instantiates a new CaptureClientGui using a look-and-feel that matches
      * the operating system.
      * 
@@ -1850,8 +1298,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         if (ace.isComplete()) {
         	mwGenerateEventButton.setEnabled(true);
         	client = new CaptureClient(mwServiceUrlTextField.getText(), mwAuthOptions.getAuthenticationOptions());
-        }
-        else {
+        } else {
         	mwGenerateEventButton.setEnabled(false);
         }
 	}
