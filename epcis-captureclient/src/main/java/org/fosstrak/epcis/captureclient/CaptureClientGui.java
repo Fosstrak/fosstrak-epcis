@@ -30,10 +30,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.StringTokenizer;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -79,7 +79,6 @@ import org.w3c.dom.Element;
  * creation of XML from the GUI data.
  * 
  * @author David Gubler
- * @author Marco Steybe
  */
 public class CaptureClientGui extends WindowAdapter implements ActionListener, AuthenticationOptionsChangeListener {
 
@@ -354,7 +353,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         mwBizTransButtons = new ArrayList<JButton>();
 
         mwBizTransactionPanel = new JPanel(new GridBagLayout());
-        ImageIcon tempImageIcon = getImageIcon("new10.gif");
+        ImageIcon tempImageIcon = CaptureClientHelper.getImageIcon("new10.gif");
         mwBizTransactionPlus = new JButton(tempImageIcon);
         mwBizTransactionPlus.setMargin(new Insets(0, 0, 0, 0));
         mwBizTransactionPlus.addActionListener(this);
@@ -695,14 +694,14 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
             root = element;
 
             // eventTime
-            if (!addEventTime(document, root)) {
+            if (!CaptureClientHelper.addEventTime(document, root, mwEventTimeTextField.getText())) {
                 JOptionPane.showMessageDialog(frame, "Please specify the event time "
                         + "(e.g. 2005-07-18T17:33:20.231Z)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // eventTimeZoneOffset
-            if (!addEventTimeZoneOffset(document, root)) {
+            if (!CaptureClientHelper.addEventTimeZoneOffset(document, root, mwEventTimeZoneOffsetTextField.getText())) {
                 JOptionPane.showMessageDialog(frame, "Please specify the event timezone offset "
                         + "(e.g. +00:00 or -06:30)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -712,67 +711,67 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
 
             int index = mwEventTypeChooserComboBox.getSelectedIndex();
             if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.ObjectEvent) {
-                if (!addEpcList(document, root)) {
+                if (!CaptureClientHelper.addEpcList(document, root, mwEpcListTextField.getText())) {
                     JOptionPane.showMessageDialog(frame, "Please specify at least one EPC", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                addAction(document, root);
-                addBizStep(document, root);
-                addDisposition(document, root);
-                addReadPoint(document, root);
-                addBizLocation(document, root);
-                addBizTransactionList(document, root);
+                CaptureClientHelper.addAction(document, root, (String) mwActionComboBox.getSelectedItem());
+                CaptureClientHelper.addBizStep(document, root, mwBizStepTextField.getText());
+                CaptureClientHelper.addDisposition(document, root, mwDispositionTextField.getText());
+                CaptureClientHelper.addReadPoint(document, root, mwReadPointTextField.getText());
+                CaptureClientHelper.addBizLocation(document, root, mwBizLocationTextField.getText());
+                CaptureClientHelper.addBizTransactions(document, root, fromGui(mwBizTransIDFields, mwBizTransTypeFields));
             } else if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.AggregationEvent) {
-                if (!addParentId(document, root) && !mwActionComboBox.getSelectedItem().equals("OBSERVE")) {
+                if (!CaptureClientHelper.addParentId(document, root, mwParentIDTextField.getText()) && !mwActionComboBox.getSelectedItem().equals("OBSERVE")) {
                     JOptionPane.showMessageDialog(frame, "Because action is OBSERVE, it's required to "
                             + "specify a ParentID", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                if (!addChildEpcList(document, root)) {
+                if (!CaptureClientHelper.addChildEpcList(document, root, mwChildEPCsTextField.getText())) {
                     JOptionPane.showMessageDialog(frame, "Please specify at least one EPC", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                addAction(document, root);
-                addBizStep(document, root);
-                addDisposition(document, root);
-                addReadPoint(document, root);
-                addBizLocation(document, root);
-                addBizTransactionList(document, root);
+                CaptureClientHelper.addAction(document, root, (String) mwActionComboBox.getSelectedItem());
+                CaptureClientHelper.addBizStep(document, root, mwBizStepTextField.getText());
+                CaptureClientHelper.addDisposition(document, root, mwDispositionTextField.getText());
+                CaptureClientHelper.addReadPoint(document, root, mwReadPointTextField.getText());
+                CaptureClientHelper.addBizLocation(document, root, mwBizLocationTextField.getText());
+                CaptureClientHelper.addBizTransactions(document, root, fromGui(mwBizTransIDFields, mwBizTransTypeFields));
             } else if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.QuantityEvent) {
-                if (!addEpcClass(document, root)) {
+                if (!CaptureClientHelper.addEpcClass(document, root, mwEpcClassTextField.getText())) {
                     JOptionPane.showMessageDialog(frame, "Please specify an EPC class (URI)", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                if (!addQuantity(document, root)) {
+                if (!CaptureClientHelper.addQuantity(document, root, mwQuantityTextField.getText())) {
                     JOptionPane.showMessageDialog(frame, "Please specify a quantity value (integer number)", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                addBizStep(document, root);
-                addDisposition(document, root);
-                addReadPoint(document, root);
-                addBizLocation(document, root);
-                addBizTransactionList(document, root);
+                CaptureClientHelper.addBizStep(document, root, mwBizStepTextField.getText());
+                CaptureClientHelper.addDisposition(document, root, mwDispositionTextField.getText());
+                CaptureClientHelper.addReadPoint(document, root, mwReadPointTextField.getText());
+                CaptureClientHelper.addBizLocation(document, root, mwBizLocationTextField.getText());
+                CaptureClientHelper.addBizTransactions(document, root, fromGui(mwBizTransIDFields, mwBizTransTypeFields));
             } else if (EpcisEventType.fromGuiIndex(index) == EpcisEventType.TransactionEvent) {
-                if (!addBizTransactionList(document, root)) {
+                if (!CaptureClientHelper.addBizTransactions(document, root, fromGui(mwBizTransIDFields, mwBizTransTypeFields))) {
                     JOptionPane.showMessageDialog(frame, "Please specify at least one business "
                             + "transaction (ID, Type)", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                addParentId(document, root);
-                if (!addEpcList(document, root)) {
+                CaptureClientHelper.addParentId(document, root, mwParentIDTextField.getText());
+                if (!CaptureClientHelper.addEpcList(document, root, mwEpcListTextField.getText())) {
                     JOptionPane.showMessageDialog(frame, "Please specify at least one EPC", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                addAction(document, root);
-                addBizStep(document, root);
-                addDisposition(document, root);
-                addReadPoint(document, root);
-                addBizLocation(document, root);
+                CaptureClientHelper.addAction(document, root, (String) mwActionComboBox.getSelectedItem());
+                CaptureClientHelper.addBizStep(document, root, mwBizStepTextField.getText());
+                CaptureClientHelper.addDisposition(document, root, mwDispositionTextField.getText());
+                CaptureClientHelper.addReadPoint(document, root, mwReadPointTextField.getText());
+                CaptureClientHelper.addBizLocation(document, root, mwBizLocationTextField.getText());
             }
 
             DOMSource domsrc = new DOMSource(document);
@@ -823,308 +822,17 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         }
     }
 
-    /**
-     * Adds the Quantity to the XML-File. Possible for the QuantityEvent
-     * (required).
-     * 
-     * @param document
-     *            The DOM-Tree where is has to inserted.
-     * @param root
-     *            The element, where it has to be added.
-     * @return If the value had been set in the GUI.
-     */
-    private boolean addQuantity(final Document document, final Element root) {
-        Element element;
-        try {
-            Integer n = new Integer(mwQuantityTextField.getText());
-            element = document.createElement("quantity");
-            element.appendChild(document.createTextNode(n.toString()));
-            root.appendChild(element);
-            return true;
-        } catch (NumberFormatException nfe) {
-            return false;
+    private Map<String, String> fromGui(ArrayList<JTextField> bizTransID, ArrayList<JTextField> bizTransType) {
+        if (bizTransID == null || bizTransType == null) {
+            return null;
         }
-    }
-
-    /**
-     * Adds the ChildEPCList to the XML-File. Possible for the QuantityEvent
-     * (required).
-     * 
-     * @param document
-     *            The DOM-Tree where is has to inserted.
-     * @param root
-     *            The element, where it has to be added.
-     * @return If the value had been set in the GUI.
-     */
-    private boolean addEpcClass(final Document document, final Element root) {
-        if (!mwEpcClassTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("epcClass");
-            element.appendChild(document.createTextNode(mwEpcClassTextField.getText()));
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the ChildEPCList to the XML-File. Possible for - AggregationEvent
-     * (required) - TransactionEvent (required)
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addChildEpcList(final Document document, final Element root) {
-        if (!mwChildEPCsTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("childEPCs");
-            Element epcNode = null;
-            String[] epcs = mwChildEPCsTextField.getText().split(" ");
-            for (String epc : epcs) {
-                epcNode = document.createElement("epc");
-                epcNode.appendChild(document.createTextNode(epc));
-                element.appendChild(epcNode);
+        Map<String, String> bizTransMap = new HashMap<String, String>(bizTransID.size());
+        for (int i = 0; i < bizTransID.size(); i++) {
+            if (i < bizTransID.size() && i < bizTransType.size()) {
+                bizTransMap.put(bizTransID.get(i).getText(), bizTransType.get(i).getText());
             }
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
         }
-    }
-
-    /**
-     * Adds the BusinessTransaction List to the XML-File. Possible for -
-     * ObjectEvent (optional) - AggregationEvent (optional) - TransactionEvent
-     * (at least one)
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addBizTransactionList(final Document document, final Element root) {
-        if (mwBizTransIDFields != null && mwBizTransIDFields.size() > 0
-                && !mwBizTransIDFields.get(0).getText().equals("")) {
-            Element element;
-            element = document.createElement("bizTransactionList");
-            Element bizNode = null;
-            int i = 0;
-            for (JTextField j : mwBizTransIDFields) {
-                if (!j.getText().equals("") && !mwBizTransTypeFields.get(i).getText().equals("")) {
-                    bizNode = document.createElement("bizTransaction");
-                    bizNode.appendChild(document.createTextNode(j.getText()));
-                    bizNode.setAttribute("type", mwBizTransTypeFields.get(i).getText());
-                    element.appendChild(bizNode);
-                }
-                i++;
-            }
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the Business Location to the XML-File. Optional for all events.
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addBizLocation(final Document document, final Element root) {
-        if (!mwBizLocationTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("bizLocation");
-            Element bizId = document.createElement("id");
-            bizId.appendChild(document.createTextNode(mwBizLocationTextField.getText()));
-            element.appendChild(bizId);
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the ReadPoint to the XML-File. Optional for all events.
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addReadPoint(final Document document, final Element root) {
-        if (!mwReadPointTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("readPoint");
-            Element pointId = document.createElement("id");
-            pointId.appendChild(document.createTextNode(mwReadPointTextField.getText()));
-            element.appendChild(pointId);
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the Disposition to the XML-File. Optional for all events.
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addDisposition(final Document document, final Element root) {
-        if (!mwDispositionTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("disposition");
-            element.appendChild(document.createTextNode(mwDispositionTextField.getText()));
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the Business Step to the XML-File. Optional for all events.
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addBizStep(final Document document, final Element root) {
-        if (!mwBizStepTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("bizStep");
-            element.appendChild(document.createTextNode(mwBizStepTextField.getText()));
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the action to the XML-File. Required for all Events except the
-     * QuantityEvent.
-     * 
-     * @param document
-     *            The DOM-Tree where is has to inserted.
-     * @param root
-     *            The element, where it has to be added.
-     */
-    private void addAction(final Document document, final Element root) {
-        Element element;
-        element = document.createElement("action");
-        element.appendChild(document.createTextNode((String) mwActionComboBox.getSelectedItem()));
-        root.appendChild(element);
-    }
-
-    /**
-     * Adds all the EPC's to the XML-File. Possible for - AggregationEvent
-     * (required) - TransactionEvent (required).
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addEpcList(final Document document, final Element root) {
-        if (!mwEpcListTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("epcList");
-            Element epcNode = null;
-            StringTokenizer st = new StringTokenizer(mwEpcListTextField.getText());
-            while (st.hasMoreTokens()) {
-                epcNode = document.createElement("epc");
-                epcNode.appendChild(document.createTextNode(st.nextToken()));
-                element.appendChild(epcNode);
-            }
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the Parent ID to the XML-File. Possible for - AggregationEvent
-     * (optional when action is OBSERVE, required otherwise) - TransactionEvent
-     * (Optional).
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addParentId(final Document document, final Element root) {
-        if (!mwParentIDTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("parentID");
-            element.appendChild(document.createTextNode(mwParentIDTextField.getText()));
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the Time of the Event to the XML-File. Required for all Events.
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addEventTime(final Document document, final Element root) {
-        if (!mwEventTimeTextField.getText().equals("")) {
-            Element element;
-            element = document.createElement("eventTime");
-            element.appendChild(document.createTextNode(mwEventTimeTextField.getText()));
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the TimeZone offset of the Event to the XML-File. Required for all
-     * Events.
-     * 
-     * @param document
-     *            the DOM-Tree where is has to inserted
-     * @param root
-     *            the element, where it has to be added
-     * @return if the value had been set in the GUI
-     */
-    private boolean addEventTimeZoneOffset(final Document document, final Element root) {
-        if (!mwEventTimeZoneOffsetTextField.getText().equals("")) {
-            Element element = document.createElement("eventTimeZoneOffset");
-            element.appendChild(document.createTextNode(mwEventTimeZoneOffsetTextField.getText()));
-            root.appendChild(element);
-            return true;
-        } else {
-            return false;
-        }
+        return bizTransMap;
     }
 
     /**
@@ -1151,7 +859,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         JTextField bizTransType = new JTextField();
         bizTransType.setToolTipText(CaptureClientHelper.toolTipBizTransType);
 
-        ImageIcon tempDelIcon = getImageIcon("delete10.gif");
+        ImageIcon tempDelIcon = CaptureClientHelper.getImageIcon("delete10.gif");
         JButton minus = new JButton(tempDelIcon);
 
         minus.setMargin(new Insets(0, 0, 0, 0));
@@ -1182,7 +890,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
 
     /**
      * After having added or deleted a Row from the BusinessTransactions, it has
-     * to be redrawn.
+     * to be re-drawn.
      */
     private void drawBizTransaction() {
         GridBagConstraints c = new GridBagConstraints();
@@ -1248,31 +956,6 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
     }
 
     /**
-     * Loads ImageIcon from either JAR or filesystem.
-     * 
-     * @param filename
-     *            The name of the file holding the image icon.
-     * @return The ImageIcon.
-     */
-    private ImageIcon getImageIcon(final String filename) {
-        // try loading image from JAR (Web Start environment)
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        URL url = classLoader.getResource("gui/" + filename);
-        if (url != null) {
-            return new ImageIcon(url);
-        } else {
-            // try loading image from filesystem - hack as we
-            // can be called in either Eclipse or shell environment
-            ImageIcon ii;
-            ii = new ImageIcon("./tools/capturingGUI/media/" + filename);
-            if (ii.getImageLoadStatus() != java.awt.MediaTracker.COMPLETE) {
-                ii = new ImageIcon("./gui/" + filename);
-            }
-            return ii;
-        }
-    }
-
-    /**
      * Instantiates a new CaptureClientGui using a look-and-feel that matches
      * the operating system.
      * 
@@ -1302,5 +985,4 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         	mwGenerateEventButton.setEnabled(false);
         }
 	}
-    
 }

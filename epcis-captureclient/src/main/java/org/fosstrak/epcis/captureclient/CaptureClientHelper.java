@@ -1,12 +1,47 @@
+/*
+ * Copyright (C) 2007 ETH Zurich
+ *
+ * This file is part of Fosstrak (www.fosstrak.org).
+ *
+ * Fosstrak is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License version 2.1, as published by the Free Software Foundation.
+ *
+ * Fosstrak is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with Fosstrak; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301  USA
+ */
+
 package org.fosstrak.epcis.captureclient;
 
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.Map.Entry;
 
+import javax.swing.ImageIcon;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+/**
+ * This is a helper class which encapsulates common functionality used within
+ * the capture client classes.
+ * 
+ * @author Marco Steybe
+ */
 public class CaptureClientHelper {
 
     /**
@@ -38,9 +73,8 @@ public class CaptureClientHelper {
     public static final String[] EPCIS_EVENT_NAMES = {
             "Object event", "Aggregation event", "Quantity event", "Transaction event" };
 
-
     public enum EpcisEventType {
-        
+
         ObjectEvent(0, "Object event"), AggregationEvent(1, "Aggregation event"), QuantityEvent(2, "Quantity event"),
         TransactionEvent(3, "Transaction event");
 
@@ -51,7 +85,7 @@ public class CaptureClientHelper {
             this.guiIndex = guiIndex;
             this.guiName = guiName;
         }
-        
+
         public static EpcisEventType fromGuiIndex(int index) {
             for (EpcisEventType eventType : values()) {
                 if (eventType.guiIndex == index) {
@@ -60,7 +94,7 @@ public class CaptureClientHelper {
             }
             return null;
         }
-        
+
         public static String[] guiNames() {
             String[] guiNames = new String[values().length];
             for (int i = 0; i < values().length; i++) {
@@ -73,7 +107,6 @@ public class CaptureClientHelper {
             return guiName;
         }
     }
-    
 
     /**
      * Returns the time zone designator in a ISO6601-compliant format from the
@@ -98,8 +131,8 @@ public class CaptureClientHelper {
     }
 
     /**
-     * Formats a <code>Calendar</code> value into an ISO8601-compliant
-     * date/time string.
+     * Formats a <code>Calendar</code> value into an ISO8601-compliant date/time
+     * string.
      * 
      * @param cal
      *            The time value to be formatted into a date/time string.
@@ -337,5 +370,339 @@ public class CaptureClientHelper {
             ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 urn:epc:id:sgtin:0057000.678930.5004");
             examples.add(ex);
         }
+    }
+
+    /**
+     * Loads ImageIcon from either JAR or filesystem.
+     * 
+     * @param filename
+     *            The name of the file holding the image icon.
+     * @return The ImageIcon.
+     */
+    public static ImageIcon getImageIcon(final String filename) {
+        // try loading image from JAR (Web Start environment)
+        ClassLoader classLoader = CaptureClientHelper.class.getClassLoader();
+        URL url = classLoader.getResource("gui/" + filename);
+        if (url != null) {
+            return new ImageIcon(url);
+        } else {
+            // try loading image from filesystem - hack as we
+            // can be called in either Eclipse or shell environment
+            ImageIcon ii;
+            ii = new ImageIcon("./tools/capturingGUI/media/" + filename);
+            if (ii.getImageLoadStatus() != java.awt.MediaTracker.COMPLETE) {
+                ii = new ImageIcon("./gui/" + filename);
+            }
+            return ii;
+        }
+    }
+
+    /**
+     * Adds the given quantity value as {@code <quantity>} element to the XML
+     * document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <quantity>} element from.
+     * @param root
+     *            The root Element under which the {@code <quantity>} element
+     *            should be generated.
+     * @param quantity
+     *            The value for the {@code <quantity>} element.
+     * @return <true> if the {@code <quantity>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addQuantity(final Document document, final Element root, final String quantity) {
+        Integer n = null;
+        try {
+            n = new Integer(quantity);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return addElement(document, root, n.toString(), "quantity");
+    }
+
+    /**
+     * Adds the given epcClass value as {@code <epcClass>} element to the XML
+     * document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <epcClass>} element from.
+     * @param root
+     *            The root Element under which the {@code <epcClass>} element
+     *            should be generated.
+     * @param epcClass
+     *            The value for the {@code <epcClass>} element.
+     * @return <true> if the {@code <epcClass>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addEpcClass(final Document document, final Element root, final String epcClass) {
+        return addElement(document, root, epcClass, "epcClass");
+    }
+
+    /**
+     * Adds the EPCs from the given list of childEPCs as {@code <epc>} elements
+     * inside an {@code <childEPCs>} element to the XML document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <epc>} and {@code
+     *            <childEPCs>} element from.
+     * @param root
+     *            The root Element under which the {@code <childEPCs>} element
+     *            should be generated.
+     * @param childEPCs
+     *            A space-separated list of EPCs.
+     * @return <true> if the {@code <childEPCs>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addChildEpcList(final Document document, final Element root, final String childEPCs) {
+        if (isEmpty(childEPCs)) {
+            return false;
+        }
+        Element element = document.createElement("childEPCs");
+        StringTokenizer st = new StringTokenizer(childEPCs);
+        while (st.hasMoreTokens()) {
+            addElement(document, element, st.nextToken(), "epc");
+        }
+        root.appendChild(element);
+        return true;
+    }
+
+    /**
+     * Adds the given mapping of business transactions ([business transaction
+     * IDs] -> [business transaction types]) as part of a {@code
+     * <bizTransactionList>} element to the XML document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <bizTransactionList>}
+     *            element from.
+     * @param root
+     *            The root Element under which the {@code <bizTransactionList>}
+     *            element should be generated.
+     * @param bizTransactions
+     *            A mapping of business transaction IDs to business transaction
+     *            types.
+     * @return <true> if the {@code <bizTransactionList>} element was
+     *         successfully created, <code>false</code> otherwise.
+     */
+    public static boolean addBizTransactions(final Document document, final Element root,
+            final Map<String, String> bizTransactions) {
+        if (bizTransactions == null || bizTransactions.isEmpty() || bizTransactions.keySet().size() < 1) {
+            return false;
+        }
+        Element element = document.createElement("bizTransactionList");
+        for (Entry<String, String> bizTransEntry : bizTransactions.entrySet()) {
+            if (!isEmpty(bizTransEntry.getKey()) && !isEmpty(bizTransEntry.getValue())) {
+                Element bizNode = document.createElement("bizTransaction");
+                bizNode.appendChild(document.createTextNode(bizTransEntry.getKey()));
+                bizNode.setAttribute("type", bizTransEntry.getValue());
+                element.appendChild(bizNode);
+            }
+        }
+        root.appendChild(element);
+        return true;
+    }
+
+    /**
+     * Adds the given bizLocation as {@code <id>} element inside a {@code
+     * <bizLocation>} element to the XML document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <id>} and {@code
+     *            <bizLocation>} elements from.
+     * @param root
+     *            The root Element under which the {@code <bizLocation>} element
+     *            should be generated.
+     * @param bizLocation
+     *            The value for the {@code <id>} element.
+     * @return <true> if the {@code <bizLocation>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addBizLocation(final Document document, final Element root, final String bizLocation) {
+        if (isEmpty(bizLocation)) {
+            return false;
+        }
+        Element element = document.createElement("bizLocation");
+        addElement(document, element, bizLocation, "id");
+        root.appendChild(element);
+        return true;
+    }
+
+    /**
+     * Adds the given readPoint as {@code <id>} element inside a {@code
+     * <readPoint>} element to the XML document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <id>} and {@code
+     *            <readPoint>} elements from.
+     * @param root
+     *            The root Element under which the {@code <readPoint>} element
+     *            should be generated.
+     * @param readPoint
+     *            The value for the {@code <id>} element.
+     * @return <true> if the {@code <readPoint>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addReadPoint(final Document document, final Element root, final String readPoint) {
+        if (isEmpty(readPoint)) {
+            return false;
+        }
+        Element element = document.createElement("readPoint");
+        addElement(document, element, readPoint, "id");
+        root.appendChild(element);
+        return true;
+    }
+
+    /**
+     * Adds the given disposition value as {@code <disposition>} element to the
+     * XML document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <disposition>} element
+     *            from.
+     * @param root
+     *            The root Element under which the {@code <disposition>} element
+     *            should be generated.
+     * @param disposition
+     *            The value for the {@code <disposition>} element.
+     * @return <true> if the {@code <disposition>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addDisposition(final Document document, final Element root, String disposition) {
+        return addElement(document, root, disposition, "disposition");
+    }
+
+    /**
+     * Adds the given bizStep value as {@code <bizStep>} element to the XML
+     * document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <bizStep>} element from.
+     * @param root
+     *            The root Element under which the {@code <bizStep>} element
+     *            should be generated.
+     * @param bizStep
+     *            The value for the {@code <bizStep>} element.
+     * @return <true> if the {@code <bizStep>} element was successfully created,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean addBizStep(final Document document, final Element root, final String bizStep) {
+        return addElement(document, root, bizStep, "bizStep");
+    }
+
+    /**
+     * Adds the given action value as {@code <action>} element to the XML
+     * document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <action>} element from.
+     * @param root
+     *            The root Element under which the {@code <action>} element
+     *            should be generated.
+     * @param action
+     *            The value for the {@code <action>} element.
+     * @return <true> if the {@code <action>} element was successfully created,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean addAction(final Document document, final Element root, String action) {
+        return addElement(document, root, action, "action");
+    }
+
+    /**
+     * Adds the EPCs from the given epcList as {@code <epc>} elements inside an
+     * {@code <epcList>} element to the XML document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <epc>} and {@code
+     *            <epcList>} element from.
+     * @param root
+     *            The root Element under which the {@code <childEPCs>} element
+     *            should be generated.
+     * @param epcList
+     *            A space-separated list of EPCs.
+     * @return <true> if the {@code <epcList>} element was successfully created,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean addEpcList(final Document document, final Element root, final String epcList) {
+        if (isEmpty(epcList)) {
+            return false;
+        }
+        Element element = document.createElement("epcList");
+        StringTokenizer st = new StringTokenizer(epcList);
+        while (st.hasMoreTokens()) {
+            addElement(document, element, st.nextToken(), "epc");
+        }
+        root.appendChild(element);
+        return true;
+    }
+
+    /**
+     * Adds the given parentID value as {@code <parentID>} element to the XML
+     * document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <parentID>} element from.
+     * @param root
+     *            The root Element under which the {@code <parentID>} element
+     *            should be generated.
+     * @param parentID
+     *            The value for the {@code <parentID>} element.
+     * @return <true> if the {@code <parentID>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addParentId(final Document document, final Element root, String parentID) {
+        return addElement(document, root, parentID, "parentID");
+    }
+
+    /**
+     * Adds the given eventTime value as {@code <eventTime>} element to the XML
+     * document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <eventTime>} element from.
+     * @param root
+     *            The root Element under which the {@code <eventTime>} element
+     *            should be generated.
+     * @param eventTime
+     *            The value for the {@code <eventTime>} element.
+     * @return <true> if the {@code <eventTime>} element was successfully
+     *         created, <code>false</code> otherwise.
+     */
+    public static boolean addEventTime(final Document document, final Element root, final String eventTime) {
+        return addElement(document, root, eventTime, "eventTime");
+    }
+
+    /**
+     * Adds the given eventTimeZoneOffset value as {@code <eventTimeZoneOffset>}
+     * element to the XML document.
+     * 
+     * @param document
+     *            The Document to generate the {@code <eventTimeZoneOffset>}
+     *            element from.
+     * @param root
+     *            The root Element under which the {@code <eventTimeZoneOffset>}
+     *            element should be generated.
+     * @param eventTimeZoneOffset
+     *            The value for the {@code <eventTimeZoneOffset>} element.
+     * @return <true> if the {@code <eventTimeZoneOffset>} element was
+     *         successfully created, <code>false</code> otherwise.
+     */
+    public static boolean addEventTimeZoneOffset(final Document document, final Element root,
+            final String eventTimeZoneOffset) {
+        return addElement(document, root, eventTimeZoneOffset, "eventTimeZoneOffset");
+    }
+
+    private static boolean addElement(final Document document, final Element root, final String elementValue,
+            final String elementName) {
+        if (isEmpty(elementValue)) {
+            return false;
+        }
+        Element element = document.createElement(elementName);
+        element.appendChild(document.createTextNode(elementValue));
+        root.appendChild(element);
+        return true;
+    }
+
+    private static boolean isEmpty(String s) {
+        return s == null || s.trim().equals("");
     }
 }
