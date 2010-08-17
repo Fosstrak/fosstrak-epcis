@@ -9,6 +9,9 @@
                 Added support for capturing EPCISMasterDataDocument in 
                 CaptureClient.
             </action>
+            <action dev="steybem" date="2010-08-17" type="update">
+                Code refactoring and cleanup.
+            </action>
         </release>
         <release version="0.4.2" date="2009-02-03" description="Feature release">
             <action dev="wellington" type="add">
