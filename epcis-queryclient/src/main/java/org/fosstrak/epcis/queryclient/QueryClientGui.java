@@ -30,6 +30,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -58,15 +60,28 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 
 import org.fosstrak.epcis.gui.AuthenticationOptionsChangeEvent;
+import org.fosstrak.epcis.gui.AuthenticationOptionsChangeListener;
 import org.fosstrak.epcis.gui.AuthenticationOptionsPanel;
+import org.fosstrak.epcis.model.AggregationEventType;
 import org.fosstrak.epcis.model.ArrayOfString;
+import org.fosstrak.epcis.model.BusinessTransactionType;
+import org.fosstrak.epcis.model.EPC;
+import org.fosstrak.epcis.model.EPCISEventType;
+import org.fosstrak.epcis.model.ObjectEventType;
+import org.fosstrak.epcis.model.Poll;
+import org.fosstrak.epcis.model.QuantityEventType;
 import org.fosstrak.epcis.model.QueryParam;
+import org.fosstrak.epcis.model.QueryParams;
+import org.fosstrak.epcis.model.QueryResults;
 import org.fosstrak.epcis.model.QuerySchedule;
 import org.fosstrak.epcis.model.Subscribe;
 import org.fosstrak.epcis.model.SubscriptionControls;
+import org.fosstrak.epcis.model.TransactionEventType;
+import org.fosstrak.epcis.queryclient.QueryClientHelper.ExampleQueries;
 import org.fosstrak.epcis.utils.TimeParser;
 
 /**
@@ -74,7 +89,7 @@ import org.fosstrak.epcis.utils.TimeParser;
  * 
  * @author David Gubler
  */
-public class QueryClientGui extends WindowAdapter implements ActionListener {
+public class QueryClientGui extends WindowAdapter implements ActionListener, AuthenticationOptionsChangeListener {
 
     /**
      * The enumeration of all possible query parameter types.
@@ -114,12 +129,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     /**
      * The query client instance. Has methods to actually execute a query.
      */
-    private QueryClientGuiHelper client = null;
+    private QueryControlClient client = null;
+
+    private boolean configurationChanged;
 
     /**
-     * All the examples are contained in an ExampleQueries instance.
+     * Holds the query parameters.
      */
-    private ExampleQueries exampleQueries = new ExampleQueries();
+    private List<QueryParam> internalQueryParams = new ArrayList<QueryParam>();
 
     /* main window */
     private JFrame mainWindow;
@@ -157,7 +174,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private LinkedList<JTextFieldEnhanced> mwQueryArgumentTextFields;
 
     private int mwQueryArgumentTextFieldsExtraWidth = 550;
-    private int mwHeightDifference;
 
     private JButton mwRunQueryButton;
     private JButton mwFillInExampleButton;
@@ -202,7 +218,11 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * The constructor. Starts a new thread which draws the main window.
      */
     public QueryClientGui() {
-        this(null);
+        try {
+            initGui(null);
+        } catch (MalformedURLException e) {
+            // shouldn't happen because url is loaded from properties 
+        }
     }
 
     /**
@@ -214,28 +234,21 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * @param address
      *            The address to send the queries to.
      */
-    public QueryClientGui(final String address) {
+    public QueryClientGui(final String address) throws MalformedURLException {
+        initGui(address);
+    }
+    
+    private void initGui(String url) throws MalformedURLException {
         generateParamHashMap();
-
-        // set up query client. The supplied JTextArea is used for debug output
-        createDebugWindow();
-        client = new QueryClientGuiHelper(this);
-
-        // update queryUrl, in case the provided address parameter was null
-        if (address != null) {
-            mwServiceUrlTextField.setText(address);
-        } else {
-        	mwServiceUrlTextField.setText(client.getDefaultEndpointAddress());
-        }
-
-        // setup client GUI
+        drawDebugWindow();
+        client = new QueryControlClient(url);
+        mwServiceUrlTextField.setText(client.getQueryUrl());
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createMainWindow(address);
+                drawMainWindow(client.getQueryUrl());
             }
         });
-
-}
+    }
 
     /**
      * Initialized all the possible Query Parameters.
@@ -491,19 +504,9 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     }
 
     /**
-     * Set a query client.
-     * 
-     * @param newclient
-     *            The QueryClient through which the queries will be sent.
-     */
-    public void setQueryClient(final QueryClientGuiHelper newclient) {
-        client = newclient;
-    }
-
-    /**
      * Sets up the main window. To be called only once per program run
      */
-    private void createMainWindow(String queryUrl) {
+    private void drawMainWindow(String queryUrl) {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         mainWindow = new JFrame("EPCIS query interface client");
@@ -568,7 +571,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mwServiceUrlLabel = new JLabel("Query interface URL: ");
         mwServiceInfoButton = new JButton("Info");
         mwServiceInfoButton.addActionListener(this);
-        mwAuthOptions = new AuthenticationOptionsPanel(client);
+        mwAuthOptions = new AuthenticationOptionsPanel(this);
 
         mwUnsubscribeQueryLabel = new JLabel("Unsubscribe ID: ");
         mwUnsubscribeQueryTextField = new JTextField("", 40);
@@ -583,25 +586,25 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
 
         mwServiceUrlTextField.getDocument().addDocumentListener(new DocumentListener() {
 
-			public void changedUpdate(DocumentEvent e) {
-				client.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
-			}
+            public void changedUpdate(DocumentEvent e) {
+                configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
+            }
 
-			public void insertUpdate(DocumentEvent e) {
-				client.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
-			}
+            public void insertUpdate(DocumentEvent e) {
+                configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
+            }
 
-			public void removeUpdate(DocumentEvent e) {
-				client.configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
-			}
-			
-			public boolean isComplete() {
-				String url = mwServiceUrlTextField.getText();
-				return url != null && url.length() > 0;
-			}
-        	
+            public void removeUpdate(DocumentEvent e) {
+                configurationChanged(new AuthenticationOptionsChangeEvent(this, isComplete()));
+            }
+
+            public boolean isComplete() {
+                String url = mwServiceUrlTextField.getText();
+                return url != null && url.length() > 0;
+            }
+
         });
-        
+
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(5, 5, 5, 0);
@@ -620,7 +623,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 1;
-        c.gridwidth=2;
+        c.gridwidth = 2;
         mwConfigPanel.add(mwAuthOptions, c);
         c.weightx = 0;
         c.gridx = 0;
@@ -837,18 +840,23 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         mainWindow.pack();
         mainWindow.setVisible(true);
 
-        /*
-         * Find out how much the window has to be scaled whenever new components
-         * are added. This must be done after rendering the GUI, otherwise the
-         * sizes will be wrong!
-         */
-        if (((JComboBox) mwQuerySelectComboBoxes.getFirst()).getSize().height > ((JTextField) mwQueryArgumentTextFields.getFirst()).getSize().height) {
-            mwHeightDifference = ((JComboBox) mwQuerySelectComboBoxes.getFirst()).getPreferredSize().height
-                    + c.insets.top + c.insets.bottom;
-        } else {
-            mwHeightDifference = ((JTextField) mwQueryArgumentTextFields.getFirst()).getPreferredSize().height
-                    + c.insets.top + c.insets.bottom;
-        }
+        // /*
+        // * Find out how much the window has to be scaled whenever new
+        // components
+        // * are added. This must be done after rendering the GUI, otherwise the
+        // * sizes will be wrong!
+        // */
+        // if (((JComboBox) mwQuerySelectComboBoxes.getFirst()).getSize().height
+        // > ((JTextField)
+        // mwQueryArgumentTextFields.getFirst()).getSize().height) {
+        // mwHeightDifference = ((JComboBox)
+        // mwQuerySelectComboBoxes.getFirst()).getPreferredSize().height
+        // + c.insets.top + c.insets.bottom;
+        // } else {
+        // mwHeightDifference = ((JTextField)
+        // mwQueryArgumentTextFields.getFirst()).getPreferredSize().height
+        // + c.insets.top + c.insets.bottom;
+        // }
     }
 
     /**
@@ -876,7 +884,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * Sets up the window used to show the list of examples. Can only be open
      * once.
      */
-    private void createExampleWindow() {
+    private void drawExampleWindow() {
         if (exampleWindow != null) {
             exampleWindow.setVisible(true);
             return;
@@ -904,9 +912,9 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         ewListPanel.add(ewExampleScrollPane);
         ewExampleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        String[] exampleList = new String[exampleQueries.getExamples().size()];
-        for (int i = 0; i < exampleQueries.getExamples().size(); i++) {
-            exampleList[i] = ((Query) exampleQueries.getExamples().get(i)).getDescription();
+        String[] exampleList = new String[ExampleQueries.getExamples().size()];
+        for (int i = 0; i < ExampleQueries.getExamples().size(); i++) {
+            exampleList[i] = ((Query) ExampleQueries.getExamples().get(i)).getDescription();
         }
         ewExampleList.setListData(exampleList);
 
@@ -923,7 +931,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     /**
      * Sets up the window used to show the debug output.
      */
-    private void createDebugWindow() {
+    private void drawDebugWindow() {
         debugWindow = new JFrame("Debug output");
         debugWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         debugWindow.addWindowListener(this);
@@ -951,62 +959,71 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      *            The ActionEvent.
      */
     public final void actionPerformed(final ActionEvent e) {
+        int i;
         if (e.getSource() == mwRunQueryButton) {
             mwQueryButtonPressed();
-            return;
-        }
-        if (e.getSource() == mwServiceInfoButton) {
+        } else if (e.getSource() == mwServiceInfoButton) {
             mwInfoButtonPressed();
-            return;
-        }
-        if (e.getSource() == mwSubscriptionIdButton) {
-        	try {
-        		client.querySubscriptionIDs();
-        		return;
-        	} catch (Exception ex) {
-                dwOutputTextArea.append("Could not fetch subscription IDs from repository.");
-                StringWriter detailed = new StringWriter();
-                PrintWriter pw = new PrintWriter(detailed);
-                ex.printStackTrace(pw);
-                dwOutputTextArea.append(detailed.toString());
-                showErrorFrame();
-        	}
-            return;
-        }
-        if (e.getSource() == mwFillInExampleButton) {
-            createExampleWindow();
-            return;
-        }
-        if (e.getSource() == dwClearButton) {
+        } else if (e.getSource() == mwSubscriptionIdButton) {
+            mwSubscriptionIdButtonPressed();
+        } else if (e.getSource() == mwFillInExampleButton) {
+            drawExampleWindow();
+        } else if (e.getSource() == dwClearButton) {
             dwOutputTextArea.setText("");
-            return;
-        }
-        if (e.getSource() == mwUnsubscribeQueryButton) {
-        	try {
-        		client.unsubscribeQuery(mwUnsubscribeQueryTextField.getText());
-        		return;
-        	}
-        	catch (Exception ex) {
-                dwOutputTextArea.append("Could not unsubscribe query.");
-                StringWriter detailed = new StringWriter();
-                PrintWriter pw = new PrintWriter(detailed);
-                ex.printStackTrace(pw);
-                dwOutputTextArea.append(detailed.toString());
-                showErrorFrame();
-        	}
-        }
-        if (e.getSource() == ewOkButton) {
+        } else if (e.getSource() == mwUnsubscribeQueryButton) {
+            mwUnsubscribeQueryButtonPressed(mwUnsubscribeQueryTextField.getText());
+        } else if (e.getSource() == ewOkButton) {
             examplesChanged();
-            return;
-        }
-        if (e.getSource() == mwShowDebugWindowCheckBox) {
+        } else if (e.getSource() == mwShowDebugWindowCheckBox) {
             debugWindow.setVisible(mwShowDebugWindowCheckBox.isSelected());
-            return;
-        }
-        int i = mwQuerySelectComboBoxes.indexOf(e.getSource());
-        if (i >= 0) {
+        } else if ((i = mwQuerySelectComboBoxes.indexOf(e.getSource())) >= 0) {
             mwQuerySelectComboBoxesChanged(i);
-            return;
+        }
+    }
+
+    private void mwSubscriptionIdButtonPressed() {
+        try {
+            String title = "Service is responding";
+            StringBuilder msg = new StringBuilder();
+            List<String> subscriptionIDs = client.getSubscriptionIds("SimpleEventQuery");
+            if (subscriptionIDs != null && !subscriptionIDs.isEmpty()) {
+                msg.append("The following subscription IDs were found in the repository:\n");
+                for (String s : subscriptionIDs) {
+                    msg.append("- ").append(s).append("\n");
+                }
+            } else {
+                msg.append("There are no subscribed queries.");
+            }
+            JFrame frame = new JFrame();
+            JOptionPane.showMessageDialog(frame, msg.toString(), title, JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            dwOutputTextArea.append("Could not fetch subscription IDs from repository.");
+            StringWriter detailed = new StringWriter();
+            PrintWriter pw = new PrintWriter(detailed);
+            ex.printStackTrace(pw);
+            dwOutputTextArea.append(detailed.toString());
+            showErrorFrame();
+        }
+    }
+
+    private void mwUnsubscribeQueryButtonPressed(String subscriptionID) {
+        try {
+            JFrame frame = new JFrame();
+            if (subscriptionID.equals("")) {
+                JOptionPane.showMessageDialog(frame, "Please specify a SubscriptionID", "Service is responding",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            client.unsubscribe(subscriptionID);
+            JOptionPane.showMessageDialog(frame, "Successfully unsubscribed.", "Service is responding",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            dwOutputTextArea.append("Could not unsubscribe query.");
+            StringWriter detailed = new StringWriter();
+            PrintWriter pw = new PrintWriter(detailed);
+            ex.printStackTrace(pw);
+            dwOutputTextArea.append(detailed.toString());
+            showErrorFrame();
         }
     }
 
@@ -1019,8 +1036,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             resultsWindow.dispose();
         }
         try {
-//            checkQueryUrl(mwServiceUrlTextField.getText());
-            client.clearParameters();
+            // checkQueryUrl(mwServiceUrlTextField.getText());
+            clearParameters();
 
             /* get event type selection from GUI */
             ArrayOfString events = new ArrayOfString();
@@ -1040,7 +1057,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 QueryParam queryParam = new QueryParam();
                 queryParam.setName("eventType");
                 queryParam.setValue(events);
-                client.addParameter(queryParam);
+                addParameter(queryParam);
             }
 
             String name;
@@ -1050,30 +1067,31 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                 param.setName(name);
                 switch (((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).queryItem.getParamType()) {
                 case ListOfString:
-                    ArrayOfString valueArray = client.stringListToArray(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
+                    ArrayOfString valueArray = QueryClientHelper.stringListToArray(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
                     param.setValue(valueArray);
-                    client.addParameter(param);
+                    addParameter(param);
                     break;
                 case Int:
                     Integer valueInteger = Integer.decode(((JTextField) mwQueryArgumentTextFields.get(i)).getText());
                     param.setValue(valueInteger);
-                    client.addParameter(param);
+                    addParameter(param);
                     break;
                 case Time:
                     // parse given ISO8601 date string into a calendar
                     String dateStr = ((JTextField) mwQueryArgumentTextFields.get(i)).getText();
                     Calendar cal = TimeParser.parseAsCalendar(dateStr);
                     param.setValue(cal);
-                    client.addParameter(param);
+                    addParameter(param);
                     break;
                 default:
                     String value = ((JTextField) mwQueryArgumentTextFields.get(i)).getText();
                     param.setValue(value);
-                    client.addParameter(param);
+                    addParameter(param);
                     break;
                 }
             }
 
+            configureServiceIfNecessary();
             if (isSubscribed.isSelected()) {
                 if (mwSubIdField.getText().equals("")) {
                     JFrame frame = new JFrame();
@@ -1104,12 +1122,19 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
                     controls.setTrigger(mwDestUriTextField.getText());
                 }
                 subcr.setControls(controls);
-                client.subscribeQuery(subcr);
+                QueryParams queryParams = new QueryParams();
+                queryParams.getParam().addAll(internalQueryParams);
+                debug("Number of query parameters: " + queryParams.getParam().size() + "\n");
+                for (QueryParam queryParam : internalQueryParams) {
+                    debug(queryParam.getName() + " " + queryParam.getValue() + "\n");
+                }
+                subcr.setParams(queryParams);
+                client.subscribe(subcr);
                 JFrame frame = new JFrame();
                 JOptionPane.showMessageDialog(frame, "Query subscription successful.", "Service invocation successful",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                data = client.runQuery();
+                data = runQuery();
                 createResultsWindow();
             }
         } catch (ParseException e) {
@@ -1130,7 +1155,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             dwOutputTextArea.append(sw.toString());
-        	showErrorFrame();
+            showErrorFrame();
         }
     }
 
@@ -1138,14 +1163,13 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      * Shows a new JFrame with a specific invocation error message.
      */
     private void showErrorFrame() {
-		JFrame frame = new JFrame();
-		String msg = "Unexpected error while invoking EPCIS Query Interface.\n"
-				+ "See the Debug output window for more details.";
-		JOptionPane.showMessageDialog(frame, msg, "Service invocation failed",
-				JOptionPane.ERROR_MESSAGE);
-	}
+        JFrame frame = new JFrame();
+        String msg = "Unexpected error while invoking EPCIS Query Interface.\n"
+                + "See the Debug output window for more details.";
+        JOptionPane.showMessageDialog(frame, msg, "Service invocation failed", JOptionPane.ERROR_MESSAGE);
+    }
 
-	/**
+    /**
      * Handles the event of a changed JComboBox in the query arguments section
      * Will add or remove JComboBoxes as necessary and resize the window.
      * 
@@ -1180,9 +1204,10 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private void mwInfoButtonPressed() {
         dwOutputTextArea.setText("");
         try {
-            String standardVersion = client.queryStandardVersion();
-            String vendorVersion = client.queryVendorVersion();
-            List<String> queryNames = client.queryNames();
+            configureServiceIfNecessary();
+            String standardVersion = client.getStandardVersion();
+            String vendorVersion = client.getVendorVersion();
+            List<String> queryNames = client.getQueryNames();
             String text = "EPCIS Query Service responding:\n" + "Standard version: " + standardVersion + "\n"
                     + "Service version: " + vendorVersion + "\n" + "Supported query names: ";
             for (String elem : queryNames) {
@@ -1208,7 +1233,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
     private void examplesChanged() {
         int selected = ewExampleList.getSelectedIndex();
         if (selected >= 0) {
-            Query ex = (Query) exampleQueries.getExamples().get(selected);
+            Query ex = (Query) ExampleQueries.getExamples().get(selected);
             mwObjectEventsCheckBox.setSelected(ex.getReturnObjectEvents());
             mwAggregationEventsCheckBox.setSelected(ex.getReturnAggregationEvents());
             mwQuantityEventsCheckBox.setSelected(ex.getReturnQuantityEvents());
@@ -1325,9 +1350,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
      */
     public class JTextFieldEnhanced extends JTextField {
 
-        /**
-         * 
-         */
         private static final long serialVersionUID = -8874871130001273285L;
 
         /**
@@ -1336,7 +1358,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         private QueryItem queryItem;
 
         /**
-         * Constructro which assigns a QueryItem.
+         * Constructor which assigns a QueryItem.
          * 
          * @param columns
          *            for the length of the JTextField
@@ -1366,7 +1388,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         }
 
         /**
-         * Sets another QueryItem an does the update of the Tooltip.
+         * Sets another QueryItem an does the update of the tool-tip.
          * 
          * @param item
          *            the new QueryItem
@@ -1468,126 +1490,327 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         }
     }
 
-    /**
-     * Implements a class that holds examples for the EPCIS Query Interface
-     * Client. Uses class QueryInterfaceQueryExampleExample to store them.
-     * 
-     * @author David Gubler
-     */
-    private class ExampleQueries {
-        /**
-         * Vector that holds all the examples.
-         */
-        private List<Query> examples = new ArrayList<Query>();
-
-        /**
-         * Constructor. Sets up the examples. Add examples here if you wish.
-         */
-        public ExampleQueries() {
-            Query ex = new Query();
-            ex.setDescription("Search for an aggregation onto a certain pallet");
-            ex.setReturnAggregationEvents(true);
-            QueryParam param = new QueryParam();
-            param.setName("EQ_action");
-            param.setValue("ADD");
-            ex.getQueryParameters().add(param);
-            param = new QueryParam();
-            param.setName("MATCH_parentID");
-            param.setValue("urn:epc:id:sscc:0614141.1234567890");
-            ex.getQueryParameters().add(param);
-            examples.add(ex);
-
-            ex = new Query();
-            ex.setDescription("Return all events for a given EPC that ocurred after a given date");
-            ex.setReturnObjectEvents(true);
-            param = new QueryParam();
-            param.setName("GE_eventTime");
-            param.setValue("2006-01-01T05:20:31Z");
-            ex.getQueryParameters().add(param);
-            param = new QueryParam();
-            param.setName("MATCH_epc");
-            param.setValue("urn:epc:id:sgtin:0034000.987650.2686");
-            ex.getQueryParameters().add(param);
-            examples.add(ex);
-
-            ex = new Query();
-            ex.setDescription("Return all events generated by a given reader");
-            ex.setReturnObjectEvents(true);
-            ex.setReturnAggregationEvents(true);
-            ex.setReturnQuantityEvents(true);
-            ex.setReturnTransactionEvents(true);
-            param = new QueryParam();
-            param.setName("EQ_readPoint");
-            param.setValue("urn:epc:id:sgln:0614141.00729.whatever215");
-            ex.getQueryParameters().add(param);
-            examples.add(ex);
-
-            ex = new Query();
-            ex.setDescription("Retrieve an EPC's shipping date");
-            ex.setReturnObjectEvents(true);
-            param = new QueryParam();
-            param.setName("EQ_action");
-            param.setValue("OBSERVE");
-            ex.getQueryParameters().add(param);
-            param = new QueryParam();
-            param.setName("EQ_bizStep");
-            param.setValue("urn:epcglobal:cbv:bizstep:shipping");
-            ex.getQueryParameters().add(param);
-            param = new QueryParam();
-            param.setName("MATCH_epc");
-            param.setValue("urn:epc:id:sgtin:0057000.123430.2028");
-            ex.getQueryParameters().add(param);
-            examples.add(ex);
-
-            ex = new Query();
-            ex.setDescription("Retrieve all EPCs that were returned in year 2006");
-            ex.setReturnObjectEvents(true);
-            param = new QueryParam();
-            param.setName("EQ_action");
-            param.setValue("OBSERVE");
-            ex.getQueryParameters().add(param);
-            param = new QueryParam();
-            param.setName("GE_eventTime");
-            param.setValue("2006-01-01T00:00:00Z");
-            ex.getQueryParameters().add(param);
-            param = new QueryParam();
-            param.setName("LT_eventTime");
-            param.setValue("2007-01-01T00:00:00Z");
-            ex.getQueryParameters().add(param);
-            param = new QueryParam();
-            param.setName("EQ_disposition");
-            param.setValue("urn:epcglobal:cbv:disp:returned");
-            ex.getQueryParameters().add(param);
-            examples.add(ex);
-        }
-
-        /**
-         * @return A List of Query.
-         */
-        public List<Query> getExamples() {
-            return examples;
-        }
-    }
-    
     void debug(String debugMessage) {
-    	dwOutputTextArea.append(debugMessage);
+        if (!debugMessage.endsWith("\n")) {
+            debugMessage += "\n";
+        }
+        dwOutputTextArea.append(debugMessage);
     }
-    
+
     String getAddress() {
-    	return mwServiceUrlTextField.getText();
+        return mwServiceUrlTextField.getText();
     }
-    
+
     Object[] getAuthenticationOptions() {
-    	return mwAuthOptions.getAuthenticationOptions();
+        return mwAuthOptions.getAuthenticationOptions();
     }
 
     void setButtonsEnabled(boolean buttonsEnabled) {
-    	JButton[] buttons = { mwRunQueryButton, mwServiceInfoButton, mwUnsubscribeQueryButton, mwSubscriptionIdButton };
-    	for (JButton button : buttons) {
-    		button.setEnabled(buttonsEnabled);
-    	}
+        JButton[] buttons = { mwRunQueryButton, mwServiceInfoButton, mwUnsubscribeQueryButton, mwSubscriptionIdButton };
+        for (JButton button : buttons) {
+            button.setEnabled(buttonsEnabled);
+        }
     }
-    
+
+    /**
+     * Set whether or not the configuration has changed. The components in the
+     * configuration panel call this method when their state is updated.
+     * 
+     * @param configurationComplete
+     *            Indicates whether or not the information present is enough to
+     *            enable the client to connect to a repository (e.g. both a
+     *            username and password are available if Basic authentication is
+     *            chosen).
+     */
+    public void configurationChanged(AuthenticationOptionsChangeEvent ace) {
+        this.configurationChanged = true;
+        setButtonsEnabled(ace.isComplete());
+    }
+
+    /**
+     * Prints the results from a query invocation to the debug window and
+     * returns a two-dimensional array in a format suitable for a JTable object.
+     * 
+     * @param eventList
+     *            The result list containing the matching events.
+     * @return A two-dimensional array containing the matching events in a
+     *         format suitable for displaying in a JTable object.
+     */
+    private Object[][] processEvents(final List<Object> eventList) {
+        int nofEvents = eventList.size();
+        Object[][] table = new Object[nofEvents][12];
+        int row = 0;
+
+        debug("\n\n" + nofEvents + " events returned by the server:\n\n");
+        for (Object o : eventList) {
+            if (o instanceof JAXBElement<?>) {
+                o = ((JAXBElement<?>) o).getValue();
+            }
+            EPCISEventType event = (EPCISEventType) o;
+            debug("[ EPCISEvent ]\n");
+            String eventTime = QueryClientHelper.printCalendar(event.getEventTime().toGregorianCalendar());
+            debug("eventTime:\t" + eventTime + "\n");
+            table[row][1] = eventTime;
+            String recordTime = QueryClientHelper.printCalendar(event.getRecordTime().toGregorianCalendar());
+            debug("recordTime:\t" + recordTime + "\n");
+            table[row][2] = recordTime;
+            debug("timeZoneOffset:\t" + event.getEventTimeZoneOffset() + "\n");
+
+            if (event instanceof ObjectEventType) {
+                debug("[ ObjectEvent ]\n");
+                ObjectEventType e = (ObjectEventType) event;
+                table[row][0] = "Object";
+                debug("epcList:\t");
+                table[row][5] = "";
+                for (EPC epc : e.getEpcList().getEpc()) {
+                    debug(" '" + epc.getValue() + "'");
+                    table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
+                }
+                debug("\n");
+                debug("action:\t\t" + e.getAction().toString() + "\n");
+                table[row][6] = e.getAction().toString();
+                debug("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debug("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debug("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debug("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debug("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debug("bizTrans:\tnull\n");
+                }
+                debug("\n");
+
+            } else if (event instanceof TransactionEventType) {
+                debug("[ TransactionEvent ]\n");
+                TransactionEventType e = (TransactionEventType) event;
+                table[row][0] = "Transaction";
+                debug("parentID:\t" + e.getParentID() + "\n");
+                table[row][3] = e.getParentID();
+                debug("epcList:\t");
+                table[row][5] = "";
+                for (EPC epc : e.getEpcList().getEpc()) {
+                    debug(" '" + epc.getValue() + "'");
+                    table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
+                }
+                debug("\n");
+                debug("action:\t\t" + e.getAction().toString() + "\n");
+                table[row][6] = e.getAction().toString();
+                debug("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debug("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debug("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debug("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debug("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debug("bizTrans:\tnull\n");
+                }
+                debug("\n");
+
+            } else if (event instanceof AggregationEventType) {
+                debug("[ AggregationEvent ]\n");
+                AggregationEventType e = (AggregationEventType) event;
+                table[row][0] = "Aggregation";
+                debug("parentID:\t" + e.getParentID() + "\n");
+                table[row][3] = e.getParentID();
+                debug("childEPCs:\t");
+                table[row][5] = "";
+                for (EPC epc : e.getChildEPCs().getEpc()) {
+                    debug(" '" + epc.getValue() + "'");
+                    table[row][5] = table[row][5] + "'" + epc.getValue() + "' ";
+                }
+                debug("\n");
+                debug("action:\t\t" + e.getAction().toString() + "\n");
+                table[row][6] = e.getAction().toString();
+                debug("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debug("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debug("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debug("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debug("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debug("bizTrans:\tnull\n");
+                }
+                debug("\n");
+
+            } else if (event instanceof QuantityEventType) {
+                debug("[ QuantityEvent ]\n");
+                QuantityEventType e = (QuantityEventType) event;
+                table[row][0] = "Quantity";
+                debug("quantity:\t" + e.getQuantity() + "\n");
+                table[row][4] = Integer.valueOf(e.getQuantity());
+                debug("ecpClass:\t" + e.getEpcClass() + "\n");
+                table[row][5] = e.getEpcClass();
+                debug("bizStep:\t" + e.getBizStep() + "\n");
+                table[row][7] = e.getBizStep();
+                debug("disposition:\t" + e.getDisposition() + "\n");
+                table[row][8] = e.getDisposition();
+                if (e.getReadPoint() != null) {
+                    debug("readPoint:\t" + e.getReadPoint().getId() + "\n");
+                    table[row][9] = e.getReadPoint().getId();
+                } else {
+                    debug("readPoint:\tnull\n");
+                }
+                if (e.getBizLocation() != null) {
+                    debug("bizLocation:\t" + e.getBizLocation().getId() + "\n");
+                    table[row][10] = e.getBizLocation().getId();
+                } else {
+                    debug("bizLocation:\tnull\n");
+                }
+                if (e.getBizTransactionList() != null) {
+                    debug("bizTrans:\tType, ID\n");
+                    table[row][11] = "";
+                    for (BusinessTransactionType bizTrans : e.getBizTransactionList().getBizTransaction()) {
+                        debug("\t'" + bizTrans.getType() + "', '" + bizTrans.getValue() + "'\n");
+                        table[row][11] = table[row][11] + "'" + bizTrans.getType() + ", " + bizTrans.getValue()
+                                + "' ; ";
+                    }
+                    if (!"".equals(table[row][11])) {
+                        // remove last "; "
+                        table[row][11] = ((String) table[row][11]).substring(0, ((String) table[row][11]).length() - 2);
+                    }
+                } else {
+                    debug("bizTrans:\tnull\n");
+                }
+                debug("\n");
+            }
+            row++;
+        }
+        return table;
+    }
+
+    /**
+     * Reset the query arguments.
+     */
+    public void clearParameters() {
+        internalQueryParams.clear();
+    }
+
+    /**
+     * Add a new query parameter.
+     * 
+     * @param param
+     *            The query parameter to add.
+     */
+    public void addParameter(final QueryParam param) {
+        internalQueryParams.add(param);
+    }
+
+    /**
+     * Forces the client to reconfigure the service if the any of its parameters
+     * (authentication, endpoint address) have been changed.
+     * 
+     * @throws Exception
+     */
+    private void configureServiceIfNecessary() throws Exception {
+        if (!client.isServiceConfigured() || configurationChanged) {
+            // validate the URL and get auth options from the main window
+            client.configureService(new URL(getAddress()), getAuthenticationOptions());
+            configurationChanged = false;
+        }
+    }
+
+    /**
+     * Run the query with the currently set query arguments Returns the results
+     * in a format that is suitable for JTable.
+     * 
+     * @return The pretty-printed query results.
+     * @throws Exception
+     *             If any Exception occurred while invoking the query service.
+     */
+    private Object[][] runQuery() throws Exception {
+        QueryParams queryParams = new QueryParams();
+        queryParams.getParam().addAll(internalQueryParams);
+        debug("Number of query parameters: " + queryParams.getParam().size() + "\n");
+        for (QueryParam queryParam : internalQueryParams) {
+            if (queryParam.getValue() instanceof ArrayOfString) {
+                debug(queryParam.getName() + " " + ((ArrayOfString) queryParam.getValue()).getString() + "\n");
+            } else {
+                debug(queryParam.getName() + " " + queryParam.getValue() + "\n");
+            }
+        }
+
+        Poll poll = new Poll();
+        poll.setQueryName("SimpleEventQuery");
+        poll.setParams(queryParams);
+
+        debug("running query...\n");
+        QueryResults results = client.poll(poll);
+        debug("done\n");
+
+        // print to debug window and return result
+        if (results != null && results.getResultsBody() != null && results.getResultsBody().getEventList() != null) {
+            return processEvents(results.getResultsBody().getEventList().getObjectEventOrAggregationEventOrQuantityEvent());
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Instantiates a new QueryClientGui and sets its look-and-feel to the one
      * matching the current operating system.
@@ -1600,10 +1823,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            e.printStackTrace();
         }
         if (args != null && args.length > 0) {
-            new QueryClientGui(args[0]);
+            try {
+                new QueryClientGui(args[0]);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         } else {
             new QueryClientGui();
         }

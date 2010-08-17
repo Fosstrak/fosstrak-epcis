@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.security.KeyStore;
@@ -33,6 +34,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
@@ -84,8 +86,14 @@ import org.fosstrak.epcis.utils.AuthenticationType;
  */
 public class QueryControlClient implements QueryControlInterface, X509TrustManager {
 
+    private static final String PROPERTY_FILE = "/queryclient.properties";
+    private static final String PROP_QUERY_URL = "default.url";
+    private static final String DEFAULT_QUERY_URL = "http://demo.fosstrak.org/epcis/query";
+
     private static final QName SERVICE = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISService");
     private static final QName PORT = new QName("urn:epcglobal:epcis:wsdl:1", "EPCglobalEPCISServicePort");
+
+    private String queryUrl;
 
     /**
      * The locator for the service.
@@ -104,22 +112,67 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
      */
     public QueryControlClient() {
     }
-    
+
     /**
-     * Instantiates a new QueryControlClient configured to communicate with
-     * the repository indicated by URL, with no authentication.
-     * @param url the URL of the repositor to communicate with.
-     * @throws Exception
+     * Instantiates a new QueryControlClient configured to communicate with the
+     * repository indicated by the given URL and with no authentication.
+     * 
+     * @param url
+     *            the URL of the repository, or <code>null</code> if a default
+     *            value should be loaded.
+     * @throws MalformedURLException
+     *             if the provided url String is not a valid URL.
      */
-    public QueryControlClient(String url) throws Exception {
-    	configureService(new URL(url), null);
+    public QueryControlClient(String url) throws MalformedURLException {
+        if (url != null) {
+            this.queryUrl = url;
+        } else {
+            Properties props = loadProperties();
+            this.queryUrl = props.getProperty(PROP_QUERY_URL, DEFAULT_QUERY_URL);
+            try {
+                new URL(queryUrl);
+            } catch (MalformedURLException e) {
+                queryUrl = DEFAULT_QUERY_URL;
+            }
+        }
+        try {
+            configureService(new URL(queryUrl), null);
+        } catch (Exception e) {
+            // this should not happen because no authentication options are
+            // provided
+            serviceConfigured = false;
+        }
     }
-    
+
+    /**
+     * @return The query client properties.
+     */
+    private Properties loadProperties() {
+        Properties props = new Properties();
+        InputStream is = getClass().getResourceAsStream(PROPERTY_FILE);
+        if (is != null) {
+            try {
+                props.load(is);
+                is.close();
+            } catch (IOException e) {
+                System.out.println("Unable to load queryclient properties from "
+                        + QueryControlClient.class.getResource(PROPERTY_FILE).toString() + ". Using defaults.");
+            }
+        } else {
+            System.out.println("Unable to load queryclient properties from " + PROPERTY_FILE + ". Using defaults.");
+        }
+        return props;
+    }
+
     /**
      * @return whether or not this service is configured and ready to use.
      */
     public boolean isServiceConfigured() {
         return serviceConfigured;
+    }
+
+    public String getQueryUrl() {
+        return queryUrl;
     }
 
     private boolean isEmpty(String s) {
@@ -181,9 +234,9 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
                 // logger.debug("Authenticating via Basic as: " +
                 // authenticationOptions[1]);
 
-            	String username = (String)authenticationOptions[1];
-            	String password = (String)authenticationOptions[2];
-            	
+                String username = (String) authenticationOptions[1];
+                String password = (String) authenticationOptions[2];
+
                 if (isEmpty(username) || isEmpty(password)) {
                     throw new Exception("Authentication method " + authenticationOptions[0]
                             + " requires a valid user name and password");
@@ -200,9 +253,9 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
                     throw new Exception("Authentication method " + authenticationOptions[0]
                             + " requires the use of HTTPS");
                 }
-                
-    			String keyStoreFile = (String)authenticationOptions[1];
-    			String password = (String)authenticationOptions[2];
+
+                String keyStoreFile = (String) authenticationOptions[1];
+                String password = (String) authenticationOptions[2];
 
                 if (isEmpty(keyStoreFile) || isEmpty(password)) {
                     throw new Exception("Authentication method " + authenticationOptions[0]
