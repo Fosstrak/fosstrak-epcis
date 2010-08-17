@@ -88,11 +88,6 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
      */
     private CaptureClient client;
 
-    /**
-     * Holds all the examples.
-     */
-    private ExampleEvents exampleEvents = new ExampleEvents();
-
     /*
      * These lists hold the input fields for the BizTransactions. The lists are
      * modified by the user to allow for as many arguments as the user wants.
@@ -526,9 +521,9 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         ewListPanel.add(ewExampleScrollPane);
         ewExampleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        String[] exampleList = new String[exampleEvents.examples.size()];
-        for (int i = 0; i < exampleEvents.examples.size(); i++) {
-            exampleList[i] = ((CaptureEvent) exampleEvents.examples.get(i)).getDescription();
+        String[] exampleList = new String[ExampleEvents.getExamples().size()];
+        for (int i = 0; i < ExampleEvents.getExamples().size(); i++) {
+            exampleList[i] = ExampleEvents.getExamples().get(i).getDescription();
         }
         ewExampleList.setListData(exampleList);
 
@@ -591,7 +586,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
     private void ewOkButtonPressed() {
         int selected = ewExampleList.getSelectedIndex();
         if (selected >= 0) {
-            CaptureEvent ex = (CaptureEvent) exampleEvents.examples.get(selected);
+            CaptureEvent ex = ExampleEvents.getExamples().get(selected);
 
             mwEventTimeTextField.setText(ex.getEventTime());
             mwEventTimeZoneOffsetTextField.setText(ex.getEventTimeZoneOffset());

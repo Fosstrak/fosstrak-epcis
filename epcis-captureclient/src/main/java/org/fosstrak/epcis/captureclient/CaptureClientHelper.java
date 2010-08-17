@@ -186,20 +186,19 @@ public class CaptureClientHelper {
 
     /**
      * Implements a class that holds examples for the EPCIS Capture Interface
-     * Client. Uses class CaptureInterfaceEventExample to store them.
+     * Client.
      * 
      * @author David Gubler
      */
     public static final class ExampleEvents {
-        /**
-         * List that holds all the examples.
-         */
-        public List<CaptureEvent> examples = new ArrayList<CaptureEvent>();
+ 
+        private static List<CaptureEvent> examples = null;
 
         /**
-         * Constructor. Sets up the examples. Add examples here if you wish.
+         * Sets up the examples. Add examples here if you wish.
          */
-        public ExampleEvents() {
+        private static void initEvents() {
+            examples = new ArrayList<CaptureEvent>();
             CaptureEvent ex = new CaptureEvent();
             ex.setDescription("DEMO 1: Item is assigned a new EPC");
             ex.setType(0);
@@ -369,6 +368,13 @@ public class CaptureClientHelper {
             ex.setBizTransaction("urn:epcglobal:cbv:fmcg:btt:po", "http://transaction.example.com/po/6677150");
             ex.setEpcList("urn:epc:id:sgtin:0057000.678930.5003 urn:epc:id:sgtin:0057000.678930.5004");
             examples.add(ex);
+        }
+        
+        public static List<CaptureEvent> getExamples() {
+            if (examples == null) {
+                initEvents();
+            }
+            return examples;
         }
     }
 
