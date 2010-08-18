@@ -758,11 +758,11 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
 	 * "A parent identifier carries, in addition to its master data attributes, a
 	 * list of its children identifiers."
 	 * 
-	 * "The term “direct or indirect descendant” is used to refer to the set of
+	 * "The term "direct or indirect descendant" is used to refer to the set of
 	 * vocabulary elements including the children of a given vocabulary element,
-	 * the children of those children, etc. That is, the “direct or indirect
-	 * descendants” of a vocabulary element are the set of vocabulary elements
-	 * obtained by taking the transitive closure of the “children” relation
+	 * the children of those children, etc. That is, the "direct or indirect
+	 * descendants" of a vocabulary element are the set of vocabulary elements
+	 * obtained by taking the transitive closure of the "children" relation
 	 * starting with the given vocabulary element."
      * 
 	 * "A given element MAY be the child of more than one parent. This allows for
