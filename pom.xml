@@ -12,8 +12,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>ISO-8859-1</project.reporting.outputEncoding>
   </properties>
 
 
@@ -171,6 +171,19 @@
             <publishDate position="left" format="yyyy-MM-dd hh:mm:ss" />
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>aggregate</id>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <phase>site</phase>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -238,10 +251,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <aggregate>true</aggregate>
-        </configuration>
       </plugin>
+      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
@@ -249,11 +260,12 @@
           <aggregate>true</aggregate>
         </configuration>
       </plugin>
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <configuration>
-          <linkXref>true</linkXref>
+          <!-- <linkXref>true</linkXref> -->
           <sourceEncoding>utf-8</sourceEncoding>
           <targetJdk>1.5</targetJdk>
           <excludes>
@@ -281,7 +293,7 @@
           </reportSet>
         </reportSets>
         <configuration>
-          <issueLinkTemplate>http://sourceforge.net/support/tracker.php?aid=%ISSUE%</issueLinkTemplate>
+          <issueLinkTemplatePerSystem>http://sourceforge.net/support/tracker.php?aid=%ISSUE%</issueLinkTemplatePerSystem>
         </configuration>
       </plugin>
     </plugins>

@@ -158,7 +158,7 @@
           <excludes>org/fosstrak/epcis/soapapi/*.*</excludes>
           <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
           <enableRulesSummary>false</enableRulesSummary>
-          <xrefLocation>xref</xrefLocation>
+          <!-- <xrefLocation>xref</xrefLocation> -->
           <propertyExpansion>samedir=${basedir}/../src/config</propertyExpansion>
         </configuration>
       </plugin>
