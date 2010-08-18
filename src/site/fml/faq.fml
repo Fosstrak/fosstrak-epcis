@@ -1,53 +1,41 @@
-<?xml version="1.0" ?>
-<faqs title="Fosstrak EPCIS - Frequently Asked Questions">
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs xmlns="http://maven.apache.org/FML/1.0.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd" title="Fosstrak EPCIS - Frequently Asked Questions">
 
-<part id="about">
-<title>About</title>
+  <part id="general">
+    <title>General</title>
+    <faq id="what-is-epcis">
+      <question>What is EPCIS?</question>
+      <answer>EPCIS is a standard to exchange RFID-related events between businesses. For more information, please see EPCglobal's EPCIS FAQ at <a href="http://www.epcglobalinc.org/standards/epcis/epcis_1_0-faq-20070427.pdf">http://www.epcglobalinc.org/standards/epcis/epcis_1_0-faq-20070427.pdf</a>.</answer>
+    </faq>
+    <faq id="reference-impl">
+      <question>Is this a reference implementation of the EPCglobal EPC Information Services (EPCIS) Specification?</question>
+      <answer>No, but the Fosstrak EPCIS repository has been EPCglobal certified.</answer>
+    </faq>
+    <faq id="contribute">
+      <question>Can I contribute to this project even if I am not part of the Auto-ID Labs or EPCglobal?</question>
+      <answer>Yes. While initiated by the Auto-ID Lab at ETH Zurich/University St. Gallen and the Distributed Systems Group at ETH Zurich, it is open for participation by everyone.</answer>
+    </faq>
+    <faq id="support">
+      <question>Where can I get further information and/or support?</question>
+      <answer>First, you should read the <a href="docs/user-guide.html">user guide</a>. If you can't find the information you are looking for you should check the <a href="mail-lists.html">mailing list</a> archive and, as a last resort, you can post your question to the <a href="mail-lists.html">mailing list</a>.</answer>
+    </faq>
+  </part>
 
-<faq>
-<question>What is EPCIS?</question>
-<answer>EPCIS is a standard to exchange RFID-related events between businesses. For more information, please see EPCglobal's EPCIS FAQ at <a href="http://www.epcglobalinc.org/standards/epcis/epcis_1_0-faq-20070427.pdf">http://www.epcglobalinc.org/standards/epcis/epcis_1_0-faq-20070427.pdf</a>.</answer>
-</faq>
+  <part id="how-to">
+    <title>How-to</title>
+    <faq id="how-to-use">
+      <question>How do I interact with the repository?</question>
+      <answer>Please consult the <a href="docs/user-guide.html">user guide</a>.</answer>
+    </faq>
+    <faq id="how-to-build">
+      <question>How do I build the project?</question>
+      <answer>Please consult the <a href="docs/developer-guide.html">developer guide</a>.</answer>
+    </faq>
+    <faq id="authentication">
+      <question>How can I get authentication and authorization in order to secure my repository?</question>
+      <answer>You can easily add these features to an Fosstrak-based EPCIS installation by setting up an instance of the Apache Webserver as a proxy and using Apache's authentication mechanisms.</answer>
+    </faq>
+  </part>
 
-<faq>
-<question>Is this a reference implementation of the EPCglobal EPC Information Services (EPCIS) Specification?</question>
-<answer>No, but the Fosstrak EPCIS repository has been EPCglobal certified.</answer>
-</faq>
-
-<faq>
-<question>Can I contribute to this project even, if I am not part of the Auto-ID Labs or EPCglobal?</question>
-<answer>Yes. While initiated by the Auto-ID Lab at ETH Zurich/University St. Gallen and the Distributed Systems Group at ETH Zurich, it is open for participation by everyone.</answer>
-</faq>
-
-</part>
-
-<part id="how-to">
-<title>How-to</title>
-
-<faq>
-<question>How do I interact with the repository?</question>
-<answer>Please consult the <a href="docs/user-guide.html">user guide</a>.</answer>
-</faq>
-
-<faq>
-<question>How can I get authentication and authorization in order to secure my repository?</question>
-<answer>You can easily add these features to an Fosstrak-based EPCIS installation by setting up an instance of the Apache Webserver as a proxy and using Apache's authentication mechanisms.</answer>
-</faq>
-
-</part>
-
-<part id="testing">
-<title>Testing</title>
-
-<faq>
-<question>Why do not all the interoperability tests run successfully?</question>
-<answer>Our EPCIS implementation does not currently support authentication or authorization mechanisms as they are not required by EPCglobal's EPCIS specification. Nevertheless testSE2, testSE5, and testSE74 of EPCglobal's interoperability test kit (which our 'epcis-interop-test' module adheres to) require the client to be authenticated and/or authorized. Therefore these tests will fail. The bottom line is that these test failures are nothing to worry about.</answer>
-</faq>
-
-<faq>
-<question>Why do I see so many failing tests during Maven's "test" phase?</question>
-<answer>Most probably, you don't have a proper test environment on your machine. The interoperability tests need access to an EPCIS repository running on your local machine that contains the test data set found in <i>epcis-repository/src/main/sql/epcis_test_data.sql</i>. Also, this repository must have the configuration parameter <i>dbResetAllowed</i> in the webapp's <i>context.xml</i> set to <i>true</i> (default value is <i>false</i>).</answer>
-</faq>
-
-</part>
-</faqs>                     
+</faqs>
