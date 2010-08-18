@@ -36,25 +36,6 @@
 
   <profiles>
     <profile>
-      <id>interop-test</id>
-      <!--
-          the epcis-interop-test module is included into a profile in order
-          to build it only on demand: running "mvn install" will not build
-          the epcis-interop-test module, but "mvn install -Dinterop-test" will
-      -->
-      <activation>
-        <property>
-          <name>interop-test</name>
-        </property>
-      </activation>
-      <modules>
-        <module>epcis-interop-test</module>
-      </modules>
-      <properties>
-        <filter.file>../src/main/filters/dev.properties</filter.file>
-      </properties>
-    </profile>
-    <profile>
       <!-- in order to trigger this profile, specify "-Denv=test" on command line -->
       <id>env-dev</id>
       <activation>
@@ -185,34 +166,9 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <!-- Lock to this version in order to prevent generating corrupted
-               menu structures for sub-modules when running site:site from the
-               parent module. See http://jira.codehaus.org/browse/MSITE-270 for
-               details on this issue. -->
-          <version>2.0-beta-5</version>
           <configuration>
             <locales>en</locales>
             <publishDate position="left" format="yyyy-MM-dd hh:mm:ss" />
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <!--
-            By default, the surefire plugin automatically includes all test classes
-            with following wildcard patterns:
-            **/Test*.java
-            **/*Test.java
-            **/*TestCase.java
-          -->
-          <configuration>
-            <testFailureIgnore>true</testFailureIgnore>
-            <excludes>
-               <!-- these tests require special setup, see FAQ -->
-              <exclude>**/ImplementationErrorTest.java</exclude>
-              <exclude>**/QueryTooComplexTest.java</exclude>
-              <exclude>**/QueryPerformanceTest.java</exclude>
-            </excludes>
           </configuration>
         </plugin>
       </plugins>
