@@ -58,7 +58,9 @@
   <table name="event_aggregationevent">
     <column>id</column>
     <column>eventTime</column>
+    <column>eventTimeMs</column>
     <column>recordTime</column>
+    <column>recordTimeMs</column>
     <column>eventTimeZoneOffset</column>
     <column>parentID</column>
     <column>action</column>
@@ -69,7 +71,9 @@
     <row>
       <value>41</value>
       <value><![CDATA[2006-06-25 03:51:00.0]]></value>
+      <value>1151207460000</value>
       <value><![CDATA[2006-06-25 03:51:00.0]]></value>
+      <value>1151207460000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614141.0000000001</value>
       <value>ADD</value>
@@ -81,7 +85,9 @@
     <row>
       <value>42</value>
       <value><![CDATA[2006-06-25 03:52:00.0]]></value>
+      <value>1151207520000</value>
       <value><![CDATA[2006-06-25 03:52:00.0]]></value>
+      <value>1151207520000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614141.0000000002</value>
       <value>ADD</value>
@@ -93,7 +99,9 @@
     <row>
       <value>43</value>
       <value><![CDATA[2006-06-25 03:53:00.0]]></value>
+      <value>1151207580000</value>
       <value><![CDATA[2006-06-25 03:53:00.0]]></value>
+      <value>1151207580000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614141.0000000003</value>
       <value>ADD</value>
@@ -105,7 +113,9 @@
     <row>
       <value>44</value>
       <value><![CDATA[2006-06-25 03:54:00.0]]></value>
+      <value>1151207640000</value>
       <value><![CDATA[2006-06-25 03:54:00.0]]></value>
+      <value>1151207640000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614141.0000000004</value>
       <value>ADD</value>
@@ -117,7 +127,9 @@
     <row>
       <value>45</value>
       <value><![CDATA[2006-06-25 03:55:00.0]]></value>
+      <value>1151207700000</value>
       <value><![CDATA[2006-06-25 03:55:00.0]]></value>
+      <value>1151207700000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614141.0000000005</value>
       <value>ADD</value>
@@ -129,7 +141,9 @@
     <row>
       <value>46</value>
       <value><![CDATA[2006-06-25 03:56:00.0]]></value>
+      <value>1151207760000</value>
       <value><![CDATA[2006-06-25 03:56:00.0]]></value>
+      <value>1151207760000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614142.0000000006</value>
       <value>ADD</value>
@@ -141,7 +155,9 @@
     <row>
       <value>47</value>
       <value><![CDATA[2006-06-25 03:57:00.0]]></value>
+      <value>1151207820000</value>
       <value><![CDATA[2006-06-25 03:57:00.0]]></value>
+      <value>1151207820000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614142.0000000007</value>
       <value>ADD</value>
@@ -153,7 +169,9 @@
     <row>
       <value>48</value>
       <value><![CDATA[2006-06-25 03:58:00.0]]></value>
+      <value>1151207880000</value>
       <value><![CDATA[2006-06-25 03:58:00.0]]></value>
+      <value>1151207880000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614142.0000000008</value>
       <value>ADD</value>
@@ -165,7 +183,9 @@
     <row>
       <value>49</value>
       <value><![CDATA[2006-06-25 03:59:00.0]]></value>
+      <value>1151207940000</value>
       <value><![CDATA[2006-06-25 03:59:00.0]]></value>
+      <value>1151207940000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614142.0000000009</value>
       <value>ADD</value>
@@ -177,7 +197,9 @@
     <row>
       <value>50</value>
       <value><![CDATA[2006-06-25 04:00:00.0]]></value>
+      <value>1151208000000</value>
       <value><![CDATA[2006-06-25 04:00:00.0]]></value>
+      <value>1151208000000</value>
       <value>-06:00</value>
       <value>urn:epc:id:sscc:0614142.0000000010</value>
       <value>ADD</value>
@@ -710,7 +732,9 @@
   <table name="event_objectevent">
     <column>id</column>
     <column>eventTime</column>
+    <column>eventTimeMs</column>
     <column>recordTime</column>
+    <column>recordTimeMs</column>
     <column>eventTimeZoneOffset</column>
     <column>action</column>
     <column>bizStep</column>
@@ -720,7 +744,9 @@
     <row>
       <value>501</value>
       <value><![CDATA[2006-06-25 00:01:00.0]]></value>
+      <value>1151193660000</value>
       <value><![CDATA[2006-06-25 00:01:00.0]]></value>
+      <value>1151193660000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -731,7 +757,9 @@
     <row>
       <value>502</value>
       <value><![CDATA[2006-06-25 00:02:00.0]]></value>
+      <value>1151193720000</value>
       <value><![CDATA[2006-06-25 00:02:00.0]]></value>
+      <value>1151193720000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -742,7 +770,9 @@
     <row>
       <value>503</value>
       <value><![CDATA[2006-06-25 00:03:00.0]]></value>
+      <value>1151193780000</value>
       <value><![CDATA[2006-06-25 00:03:00.0]]></value>
+      <value>1151193780000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -753,7 +783,9 @@
     <row>
       <value>504</value>
       <value><![CDATA[2006-06-25 00:04:00.0]]></value>
+      <value>1151193840000</value>
       <value><![CDATA[2006-06-25 00:04:00.0]]></value>
+      <value>1151193840000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -764,7 +796,9 @@
     <row>
       <value>505</value>
       <value><![CDATA[2006-06-25 00:05:00.0]]></value>
+      <value>1151193900000</value>
       <value><![CDATA[2006-06-25 00:05:00.0]]></value>
+      <value>1151193900000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -775,7 +809,9 @@
     <row>
       <value>506</value>
       <value><![CDATA[2006-06-25 00:06:00.0]]></value>
+      <value>1151193960000</value>
       <value><![CDATA[2006-06-25 00:06:00.0]]></value>
+      <value>1151193960000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -786,7 +822,9 @@
     <row>
       <value>507</value>
       <value><![CDATA[2006-06-25 00:07:00.0]]></value>
+      <value>1151194020000</value>
       <value><![CDATA[2006-06-25 00:07:00.0]]></value>
+      <value>1151194020000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -797,7 +835,9 @@
     <row>
       <value>508</value>
       <value><![CDATA[2006-06-25 00:08:00.0]]></value>
+      <value>1151194080000</value>
       <value><![CDATA[2006-06-25 00:08:00.0]]></value>
+      <value>1151194080000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -808,7 +848,9 @@
     <row>
       <value>509</value>
       <value><![CDATA[2006-06-25 00:09:00.0]]></value>
+      <value>1151194140000</value>
       <value><![CDATA[2006-06-25 00:09:00.0]]></value>
+      <value>1151194140000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -819,7 +861,9 @@
     <row>
       <value>510</value>
       <value><![CDATA[2006-06-25 00:10:00.0]]></value>
+      <value>1151194200000</value>
       <value><![CDATA[2006-06-25 00:10:00.0]]></value>
+      <value>1151194200000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -830,7 +874,9 @@
     <row>
       <value>511</value>
       <value><![CDATA[2006-06-25 00:11:00.0]]></value>
+      <value>1151194260000</value>
       <value><![CDATA[2006-06-25 00:11:00.0]]></value>
+      <value>1151194260000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -841,7 +887,9 @@
     <row>
       <value>512</value>
       <value><![CDATA[2006-06-25 00:12:00.0]]></value>
+      <value>1151194320000</value>
       <value><![CDATA[2006-06-25 00:12:00.0]]></value>
+      <value>1151194320000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -852,7 +900,9 @@
     <row>
       <value>513</value>
       <value><![CDATA[2006-06-25 00:13:00.0]]></value>
+      <value>1151194380000</value>
       <value><![CDATA[2006-06-25 00:13:00.0]]></value>
+      <value>1151194380000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -863,7 +913,9 @@
     <row>
       <value>514</value>
       <value><![CDATA[2006-06-25 00:14:00.0]]></value>
+      <value>1151194440000</value>
       <value><![CDATA[2006-06-25 00:14:00.0]]></value>
+      <value>1151194440000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -874,7 +926,9 @@
     <row>
       <value>515</value>
       <value><![CDATA[2006-06-25 00:15:00.0]]></value>
+      <value>1151194500000</value>
       <value><![CDATA[2006-06-25 00:15:00.0]]></value>
+      <value>1151194500000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -885,7 +939,9 @@
     <row>
       <value>516</value>
       <value><![CDATA[2006-06-25 00:16:00.0]]></value>
+      <value>1151194560000</value>
       <value><![CDATA[2006-06-25 00:16:00.0]]></value>
+      <value>1151194560000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -896,7 +952,9 @@
     <row>
       <value>517</value>
       <value><![CDATA[2006-06-25 00:17:00.0]]></value>
+      <value>1151194620000</value>
       <value><![CDATA[2006-06-25 00:17:00.0]]></value>
+      <value>1151194620000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -907,7 +965,9 @@
     <row>
       <value>518</value>
       <value><![CDATA[2006-06-25 00:18:00.0]]></value>
+      <value>1151194680000</value>
       <value><![CDATA[2006-06-25 00:18:00.0]]></value>
+      <value>1151194680000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -918,7 +978,9 @@
     <row>
       <value>519</value>
       <value><![CDATA[2006-06-25 00:19:00.0]]></value>
+      <value>1151194740000</value>
       <value><![CDATA[2006-06-25 00:19:00.0]]></value>
+      <value>1151194740000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -929,7 +991,9 @@
     <row>
       <value>520</value>
       <value><![CDATA[2006-06-25 00:20:00.0]]></value>
+      <value>1151194800000</value>
       <value><![CDATA[2006-06-25 00:20:00.0]]></value>
+      <value>1151194800000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -940,7 +1004,9 @@
     <row>
       <value>521</value>
       <value><![CDATA[2006-06-25 00:21:00.0]]></value>
+      <value>1151194860000</value>
       <value><![CDATA[2006-06-25 00:21:00.0]]></value>
+      <value>1151194860000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -951,7 +1017,9 @@
     <row>
       <value>522</value>
       <value><![CDATA[2006-06-25 00:22:00.0]]></value>
+      <value>1151194920000</value>
       <value><![CDATA[2006-06-25 00:22:00.0]]></value>
+      <value>1151194920000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -962,7 +1030,9 @@
     <row>
       <value>523</value>
       <value><![CDATA[2006-06-25 00:23:00.0]]></value>
+      <value>1151194980000</value>
       <value><![CDATA[2006-06-25 00:23:00.0]]></value>
+      <value>1151194980000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -973,7 +1043,9 @@
     <row>
       <value>524</value>
       <value><![CDATA[2006-06-25 00:24:00.0]]></value>
+      <value>1151195040000</value>
       <value><![CDATA[2006-06-25 00:24:00.0]]></value>
+      <value>1151195040000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -984,7 +1056,9 @@
     <row>
       <value>525</value>
       <value><![CDATA[2006-06-25 00:25:00.0]]></value>
+      <value>1151195100000</value>
       <value><![CDATA[2006-06-25 00:25:00.0]]></value>
+      <value>1151195100000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -995,7 +1069,9 @@
     <row>
       <value>526</value>
       <value><![CDATA[2006-06-25 00:26:00.0]]></value>
+      <value>1151195160000</value>
       <value><![CDATA[2006-06-25 00:26:00.0]]></value>
+      <value>1151195160000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1006,7 +1082,9 @@
     <row>
       <value>527</value>
       <value><![CDATA[2006-06-25 00:27:00.0]]></value>
+      <value>1151195220000</value>
       <value><![CDATA[2006-06-25 00:27:00.0]]></value>
+      <value>1151195220000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1017,7 +1095,9 @@
     <row>
       <value>528</value>
       <value><![CDATA[2006-06-25 00:28:00.0]]></value>
+      <value>1151195280000</value>
       <value><![CDATA[2006-06-25 00:28:00.0]]></value>
+      <value>1151195280000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1028,7 +1108,9 @@
     <row>
       <value>529</value>
       <value><![CDATA[2006-06-25 00:29:00.0]]></value>
+      <value>1151195340000</value>
       <value><![CDATA[2006-06-25 00:29:00.0]]></value>
+      <value>1151195340000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1039,7 +1121,9 @@
     <row>
       <value>530</value>
       <value><![CDATA[2006-06-25 00:30:00.0]]></value>
+      <value>1151195400000</value>
       <value><![CDATA[2006-06-25 00:30:00.0]]></value>
+      <value>1151195400000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1050,7 +1134,9 @@
     <row>
       <value>531</value>
       <value><![CDATA[2006-06-25 00:31:00.0]]></value>
+      <value>1151195460000</value>
       <value><![CDATA[2006-06-25 00:31:00.0]]></value>
+      <value>1151195460000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1061,7 +1147,9 @@
     <row>
       <value>532</value>
       <value><![CDATA[2006-06-25 00:32:00.0]]></value>
+      <value>1151195520000</value>
       <value><![CDATA[2006-06-25 00:32:00.0]]></value>
+      <value>1151195520000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1072,7 +1160,9 @@
     <row>
       <value>533</value>
       <value><![CDATA[2006-06-25 00:33:00.0]]></value>
+      <value>1151195580000</value>
       <value><![CDATA[2006-06-25 00:33:00.0]]></value>
+      <value>1151195580000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1083,7 +1173,9 @@
     <row>
       <value>534</value>
       <value><![CDATA[2006-06-25 00:34:00.0]]></value>
+      <value>1151195640000</value>
       <value><![CDATA[2006-06-25 00:34:00.0]]></value>
+      <value>1151195640000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1094,7 +1186,9 @@
     <row>
       <value>535</value>
       <value><![CDATA[2006-06-25 00:35:00.0]]></value>
+      <value>1151195700000</value>
       <value><![CDATA[2006-06-25 00:35:00.0]]></value>
+      <value>1151195700000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1105,7 +1199,9 @@
     <row>
       <value>536</value>
       <value><![CDATA[2006-06-25 00:36:00.0]]></value>
+      <value>1151195760000</value>
       <value><![CDATA[2006-06-25 00:36:00.0]]></value>
+      <value>1151195760000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1116,7 +1212,9 @@
     <row>
       <value>537</value>
       <value><![CDATA[2006-06-25 00:37:00.0]]></value>
+      <value>1151195820000</value>
       <value><![CDATA[2006-06-25 00:37:00.0]]></value>
+      <value>1151195820000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1127,7 +1225,9 @@
     <row>
       <value>538</value>
       <value><![CDATA[2006-06-25 00:38:00.0]]></value>
+      <value>1151195880000</value>
       <value><![CDATA[2006-06-25 00:38:00.0]]></value>
+      <value>1151195880000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1138,7 +1238,9 @@
     <row>
       <value>539</value>
       <value><![CDATA[2006-06-25 00:39:00.0]]></value>
+      <value>1151195940000</value>
       <value><![CDATA[2006-06-25 00:39:00.0]]></value>
+      <value>1151195940000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1149,7 +1251,9 @@
     <row>
       <value>540</value>
       <value><![CDATA[2006-06-25 00:40:00.0]]></value>
+      <value>1151196000000</value>
       <value><![CDATA[2006-06-25 00:40:00.0]]></value>
+      <value>1151196000000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1160,7 +1264,9 @@
     <row>
       <value>541</value>
       <value><![CDATA[2006-06-25 00:41:00.0]]></value>
+      <value>1151196060000</value>
       <value><![CDATA[2006-06-25 00:41:00.0]]></value>
+      <value>1151196060000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1171,7 +1277,9 @@
     <row>
       <value>542</value>
       <value><![CDATA[2006-06-25 00:42:00.0]]></value>
+      <value>1151196120000</value>
       <value><![CDATA[2006-06-25 00:42:00.0]]></value>
+      <value>1151196120000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1182,7 +1290,9 @@
     <row>
       <value>543</value>
       <value><![CDATA[2006-06-25 00:43:00.0]]></value>
+      <value>1151196180000</value>
       <value><![CDATA[2006-06-25 00:43:00.0]]></value>
+      <value>1151196180000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1193,7 +1303,9 @@
     <row>
       <value>544</value>
       <value><![CDATA[2006-06-25 00:44:00.0]]></value>
+      <value>1151196240000</value>
       <value><![CDATA[2006-06-25 00:44:00.0]]></value>
+      <value>1151196240000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1204,7 +1316,9 @@
     <row>
       <value>545</value>
       <value><![CDATA[2006-06-25 00:45:00.0]]></value>
+      <value>1151196300000</value>
       <value><![CDATA[2006-06-25 00:45:00.0]]></value>
+      <value>1151196300000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1215,7 +1329,9 @@
     <row>
       <value>546</value>
       <value><![CDATA[2006-06-25 00:46:00.0]]></value>
+      <value>1151196360000</value>
       <value><![CDATA[2006-06-25 00:46:00.0]]></value>
+      <value>1151196360000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1226,7 +1342,9 @@
     <row>
       <value>547</value>
       <value><![CDATA[2006-06-25 00:47:00.0]]></value>
+      <value>1151196420000</value>
       <value><![CDATA[2006-06-25 00:47:00.0]]></value>
+      <value>1151196420000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1237,7 +1355,9 @@
     <row>
       <value>548</value>
       <value><![CDATA[2006-06-25 00:48:00.0]]></value>
+      <value>1151196480000</value>
       <value><![CDATA[2006-06-25 00:48:00.0]]></value>
+      <value>1151196480000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1248,7 +1368,9 @@
     <row>
       <value>549</value>
       <value><![CDATA[2006-06-25 00:49:00.0]]></value>
+      <value>1151196540000</value>
       <value><![CDATA[2006-06-25 00:49:00.0]]></value>
+      <value>1151196540000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1259,7 +1381,9 @@
     <row>
       <value>550</value>
       <value><![CDATA[2006-06-25 00:50:00.0]]></value>
+      <value>1151196600000</value>
       <value><![CDATA[2006-06-25 00:50:00.0]]></value>
+      <value>1151196600000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1270,7 +1394,9 @@
     <row>
       <value>551</value>
       <value><![CDATA[2006-06-25 00:51:00.0]]></value>
+      <value>1151196660000</value>
       <value><![CDATA[2006-06-25 00:51:00.0]]></value>
+      <value>1151196660000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1281,7 +1407,9 @@
     <row>
       <value>552</value>
       <value><![CDATA[2006-06-25 00:52:00.0]]></value>
+      <value>1151196720000</value>
       <value><![CDATA[2006-06-25 00:52:00.0]]></value>
+      <value>1151196720000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1292,7 +1420,9 @@
     <row>
       <value>553</value>
       <value><![CDATA[2006-06-25 00:53:00.0]]></value>
+      <value>1151196780000</value>
       <value><![CDATA[2006-06-25 00:53:00.0]]></value>
+      <value>1151196780000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1303,7 +1433,9 @@
     <row>
       <value>554</value>
       <value><![CDATA[2006-06-25 00:54:00.0]]></value>
+      <value>1151196840000</value>
       <value><![CDATA[2006-06-25 00:54:00.0]]></value>
+      <value>1151196840000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1314,7 +1446,9 @@
     <row>
       <value>555</value>
       <value><![CDATA[2006-06-25 00:55:00.0]]></value>
+      <value>1151196900000</value>
       <value><![CDATA[2006-06-25 00:55:00.0]]></value>
+      <value>1151196900000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1325,7 +1459,9 @@
     <row>
       <value>556</value>
       <value><![CDATA[2006-06-25 00:56:00.0]]></value>
+      <value>1151196960000</value>
       <value><![CDATA[2006-06-25 00:56:00.0]]></value>
+      <value>1151196960000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1336,7 +1472,9 @@
     <row>
       <value>557</value>
       <value><![CDATA[2006-06-25 00:57:00.0]]></value>
+      <value>1151197020000</value>
       <value><![CDATA[2006-06-25 00:57:00.0]]></value>
+      <value>1151197020000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1347,7 +1485,9 @@
     <row>
       <value>558</value>
       <value><![CDATA[2006-06-25 00:58:00.0]]></value>
+      <value>1151197080000</value>
       <value><![CDATA[2006-06-25 00:58:00.0]]></value>
+      <value>1151197080000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1358,7 +1498,9 @@
     <row>
       <value>559</value>
       <value><![CDATA[2006-06-25 00:59:00.0]]></value>
+      <value>1151197140000</value>
       <value><![CDATA[2006-06-25 00:59:00.0]]></value>
+      <value>1151197140000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1369,7 +1511,9 @@
     <row>
       <value>560</value>
       <value><![CDATA[2006-06-25 01:00:00.0]]></value>
+      <value>1151197200000</value>
       <value><![CDATA[2006-06-25 01:00:00.0]]></value>
+      <value>1151197200000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1380,7 +1524,9 @@
     <row>
       <value>561</value>
       <value><![CDATA[2006-06-25 01:01:00.0]]></value>
+      <value>1151197260000</value>
       <value><![CDATA[2006-06-25 01:01:00.0]]></value>
+      <value>1151197260000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1391,7 +1537,9 @@
     <row>
       <value>562</value>
       <value><![CDATA[2006-06-25 01:02:00.0]]></value>
+      <value>1151197320000</value>
       <value><![CDATA[2006-06-25 01:02:00.0]]></value>
+      <value>1151197320000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1402,7 +1550,9 @@
     <row>
       <value>563</value>
       <value><![CDATA[2006-06-25 01:03:00.0]]></value>
+      <value>1151197380000</value>
       <value><![CDATA[2006-06-25 01:03:00.0]]></value>
+      <value>1151197380000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1413,7 +1563,9 @@
     <row>
       <value>564</value>
       <value><![CDATA[2006-06-25 01:04:00.0]]></value>
+      <value>1151197440000</value>
       <value><![CDATA[2006-06-25 01:04:00.0]]></value>
+      <value>1151197440000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1424,7 +1576,9 @@
     <row>
       <value>565</value>
       <value><![CDATA[2006-06-25 01:05:00.0]]></value>
+      <value>1151197500000</value>
       <value><![CDATA[2006-06-25 01:05:00.0]]></value>
+      <value>1151197500000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1435,7 +1589,9 @@
     <row>
       <value>566</value>
       <value><![CDATA[2006-06-25 01:06:00.0]]></value>
+      <value>1151197560000</value>
       <value><![CDATA[2006-06-25 01:06:00.0]]></value>
+      <value>1151197560000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1446,7 +1602,9 @@
     <row>
       <value>567</value>
       <value><![CDATA[2006-06-25 01:07:00.0]]></value>
+      <value>1151197620000</value>
       <value><![CDATA[2006-06-25 01:07:00.0]]></value>
+      <value>1151197620000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1457,7 +1615,9 @@
     <row>
       <value>568</value>
       <value><![CDATA[2006-06-25 01:08:00.0]]></value>
+      <value>1151197680000</value>
       <value><![CDATA[2006-06-25 01:08:00.0]]></value>
+      <value>1151197680000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1468,7 +1628,9 @@
     <row>
       <value>569</value>
       <value><![CDATA[2006-06-25 01:09:00.0]]></value>
+      <value>1151197740000</value>
       <value><![CDATA[2006-06-25 01:09:00.0]]></value>
+      <value>1151197740000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1479,7 +1641,9 @@
     <row>
       <value>570</value>
       <value><![CDATA[2006-06-25 01:10:00.0]]></value>
+      <value>1151197800000</value>
       <value><![CDATA[2006-06-25 01:10:00.0]]></value>
+      <value>1151197800000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1490,7 +1654,9 @@
     <row>
       <value>571</value>
       <value><![CDATA[2006-06-25 01:11:00.0]]></value>
+      <value>1151197860000</value>
       <value><![CDATA[2006-06-25 01:11:00.0]]></value>
+      <value>1151197860000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1501,7 +1667,9 @@
     <row>
       <value>572</value>
       <value><![CDATA[2006-06-25 01:12:00.0]]></value>
+      <value>1151197920000</value>
       <value><![CDATA[2006-06-25 01:12:00.0]]></value>
+      <value>1151197920000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1512,7 +1680,9 @@
     <row>
       <value>573</value>
       <value><![CDATA[2006-06-25 01:13:00.0]]></value>
+      <value>1151197980000</value>
       <value><![CDATA[2006-06-25 01:13:00.0]]></value>
+      <value>1151197980000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1523,7 +1693,9 @@
     <row>
       <value>574</value>
       <value><![CDATA[2006-06-25 01:14:00.0]]></value>
+      <value>1151198040000</value>
       <value><![CDATA[2006-06-25 01:14:00.0]]></value>
+      <value>1151198040000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1534,7 +1706,9 @@
     <row>
       <value>575</value>
       <value><![CDATA[2006-06-25 01:15:00.0]]></value>
+      <value>1151198100000</value>
       <value><![CDATA[2006-06-25 01:15:00.0]]></value>
+      <value>1151198100000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1545,7 +1719,9 @@
     <row>
       <value>576</value>
       <value><![CDATA[2006-06-25 01:16:00.0]]></value>
+      <value>1151198160000</value>
       <value><![CDATA[2006-06-25 01:16:00.0]]></value>
+      <value>1151198160000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1556,7 +1732,9 @@
     <row>
       <value>577</value>
       <value><![CDATA[2006-06-25 01:17:00.0]]></value>
+      <value>1151198220000</value>
       <value><![CDATA[2006-06-25 01:17:00.0]]></value>
+      <value>1151198220000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1567,7 +1745,9 @@
     <row>
       <value>578</value>
       <value><![CDATA[2006-06-25 01:18:00.0]]></value>
+      <value>1151198280000</value>
       <value><![CDATA[2006-06-25 01:18:00.0]]></value>
+      <value>1151198280000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1578,7 +1758,9 @@
     <row>
       <value>579</value>
       <value><![CDATA[2006-06-25 01:19:00.0]]></value>
+      <value>1151198340000</value>
       <value><![CDATA[2006-06-25 01:19:00.0]]></value>
+      <value>1151198340000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1589,7 +1771,9 @@
     <row>
       <value>580</value>
       <value><![CDATA[2006-06-25 01:20:00.0]]></value>
+      <value>1151198400000</value>
       <value><![CDATA[2006-06-25 01:20:00.0]]></value>
+      <value>1151198400000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1600,7 +1784,9 @@
     <row>
       <value>581</value>
       <value><![CDATA[2006-06-25 01:21:00.0]]></value>
+      <value>1151198460000</value>
       <value><![CDATA[2006-06-25 01:21:00.0]]></value>
+      <value>1151198460000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1611,7 +1797,9 @@
     <row>
       <value>582</value>
       <value><![CDATA[2006-06-25 01:22:00.0]]></value>
+      <value>1151198520000</value>
       <value><![CDATA[2006-06-25 01:22:00.0]]></value>
+      <value>1151198520000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1622,7 +1810,9 @@
     <row>
       <value>583</value>
       <value><![CDATA[2006-06-25 01:23:00.0]]></value>
+      <value>1151198580000</value>
       <value><![CDATA[2006-06-25 01:23:00.0]]></value>
+      <value>1151198580000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1633,7 +1823,9 @@
     <row>
       <value>584</value>
       <value><![CDATA[2006-06-25 01:24:00.0]]></value>
+      <value>1151198640000</value>
       <value><![CDATA[2006-06-25 01:24:00.0]]></value>
+      <value>1151198640000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1644,7 +1836,9 @@
     <row>
       <value>585</value>
       <value><![CDATA[2006-06-25 01:25:00.0]]></value>
+      <value>1151198700000</value>
       <value><![CDATA[2006-06-25 01:25:00.0]]></value>
+      <value>1151198700000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1655,7 +1849,9 @@
     <row>
       <value>586</value>
       <value><![CDATA[2006-06-25 01:26:00.0]]></value>
+      <value>1151198760000</value>
       <value><![CDATA[2006-06-25 01:26:00.0]]></value>
+      <value>1151198760000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1666,7 +1862,9 @@
     <row>
       <value>587</value>
       <value><![CDATA[2006-06-25 01:27:00.0]]></value>
+      <value>1151198820000</value>
       <value><![CDATA[2006-06-25 01:27:00.0]]></value>
+      <value>1151198820000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1677,7 +1875,9 @@
     <row>
       <value>588</value>
       <value><![CDATA[2006-06-25 01:28:00.0]]></value>
+      <value>1151198880000</value>
       <value><![CDATA[2006-06-25 01:28:00.0]]></value>
+      <value>1151198880000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1688,7 +1888,9 @@
     <row>
       <value>589</value>
       <value><![CDATA[2006-06-25 01:29:00.0]]></value>
+      <value>1151198940000</value>
       <value><![CDATA[2006-06-25 01:29:00.0]]></value>
+      <value>1151198940000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1699,7 +1901,9 @@
     <row>
       <value>590</value>
       <value><![CDATA[2006-06-25 01:30:00.0]]></value>
+      <value>1151199000000</value>
       <value><![CDATA[2006-06-25 01:30:00.0]]></value>
+      <value>1151199000000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1710,7 +1914,9 @@
     <row>
       <value>591</value>
       <value><![CDATA[2006-06-25 01:31:00.0]]></value>
+      <value>1151199060000</value>
       <value><![CDATA[2006-06-25 01:31:00.0]]></value>
+      <value>1151199060000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1721,7 +1927,9 @@
     <row>
       <value>592</value>
       <value><![CDATA[2006-06-25 01:32:00.0]]></value>
+      <value>1151199120000</value>
       <value><![CDATA[2006-06-25 01:32:00.0]]></value>
+      <value>1151199120000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1732,7 +1940,9 @@
     <row>
       <value>593</value>
       <value><![CDATA[2006-06-25 01:33:00.0]]></value>
+      <value>1151199180000</value>
       <value><![CDATA[2006-06-25 01:33:00.0]]></value>
+      <value>1151199180000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1743,7 +1953,9 @@
     <row>
       <value>594</value>
       <value><![CDATA[2006-06-25 01:34:00.0]]></value>
+      <value>1151199240000</value>
       <value><![CDATA[2006-06-25 01:34:00.0]]></value>
+      <value>1151199240000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1754,7 +1966,9 @@
     <row>
       <value>595</value>
       <value><![CDATA[2006-06-25 01:35:00.0]]></value>
+      <value>1151199300000</value>
       <value><![CDATA[2006-06-25 01:35:00.0]]></value>
+      <value>1151199300000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1765,7 +1979,9 @@
     <row>
       <value>596</value>
       <value><![CDATA[2006-06-25 01:36:00.0]]></value>
+      <value>1151199360000</value>
       <value><![CDATA[2006-06-25 01:36:00.0]]></value>
+      <value>1151199360000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1776,7 +1992,9 @@
     <row>
       <value>597</value>
       <value><![CDATA[2006-06-25 01:37:00.0]]></value>
+      <value>1151199420000</value>
       <value><![CDATA[2006-06-25 01:37:00.0]]></value>
+      <value>1151199420000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1787,7 +2005,9 @@
     <row>
       <value>598</value>
       <value><![CDATA[2006-06-25 01:38:00.0]]></value>
+      <value>1151199480000</value>
       <value><![CDATA[2006-06-25 01:38:00.0]]></value>
+      <value>1151199480000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1798,7 +2018,9 @@
     <row>
       <value>599</value>
       <value><![CDATA[2006-06-25 01:39:00.0]]></value>
+      <value>1151199540000</value>
       <value><![CDATA[2006-06-25 01:39:00.0]]></value>
+      <value>1151199540000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1809,7 +2031,9 @@
     <row>
       <value>600</value>
       <value><![CDATA[2006-06-25 01:40:00.0]]></value>
+      <value>1151199600000</value>
       <value><![CDATA[2006-06-25 01:40:00.0]]></value>
+      <value>1151199600000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1820,7 +2044,9 @@
     <row>
       <value>601</value>
       <value><![CDATA[2006-06-25 02:41:00.0]]></value>
+      <value>1151203260000</value>
       <value><![CDATA[2006-06-25 02:41:00.0]]></value>
+      <value>1151203260000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1831,7 +2057,9 @@
     <row>
       <value>602</value>
       <value><![CDATA[2006-06-25 02:42:00.0]]></value>
+      <value>1151203320000</value>
       <value><![CDATA[2006-06-25 02:42:00.0]]></value>
+      <value>1151203320000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1842,7 +2070,9 @@
     <row>
       <value>603</value>
       <value><![CDATA[2006-06-25 02:43:00.0]]></value>
+      <value>1151203380000</value>
       <value><![CDATA[2006-06-25 02:43:00.0]]></value>
+      <value>1151203380000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1853,7 +2083,9 @@
     <row>
       <value>604</value>
       <value><![CDATA[2006-06-25 02:44:00.0]]></value>
+      <value>1151203440000</value>
       <value><![CDATA[2006-06-25 02:44:00.0]]></value>
+      <value>1151203440000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1864,7 +2096,9 @@
     <row>
       <value>605</value>
       <value><![CDATA[2006-06-25 02:45:00.0]]></value>
+      <value>1151203500000</value>
       <value><![CDATA[2006-06-25 02:45:00.0]]></value>
+      <value>1151203500000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1875,7 +2109,9 @@
     <row>
       <value>606</value>
       <value><![CDATA[2006-06-25 02:46:00.0]]></value>
+      <value>1151203560000</value>
       <value><![CDATA[2006-06-25 02:46:00.0]]></value>
+      <value>1151203560000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1886,7 +2122,9 @@
     <row>
       <value>607</value>
       <value><![CDATA[2006-06-25 02:47:00.0]]></value>
+      <value>1151203620000</value>
       <value><![CDATA[2006-06-25 02:47:00.0]]></value>
+      <value>1151203620000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1897,7 +2135,9 @@
     <row>
       <value>608</value>
       <value><![CDATA[2006-06-25 02:48:00.0]]></value>
+      <value>1151203680000</value>
       <value><![CDATA[2006-06-25 02:48:00.0]]></value>
+      <value>1151203680000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1908,7 +2148,9 @@
     <row>
       <value>609</value>
       <value><![CDATA[2006-06-25 02:49:00.0]]></value>
+      <value>1151203740000</value>
       <value><![CDATA[2006-06-25 02:49:00.0]]></value>
+      <value>1151203740000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1919,7 +2161,9 @@
     <row>
       <value>610</value>
       <value><![CDATA[2006-06-25 02:50:00.0]]></value>
+      <value>1151203800000</value>
       <value><![CDATA[2006-06-25 02:50:00.0]]></value>
+      <value>1151203800000</value>
       <value>-06:00</value>
       <value>ADD</value>
       <value>21</value>
@@ -1930,7 +2174,9 @@
     <row>
       <value>611</value>
       <value><![CDATA[2006-06-25 05:01:00.0]]></value>
+      <value>1151211660000</value>
       <value><![CDATA[2006-06-25 05:01:00.0]]></value>
+      <value>1151211660000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -1941,7 +2187,9 @@
     <row>
       <value>612</value>
       <value><![CDATA[2006-06-25 05:02:00.0]]></value>
+      <value>1151211720000</value>
       <value><![CDATA[2006-06-25 05:02:00.0]]></value>
+      <value>1151211720000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -1952,7 +2200,9 @@
     <row>
       <value>613</value>
       <value><![CDATA[2006-06-25 05:03:00.0]]></value>
+      <value>1151211780000</value>
       <value><![CDATA[2006-06-25 05:03:00.0]]></value>
+      <value>1151211780000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -1963,7 +2213,9 @@
     <row>
       <value>614</value>
       <value><![CDATA[2006-06-25 05:04:00.0]]></value>
+      <value>1151211840000</value>
       <value><![CDATA[2006-06-25 05:04:00.0]]></value>
+      <value>1151211840000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -1974,7 +2226,9 @@
     <row>
       <value>615</value>
       <value><![CDATA[2006-06-25 05:05:00.0]]></value>
+      <value>1151211900000</value>
       <value><![CDATA[2006-06-25 05:05:00.0]]></value>
+      <value>1151211900000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -1985,7 +2239,9 @@
     <row>
       <value>616</value>
       <value><![CDATA[2006-06-25 05:06:00.0]]></value>
+      <value>1151211960000</value>
       <value><![CDATA[2006-06-25 05:06:00.0]]></value>
+      <value>1151211960000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -1996,7 +2252,9 @@
     <row>
       <value>617</value>
       <value><![CDATA[2006-06-25 05:07:00.0]]></value>
+      <value>1151212020000</value>
       <value><![CDATA[2006-06-25 05:07:00.0]]></value>
+      <value>1151212020000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -2007,7 +2265,9 @@
     <row>
       <value>618</value>
       <value><![CDATA[2006-06-25 05:08:00.0]]></value>
+      <value>1151212080000</value>
       <value><![CDATA[2006-06-25 05:08:00.0]]></value>
+      <value>1151212080000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -2018,7 +2278,9 @@
     <row>
       <value>619</value>
       <value><![CDATA[2006-06-25 05:09:00.0]]></value>
+      <value>1151212140000</value>
       <value><![CDATA[2006-06-25 05:09:00.0]]></value>
+      <value>1151212140000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -2029,7 +2291,9 @@
     <row>
       <value>620</value>
       <value><![CDATA[2006-06-25 05:10:00.0]]></value>
+      <value>1151212200000</value>
       <value><![CDATA[2006-06-25 05:10:00.0]]></value>
+      <value>1151212200000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>23</value>
@@ -2040,7 +2304,9 @@
     <row>
       <value>621</value>
       <value><![CDATA[2006-06-25 06:11:00.0]]></value>
+      <value>1151215860000</value>
       <value><![CDATA[2006-06-25 06:11:00.0]]></value>
+      <value>1151215860000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>24</value>
@@ -2051,7 +2317,9 @@
     <row>
       <value>622</value>
       <value><![CDATA[2006-06-25 06:12:00.0]]></value>
+      <value>1151215920000</value>
       <value><![CDATA[2006-06-25 06:12:00.0]]></value>
+      <value>1151215920000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>24</value>
@@ -2062,7 +2330,9 @@
     <row>
       <value>623</value>
       <value><![CDATA[2006-06-25 06:13:00.0]]></value>
+      <value>1151215980000</value>
       <value><![CDATA[2006-06-25 06:13:00.0]]></value>
+      <value>1151215980000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>24</value>
@@ -2073,7 +2343,9 @@
     <row>
       <value>624</value>
       <value><![CDATA[2006-06-25 06:14:00.0]]></value>
+      <value>1151216040000</value>
       <value><![CDATA[2006-06-25 06:14:00.0]]></value>
+      <value>1151216040000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>24</value>
@@ -2084,7 +2356,9 @@
     <row>
       <value>625</value>
       <value><![CDATA[2006-06-25 06:15:00.0]]></value>
+      <value>1151216100000</value>
       <value><![CDATA[2006-06-25 06:15:00.0]]></value>
+      <value>1151216100000</value>
       <value>-06:00</value>
       <value>OBSERVE</value>
       <value>24</value>
@@ -5811,7 +6085,9 @@
   <table name="event_quantityevent">
     <column>id</column>
     <column>eventTime</column>
+    <column>eventTimeMs</column>
     <column>recordTime</column>
+    <column>recordTimeMs</column>
     <column>eventTimeZoneOffset</column>
     <column>epcClass</column>
     <column>quantity</column>
@@ -5822,7 +6098,9 @@
     <row>
       <value>41</value>
       <value><![CDATA[2006-06-25 09:26:00.0]]></value>
+      <value>1151227560000</value>
       <value><![CDATA[2006-06-25 09:26:00.0]]></value>
+      <value>1151227560000</value>
       <value>-06:00</value>
       <value>41</value>
       <value>1</value>
@@ -5834,7 +6112,9 @@
     <row>
       <value>42</value>
       <value><![CDATA[2006-06-25 09:27:00.0]]></value>
+      <value>1151227620000</value>
       <value><![CDATA[2006-06-25 09:27:00.0]]></value>
+      <value>1151227620000</value>
       <value>-06:00</value>
       <value>42</value>
       <value>2</value>
@@ -5846,7 +6126,9 @@
     <row>
       <value>43</value>
       <value><![CDATA[2006-06-25 09:28:00.0]]></value>
+      <value>1151227680000</value>
       <value><![CDATA[2006-06-25 09:28:00.0]]></value>
+      <value>1151227680000</value>
       <value>-06:00</value>
       <value>43</value>
       <value>3</value>
@@ -5858,7 +6140,9 @@
     <row>
       <value>44</value>
       <value><![CDATA[2006-06-25 09:29:00.0]]></value>
+      <value>1151227740000</value>
       <value><![CDATA[2006-06-25 09:29:00.0]]></value>
+      <value>1151227740000</value>
       <value>-06:00</value>
       <value>44</value>
       <value>4</value>
@@ -5870,7 +6154,9 @@
     <row>
       <value>45</value>
       <value><![CDATA[2006-06-25 09:30:00.0]]></value>
+      <value>1151227800000</value>
       <value><![CDATA[2006-06-25 09:30:00.0]]></value>
+      <value>1151227800000</value>
       <value>-06:00</value>
       <value>45</value>
       <value>5</value>
@@ -5882,7 +6168,9 @@
     <row>
       <value>46</value>
       <value><![CDATA[2006-06-25 09:31:00.0]]></value>
+      <value>1151227860000</value>
       <value><![CDATA[2006-06-25 09:31:00.0]]></value>
+      <value>1151227860000</value>
       <value>-06:00</value>
       <value>46</value>
       <value>6</value>
@@ -5894,7 +6182,9 @@
     <row>
       <value>47</value>
       <value><![CDATA[2006-06-25 09:32:00.0]]></value>
+      <value>1151227920000</value>
       <value><![CDATA[2006-06-25 09:32:00.0]]></value>
+      <value>1151227920000</value>
       <value>-06:00</value>
       <value>47</value>
       <value>7</value>
@@ -5906,7 +6196,9 @@
     <row>
       <value>48</value>
       <value><![CDATA[2006-06-25 09:33:00.0]]></value>
+      <value>1151227980000</value>
       <value><![CDATA[2006-06-25 09:33:00.0]]></value>
+      <value>1151227980000</value>
       <value>-06:00</value>
       <value>48</value>
       <value>8</value>
@@ -5918,7 +6210,9 @@
     <row>
       <value>49</value>
       <value><![CDATA[2006-06-25 09:34:00.0]]></value>
+      <value>1151228040000</value>
       <value><![CDATA[2006-06-25 09:34:00.0]]></value>
+      <value>1151228040000</value>
       <value>-06:00</value>
       <value>49</value>
       <value>9</value>
@@ -5930,7 +6224,9 @@
     <row>
       <value>50</value>
       <value><![CDATA[2006-06-25 09:35:00.0]]></value>
+      <value>1151228100000</value>
       <value><![CDATA[2006-06-25 09:35:00.0]]></value>
+      <value>1151228100000</value>
       <value>-06:00</value>
       <value>50</value>
       <value>10</value>
@@ -5958,7 +6254,9 @@
   <table name="event_transactionevent">
     <column>id</column>
     <column>eventTime</column>
+    <column>eventTimeMs</column>
     <column>recordTime</column>
+    <column>recordTimeMs</column>
     <column>eventTimeZoneOffset</column>
     <column>parentID</column>
     <column>action</column>
@@ -5969,7 +6267,9 @@
     <row>
       <value>41</value>
       <value><![CDATA[2006-06-25 07:16:00.0]]></value>
+      <value>1151219760000</value>
       <value><![CDATA[2006-06-25 07:16:00.0]]></value>
+      <value>1151219760000</value>
       <value>-06:00</value>
       <null/>
       <value>ADD</value>
@@ -5981,7 +6281,9 @@
     <row>
       <value>42</value>
       <value><![CDATA[2006-06-25 07:17:00.0]]></value>
+      <value>1151219820000</value>
       <value><![CDATA[2006-06-25 07:17:00.0]]></value>
+      <value>1151219820000</value>
       <value>-06:00</value>
       <null/>
       <value>ADD</value>
@@ -5993,7 +6295,9 @@
     <row>
       <value>43</value>
       <value><![CDATA[2006-06-25 07:18:00.0]]></value>
+      <value>1151219880000</value>
       <value><![CDATA[2006-06-25 07:18:00.0]]></value>
+      <value>1151219880000</value>
       <value>-06:00</value>
       <null/>
       <value>ADD</value>
@@ -6005,7 +6309,9 @@
     <row>
       <value>44</value>
       <value><![CDATA[2006-06-25 07:19:00.0]]></value>
+      <value>1151219940000</value>
       <value><![CDATA[2006-06-25 07:19:00.0]]></value>
+      <value>1151219940000</value>
       <value>-06:00</value>
       <null/>
       <value>ADD</value>
@@ -6017,7 +6323,9 @@
     <row>
       <value>45</value>
       <value><![CDATA[2006-06-25 07:20:00.0]]></value>
+      <value>1151220000000</value>
       <value><![CDATA[2006-06-25 07:20:00.0]]></value>
+      <value>1151220000000</value>
       <value>-06:00</value>
       <null/>
       <value>ADD</value>
@@ -6029,7 +6337,9 @@
     <row>
       <value>46</value>
       <value><![CDATA[2006-06-25 08:21:00.0]]></value>
+      <value>1151223660000</value>
       <value><![CDATA[2006-06-25 08:21:00.0]]></value>
+      <value>1151223660000</value>
       <value>-06:00</value>
       <null/>
       <value>OBSERVE</value>
@@ -6041,7 +6351,9 @@
     <row>
       <value>47</value>
       <value><![CDATA[2006-06-25 08:22:00.0]]></value>
+      <value>1151223720000</value>
       <value><![CDATA[2006-06-25 08:22:00.0]]></value>
+      <value>1151223720000</value>
       <value>-06:00</value>
       <null/>
       <value>OBSERVE</value>
@@ -6053,7 +6365,9 @@
     <row>
       <value>48</value>
       <value><![CDATA[2006-06-25 08:23:00.0]]></value>
+      <value>1151223780000</value>
       <value><![CDATA[2006-06-25 08:23:00.0]]></value>
+      <value>1151223780000</value>
       <value>-06:00</value>
       <null/>
       <value>OBSERVE</value>
@@ -6065,7 +6379,9 @@
     <row>
       <value>49</value>
       <value><![CDATA[2006-06-25 08:24:00.0]]></value>
+      <value>1151223840000</value>
       <value><![CDATA[2006-06-25 08:24:00.0]]></value>
+      <value>1151223840000</value>
       <value>-06:00</value>
       <null/>
       <value>OBSERVE</value>
@@ -6077,7 +6393,9 @@
     <row>
       <value>50</value>
       <value><![CDATA[2006-06-25 08:25:00.0]]></value>
+      <value>1151223900000</value>
       <value><![CDATA[2006-06-25 08:25:00.0]]></value>
+      <value>1151223900000</value>
       <value>-06:00</value>
       <null/>
       <value>OBSERVE</value>
