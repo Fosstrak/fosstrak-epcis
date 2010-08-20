@@ -131,12 +131,6 @@ for (EpcisEvent event : events) {
   generic or could be replaced by an existing ISO8601 parser
   ({{http://joda-time.sourceforge.net}} might be an alternative).
 
-** Support for milliseconds
-
-  MySQL does not support milliseconds, therefore, event times are truncated
-  when stored in the database. Event times could be stored in the database
-  as long values (millisecond).
-
 ** Generic EPC parser
 
   Incoming EPCs are parsed and validated in a very basic way. EPC validation
