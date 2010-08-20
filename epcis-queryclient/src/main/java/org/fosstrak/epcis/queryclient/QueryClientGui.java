@@ -950,14 +950,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
         dwButtonPanel.add(dwClearButton);
     }
 
-    /**
-     * Dispatcher for the various events. Some simple cases may be handled
-     * directly within this method.
-     * 
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     * @param e
-     *            The ActionEvent.
-     */
     public final void actionPerformed(final ActionEvent e) {
         int i;
         if (e.getSource() == mwRunQueryButton) {
@@ -1330,13 +1322,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
         mainWindow.pack();
     }
 
-    /**
-     * Event handler for window manager closing events. Overrides the default,
-     * empty method.
-     * 
-     * @param e
-     *            The WindowEvent.
-     */
+    @Override
     public void windowClosing(final WindowEvent e) {
         if (e.getSource() == debugWindow) {
             mwShowDebugWindowCheckBox.setSelected(false);
@@ -1512,16 +1498,6 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
         }
     }
 
-    /**
-     * Set whether or not the configuration has changed. The components in the
-     * configuration panel call this method when their state is updated.
-     * 
-     * @param configurationComplete
-     *            Indicates whether or not the information present is enough to
-     *            enable the client to connect to a repository (e.g. both a
-     *            username and password are available if Basic authentication is
-     *            chosen).
-     */
     public void configurationChanged(AuthenticationOptionsChangeEvent ace) {
         this.configurationChanged = true;
         setButtonsEnabled(ace.isComplete());

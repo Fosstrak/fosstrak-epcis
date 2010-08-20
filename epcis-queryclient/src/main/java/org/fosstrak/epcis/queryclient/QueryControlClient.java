@@ -107,7 +107,7 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
 
     /**
      * Instantiates a new unconfigured QueryControlClient. Configure the service
-     * through {@link #configureService(URL, String[])} prior to calling any
+     * through {@link #configureService(URL, Object[])} prior to calling any
      * QueryControlInterface service method.
      */
     public QueryControlClient() {

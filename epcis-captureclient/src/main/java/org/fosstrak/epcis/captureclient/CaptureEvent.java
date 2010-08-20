@@ -169,7 +169,7 @@ public class CaptureEvent {
     }
 
     /**
-     * @param time
+     * @param timeZoneOffset
      *            Sets the event time zone offset.
      */
     public void setEventTimeZoneOffset(final String timeZoneOffset) {
