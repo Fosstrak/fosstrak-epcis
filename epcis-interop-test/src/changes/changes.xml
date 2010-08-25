@@ -1,20 +1,38 @@
-<document>
-  <properties>
-    <title>Changes epcis-interop-test</title>
-  </properties>
-  <body>
-    <release version="0.2.1" date="2007-08-10">
-      <action dev="steybem" type="update">
-        Changed build environment: Included epcis-interop-test module to a profile in order
-        to execute it only on demand (add "-Dinterop-test" to your
-        mvn build command to run the tests).
-      </action>
-      <action dev="steybem" type="update">      
-        Changed build environment: Servlet container is automatically started
-        and test data is automatically inserted into the database
-        prior to running the interop tests.
-      </action>    
-    </release>
-    <release version="0.2.0" date="2007-04-27" description="first release" />
-  </body>
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
+    <properties>
+        <title>Changes epcis-interop-test</title>
+    </properties>
+    <body>
+        <release version="0.5" date="2010-??-??" description="Bug fix and feature release">
+            <action dev="steybem" type="update">
+                Decoupled test setup from maven's build phase and re-integrated
+                epcis-interop-test into Fosstrak epcis project module hierarchy.
+                Tests can be started manually by running the AllTests JUnit test
+                suite, but require a running epcis repository.
+            </action>
+            <action dev="steybem" type="add">
+                Use DBUnit to setup the required database state before each test.
+            </action>
+        </release>
+        <release version="0.4.0" date="2008-07-29" description="Project name changed to Fosstrak">
+            <action dev="roduner" type="update">
+                Renamed packages from org.accada to org.fosstrak.
+            </action>
+        </release>
+        <release version="0.2.1" date="2007-08-10">
+            <action dev="steybem" type="update">
+                Changed build environment: Included epcis-interop-test module to a
+                profile in order to execute it only on demand (add "-Dinterop-test" to
+                your mvn build command to run the tests).
+            </action>
+            <action dev="steybem" type="update">
+                Changed build environment: Servlet container is automatically started
+                and test data is automatically inserted into the database
+                prior to running the interop tests.
+            </action>
+        </release>
+        <release version="0.2.0" date="2007-04-27" description="first release" />
+    </body>
 </document>
