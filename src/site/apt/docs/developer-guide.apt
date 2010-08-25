@@ -9,29 +9,29 @@ Developer Guide
 
 * Contents
 
-   [[1]] {{{#About_this_Guide}About this Guide}}
+   [[1]] {{{About_this_Guide}About this Guide}}
 
-   [[1]] {{{#Getting_Started}Getting Started}}
+   [[1]] {{{Getting_Started}Getting Started}}
 
-         [[i]] {{{#Setting_up_the_Development_Environment}Setting up the Development Environment}}
+         [[i]] {{{Setting_up_the_Development_Environment}Setting up the Development Environment}}
 
-         [[i]] {{{#Getting_the_Source_Code}Getting the Source Code}}
+         [[i]] {{{Getting_the_Source_Code}Getting the Source Code}}
 
-         [[i]] {{{#Setting_up_Eclipse}Setting up Eclipse}}
+         [[i]] {{{Setting_up_Eclipse}Setting up Eclipse}}
 
-         [[i]] {{{#Building_and_Deploying_the_Project}Building and Deploying the Project}}
+         [[i]] {{{Building_and_Deploying_the_Project}Building and Deploying the Project}}
 
-   [[1]] {{{#Project_Layout}Project Layout}}
+   [[1]] {{{Project_Layout}Project Layout}}
 
-         [[i]] {{{#Project_Modules}Project Modules}}
+         [[i]] {{{Project_Modules}Project Modules}}
 
-         [[i]] {{{#Directory_Layout}Directory Layout}}
+         [[i]] {{{Directory_Layout}Directory Layout}}
 
-   [[1]] {{{#Other_Features}Other Features}}
+   [[1]] {{{Other_Features}Other Features}}
 
-         [[i]] {{{#Build_Profiles}Build Profiles}}
+         [[i]] {{{Build_Profiles}Build Profiles}}
 
-         [[i]] {{{#Generating_the_Project_Website}Generating the Project Website}}
+         [[i]] {{{Generating_the_Project_Website}Generating the Project Website}}
 
 
 * {About this Guide}
@@ -42,8 +42,8 @@ Developer Guide
   developers to find their way through the code.
 
   If you just want to set up your own EPCIS repository for use in your own
-  project, you should follow the {{{user-guide.html}User Guide}}. Generally,
-  it is advisable if you first read the {{{user-guide.html}User Guide}} before
+  project, you should follow the {{{./user-guide.html}User Guide}}. Generally,
+  it is advisable if you first read the {{{./user-guide.html}User Guide}} before
   continuing with the developer guide.
 
   If you cannot find your answer here, feel free to ask the

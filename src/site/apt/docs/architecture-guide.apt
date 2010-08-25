@@ -3,38 +3,38 @@
               -------------------
               Marco Steybe
               -------------------
-              03/19/2008
+              2008-03-19
               -------------------
 
 Architecture Guide
 
 * Contents
 
-  [[1]] {{{#About this Guide}About this Guide}}
+  [[1]] {{{About_this_Guide}About this Guide}}
 
-  [[1]] {{{#Introduction}Introduction}}
+  [[1]] {{{Introduction}Introduction}}
 
-  [[1]] {{{#EPCIS Repository}EPCIS Repository}}
+  [[1]] {{{EPCIS_Repository}EPCIS Repository}}
 
-        [[i]] {{{#Access Tier}Access Tier}}
+        [[i]] {{{Access_Tier}Access Tier}}
 
-             * {{{#Capture Interface}Capture Interface}}
+             * {{{Capture_Interface}Capture Interface}}
 
-             * {{{#Query Control Interface}Query Control Interface}}
+             * {{{Query_Control_Interface}Query Control Interface}}
 
-        [[i]] {{{#Business Tier}Business Tier}}
+        [[i]] {{{Business_Tier}Business Tier}}
 
-             * {{{#Capture Operations Module}Capture Operations Module}}
+             * {{{Capture_Operations_Module}Capture Operations Module}}
 
-             * {{{#Query Operations Module}Query Operations Module}}
+             * {{{Query_Operations_Module}Query Operations Module}}
 
-             * {{{#Query Callback Interface}Query Callback Interface}}
+             * {{{Query_Callback_Interface}Query Callback Interface}}
 
-        [[i]] {{{#Resource Tier}Resource Tier}}
+        [[i]] {{{Resource_Tier}Resource Tier}}
 
-  [[1]] {{{#EPCIS Capture Application}EPCIS Capture Application}}
+  [[1]] {{{EPCIS_Capture_Application}EPCIS Capture Application}}
 
-  [[1]] {{{#EPCIS Query Application}EPCIS Query Application}}
+  [[1]] {{{EPCIS_Query_Application}EPCIS Query Application}}
 
 
 
@@ -209,7 +209,7 @@ Architecture Guide
   The Fosstrak EPCIS capture application provides both a capture client API and a
   capture client GUI. The API can be used by other applications to send capture
   requests to the repository, and the GUI can be used to manually insert EPCIS
-  events into a repository. Please refer to the {{{user-guide.html}User Guide}}
+  events into a repository. Please refer to the {{{./user-guide.html}User Guide}}
   for further information on how to use the capture client API or GUI.
 
 
@@ -223,6 +223,6 @@ Architecture Guide
 
   Similar to the capture application, the query application provides both a
   query client API and a query client GUI. Please refer to the
-  {{{user-guide.html}User Guide}} for details about how to use the query client
+  {{{./user-guide.html}User Guide}} for details about how to use the query client
   API or GUI.
 

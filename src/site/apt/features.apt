@@ -3,7 +3,7 @@
               -------------------
               Christof Roduner
               -------------------
-              03/06/2007
+              2007-06-03
               -------------------
 
 Features
@@ -69,50 +69,50 @@ Features
 | <<Feature>>  | <<Described in>>            | <<Supported in>>     | <<Notes>> |
 |              | <<EPCIS Specification 1.0>> | <<Fosstrak EPCIS 0.3>> |           |
 *--------------+-----------------------------*----------------------*-----------*
-| Extension mechanism (e.g. new event fields) | Sect. 6.3 | X | {{{#\[1\]}\[1\]}}
+| Extension mechanism (e.g. new event fields) | Sect. 6.3 | X | {{{a1}\[1\]}}
 *--------------+-----------------------------*----------------------*-----------*
 | Hierarchical vocabularies (e.g. <<<urn:epc:id:sgtin:123.*>>>) | Sect. 6.5 | X |
 *--------------+-----------------------------*----------------------*-----------*
-| Core event types (EventData & MasterData) | Sect. 7.2 | X | {{{#\[2\]}\[2\]}}
+| Core event types (EventData & MasterData) | Sect. 7.2 | X | {{{a2}\[2\]}}
 *--------------+-----------------------------*----------------------*-----------*
 | Core capture operations (capture interface) | Sect. 8.1 | X |
 *--------------+-----------------------------*----------------------*-----------*
-| Authentication & authorization for capture operations | Sect. 8.1.1 | - | {{{#\[5\]}\[5\]}}
+| Authentication & authorization for capture operations | Sect. 8.1.1 | - | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| Core query operations (query control & query callback interface) | Sect. 8.2 | X | {{{#\[3\]}\[3\]}}
+| Core query operations (query control & query callback interface) | Sect. 8.2 | X | {{{a3}\[3\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| Authentication & authorization for query operations | Sect. 8.2.1 | - | {{{#\[5\]}\[5\]}}
+| Authentication & authorization for query operations | Sect. 8.2.1 | - | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
 | Triggered and scheduled queries | Sect. 8.2.5 | X |
 *--------------+-----------------------------*----------------------*-----------*
-| Error Conditions (exceptions) | Sect. 8.2.6 | X | {{{#\[4\]}\[4\]}}
+| Error Conditions (exceptions) | Sect. 8.2.6 | X | {{{a4}\[4\]}}
 *--------------+-----------------------------*----------------------*-----------*
 | Predefined queries (SimpleEventQuery & SimpleMasterDataQuery) | Sect. 8.2.7 | X |
 *--------------+-----------------------------*----------------------*-----------*
-| Message queue binding for capture operations module | Sect. 10.1 | - | {{{#\[5\]}\[5\]}}
+| Message queue binding for capture operations module | Sect. 10.1 | - | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| HTTP binding for the capture operations module | Sect. 10.2 | X | {{{#\[5\]}\[5\]}}
+| HTTP binding for the capture operations module | Sect. 10.2 | X | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| SOAP over HTTP binding for query control interface | Sect. 11.2 | X | {{{#\[5\]}\[5\]}}
+| SOAP over HTTP binding for query control interface | Sect. 11.2 | X | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| XML over AS2 binding for query control interface | Sect. 11.3 | - | {{{#\[5\]}\[5\]}}
+| XML over AS2 binding for query control interface | Sect. 11.3 | - | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| XML over HTTP binding for query callback interface | Sect. 11.4.2 | X | {{{#\[5\]}\[5\]}}
+| XML over HTTP binding for query callback interface | Sect. 11.4.2 | X | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| XML over HTTPS binding for query callback interface | Sect. 11.4.3 | X | {{{#\[5\]}\[5\]}}
+| XML over HTTPS binding for query callback interface | Sect. 11.4.3 | X | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
-| XML over AS2 binding for query callback interface | Sect. 11.4.4 | - | {{{#\[5\]}\[5\]}}
+| XML over AS2 binding for query callback interface | Sect. 11.4.4 | - | {{{a5}\[5\]}}
 *--------------+-----------------------------*----------------------*-----------*
 
 
 
-   {\[1\]} - no support for "new vocabulary type" extension
+   \[{1}\] - no support for "new vocabulary type" extension
    
-   {\[2\]} - EPC syntax is not checked against Tag Data Standard 1.3
+   \[{2}\] - EPC syntax is not checked against Tag Data Standard 1.3
    
-   {\[3\]} - query paramter <<<orderBy>>> does not support ordering for event field extensions, parameters <<<EQATTR_fieldname_attrname>>> and <<<HASATTR_fieldname>>> do not support event field extensions
+   \[{3}\] - query paramter <<<orderBy>>> does not support ordering for event field extensions, parameters <<<EQATTR_fieldname_attrname>>> and <<<HASATTR_fieldname>>> do not support event field extensions
    
-   {\[4\]} - <<<SecurityException>>> is never thrown, <<<QueryTooComplexException>>> is thrown when query execution takes longer than a predefined threshold, <<<QueryTooLargeException>>> is thrown when a query returns more results than a predefined threshold
+   \[{4}\] - <<<SecurityException>>> is never thrown, <<<QueryTooComplexException>>> is thrown when query execution takes longer than a predefined threshold, <<<QueryTooLargeException>>> is thrown when a query returns more results than a predefined threshold
    
-   {\[5\]} - optional feature
+   \[{5}\] - optional feature
 

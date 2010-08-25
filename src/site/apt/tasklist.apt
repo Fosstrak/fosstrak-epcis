@@ -9,7 +9,7 @@ Fosstrak EPCIS - Roadmap
   This page lists all tasks that we would like to address in the next
   major releases. If you feel like contributing to one of these tasks or if you
   have any other ideas for features you'd love to see implemented, please contact the
-  developer mailing list (see the project {{{mail-lists.html}mailing lists}}).
+  developer mailing list (see the project {{{./mail-lists.html}mailing lists}}).
 
 =======================================================================
 
@@ -44,7 +44,7 @@ Fosstrak EPCIS - Roadmap
   modules. The capture part makes use of Hibernate to separate the database
   from the domain model. For the query module, we implemented an SQL backend
   which uses JDBC to connect to the database (see the
-  {{{docs/architecture-guide.html}architecture guide}} for more details).
+  {{{./docs/architecture-guide.html}architecture guide}} for more details).
   Unfortunately the query backend is still too much coupled with the actual
   query operations module. The goal would be to have a fully decoupled front-
   and backend, such that the DBMS could be easily replaced.
@@ -116,7 +116,7 @@ for (EpcisEvent event : events) {
 
   Triggered queries are currently implemented with the help of scheduled
   queries, i.e., the trigger condition is checked using a scheduled query which
-  runs every once in a while (see the {{{docs/user-guide.html}user guide}} for
+  runs every once in a while (see the {{{./docs/user-guide.html}user guide}} for
   information on how to configure at which intervals the repository should
   check for the trigger condition). This checking for trigger condition adds up
   to a lot of overhead and might be implemented more efficiently using a

@@ -3,7 +3,7 @@
               -------------------
               Christof Roduner
               -------------------
-              06/04/2008
+              2008-04-06
               -------------------
 
 
@@ -17,11 +17,11 @@ Download
 *----------+--------------------+-----------------------+-------------+
 <<Module>> | <<Download (zip)>> | <<Download (tar.gz)>> | <<Notes>> |
 *----------+--------------------+-----------------------+-------------+
-Fosstrak EPCIS Repository 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.2/epcis-repository-0.4.2-bin-with-dependencies.zip}epcis-repository-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.2/epcis-repository-0.4.2-bin-with-dependencies.tar.gz}epcis-repository-0.4.2-bin-with-dependencies.tar.gz}} | {{{epcis-repository/changes-report.html}Changes}} | 
+Fosstrak EPCIS Repository 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.2/epcis-repository-0.4.2-bin-with-dependencies.zip}epcis-repository-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-repository/0.4.2/epcis-repository-0.4.2-bin-with-dependencies.tar.gz}epcis-repository-0.4.2-bin-with-dependencies.tar.gz}} | {{{./epcis-repository/changes-report.html}Changes}} | 
 *----------+--------------------+-----------------------+-------------+
-Fosstrak EPCIS Capture Client 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.2/epcis-captureclient-0.4.2-bin-with-dependencies.zip}epcis-captureclient-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.2/epcis-captureclient-0.4.2-bin-with-dependencies.tar.gz}epcis-captureclient-0.4.2-bin-with-dependencies.tar.gz}} | {{{epcis-captureclient/changes-report.html}Changes}} |
+Fosstrak EPCIS Capture Client 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.2/epcis-captureclient-0.4.2-bin-with-dependencies.zip}epcis-captureclient-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-captureclient/0.4.2/epcis-captureclient-0.4.2-bin-with-dependencies.tar.gz}epcis-captureclient-0.4.2-bin-with-dependencies.tar.gz}} | {{{./epcis-captureclient/changes-report.html}Changes}} |
 *----------+--------------------+-----------------------+-------------+
-Fosstrak EPCIS Query Client 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.2/epcis-queryclient-0.4.2-bin-with-dependencies.zip}epcis-queryclient-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.2/epcis-queryclient-0.4.2-bin-with-dependencies.tar.gz}epcis-queryclient-0.4.2-bin-with-dependencies.tar.gz}} | {{{epcis-queryclient/changes-report.html}Changes}} |
+Fosstrak EPCIS Query Client 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.2/epcis-queryclient-0.4.2-bin-with-dependencies.zip}epcis-queryclient-0.4.2-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis-queryclient/0.4.2/epcis-queryclient-0.4.2-bin-with-dependencies.tar.gz}epcis-queryclient-0.4.2-bin-with-dependencies.tar.gz}} | {{{./epcis-queryclient/changes-report.html}Changes}} |
 *----------+--------------------+-----------------------+-------------+
 Fosstrak EPCIS Source Code 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.2/epcis-0.4.2-src.zip}epcis-0.4.2-src.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.2/epcis-0.4.2-src.tar.gz}epcis-0.4.2-src.tar.gz}} | |
 *----------+--------------------+-----------------------+-------------+
@@ -45,4 +45,4 @@ Fosstrak EPCIS Source Code 0.4.2 | {{{http://maven-repository.fosstrak.org/relea
 
 * Installation and Usage Instructions
 
-  Please consult the {{{docs/user-guide.html} User Guide}} for installation and usage instructions.
+  Please consult the {{{./docs/user-guide.html} User Guide}} for installation and usage instructions.
