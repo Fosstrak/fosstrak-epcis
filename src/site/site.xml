@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="Fosstrak EPCIS">
+<project name="Fosstrak EPCIS" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
   <bannerLeft>
     <name>Fosstrak</name>
     <src>images/banner_left.gif</src>
@@ -23,11 +23,15 @@
 	  <item name="LLRP Commander" href="../llrp/index.html"/>
     </links>
 
+    <breadcrumbs>
+      <item href="../index.html" name="Fosstrak" />
+      <item name="EPCIS"/> <!-- href is derived from project.url -->
+    </breadcrumbs>
+
 
     <!-- =========================================================== -->
     <!-- Navigation Menu                                             -->
     <!-- =========================================================== -->
-
 
     <menu name="EPCIS" inherit="top">
       <item name="Overview" href="index.html"/>
@@ -67,11 +71,5 @@
       </item>
     </menu>
 
-    <breadcrumbs>
-      <item href="../index.html" name="Fosstrak" />
-      <item name="EPCIS"/> <!-- href is derived from project.url -->
-    </breadcrumbs>
-  
   </body>
-     
 </project>
