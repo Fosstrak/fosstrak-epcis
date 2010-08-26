@@ -166,23 +166,17 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
+          <!--
+              Lock to this version in order to prevent generating corrupted menu
+              structures for sub-modules when running site:site from the parent
+              module. See http://jira.codehaus.org/browse/MSITE-270 for details
+              on this issue.
+          -->
+          <version>2.0-beta-5</version>
           <configuration>
             <locales>en</locales>
             <publishDate position="left" format="yyyy-MM-dd hh:mm:ss" />
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>aggregate</id>
-              <goals>
-                <goal>aggregate</goal>
-              </goals>
-              <phase>site</phase>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -217,7 +211,7 @@
     </site>
   </distributionManagement>
   <issueManagement>
-    <system>Sourceforge</system>
+    <system>sourceforge</system>
     <url>http://sourceforge.net/tracker/?group_id=170911</url>
   </issueManagement>
   <mailingLists>
@@ -228,13 +222,15 @@
       <post>accada-epcis-user@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-user</archive>
     </mailingList>
-    <!-- <mailingList>
+    <!-- 
+    <mailingList>
       <name>EPCIS developer mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
       <unsubscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</unsubscribe>
       <post>accada-epcis-developer@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-developer</archive>
-    </mailingList> -->
+    </mailingList>
+    -->
   </mailingLists>
 
 
@@ -247,12 +243,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <!-- Lock to this version to prevent "Deprecated API called" warnings
+             during site:stage. See http://jira.codehaus.org/browse/MPIR-194 -->
+        <version>2.1</version>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
@@ -260,13 +254,35 @@
           <aggregate>true</aggregate>
         </configuration>
       </plugin>
-      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
+        <!-- 
+        <reportSets>
+          <reportSet>
+            <id>non-aggregate</id>
+            <reports>
+              <report>javadoc</report>-->
+              <!-- <report>test-javadoc</report> -->
+              <!-- 
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+        -->
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <configuration>
-          <!-- <linkXref>true</linkXref> -->
-          <sourceEncoding>utf-8</sourceEncoding>
           <targetJdk>1.5</targetJdk>
           <excludes>
             <exclude>**/*Test.java</exclude>
@@ -281,6 +297,28 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
+        <configuration>
+          <!-- Need to specify tags explicitly to prevent warnings
+               "Using legacy tag format. This is not recommended."
+               See http://jira.codehaus.org/browse/MTAGLIST-49 -->
+          <tagListOptions>
+            <tagClasses>
+              <tagClass>
+                <displayName>Todo Work</displayName>
+                <tags>
+                  <tag>
+                    <matchString>todo</matchString>
+                    <matchType>ignoreCase</matchType>
+                  </tag>
+                  <tag>
+                    <matchString>FIXME</matchString>
+                    <matchType>exact</matchType>
+                  </tag>
+                </tags>
+              </tagClass>
+            </tagClasses>
+          </tagListOptions>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -293,7 +331,9 @@
           </reportSet>
         </reportSets>
         <configuration>
-          <issueLinkTemplatePerSystem>http://sourceforge.net/support/tracker.php?aid=%ISSUE%</issueLinkTemplatePerSystem>
+          <issueLinkTemplatePerSystem>
+            <default>http://sourceforge.net/tracker/?func=detail&amp;aid=%ISSUE%&amp;group_id=170911&amp;atid=856005</default>
+          </issueLinkTemplatePerSystem>
         </configuration>
       </plugin>
     </plugins>
