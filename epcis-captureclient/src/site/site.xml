@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="Fosstrak" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+<project name="Fosstrak" xmlns="http://maven.apache.org/DECORATION/1.0.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.1 http://maven.apache.org/xsd/decoration-1.0.1.xsd">
   <body>
 
-    <menu name="EPCIS Project Modules">
+    <menu name="EPCIS Modules">
       <item name="EPCIS Repository" href="../epcis-repository/project-reports.html" collapse="true">
         <item name="dummy"/>
       </item>
@@ -10,13 +10,14 @@
         <item name="dummy"/>
       </item>
       <item name="EPCIS Capture Client" href="project-reports.html" collapse="false">
-        <item name="Changes Report" href="changes-report.html"/>
+        <item name="Changes" href="changes-report.html"/>
+        <item name="Surefire Report" href="surefire-report.html"/>
+        <item name="Checkstyle" href="checkstyle.html"/>
         <item name="Dependencies" href="dependencies.html"/>
-        <item name="Checkstyle Report" href="checkstyle.html"/>
+        <item name="Tag List" href="taglist.html"/>
         <item name="PMD Report" href="pmd.html"/>
         <item name="CPD Report" href="cpd.html"/>
         <item name="JavaNCSS Report" href="javancss.html"/>
-        <item name="Tag List" href="taglist.html"/>
       </item>
       <item name="EPCIS Commons" href="../epcis-commons/project-reports.html" collapse="true">
         <item name="dummy"/>

@@ -200,9 +200,20 @@
           <excludes>org/fosstrak/epcis/soapapi/*.*</excludes>
           <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
           <enableRulesSummary>false</enableRulesSummary>
-          <!-- <xrefLocation>xref</xrefLocation> -->
           <propertyExpansion>samedir=${basedir}/../src/config</propertyExpansion>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependencies</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -216,13 +227,8 @@
   <!-- Repositories                                                -->
   <!-- =========================================================== -->
 
-  <repositories>
-    <!-- inherited from parent pom -->
-  </repositories>
   <pluginRepositories>
-    <!--
-      for getting the tomcat-maven-plugin libraries
-    -->
+    <!-- for getting the tomcat-maven-plugin libraries -->
     <pluginRepository>
       <id>Codehaus Maven Repository</id>
       <url>http://maven.codehaus.org/maven2/</url>
