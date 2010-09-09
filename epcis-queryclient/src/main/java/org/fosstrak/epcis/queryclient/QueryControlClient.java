@@ -106,24 +106,56 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
     private boolean serviceConfigured = false;
 
     /**
-     * Instantiates a new unconfigured QueryControlClient. Configure the service
-     * through {@link #configureService(URL, Object[])} prior to calling any
+     * Constructs a new QueryControlClient using a default URL and no
+     * authentication. You can also configure the service through
+     * {@link #configureService(URL, Object[])} prior to calling any
      * QueryControlInterface service method.
      */
     public QueryControlClient() {
+        this(null, null);
     }
 
     /**
-     * Instantiates a new QueryControlClient configured to communicate with the
-     * repository indicated by the given URL and with no authentication.
+     * Constructs a new QueryControlClient using the given URL and no
+     * authentication. You can also configure the service through
+     * {@link #configureService(URL, Object[])} prior to calling any
+     * QueryControlInterface service method.
+     */
+    public QueryControlClient(String url) {
+        this(url, null);
+    }
+
+    /**
+     * Constructs a new QueryControlClient using the given URL and
+     * authentication options. You can also configure the service through
+     * {@link #configureService(URL, Object[])} prior to calling any
+     * QueryControlInterface service method.
      * 
      * @param url
      *            the URL of the repository, or <code>null</code> if a default
      *            value should be loaded.
-     * @throws MalformedURLException
-     *             if the provided url String is not a valid URL.
+     * @param authenticationOptions
+     *            The authentication options:
+     *            <p>
+     *            <table border="1">
+     *            <tr>
+     *            <td><code>authenticationOptions[0]</code></td>
+     *            <td><code>[1]</code></td>
+     *            <td><code>[2]</code></td>
+     *            </tr>
+     *            <tr>
+     *            <td><code>AuthenticationType.BASIC</code></td>
+     *            <td>username</td>
+     *            <td>password</td>
+     *            </tr>
+     *            <tr>
+     *            <td><code>AuthenticationType.HTTPS_WITH_CLIENT_CERT</code></td>
+     *            <td>keystore file</td>
+     *            <td>password</td>
+     *            </tr>
+     *            </table>
      */
-    public QueryControlClient(String url) throws MalformedURLException {
+    public QueryControlClient(String url, Object[] authenticationOptions) {
         if (url != null) {
             this.queryUrl = url;
         } else {
@@ -136,11 +168,9 @@ public class QueryControlClient implements QueryControlInterface, X509TrustManag
             }
         }
         try {
-            configureService(new URL(queryUrl), null);
+            configureService(new URL(queryUrl), authenticationOptions);
         } catch (Exception e) {
-            // this should not happen because no authentication options are
-            // provided
-            serviceConfigured = false;
+            throw new RuntimeException("unable to configure QueryControlClient: " + e.getMessage(), e);
         }
     }
 
