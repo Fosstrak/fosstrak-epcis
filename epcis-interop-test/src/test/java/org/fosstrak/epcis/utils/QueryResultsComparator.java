@@ -112,7 +112,7 @@ public final class QueryResultsComparator {
                 try {
                     Calendar testCal = TimeParser.parseAsCalendar(difference.getTestNodeDetail().getValue());
                     Calendar controlCal = TimeParser.parseAsCalendar(difference.getControlNodeDetail().getValue());
-                    return controlCal.equals(testCal) ? RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL
+                    return controlCal.getTimeInMillis() == testCal.getTimeInMillis() ? RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL
                             : RETURN_ACCEPT_DIFFERENCE;
                 } catch (ParseException e) {
                     e.printStackTrace();
