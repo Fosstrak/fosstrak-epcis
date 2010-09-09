@@ -211,14 +211,15 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                  * one for the name of the parameter and another one for the
                  * value. Example: extension.intValue extension.fieldname
                  * Therefore, the JOINs will be created once from every two
-                 * extension conditions (the even ones)
+                 * extension conditions (the odd ones)
                  */
                 nofEventFieldExtensions++;
-                if (nofEventFieldExtensions % 2 == 0) {
+                if (nofEventFieldExtensions % 2 == 1) {
+                    System.out.println((nofEventFieldExtensions / 2)+1);
                     sqlSelectFrom.append(" JOIN event_").append(eventType).append("_extensions AS extension").append(
-                            nofEventFieldExtensions / 2);
+                            (nofEventFieldExtensions / 2)+1);
                     sqlSelectFrom.append(" ON event_").append(eventType).append(".id=extension").append(
-                            nofEventFieldExtensions / 2).append(".event_id");
+                            (nofEventFieldExtensions / 2)+1).append(".event_id");
                 }
             } else if (eventField.startsWith("bizTrans")) {
                 // we have a query on business transactions, so we need to join
