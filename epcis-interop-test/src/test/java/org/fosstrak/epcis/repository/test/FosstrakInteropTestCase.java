@@ -29,6 +29,7 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.XmlDataSet;
 import org.dbunit.ext.mysql.MySqlDataTypeFactory;
+import org.dbunit.operation.DatabaseOperation;
 
 /**
  * All test cases that require a clean state of the database should inherit from
@@ -99,5 +100,10 @@ public class FosstrakInteropTestCase extends JdbcBasedDBTestCase {
     @Override
     protected String getUsername() {
         return "epcis";
+    }
+    
+    @Override
+    protected DatabaseOperation getSetUpOperation() throws Exception {
+        return DatabaseOperation.NONE;
     }
 }

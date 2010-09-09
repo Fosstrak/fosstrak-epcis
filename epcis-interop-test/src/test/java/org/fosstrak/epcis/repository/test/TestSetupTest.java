@@ -20,29 +20,21 @@
 
 package org.fosstrak.epcis.repository.test;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.dbunit.operation.DatabaseOperation;
 
 /**
- * Contains all the Fosstrak EPCIS interoperability tests.
- * 
- * EPCglobal's interoperability test kit
+ * No test functionality. Used to reset the database for the query tests.
  * 
  * @author Marco Steybe
  */
-public class AllTests {
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Test for org.fosstrak.epcis.repository.test");
-        suite.addTestSuite(CaptureTest.class);
-        suite.addTestSuite(DbResetOperationTest.class);
-        
-        // this needs to be executed before all the query tests in
-        // order to work with a clean pre-defined database state
-        suite.addTestSuite(DbResetOperationTest.class);
-        
-        suite.addTestSuite(EventQueryTest.class);
-        return suite;
+public class TestSetupTest extends FosstrakInteropTestCase {
+    
+    @Override
+    protected DatabaseOperation getSetUpOperation() throws Exception {
+        return DatabaseOperation.CLEAN_INSERT;
     }
 
+    public void testDbReset() throws Exception {
+        assertTrue(true);
+    }
 }

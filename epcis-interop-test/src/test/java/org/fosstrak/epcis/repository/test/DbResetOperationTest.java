@@ -21,6 +21,7 @@
 package org.fosstrak.epcis.repository.test;
 
 import org.dbunit.dataset.ITable;
+import org.dbunit.operation.DatabaseOperation;
 import org.fosstrak.epcis.captureclient.CaptureClient;
 import org.fosstrak.epcis.utils.FosstrakDatabaseHelper;
 
@@ -30,11 +31,16 @@ import org.fosstrak.epcis.utils.FosstrakDatabaseHelper;
  * 
  * @author Marco Steybe
  */
-public class DbResetTest extends FosstrakInteropTestCase {
+public class DbResetOperationTest extends FosstrakInteropTestCase {
 
     private CaptureClient capture = new CaptureClient();
+    
+    @Override
+    protected DatabaseOperation getSetUpOperation() throws Exception {
+        return DatabaseOperation.DELETE_ALL;
+    }
 
-    public void testDbReset() throws Exception {
+    public void testDummyDbResetOperation() throws Exception {
         ITable table = FosstrakDatabaseHelper.getObjectEventByEpc(getConnection(), "urn:epc:id:sgtin:0057000.123780.7788");
         assertEquals(0, table.getRowCount());
         

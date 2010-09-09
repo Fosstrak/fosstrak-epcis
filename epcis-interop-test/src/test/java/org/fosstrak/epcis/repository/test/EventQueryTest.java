@@ -23,8 +23,6 @@ package org.fosstrak.epcis.repository.test;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
 import org.fosstrak.epcis.model.QueryResults;
 import org.fosstrak.epcis.queryclient.QueryControlClient;
 import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
@@ -33,11 +31,11 @@ import org.fosstrak.epcis.utils.QueryResultsComparator;
 import org.fosstrak.epcis.utils.QueryResultsParser;
 
 /**
- * Tests all the simple event queries (SE10-43, SE73).
+ * Tests all the simple event queries from the interoperability tests (SE10-43, SE73).
  * 
  * @author Marco Steybe
  */
-public class EventQueryTest extends TestCase {
+public class EventQueryTest extends FosstrakInteropTestCase {
 
     private static final String REQ_PATH = "src/test/resources/queries/webservice/requests/";
     private static final String REQ_PREFIX = "Test-EPCIS10-SE";
@@ -60,11 +58,13 @@ public class EventQueryTest extends TestCase {
         InputStream fis = new FileInputStream(query);
         QueryResults actResults = client.poll(fis);
         fis.close();
+//        QueryResultsParser.queryResultsToXml(actResults, System.out);
 
         String resp = RESP_PATH + RESP_PREFIX + testNr + RESP_SUFFIX;
         fis = new FileInputStream(resp);
         QueryResults expResults = QueryResultsParser.parseResults(fis);
         fis.close();
+//        QueryResultsParser.queryResultsToXml(expResults, System.out);
         assertTrue(QueryResultsComparator.identical(expResults, actResults));
     }
 
