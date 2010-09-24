@@ -72,13 +72,6 @@ public final class QueryResultsComparator {
 
         Diff diff = new Diff(expDoc, actDoc);
         diff.overrideDifferenceListener(new MyDifferenceLister());
-        // if (!diff.identical()) {
-        // DetailedDiff ddiff = new DetailedDiff(diff);
-        // List<Difference> diffs = ddiff.getAllDifferences();
-        // for (Difference d : diffs) {
-        // System.out.println(d.getId() + ": " + d);
-        // }
-        // }
         return diff.identical();
     }
 

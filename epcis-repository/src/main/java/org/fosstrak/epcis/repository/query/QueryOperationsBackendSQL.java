@@ -215,7 +215,6 @@ public class QueryOperationsBackendSQL implements QueryOperationsBackend {
                  */
                 nofEventFieldExtensions++;
                 if (nofEventFieldExtensions % 2 == 1) {
-                    System.out.println((nofEventFieldExtensions / 2)+1);
                     sqlSelectFrom.append(" JOIN event_").append(eventType).append("_extensions AS extension").append(
                             (nofEventFieldExtensions / 2)+1);
                     sqlSelectFrom.append(" ON event_").append(eventType).append(".id=extension").append(
