@@ -24,9 +24,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Contains all the Fosstrak EPCIS interoperability tests.
- * 
- * EPCglobal's interoperability test kit
+ * Contains all the Fosstrak EPCIS interoperability tests. These tests are based
+ * on EPCglobal's interoperability test kit.
  * 
  * @author Marco Steybe
  */
@@ -36,12 +35,21 @@ public class AllTests {
         TestSuite suite = new TestSuite("Test for org.fosstrak.epcis.repository.test");
         suite.addTestSuite(CaptureTest.class);
         suite.addTestSuite(DbResetOperationTest.class);
-        
+
         // this needs to be executed before all the query tests in
         // order to work with a clean pre-defined database state
         suite.addTestSuite(DbResetOperationTest.class);
-        
+
         suite.addTestSuite(EventQueryTest.class);
+        suite.addTestSuite(ImplementationErrorTest.class);
+
+        // TODO: the following tests cannot be executed automatically yet
+        // suite.addTestSuite(QueryTooComplexTest.class);
+        // suite.addTestSuite(QueryTooLargeTest.class);
+
+        // performance tests, should not be part of this test suite
+        // suite.addTestSuite(QueryPerformanceTest.class);
+
         return suite;
     }
 

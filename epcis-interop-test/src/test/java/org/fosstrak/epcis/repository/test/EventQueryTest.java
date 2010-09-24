@@ -23,6 +23,7 @@ package org.fosstrak.epcis.repository.test;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import org.dbunit.operation.DatabaseOperation;
 import org.fosstrak.epcis.model.QueryResults;
 import org.fosstrak.epcis.queryclient.QueryControlClient;
 import org.fosstrak.epcis.soap.QueryParameterExceptionResponse;
@@ -44,8 +45,12 @@ public class EventQueryTest extends FosstrakInteropTestCase {
     private static final String RESP_PREFIX = "Test-EPCIS10-SE";
     private static final String RESP_SUFFIX = "-Response-1-poll.xml";
 
-    private static QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient("http://localhost:8080/epcis-repository/query");
 
+    @Override
+    protected DatabaseOperation getSetUpOperation() throws Exception {
+    	return DatabaseOperation.CLEAN_INSERT;
+    }
     /**
      * Tests the GE_eventTime attribute.
      * 

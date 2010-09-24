@@ -30,7 +30,7 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatDtdDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.XmlDataSet;
 import org.dbunit.ext.mysql.MySqlConnection;
 
 /**
@@ -51,7 +51,7 @@ public class FosstrakDatabaseHelper {
     public static void exportDatabase() throws Exception {
         IDatabaseConnection connection = getDatabaseConnection();
         IDataSet fullDataSet = connection.createDataSet();
-        FlatXmlDataSet.write(fullDataSet, new FileOutputStream("src/test/resources/dbunit/export.xml"));
+        XmlDataSet.write(fullDataSet, new FileOutputStream("src/test/resources/dbunit/export.xml"));
     }
 
     private static IDatabaseConnection getDatabaseConnection() throws ClassNotFoundException, SQLException,
@@ -76,8 +76,8 @@ public class FosstrakDatabaseHelper {
     }
 
     public static void main(String... args) throws Exception {
-        // exportDatabase();
-        extractXmlSchema();
+        exportDatabase();
+//        extractXmlSchema();
     }
     
     public static ITable getObjectEventByEpc(IDatabaseConnection connection, String epc) throws Exception {

@@ -21,10 +21,12 @@
 package org.fosstrak.epcis.repository.test;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.XmlDataSet;
+import org.dbunit.operation.DatabaseOperation;
 import org.fosstrak.epcis.model.QueryResults;
 import org.fosstrak.epcis.queryclient.QueryControlClient;
 
@@ -34,12 +36,15 @@ import org.fosstrak.epcis.queryclient.QueryControlClient;
  * 
  * @author Marco Steybe
  */
-public class QueryPerformanceTest extends TestCase {
+public class QueryPerformanceTest extends FosstrakInteropTestCase {
 
     private static final String PERFORMANCE_QUERY_1 = "src/test/resources/queries/PerformanceQuery1.xml";
+	private static final String PATH_TO_DATASET = "src/test/resources/dbunit/perf_test_data.xml";
+    private static final String DEFAULT_QUERY_URL = "http://localhost:8080/epcis-repository/query";
+	
+	private static QueryControlClient client = new QueryControlClient(DEFAULT_QUERY_URL);
 
     public void testPerformance() throws Exception {
-        QueryControlClient client = new QueryControlClient();
         long t1 = System.currentTimeMillis();
         QueryResults res = client.poll(new FileInputStream(PERFORMANCE_QUERY_1));
         long t2 = System.currentTimeMillis();
@@ -51,10 +56,10 @@ public class QueryPerformanceTest extends TestCase {
         List<Object> events = res.getResultsBody().getEventList().getObjectEventOrAggregationEventOrQuantityEvent();
         assertNotNull(events);
         int numOfObjEvents = events.size();
-        System.out.println("returned " + numOfObjEvents + " ObjectEvents");
+        assertEquals("query must return 1000 events", 1000, numOfObjEvents);
 
         // output response time
-        System.out.println("response time: " + (t2 - t1) + "ms");
+        System.out.println("response time initial run: " + (t2 - t1) + "ms");
 
         // run the same query several times
         int count = 10;
@@ -76,9 +81,19 @@ public class QueryPerformanceTest extends TestCase {
 
         // output response time
         System.out.println("----- results -----");
-        System.out.println("sum: " + sum + "ms");
-        System.out.println("avg: " + avg + "ms");
         System.out.println("min: " + min + "ms");
         System.out.println("max: " + max + "ms");
+        System.out.println("avg: " + avg + "ms");
+    }
+    
+    @Override
+    protected DatabaseOperation getSetUpOperation() throws Exception {
+    	return DatabaseOperation.CLEAN_INSERT;
+    }
+    
+    @Override
+    protected IDataSet getDataSet() throws Exception {
+        InputStream is = new FileInputStream(PATH_TO_DATASET);
+        return new XmlDataSet(is);
     }
 }

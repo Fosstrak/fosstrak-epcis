@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <table name="event_objectevent">
+    <column>id</column>
+    <column>eventTime</column>
+    <column>eventTimeMs</column>
+    <column>recordTime</column>
+    <column>recordTimeMs</column>
+    <column>eventTimeZoneOffset</column>
+    <column>action</column>
+    <column>bizStep</column>
+    <column>disposition</column>
+    <column>readPoint</column>
+    <column>bizLocation</column>
+    <row>
+      <value>1</value>
+      <value><![CDATA[2006-06-25 00:01:00.0]]></value>
+      <value>1151193660000</value>
+      <value><![CDATA[2006-06-25 00:01:00.0]]></value>
+      <value>1151193660000</value>
+      <value>-06:00</value>
+      <value>invalid</value>
+      <value>1</value>
+      <value>1</value>
+      <value>1</value>
+      <value>1</value>
+    </row>
+  </table>
+  <table name="event_objectevent_epcs">
+    <column>event_id</column>
+    <column>epc</column>
+    <column>idx</column>
+    <row>
+      <value>1</value>
+      <value>invalid</value>
+      <value>1</value>
+    </row>
+  </table>
+</dataset>

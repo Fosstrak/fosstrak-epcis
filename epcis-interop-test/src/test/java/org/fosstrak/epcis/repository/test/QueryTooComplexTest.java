@@ -29,35 +29,35 @@ import org.fosstrak.epcis.queryclient.QueryControlClient;
 import org.fosstrak.epcis.soap.QueryTooComplexExceptionResponse;
 
 /**
- * Tests for QueryTooLargeException (SE49). Note 'maxQueryExecutionTime'
- * property in application.properties must be set to 0 and context must be
- * reloaded.
+ * Tests for QueryTooLargeException (SE49). TODO: this cannot yet be tested
+ * automatically, idea: needs a repository running with the application property
+ * 'maxQueryExecutionTime' set to 0.
  * 
  * @author Marco Steybe
  */
 public class QueryTooComplexTest extends TestCase {
 
-    private static final String PATH = "src/test/resources/queries/webservice/requests/";
+	private static final String PATH = "src/test/resources/queries/webservice/requests/";
+    private static final String DEFAULT_QUERY_URL = "http://localhost:8080/epcis-repository/query";
 
-    private static QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient(DEFAULT_QUERY_URL);
 
-    /**
-     * Tests if QueryTooComplexException is raised.
-     * 
-     * @throws Exception
-     *             Any exception, caught by the JUnit framework.
-     */
-    public void testSE49() throws Exception {
-        System.out.println("SETUP: 'maxQueryExecutionTime' property must be set to 0!");
-        final String query = "Test-EPCIS10-SE49-Request-1-Poll.xml";
-        InputStream fis = new FileInputStream(PATH + query);
-        try {
-            client.poll(fis);
-            fis.close();
-            fail("QueryTooComplexException expected");
-        } catch (QueryTooComplexExceptionResponse e) {
-            // ok
-            fis.close();
-        }
-    }
+	/**
+	 * Tests if QueryTooComplexException is raised.
+	 * 
+	 * @throws Exception
+	 *             Any exception, caught by the JUnit framework.
+	 */
+	public void _testSE49() throws Exception {
+		final String query = "Test-EPCIS10-SE49-Request-1-Poll.xml";
+		InputStream fis = new FileInputStream(PATH + query);
+		try {
+			client.poll(fis);
+			fis.close();
+			fail("QueryTooComplexException expected");
+		} catch (QueryTooComplexExceptionResponse e) {
+			// ok
+			fis.close();
+		}
+	}
 }

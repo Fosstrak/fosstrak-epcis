@@ -23,34 +23,38 @@ package org.fosstrak.epcis.repository.test;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.XmlDataSet;
+import org.dbunit.operation.DatabaseOperation;
 import org.fosstrak.epcis.queryclient.QueryControlClient;
 import org.fosstrak.epcis.soap.ImplementationExceptionResponse;
 import org.fosstrak.epcis.soap.NoSuchSubscriptionExceptionResponse;
 import org.fosstrak.epcis.utils.QueryCallbackListener;
 
 /**
- * Tests for some ImplementationException with severity SEVERE (SE50). Note: to
- * get an implementation exception, for example mysql instance must be shut
- * down.
+ * Tests for an ImplementationException with severity SEVERE (SE51, SE69). In
+ * order to trigger such an ImplementationException we start off with a dataset
+ * that contains invalid data.
  * 
  * @author Marco Steybe
  */
-public class ImplementationErrorTest extends TestCase {
+public class ImplementationErrorTest extends FosstrakInteropTestCase {
 
     private static final String PATH = "src/test/resources/queries/webservice/requests/";
+    private static final String PATH_TO_DATASET = "src/test/resources/dbunit/invalid_test_data.xml";
+    private static final String DEFAULT_QUERY_URL = "http://localhost:8080/epcis-repository/query";
 
-    private static QueryControlClient client = new QueryControlClient();
+    private static QueryControlClient client = new QueryControlClient(DEFAULT_QUERY_URL);
 
-    /**
-     * No testing, just print a message that reminds that the setup for an
-     * ImplementationException must be given.
-     */
-    public void testSetup() {
-        // the easiest (and maybe currently only) way to test for an
-        // ImplementationException is when an EPC is not in URI format.
-        System.out.println("SETUP: modify the URI of an ObjectEvent EPC in the DB so that it is not valid anymore!");
+    @Override
+    protected IDataSet getDataSet() throws Exception {
+        InputStream is = new FileInputStream(PATH_TO_DATASET);
+        return new XmlDataSet(is);
+    }
+
+    @Override
+    protected DatabaseOperation getSetUpOperation() throws Exception {
+        return DatabaseOperation.CLEAN_INSERT;
     }
 
     /**
@@ -73,12 +77,12 @@ public class ImplementationErrorTest extends TestCase {
     }
 
     /**
-     * Tests if ImplementationException is raised (callback).
+     * Tests if ImplementationException is raised (callback). TODO
      * 
      * @throws Exception
      *             Any exception, caught by the JUnit framework.
      */
-    public void testSE69() throws Exception {
+    public void _testSE69() throws Exception {
         // subscribe query
         final String query = "Test-EPCIS10-SE69-Request-1-Subscribe.xml";
         InputStream fis = new FileInputStream(PATH + query);
@@ -108,7 +112,7 @@ public class ImplementationErrorTest extends TestCase {
     /**
      * {@inheritDoc}
      */
-    protected void tearDown() throws Exception {
+    protected void _tearDown() throws Exception {
         // make sure the query is unsubscribed!
         try {
             client.unsubscribe("QuerySE69");
