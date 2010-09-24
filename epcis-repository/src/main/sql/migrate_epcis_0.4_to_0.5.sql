@@ -1,4 +1,4 @@
-﻿ALTER TABLE event_aggregationevent ADD COLUMN eventTimeMs BIGINT(20) NOT NULL AFTER eventTime;
+ALTER TABLE event_aggregationevent ADD COLUMN eventTimeMs BIGINT(20) NOT NULL AFTER eventTime;
 ALTER TABLE event_aggregationevent ADD COLUMN recordTimeMs BIGINT(20) NOT NULL AFTER recordTime;
 UPDATE event_aggregationevent SET eventTimeMs = UNIX_TIMESTAMP(eventTime) * 1000;
 UPDATE event_aggregationevent SET recordTimeMs = UNIX_TIMESTAMP(recordTime) * 1000;
