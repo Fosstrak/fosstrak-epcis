@@ -373,7 +373,7 @@
     <developer>
       <id>roduner</id>
       <name>Christof Roduner</name>
-      <email>roduner at inf.ethz.ch</email>
+      <email>-</email>
       <organization>ETH Zurich</organization>
       <roles>
         <role>project coordinator</role>
@@ -384,7 +384,7 @@
     <developer>
       <id>steybem</id>
       <name>Marco Steybe</name>
-      <email>marco.steybe at zuehlke.com</email>
+      <email>-</email>
       <organization>Zuehlke Engineering</organization>
       <roles>
         <role>developer</role>
