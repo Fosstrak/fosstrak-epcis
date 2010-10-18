@@ -41,7 +41,7 @@
       <item name="License" href="license.html"/>
       <item name="FAQ" href="faq.html"/>
       <item name="Roadmap" href="tasklist.html"/>
-      <item name="Project Team" href="team-list.html"/>
+      <!-- <item name="Project Team" href="team-list.html"/> -->
       <item name="Mailing Lists" href="mail-lists.html"/>
       <item name="Issue Tracking" href="issue-tracking.html"/>
     </menu>
