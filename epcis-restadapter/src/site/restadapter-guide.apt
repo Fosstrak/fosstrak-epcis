@@ -1,0 +1,239 @@
+              -------------------
+              epcis-restadapter User Guide
+              -------------------
+              Dominique Guinard (guinard.org)
+              -------------------
+              10/20/2010
+              -------------------
+
+User Guide
+
+* Contents
+
+	[[1]] {{{#About this Guide}About this Guide}}
+
+	[[1]] {{{#Installing the epcis-restadapter}Installing the epcis-restadapter}}
+
+         [[i]] {{{#Setting up an EPCIS Repository}Setting up an EPCIS Repository}}
+
+         [[i]] {{{#Deploying the epcis-restadapter}Deploying the epcis-restadapter}}
+
+		 [[i]] {{{#Configuring the epcis-restadapter}Configuring the epcis-restadapter}}
+
+	[[1]] {{{#Using the epcis-restadapter}}Using the epcis-restadapter}
+		
+	[[1]] {{{#Developing Applications Using the REST API}Developing Applications Using the REST API}}
+ 
+* {About this Guide}
+
+	This guide is intended to help users get started with the Fosstrak epcis-restadapter module.
+	The epcis-restadapter adds a RESTful, fully web-enabled, API to a standard EPCIS repository.
+	While the epcis-restadapter can be deployed on top of any standard compliant EPCIS Repository,
+	this guide outlines the steps to follow in order to set up the restadapter to work with
+	the Fosstrak EPCIS Repository.
+	
+	The Electronic Product Code Information Service (EPCIS) is a standard which defines interfaces enabling RFID events to be captured and queried. The query 		interface, implemented with WS-* Web services, enables business applications to consume and share data within and across companies, to form a global network 		of independent EPCIS instances. However, the interface limits the application space to the rather powerful platforms which understand WS-* Web services. In 	this the epcis-restadapter seamlessly integrate EPCIS data with the web by providing a RESTful (REpresentational State Transfer) architecture for the EPCIS. 		Using this approach, each query, tagged object, location or RFID reader gets a unique URL that can be linked to, exchanged in emails, browsed for, 			 	 bookmarked, etc. Additionally, this paradigm shift allows Web languages like HTML and JavaScript to directly use RFID data to fast-prototype light-weight 		applications such as mobile applications, wireless sensor networks applications or Web mashups.
+
+
+	The project was started in frame of the {{{http://www.webofthings.com} Web of Things initiative}} at
+	{{{http://www.ethz.ch/} ETH Zurich}}. It is a collaboration between the 
+	{{{http://www.vs.inf.ethz.ch/} Distributed Systems Lab of ETH}}, the
+	{{{http://www.autoidlabs.org/} Auto-ID Labs (MIT and Zurich)}}, the {{{http://diuf.unifr.ch/drupal/softeng/} Software Engineering Group of the University of 		Fribourg}} and {{{http://www.sap.com/about/company/research/centers/zurich.epx} SAP Research Zurich}}.
+
+	More information about the idea behind the project can be found {{{http://www.inf.ethz.ch/personal/dguinard/publications/bibtex.html?file=/home/webvs/www/htdocs/publ/papers/dguinard-giving-2010} in this paper}}.
+
+  	If this guide does not answer the questions you may have, feel free to post them
+  	to the {{{mailto:fosstrak-epcis-user@lists.sourceforge.net}Fosstrak EPCIS user mailing list}}.
+
+* {Installing the epcis-restadapter}
+
+  	This section includes a step-by-step tutorial describing
+  	how to set up the epcis-restadapter to work with the Fosstrak EPCIS Repository.
+
+** {Setting up an EPCIS Repository}
+	The epcis-restadapter can be deployed on top of any standard compliant EPCIS Repository. To install
+	the Fosstrak EPCIS Repository please refer to {{{../docs/user-guide.html}EPCIS Repository User Guide}}.
+	To go on with this installation guide, all you need is the root URL of an EPCIS Repository (e.g., 
+	http://localhost:8080/epcis-repository-0.4.2).
+
+** {Deploying the epcis-restadapter}
+	The epcis-restadapter can be deployed in any Java compliant Web/Application server that supports
+	the deployment of JAX-RS based applications. It was successfully tested with Tomcat (6.x) and the Glassfish (3.x) 
+	Application Server.
+
+	To deploy it on Tomcat simply copy the epcis-restadapter-VERSION_NUMBER.war archive to
+	CATALINA_BASE/webapps folder of Tomcat which will auto-deploy the application. Alternatively you can also 
+	use the Tomcat manager Webapp and upload the epcis-restadapter-VERSION_NUMBER.war archive there.
+
+	If the deployment was successful you should be able to browse to:
+	-----------------------------
+	http://HOST:PORT/epcis-restadapter-VERSION_NUMBER
+	-----------------------------
+	and see a web-page there. From there click on the "EPCIS REST Adapter" link. Since this triggers the initial configuration phase
+	of the epcis-restadapter (creation of the internal databased, etc.), this might take a while. Please do not interrupt this phase.
+
+** {Configuring the epcis-restadapter}
+	The epcis-restadapter is configured to automatically connect to a local EPCIS instance on:
+	http://localhost:8080/epcis-repository-0.4.2. To change the instance it connects to go to:
+	
+	-----------------------------
+	http://HOST:PORT/epcis-restadapter-VERSION_NUMBER/rest/API_VERSION/config/epcisurl
+	-----------------------------
+	There, you can specify a new instance of an EPCIS repository the rest-adapter should connect to. Any standard-compliant EPCIS repository
+	should work. However, the epcis-restadapter was tested on the {{{../docs/user-guide.html} Fosstrak EPCIS Repository}}.
+
+	The epcis-restadapter also offers clients to register to queries for which updates are delivered to standard Atom feeds. This enables clients to register to 		EPC queries without requiring them to run an HTTP server. The epcis-restadapter embeds an Atom server (based on {{{http://abdera.apache.org/} Apache Abdera}}). However, the restadapter can be configured to publish the queries updates to any AtomPub compliant server.
+	To change the AtomPub server it pushes updates to, go to:
+ 	-----------------------------
+	http://HOST:PORT/epcis-restadapter-VERSION_NUMBER/rest/API_VERSION/config/feedurl
+	-----------------------------
+	
+	and provide a valid URL to an AtomPub server endpoint.
+
+*{Using the epcis-restadapter}
+
+	The epcis-restadapter adds a RESTful, fully web-enabled, API to a standard EPCIS repository. If you are not familiar with REST, we invite you to read
+	{{{http://www.inf.ethz.ch/personal/dguinard/publications/bibtex.html?file=/home/webvs/www/htdocs/publ/papers/dguinard-giving-2010} this paper}}, which
+	briefly presents REST in the context of the epcis-restadapter.
+
+	Using this approach, each query, tagged object, location or RFID reader gets a unique URL that can be linked to, exchanged in emails, browsed for
+	bookmarked, etc. Furthermore, these resources can be accessed using the standard HTTP 1.1 protocol. Thus, any platform that understands HTTP
+	protocol can consume data from the epcis-restadapter in a straightforward way. 
+
+	The simplest way to used the epcis-restadapter is to use the HTML representation of resources. Pointing any browser (except for WebKit browsers as they currently request XML representations instead of HTML) to:
+	-----------------------------
+	http://HOST:PORT/epcis-restadapter-VERSION_NUMBER
+	-----------------------------
+	will give you access to the HTML representation. From there you can:
+	
+	* Query the EPCIS using an HTML form by clicking on "Query Form Browsable Event Finder".
+	* Navigate through the EPCIS data directly, by clicking on "Browsable Event Finder".
+	* Manage Atom Feeds generated for queries, by clicking on "Subscription List".
+	* Simulate RFID events for testing purposes using a simple HTML form, by clicking on "Capture Interface".	
+	* Configure the epcis-restadapter by clicking on "Configuration".
+	
+	Note that each URL you will encounter in the HTML representation is unique and referenceable. Thus, you can bookmark any result for later use or sharing.	
+
+*{Developing Applications Using the RESTful API}
+	
+	The epcis-restadapter makes it easier to create lightweight (e.g., mobile, Web) application that consume EPC data. From a developer view point, all the
+	interaction with the epcis-restadapter occurs through the exhaustive use of HTTP 1.1. While 
+	
+	Basically, the restadapter covers all the functionality of a standard EPCIS repository, plus some more advanced query capabilities. 
+	The best way to find how to access this functionality is to explore the HTML representation. There are basically two ways of formulating queries:
+	* By using the "Browsable Event Finder", which lets you explore the available resources by clicking on hyper-links.
+	* By using the "Query Form", which lets you formulate queries through an HTML form.
+	Both interfaces will directly display the query results. You can then use the resulting URLs from your application.
+
+	For example, let's say we are looking for all the EPC events for the business location: "urn:ch:sap:regensdorf:frc". 
+	We first use the "Browsable Event Finder" to formulate this query. We directly see the query result and copy the query URL to use it in our
+	application, we just need to GET:
+	-----------------------------
+	http://HOST:PORT/epcis-restadapter-VERSION_NUMBER/rest/API_VERSION/eventquery/result?location=urn%3Ach%3Asap%3Aregensdorf%3Afrc
+	-----------------------------
+
+	Similarly, we can use the "Browsable Event Finder" to find out, for instance, all the readers at location "urn:de:maxhavelaar:hamburg:shipyard". We do so 		by clicking on "Browsable Event Finder", on "urn:de:maxhavelaar:hamburg:shipyard" and finally on "List of Read Points". This returns us a list of all the
+	readers at "urn:de:maxhavelaar:hamburg:shipyard".
+
+	As before, we can use the created URL for retrieving this list from our application, we just need to GET:
+	-----------------------------
+	http://HOST:PORT/epcis-restadapter-VERSION_NUMBER/rest/API_VERSION/location/urn:de:maxhavelaar:hamburg:shipyard/reader
+	-----------------------------
+	
+**{Tools for Interacting with the RESTful API}
+	Any client that can communicate with sockets (e.g., using the java.net package) can consume RESTful Web services. However, several tools can help you make
+	this even more straightforward:
+	* For testing tools such as the {{{http://code.google.com/p/poster-extension/} Poster Firefox Extension}}, or the {{{http://curl.haxx.se/} cURL command-line tool}} can help you test all the features of HTTP and RESTful APIs. 
+	* HTTP Client Libraries such as the {{{http://hc.apache.org/httpcomponents-client-ga} Apache HTTP Client}} are available on most platforms (e.g., {{{http://www.android.com/} Android}}) and help you formulate RESTful request within a few lines of code.
+	* Programming languages such as PHP, Python, Javascript, Ruby have full built in support for consuming RESTful Web Services over HTTP.
+	* In the Java world, implementations of the JAX-RS standard provide high level client API (e.g., {{{http://jersey.dev.java.net/} Jersey Client API}}) that literally reduce the complexity of communicating with RESTful service to a couple of lines.
+
+**{Requesting Different Formats}
+	As a RESTful API, the epcis-restadapter offers several representations (i.e., formats) for resources identified by the following mime-types:
+	* text/html: a Web page, including page layout, navigation menu and logos. This representation is human-friendly and meant for web browsers.
+	* application/xhtml+xml: contains just the core business of the resource, without layout, navigation or images. It is meant to be embedded into other Web 		pages or used in Web Mashups.
+	* text/xml: is an XML representation, strictly following the XML Schema of the EPCIS standard.
+	* application/xml: is an XML representation containing the whole state of the resource (e.g., links to sub-resources, etc.).
+	* application/json: is a {{{http://www.json.org} JSON}} representation of a resource and its state. JSON is a lightweight alternative to XML which is often used in Web Mashups or mobile applications.
+	
+	A client requests a particular format through the standard HTTP 1.1 {{http://en.wikipedia.org/wiki/Content_negotiation} content-negotiation}} mechanism. 
+	More concretely it does this by setting the Accept header of the HTTP packet to one (or a list) of accepted/preferred formats. As an example, we can use {{{http://curl.haxx.se/} cURL}} to get the list of all EPC events for the business location: "urn:ch:sap:regensdorf:frc" in JSON:
+	-----------------------------
+	curl -X GET -H Accept:application/json http://localhost:8080/epcis-restadapter-0.0.1-SNAPSHOT/rest/0.0.1/eventquery/result?reader=urn:br:maxhavelaar:natal:shipyard:incoming
+	-----------------------------
+
+**{Working with Feeds}
+	The epcis-restadapter also features an {{http://en.wikipedia.org/wiki/Atom_%28standard%29} Atom }} Web feed subscription and generation system on top of the EPCIS Subscription Standard. This is especially useful since, unlike the original EPCIS Subscription system, it does not require clients to run a server with a tailored Web applications that listens to the subscribed endpoint. Thus, it is more adapted to more lightweight clients such as mobile phones, sensor networks, Web browsers, etc.
+
+	To create an Atom feed you first need to create the query URL. This is best achieved by using the "Browsable Event Finder" or the "Query Form". Once you have the query URL you can subscribe to it by calling PUT, for example on:
+
+	-----------------------------
+	http://localhost:8080/epcis-restadapter-0.0.1-SNAPSHOT/rest/0.0.1/eventquery/subscription?reader=urn:epc:id:sgln:unifr.perolles.cafeteria
+	-----------------------------
+
+Or with cURL:
+
+	-----------------------------
+	curl -X PUT -H Accept:application/xml http://localhost:8080/epcis-restadapter-0.0.1-SNAPSHOT/rest/0.0.1/eventquery/subscription?reader=urn:epc:id:sgln:unifr.perolles.cafeteria
+	-----------------------------
+
+You can then get the feeds by calling GET on:
+
+	-----------------------------
+	http://localhost:8080/epcis-restadapter-0.0.1-SNAPSHOT/rest/feed
+	-----------------------------
+
+
+
+**{Sample Calls using HTTP and REST Client Libraries}
+
+The epcis-restadapter can be easily used from any language supporting sockets. However, it is very straightforward to use in combination with HTTP client libraries. Here, we provide two examples in Java using two different HTTP library.
+
+***{Using Apache HTTP Client}
+This an example of a query on the epcis-restadapter using the {{{http://hc.apache.org/httpcomponents-client-ga} Apache HTTP Client}} in Java. This call uses the "query" resource to get all the EPC events that occurred at "urn:ch:sap:regensdorf:frc:shopfloor:". Note that this query was successfully tested on a desktop computer as well as on an {{{http://www.android.com/} Android}} 2.2 mobile device:
+
+	-----------------------------
+import java.io.IOException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+[...]
+
+    public String queryRestAdapter() {
+        String result = null;
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpGet request = new HttpGet("http://localhost:8080/epcis-restadapter-0.0.1-SNAPSHOT/rest/0.0.1/eventquery/result?reader=urn%3Ach%3Asap3Aregensdorf%	3Afrc%3Astorage");
+        request.addHeader("Accept", "application/json");
+
+        ResponseHandler<String> handler = new BasicResponseHandler();
+        try {
+            result = httpclient.execute(request, handler);
+        } catch (ClientProtocolException e) {
+            //handle exception
+        } catch (IOException e) {
+            //handle exception
+        }
+        httpclient.getConnectionManager().shutdown();
+
+        return result;
+    }
+	-----------------------------
+
+In this more compact version, we use the {{{http://jersey.dev.java.net/} Jersey JAX-RS Client}} library in Java to get all the locations registered by the EPCIS Repository on which the epcis-restadapter is plugged:
+
+	-----------------------------
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+  
+    public String queryRestAdapterJersey() {
+        Client client = Client.create();
+        WebResource webResource = client.resource("http://localhost:8080/epcis-restadapter-0.0.1-SNAPSHOT/rest/0.0.1/location");        
+        return webResource.accept("application/xml").get(String.class);
+    }
+	-----------------------------
+
+

@@ -1,0 +1,199 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- =========================================================== -->
+  <!-- Basics                                                      -->
+  <!-- =========================================================== -->
+
+    <groupId>org.fosstrak.epcis</groupId>
+    <artifactId>epcis-restadapter</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <parent>
+        <artifactId>epcis</artifactId>
+        <groupId>org.fosstrak.epcis</groupId>
+        <version>0.4.3-SNAPSHOT</version>
+    </parent>
+    <packaging>war</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <name>epcis-restadapter</name>
+
+  <!-- =========================================================== -->
+  <!-- Dependencies                                                -->
+  <!-- =========================================================== -->
+
+    <dependencies>
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        
+        <!-- Atom Server / Client -->
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-core</artifactId>
+            <version>1.1</version>
+        </dependency>
+        
+        <!-- JAX-RS (REST) Implementation (Client and Server) -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-atom-abdera</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+
+
+        <!-- Internal SQL DB -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
+
+
+    <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>[3.8,4)</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!-- Build settings                                              -->
+  <!-- =========================================================== -->
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <filtering>true</filtering>
+                <targetPath>../webapp-filtered</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/sql</directory>
+                <includes>
+                    <include>**/*.sql</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warSourceDirectory>${project.build.directory}/webapp-filtered</warSourceDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/bin-with-dependencies.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+
+        </plugins>
+    </build>
+
+
+  <!-- =========================================================== -->
+  <!-- Reporting                                                   -->
+  <!-- =========================================================== -->
+  
+  <!-- <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <includes>**/*.java</includes>
+          <excludes>org/fosstrak/epcis/soapapi/*.*</excludes>
+          <configLocation>${basedir}/../src/config/epcis_checks.xml</configLocation>
+          <enableRulesSummary>false</enableRulesSummary>
+          <xrefLocation>xref</xrefLocation>
+          <propertyExpansion>samedir=${basedir}/../src/config</propertyExpansion>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting> -->
+
+
+  <!-- =========================================================== -->
+  <!-- Repositories                                                -->
+  <!-- =========================================================== -->
+
+    <repositories>
+    <!-- inherited from parent pom -->
+    </repositories>
+    <pluginRepositories>
+    <!--
+      for getting the tomcat-maven-plugin libraries
+    -->
+        <pluginRepository>
+            <id>Codehaus Maven Repository</id>
+            <url>http://maven.codehaus.org/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+    <properties>
+        <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+    </properties>
+</project>

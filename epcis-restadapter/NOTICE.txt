@@ -1,0 +1,10 @@
+This product includes software developed by ETH Zurich.
+
+This product includes software developed by The Apache Software Foundation (http://www.apache.org/).
+
+This product includes redistributable components of the JAVA TM Web Services Developer Pack.
+
+Please read the different LICENSE files present in the java archives of the lib directory and the LICENSE.txt file in this folder.
+
+
+
