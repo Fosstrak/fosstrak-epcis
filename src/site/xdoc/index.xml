@@ -7,7 +7,7 @@
     <!-- The body of the document contains a number of sections -->
     <section name="Fosstrak EPCIS">
 <p>Fosstrak EPCIS provides an EPCglobal-certified EPCIS Repository as well as Query and Capture clients.
-It further offers a "Webadapter" to provide easy EPCIS access via Web protocols (e.g., REST).</p>
+It further offers a "Webadapter" for easy EPCIS access via web protocols (e.g., REST).</p>
 
 <subsection name="Status">
 <p>
