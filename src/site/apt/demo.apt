@@ -79,7 +79,7 @@ Webadapter Demo
 
 	The EPCIS Webadapter can also be used from a smart phone (experimental HTML rendering for Android and iPhone) using the same URL as above or by scanning the following barcode:
 
-[images/epcis-webadapter-barcode.png] Mobile access to the EPCIS Webadapter
+[../webadapters/images/epcis-webadapter-barcode.png] Mobile access to the EPCIS Webadapter
 
 	The EPC Mashup Dashboard is a Javascript client (running on Google App Engine) that demonstrates how the EPCIS Webadapter helps building lightweight (e.g., mobile, mashup) applications on top of the EPCIS Respository featuring the Webadapter. You can access it here (best viewed with Firefox):
 
@@ -93,6 +93,6 @@ Webadapter Demo
 
   .
 
-[../webadaptersimages/epcis-webadapter-mashupdashboard.png] EPC Mashup Dashboard built on top of the EPCIS Webadapter
+[../webadapters/images/epcis-webadapter-mashupdashboard.png] EPC Mashup Dashboard built on top of the EPCIS Webadapter
 
 
