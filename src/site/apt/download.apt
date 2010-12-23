@@ -26,6 +26,14 @@ Fosstrak EPCIS Query Client 0.4.2 | {{{http://maven-repository.fosstrak.org/rele
 Fosstrak EPCIS Source Code 0.4.2 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.2/epcis-0.4.2-src.zip}epcis-0.4.2-src.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.2/epcis-0.4.2-src.tar.gz}epcis-0.4.2-src.tar.gz}} | |
 *----------+--------------------+-----------------------+-------------+
 
+*----------+--------------------+-----------------------+-------------+
+<<Module>> | <<Download (zip)>> | <<Download (tar.gz)>> | <<Notes>> |
+*----------+--------------------+-----------------------+-------------+
+Fosstrak EPCIS Webadapter 0.1.0 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/webadapters/epcis-webadapter/0.1.0/epcis-webadapter-0.1.0-bin-with-dependencies.zip}epcis-webadapter-0.1.0-bin-with-dependencies.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/webadapter/epcis-webadapter/0.1.0/epcis-webadapter-0.1.0-bin-with-dependencies.zip}epcis-webadapter-0.1.0-bin-with-dependencies.tar.gz}epcis-webadapter-0.1.0-bin-with-dependencies.tar.gz}} | {{{../webadapters/changes-report.html}Changes}} | 
+*----------+--------------------+-----------------------+-------------+
+Fosstrak EPCIS Webadapter Source Code 0.1.0 | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/webadapter/epcis/0.4.2/epcis-0.4.2-src.zip}epcis-0.4.2-src.zip}} | {{{http://maven-repository.fosstrak.org/releases/org/fosstrak/epcis/epcis/0.4.2/epcis-0.4.2-src.tar.gz}epcis-0.4.2-src.tar.gz}} | |
+*----------+--------------------+-----------------------+-------------+
+
 
 * Previous Releases
 
