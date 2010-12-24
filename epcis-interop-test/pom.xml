@@ -118,7 +118,8 @@
         <reportSets>
           <reportSet>
             <reports>
-              <report>dependencies</report>
+              <!-- Can't reliably build site with dependencies report enabled. -->
+              <!-- <report>dependencies</report> -->
             </reports>
           </reportSet>
         </reportSets>
