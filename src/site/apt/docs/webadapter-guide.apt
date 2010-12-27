@@ -15,6 +15,7 @@ EPCIS Webadapter Guide
 	[[1]] {{{#Introduction to the EPCIS Webadapter}Introduction to the EPCIS Webadapter}}
 	
 		[[i]] {{{#Features}Features}}
+
 		[[i]] {{{#Architecture}Architecture}}
 
 	[[1]] {{{#Online Demonstration}Online Demonstration}}
@@ -53,7 +54,7 @@ EPCIS Webadapter Guide
 
 	<<Please note that the EPCIS Webadapter is not an EPCglobal standardized interface and currently is still a beta Fosstrak module.>>
 	
-	As the project is part of an {{{http://www.webofthings.com/rfid}ongoing research project}}, your feedback is <<very>> 	valuable to us! We created a questionnaire where we try to better understand your experience and where you can ask us 	for new features or improvements, thanks a lot for your answers: {{{https://spreadsheets.google.com/viewform?f			formkey=dGplWlFEc3pwajNJVldnUjZTZzh3ZkE6MA}Feedback form}}. If this guide does not answer the questions you may have,
+	As the project is part of an {{{http://www.webofthings.com/rfid}ongoing research project}}, your feedback is <<very>> 	valuable to us! We created a questionnaire where we try to better understand your experience and where you can ask us 	for new features or improvements, thanks a lot for your answers: {{{https://spreadsheets.google.com/viewform?formkey=dGplWlFEc3pwajNJVldnUjZTZzh3ZkE6MA}Feedback form}}. If this guide does not answer the questions you may have,
 	feel free to post them to the {{{mailto:fosstrak-epcis-	user@lists.sourceforge.net}Fosstrak EPCIS user mailing list}}. 
 
 	The project was started in frame of the {{{http://www.webofthings.com} Web of Things initiative}} at
@@ -81,7 +82,7 @@ EPCIS Webadapter Guide
 	* You create light-weight applications that are using RFID data on resource-limited environements such as <<mobile phones, wireless sensor nodes or Web mashups>>. 
 
 
-** Features
+** {Features}
 
 	The WS-* type of integration architecture is well adapted to combine business applications. 
 	For example, it can be used to integrate EPCIS data about the status of a shipment with an ERP 
@@ -111,7 +112,7 @@ EPCIS Webadapter Guide
 
   []
 
-** Architecture
+** {Architecture}
 
 	The module basically translates the incoming RESTful request into SOAP requests on the original EPCIS. It further takes care of reformatting the results into several Web formats such as HTML, JSON, Atom and XML. The plugin is based on {{{http://jersey.dev.java.net/} Jersey}}, an implementation of the Java Standard for RESTful Web Services (JAX-RS). For generating Atom feeds for query subscriptions, it uses the {{{http://abdera.apache.org/} Apache Abdera}} framework.
 
@@ -121,7 +122,7 @@ EPCIS Webadapter Guide
 	More information about the architecture of the project can be found {{{http://www.inf.ethz.ch/personal/dguinard/publications/bibtex.html?file=/home/webvs/www/htdocs/publ/papers/dguinard-giving-2010}in this paper}}.
 
 
-*{Online Demonstration}
+* {Online Demonstration}
 
 	The EPCIS Webadapter and some of the applications built upon can be directly tested from our {{{../demo.html} demo server}}.
 
@@ -378,5 +379,5 @@ java.lang.NullPointerException
 
 	This is a known bug due to the fact that the SQLite embedded database-driver the EPCIS Webadapter uses is based on JNI. Thus, in some containers (e.g., Tomcat) it can only be loaded once and is not released when undeploying the application. The only workaround we currently have is to restart the Tomcat instance. We are working on migrating the SQLite database to one that does not require the use of a JNI driver.
 
-	As the project is part of an {{{http://www.webofthings.com/rfid}ongoing research project}}, your feedback is <<very>> 	valuable to us! We created a questionnaire where we try to better understand your experience and where you can ask us 	for new features or improvements, thanks a lot for your answers: {{{https://spreadsheets.google.com/viewform?			formkey=dGplWlFEc3pwajNJVldnUjZTZzh3ZkE6MA}Click here to access the Feedback form}}.
+	As the project is part of an {{{http://www.webofthings.com/rfid}ongoing research project}}, your feedback is <<very>> 	valuable to us! We created a questionnaire where we try to better understand your experience and where you can ask us 	for new features or improvements, thanks a lot for your answers: {{{https://spreadsheets.google.com/viewform?formkey=dGplWlFEc3pwajNJVldnUjZTZzh3ZkE6MA}Feedback form}}.
 
