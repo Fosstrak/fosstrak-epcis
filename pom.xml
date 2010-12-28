@@ -7,7 +7,7 @@
 
   <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis</artifactId>
-  <version>0.5.0</version>
+  <version>0.5.1-SNAPSHOT</version>
   <packaging>pom</packaging> <!-- aggregator projects require 'pom' as packaging -->
   <modelVersion>4.0.0</modelVersion>
 
@@ -189,9 +189,9 @@
   
   <scm>
     <!-- keep empty tags here to avoid release:prepare crashes -->
-    <connection>scm:svn:https://svn.fosstrak.org/repos/epcis/tags/epcis-0.5.0</connection>
-    <developerConnection>scm:svn:https://svn.fosstrak.org/repos/epcis/tags/epcis-0.5.0</developerConnection>
-    <url>https://svn.fosstrak.org/repos/epcis/tags/epcis-0.5.0</url>
+    <connection></connection>
+    <developerConnection>scm:svn:https://svn.fosstrak.org/repos/epcis/trunk</developerConnection>
+    <url>https://svn.fosstrak.org/repos/epcis/</url>
   </scm>
   <distributionManagement>
     <repository>
