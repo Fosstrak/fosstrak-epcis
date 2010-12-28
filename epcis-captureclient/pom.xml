@@ -6,11 +6,11 @@
 
   <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis-captureclient</artifactId>
-  <version>0.4.3-SNAPSHOT</version>
+  <version>0.5.0</version>
   <parent>
     <artifactId>epcis</artifactId>
     <groupId>org.fosstrak.epcis</groupId>
-    <version>0.4.3-SNAPSHOT</version>
+    <version>0.5.0</version>
   </parent>
   <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>

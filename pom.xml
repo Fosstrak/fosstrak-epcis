@@ -7,7 +7,7 @@
 
   <groupId>org.fosstrak.epcis</groupId>
   <artifactId>epcis</artifactId>
-  <version>0.4.3-SNAPSHOT</version>
+  <version>0.5.0</version>
   <packaging>pom</packaging> <!-- aggregator projects require 'pom' as packaging -->
   <modelVersion>4.0.0</modelVersion>
 
@@ -189,9 +189,9 @@
   
   <scm>
     <!-- keep empty tags here to avoid release:prepare crashes -->
-    <connection></connection>
-    <developerConnection>scm:svn:https://svn.fosstrak.org/repos/epcis/trunk</developerConnection>
-    <url>https://svn.fosstrak.org/repos/epcis/</url>
+    <connection>scm:svn:https://svn.fosstrak.org/repos/epcis/tags/epcis-0.5.0</connection>
+    <developerConnection>scm:svn:https://svn.fosstrak.org/repos/epcis/tags/epcis-0.5.0</developerConnection>
+    <url>https://svn.fosstrak.org/repos/epcis/tags/epcis-0.5.0</url>
   </scm>
   <distributionManagement>
     <repository>
@@ -423,7 +423,7 @@
       </roles>
     </developer>
     <developer>
-      <id></id>
+      <id />
       <name>Adrien Laurence</name>
       <email>-</email>
       <organization>-</organization>
@@ -441,7 +441,7 @@
       </roles>
     </developer>
     <developer>
-      <id></id>
+      <id />
       <name>Andrea Groessbauer</name>
       <email>-</email>
       <organization>-</organization>
@@ -450,7 +450,7 @@
       </roles>
     </developer>
     <developer>
-      <id></id>
+      <id />
       <name>Alain Remund</name>
       <email>-</email>
       <organization>-</organization>
@@ -459,7 +459,7 @@
       </roles>
     </developer>
     <developer>
-      <id></id>
+      <id />
       <name>Arthur Van Dorp</name>
       <email>-</email>
       <organization>-</organization>
@@ -468,7 +468,7 @@
       </roles>
     </developer>
     <developer>
-      <id></id>
+      <id />
       <name>David Gubler</name>
       <email>-</email>
       <organization>-</organization>
@@ -491,12 +491,12 @@
     <contributor>
       <name>Stephen Tan</name>
       <email>-</email>
-      <organization></organization>
+      <organization />
     </contributor>
     <contributor>
       <name>Geir Vevle</name>
       <email>-</email>
-      <organization></organization>
+      <organization />
     </contributor>
   </contributors>
 </project>
