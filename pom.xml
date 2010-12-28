@@ -222,7 +222,6 @@
       <post>accada-epcis-user@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-user</archive>
     </mailingList>
-    <!-- 
     <mailingList>
       <name>EPCIS developer mailing list</name>
       <subscribe>https://lists.sourceforge.net/lists/listinfo/accada-epcis-developer</subscribe>
@@ -230,7 +229,6 @@
       <post>accada-epcis-developer@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=accada-epcis-developer</archive>
     </mailingList>
-    -->
   </mailingLists>
 
 
@@ -376,10 +374,8 @@
       <email>-</email>
       <organization>ETH Zurich</organization>
       <roles>
-        <role>project coordinator</role>
-        <role>project lead</role>
+        <role>project coordinator and lead</role>
       </roles>
-      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>steybem</id>
@@ -387,56 +383,120 @@
       <email>-</email>
       <organization>Zuehlke Engineering</organization>
       <roles>
+        <role>project lead</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mouilleron</id>
+      <name>Marc-Antoine Mouilleron</name>
+      <email>-</email>
+      <organization>-</organization>
+      <roles>
         <role>developer</role>
       </roles>
-      <timezone>+1</timezone>
     </developer>
-  </developers>
-  <contributors>
-    <contributor>
+    <developer>
+      <id>mathiasmueller</id>
+      <name>Mathias Mueller</name>
+      <email>-</email>
+      <organization>University of Fribourg</organization>
+      <roles>
+        <role>Webadapter: developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>domguinard</id>
+      <name>Dominique Guinard</name>
+      <email>-</email>
+      <organization>ETH Zurich / SAP Research / MIT Auto-ID Labs</organization>
+      <roles>
+        <role>Webadapter: project lead and developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>kefalakis</id>
+      <name>Nikos Kefalakis</name>
+      <email>-</email>
+      <organization>Athens Information Technology</organization>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id></id>
+      <name>Adrien Laurence</name>
+      <email>-</email>
+      <organization>-</organization>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>wellington</id>
       <name>Sean Wellington</name>
       <email>-</email>
       <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
-    </contributor>
-    <contributor>
+    </developer>
+    <developer>
+      <id></id>
       <name>Andrea Groessbauer</name>
       <email>-</email>
       <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
-      <timezone>+1</timezone>
-    </contributor>
-    <contributor>
+    </developer>
+    <developer>
+      <id></id>
       <name>Alain Remund</name>
       <email>-</email>
       <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
-      <timezone>+1</timezone>
-    </contributor>
-    <contributor>
+    </developer>
+    <developer>
+      <id></id>
       <name>Arthur Van Dorp</name>
       <email>-</email>
       <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
-      <timezone>+1</timezone>
-    </contributor>
-    <contributor>
+    </developer>
+    <developer>
+      <id></id>
       <name>David Gubler</name>
       <email>-</email>
       <organization>-</organization>
       <roles>
         <role>developer</role>
       </roles>
-      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Thomas Rudfoss</name>
+      <email>-</email>
+      <organization>Telenor R&amp;I</organization>
+    </contributor>
+    <contributor>
+      <name>Oskar Saiz</name>
+      <email>-</email>
+      <organization>-</organization>
+    </contributor>
+    <contributor>
+      <name>Stephen Tan</name>
+      <email>-</email>
+      <organization></organization>
+    </contributor>
+    <contributor>
+      <name>Geir Vevle</name>
+      <email>-</email>
+      <organization></organization>
     </contributor>
   </contributors>
-
 </project>
