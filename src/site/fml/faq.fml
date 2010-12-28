@@ -36,6 +36,14 @@
       <question>How can I get authentication and authorization in order to secure my repository?</question>
       <answer>You can easily add these features to an Fosstrak-based EPCIS installation by setting up an instance of the Apache Webserver as a proxy and using Apache's authentication mechanisms.</answer>
     </faq>
+    <faq id="other-databases">
+      <question>How can I use Fosstrak with other database backends (e.g., PostgreSQL)?</question>
+      <answer>The database backend officially supported by Fosstrak EPCIS is MySQL. However,
+      Thomas Rudfoss wrote a very nice <a href="http://sourceforge.net/mailarchive/message.php?msg_id=23157984">tutorial</a>
+      on how to run Fosstrak EPCIS on top of PostgreSQL or Oracle. Stephen Tan also provided some great
+      <a href="http://sourceforge.net/mailarchive/message.php?msg_id=21116989">hints</a>
+      on how to use Fosstrak EPCIS with Microsoft SQL Server.</answer>
+    </faq>
   </part>
 
 </faqs>
