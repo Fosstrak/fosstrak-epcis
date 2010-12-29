@@ -55,7 +55,7 @@ EPCIS Webadapter Guide
 	<<Please note that the EPCIS Webadapter is not an EPCglobal standardized interface and currently is still a beta Fosstrak module.>>
 	
 	As the project is part of an {{{http://www.webofthings.com/rfid}ongoing research project}}, your feedback is <<very>> 	valuable to us! We created a questionnaire where we try to better understand your experience and where you can ask us 	for new features or improvements, thanks a lot for your answers: {{{https://spreadsheets.google.com/viewform?formkey=dGplWlFEc3pwajNJVldnUjZTZzh3ZkE6MA}Feedback form}}. If this guide does not answer the questions you may have,
-	feel free to post them to the {{{mailto:fosstrak-epcis-	user@lists.sourceforge.net}Fosstrak EPCIS user mailing list}}. 
+	feel free to post them to the {{{../mail-lists.html}Fosstrak EPCIS user mailing list}}. 
 
 	The project was started in frame of the {{{http://www.webofthings.com} Web of Things initiative}} at
 	{{{http://www.vs.inf.ethz.ch/} ETH Zurich}}. It is a collaboration between the 

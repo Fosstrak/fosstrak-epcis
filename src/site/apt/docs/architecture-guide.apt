@@ -10,31 +10,31 @@ Architecture Guide
 
 * Contents
 
-  [[1]] {{{About_this_Guide}About this Guide}}
+  [[1]] {{{#About this Guide}About this Guide}}
 
-  [[1]] {{{Introduction}Introduction}}
+  [[1]] {{{#Introduction}Introduction}}
 
-  [[1]] {{{EPCIS_Repository}EPCIS Repository}}
+  [[1]] {{{#EPCIS Repository}EPCIS Repository}}
 
-        [[i]] {{{Access_Tier}Access Tier}}
+        [[i]] {{{#Access Tier}Access Tier}}
 
-             * {{{Capture_Interface}Capture Interface}}
+             * {{{#Capture Interface}Capture Interface}}
 
-             * {{{Query_Control_Interface}Query Control Interface}}
+             * {{{#Query Control Interface}Query Control Interface}}
 
-        [[i]] {{{Business_Tier}Business Tier}}
+        [[i]] {{{#Business Tier}Business Tier}}
 
-             * {{{Capture_Operations_Module}Capture Operations Module}}
+             * {{{#Capture Operations Module}Capture Operations Module}}
 
-             * {{{Query_Operations_Module}Query Operations Module}}
+             * {{{#Query Operations Module}Query Operations Module}}
 
-             * {{{Query_Callback_Interface}Query Callback Interface}}
+             * {{{#Query Callback Interface}Query Callback Interface}}
 
-        [[i]] {{{Resource_Tier}Resource Tier}}
+        [[i]] {{{#Resource Tier}Resource Tier}}
 
-  [[1]] {{{EPCIS_Capture_Application}EPCIS Capture Application}}
+  [[1]] {{{#EPCIS Capture Application}EPCIS Capture Application}}
 
-  [[1]] {{{EPCIS_Query_Application}EPCIS Query Application}}
+  [[1]] {{{#EPCIS Query Application}EPCIS Query Application}}
 
 
 

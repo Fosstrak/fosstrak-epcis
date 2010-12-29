@@ -9,29 +9,29 @@ Developer Guide
 
 * Contents
 
-   [[1]] {{{About_this_Guide}About this Guide}}
+   [[1]] {{{#About this Guide}About this Guide}}
 
-   [[1]] {{{Getting_Started}Getting Started}}
+   [[1]] {{{#Getting Started}Getting Started}}
 
-         [[i]] {{{Setting_up_the_Development_Environment}Setting up the Development Environment}}
+         [[i]] {{{#Setting up the Development Environment}Setting up the Development Environment}}
 
-         [[i]] {{{Getting_the_Source_Code}Getting the Source Code}}
+         [[i]] {{{#Getting the Source Code}Getting the Source Code}}
 
-         [[i]] {{{Setting_up_Eclipse}Setting up Eclipse}}
+         [[i]] {{{#Setting up Eclipse}Setting up Eclipse}}
 
-         [[i]] {{{Building_and_Deploying_the_Project}Building and Deploying the Project}}
+         [[i]] {{{#Building and Deploying the Project}Building and Deploying the Project}}
 
-   [[1]] {{{Project_Layout}Project Layout}}
+   [[1]] {{{#Project Layout}Project Layout}}
 
-         [[i]] {{{Project_Modules}Project Modules}}
+         [[i]] {{{#Project Modules}Project Modules}}
 
-         [[i]] {{{Directory_Layout}Directory Layout}}
+         [[i]] {{{#Directory Layout}Directory Layout}}
 
-   [[1]] {{{Other_Features}Other Features}}
+   [[1]] {{{#Other Features}Other Features}}
 
-         [[i]] {{{Build_Profiles}Build Profiles}}
+         [[i]] {{{#Build Profiles}Build Profiles}}
 
-         [[i]] {{{Generating_the_Project_Website}Generating the Project Website}}
+         [[i]] {{{#Generating the Project Website}Generating the Project Website}}
 
 
 * {About this Guide}
