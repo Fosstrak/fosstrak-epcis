@@ -17,10 +17,10 @@ import org.hibernate.usertype.ParameterizedType;
  * 
  * @author Gavin King
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class EnumUserType implements EnhancedUserType, ParameterizedType {
 
-    private Class<Enum> enumClass;
+	private Class<Enum> enumClass;
 
     public void setParameterValues(Properties parameters) {
         String enumClassName = parameters.getProperty("enumClassName");

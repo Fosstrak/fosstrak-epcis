@@ -242,10 +242,11 @@ public class CaptureOperationsModule {
                     session = sessionFactory.openSession();
                     Transaction tx = null;
                     for (File file : dbResetScripts) {
+                    	BufferedReader reader = null;
                         try {
                             tx = session.beginTransaction();
                             LOG.info("Running db reset script from file " + file);
-                            BufferedReader reader = new BufferedReader(new FileReader(file));
+                            reader = new BufferedReader(new FileReader(file));
                             String line;
                             String sql = "";
                             while ((line = reader.readLine()) != null) {
@@ -265,6 +266,10 @@ public class CaptureOperationsModule {
                                 tx.rollback();
                             }
                             throw new SQLException(e.toString());
+                        } finally {
+                        	if (reader != null) {
+                        		reader.close();
+                        	}
                         }
                     }
                 } finally {
@@ -1213,11 +1218,7 @@ public class CaptureOperationsModule {
                 vocAttributeElement.setVocabularyAttrCiD(vocabularyAttrCiD);
                 vocAttributeElement.setValue(vocabularyAttributeElementValue);
 
-                if (vocAttributeElement == null) {
-                    session.save(vocAttributeElement);
-                }
-
-                else if (deleteAttribute) {
+                if (deleteAttribute) {
                     Object vocabularyAttr = session.get(c, vocabularyAttrCiD);
                     if (vocabularyAttr != null) session.delete(vocabularyAttr);
                     session.flush();

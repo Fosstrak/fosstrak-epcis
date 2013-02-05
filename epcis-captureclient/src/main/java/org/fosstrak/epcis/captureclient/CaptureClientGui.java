@@ -110,7 +110,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
     private JLabel mwServiceUrlLabel;
 
     private JTextField mwServiceUrlTextField;
-    private JComboBox mwEventTypeChooserComboBox;
+    private JComboBox<String> mwEventTypeChooserComboBox;
     private JCheckBox mwShowDebugWindowCheckBox;
 
     /* the BizTransaction field */
@@ -125,7 +125,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
 
     /* the action type drop-down box */
     private JLabel mwActionLabel;
-    private JComboBox mwActionComboBox;
+    private JComboBox<String> mwActionComboBox;
 
     /* fields for the various URIs */
     private JLabel mwBizStepLabel;
@@ -169,7 +169,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
     private JPanel ewMainPanel;
     private JPanel ewListPanel;
     private JPanel ewButtonPanel;
-    private JList ewExampleList;
+    private JList<String> ewExampleList;
     private JScrollPane ewExampleScrollPane;
     private JButton ewOkButton;
 
@@ -283,7 +283,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         c.gridy = 2;
         mwConfigPanel.add(mwShowDebugWindowCheckBox, c);
 
-        mwEventTypeChooserComboBox = new JComboBox(EpcisEventType.guiNames());
+        mwEventTypeChooserComboBox = new JComboBox<String>(EpcisEventType.guiNames());
         mwEventTypeChooserComboBox.addActionListener(this);
         mwEventTypePanel.add(mwEventTypeChooserComboBox);
 
@@ -301,7 +301,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         mwEventTimeZoneOffsetTextField = new JTextField(CaptureClientHelper.getTimeZone(Calendar.getInstance()));
 
         mwActionLabel = new JLabel("action");
-        mwActionComboBox = new JComboBox(CaptureClientHelper.ACTIONS);
+        mwActionComboBox = new JComboBox<String>(CaptureClientHelper.ACTIONS);
 
         mwBizStepLabel = new JLabel("business step");
         mwBizStepTextField = new JTextField();
@@ -516,7 +516,7 @@ public class CaptureClientGui extends WindowAdapter implements ActionListener, A
         ewMainPanel.add(ewListPanel);
         ewMainPanel.add(ewButtonPanel);
 
-        ewExampleList = new JList();
+        ewExampleList = new JList<String>();
         ewExampleScrollPane = new JScrollPane(ewExampleList);
         ewListPanel.add(ewExampleScrollPane);
         ewExampleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

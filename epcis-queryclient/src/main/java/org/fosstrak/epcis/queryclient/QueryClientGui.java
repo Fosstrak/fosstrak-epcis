@@ -170,7 +170,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
      * Objects may be deleted from these lists by selecting "ignore" from the
      * drop-down box
      */
-    private LinkedList<JComboBox> mwQuerySelectComboBoxes;
+    private LinkedList<JComboBox<String>> mwQuerySelectComboBoxes;
     private LinkedList<JTextFieldEnhanced> mwQueryArgumentTextFields;
 
     private int mwQueryArgumentTextFieldsExtraWidth = 550;
@@ -203,7 +203,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
     private JPanel ewMainPanel;
     private JPanel ewListPanel;
     private JPanel ewButtonPanel;
-    private JList ewExampleList;
+    private JList<String> ewExampleList;
     private JScrollPane ewExampleScrollPane;
     private JButton ewOkButton;
 
@@ -658,11 +658,11 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
         mwTransactionEventsCheckBox = new JCheckBox("TransactionEvents");
         mwEventTypeSelectPanel.add(mwTransactionEventsCheckBox);
 
-        mwQuerySelectComboBoxes = new LinkedList<JComboBox>();
+        mwQuerySelectComboBoxes = new LinkedList<JComboBox<String>>();
         mwQueryArgumentTextFields = new LinkedList<JTextFieldEnhanced>();
 
-        mwQuerySelectComboBoxes.add(new JComboBox(queryParameterUsertext));
-        ((JComboBox) mwQuerySelectComboBoxes.getFirst()).addActionListener(this);
+        mwQuerySelectComboBoxes.add(new JComboBox<String>(queryParameterUsertext));
+        ((JComboBox<String>) mwQuerySelectComboBoxes.getFirst()).addActionListener(this);
         queryParamsUserText.get("ignore");
         mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15, queryParamsUserText.get("ignore")));
 
@@ -677,7 +677,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = 0;
-        mwQueryArgsPanel.add((JComboBox) mwQuerySelectComboBoxes.getFirst(), c);
+        mwQueryArgsPanel.add((JComboBox<String>) mwQuerySelectComboBoxes.getFirst(), c);
         c.weightx = 1;
         c.gridx = 1;
         c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
@@ -907,7 +907,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
         ewMainPanel.add(ewListPanel);
         ewMainPanel.add(ewButtonPanel);
 
-        ewExampleList = new JList();
+        ewExampleList = new JList<String>();
         ewExampleScrollPane = new JScrollPane(ewExampleList);
         ewListPanel.add(ewExampleScrollPane);
         ewExampleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -1169,7 +1169,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
      *            The index of the combo box.
      */
     private void mwQuerySelectComboBoxesChanged(final int i) {
-        JComboBox cb = (JComboBox) mwQuerySelectComboBoxes.get(i);
+        JComboBox<String> cb = (JComboBox<String>) mwQuerySelectComboBoxes.get(i);
 
         if ((cb.getSelectedIndex() == 0) && (cb != mwQuerySelectComboBoxes.getLast())) {
             /*
@@ -1239,7 +1239,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
                 if (toAddItem == null) {
                     dwOutputTextArea.append("bugbug: Query example " + "uses unknown queryParam");
                 } else {
-                    ((JComboBox) mwQuerySelectComboBoxes.get(i)).setSelectedItem(toAddItem.getUserText());
+                    ((JComboBox<String>) mwQuerySelectComboBoxes.get(i)).setSelectedItem(toAddItem.getUserText());
                     ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).setText((String) item.getValue());
                 }
                 i++;
@@ -1248,7 +1248,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
             /* set the not necessary rows to "ignore" which will delete them */
             int tobedeleted = mwQuerySelectComboBoxes.size() - 1 - i;
             for (int j = 0; j < tobedeleted; j++) {
-                ((JComboBox) mwQuerySelectComboBoxes.get(i)).setSelectedIndex(0);
+                ((JComboBox<String>) mwQuerySelectComboBoxes.get(i)).setSelectedIndex(0);
             }
 
             exampleWindow.setVisible(false);
@@ -1263,7 +1263,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
      *            The index of the row to be removed.
      */
     private void removeArgumentRow(final int i) {
-        mwQueryArgsPanel.remove((JComboBox) mwQuerySelectComboBoxes.get(i));
+        mwQueryArgsPanel.remove((JComboBox<String>) mwQuerySelectComboBoxes.get(i));
         mwQueryArgsPanel.remove((JTextField) mwQueryArgumentTextFields.get(i));
 
         mwQuerySelectComboBoxes.remove(i);
@@ -1279,7 +1279,7 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
             c.gridx = 0;
             c.gridy = j;
             c.ipadx = 0;
-            layout.setConstraints((JComboBox) mwQuerySelectComboBoxes.get(j), c);
+            layout.setConstraints((JComboBox<String>) mwQuerySelectComboBoxes.get(j), c);
             c.weightx = 1;
             c.gridx = 1;
             c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
@@ -1298,8 +1298,8 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
      */
     private void addArgumentRow(final int i) {
 
-        mwQuerySelectComboBoxes.add(new JComboBox(queryParameterUsertext));
-        ((JComboBox) mwQuerySelectComboBoxes.getLast()).addActionListener(this);
+        mwQuerySelectComboBoxes.add(new JComboBox<String>(queryParameterUsertext));
+        ((JComboBox<String>) mwQuerySelectComboBoxes.getLast()).addActionListener(this);
         mwQueryArgumentTextFields.add(new JTextFieldEnhanced(15, queryParamsUserText.get("ignore")));
 
         GridBagConstraints c = new GridBagConstraints();
@@ -1308,14 +1308,14 @@ public class QueryClientGui extends WindowAdapter implements ActionListener, Aut
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = i + 1;
-        mwQueryArgsPanel.add((JComboBox) mwQuerySelectComboBoxes.getLast(), c);
+        mwQueryArgsPanel.add((JComboBox<String>) mwQuerySelectComboBoxes.getLast(), c);
         c.weightx = 1;
         c.gridx = 1;
         c.ipadx = mwQueryArgumentTextFieldsExtraWidth;
         mwQueryArgsPanel.add((JTextFieldEnhanced) mwQueryArgumentTextFields.getLast(), c);
 
         /* update tooltip of TextField */
-        JComboBox cb = (JComboBox) mwQuerySelectComboBoxes.get(i);
+        JComboBox<String> cb = (JComboBox<String>) mwQuerySelectComboBoxes.get(i);
         ((JTextFieldEnhanced) mwQueryArgumentTextFields.get(i)).setQueryItem(queryParamsUserText.get(queryParameterUsertext[cb.getSelectedIndex()]));
 
         /* update graphics */

@@ -79,10 +79,11 @@ public class CaptureOperationsBackendSQL implements CaptureOperationsBackend {
     public void dbReset(final Connection dbconnection, final String dbResetScript) throws SQLException, IOException {
         LOG.info("Running db reset script.");
         Statement stmt = null;
+        BufferedReader reader = null;
         try {
             stmt = dbconnection.createStatement();
             if (dbResetScript != null) {
-                BufferedReader reader = new BufferedReader(new FileReader(dbResetScript));
+                reader = new BufferedReader(new FileReader(dbResetScript));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     stmt.addBatch(line);
@@ -92,6 +93,9 @@ public class CaptureOperationsBackendSQL implements CaptureOperationsBackend {
         } finally {
             if (stmt != null) {
                 stmt.close();
+            }
+            if (reader != null) {
+            	reader.close();
             }
         }
     }

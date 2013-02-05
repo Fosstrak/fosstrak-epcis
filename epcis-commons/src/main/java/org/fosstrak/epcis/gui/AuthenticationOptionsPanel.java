@@ -65,7 +65,7 @@ public class AuthenticationOptionsPanel extends JPanel implements ActionListener
     private AuthenticationOptionsChangeListener helper;
 
     private JLabel authTypeLabel;
-    private JComboBox authTypeSelector;
+    private JComboBox<String> authTypeSelector;
     private OptionsPanel selectedOptionsPanel;
 
     private Map<AuthenticationType, OptionsPanel> allOptionsPanels = new HashMap<AuthenticationType, OptionsPanel>();
@@ -77,7 +77,7 @@ public class AuthenticationOptionsPanel extends JPanel implements ActionListener
         authTypeLabel = new JLabel("Authentication Mode:");
         add(authTypeLabel);
 
-        authTypeSelector = new JComboBox(authTypes.keySet().toArray());
+        authTypeSelector = new JComboBox<String>(authTypes.keySet().toArray(new String[0]));
         authTypeSelector.addActionListener(this);
         add(authTypeSelector);
 
