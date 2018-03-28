@@ -4,7 +4,8 @@
   allows clean undeploys but also impacts application startup time. This flag
   can be omitted on non-Windows systems.
  -->
-<Context reloadable="true" antiResourceLocking="true">
+ <!-- Netbeans refuses to compile this if path attribute is missing, but it's only actually required if setting it to something different to what's below! -->
+<Context reloadable="true" antiResourceLocking="true" path="/epcis-repository-0.5.1-SNAPSHOT">
 
   <!--
      Parameters defined here are 'initial parameters' which are loaded at

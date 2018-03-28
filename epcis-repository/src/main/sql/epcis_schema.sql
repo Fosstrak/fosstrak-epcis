@@ -23,8 +23,10 @@
 
 BEGIN;
 
-SET storage_engine=INNODB;
+-- storage_engine removed in MySQL 5.7.5
+SET default_storage_engine=INNODB;
 
+-- added indices for various columns in tables used for lookup, as this speeds up queries no end
 
 -- ---------------------------------------------
 -- Vocabularies
@@ -32,79 +34,107 @@ SET storage_engine=INNODB;
 
 CREATE TABLE `voc_BizLoc` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
-`uri` varchar(1023) NOT NULL 
+`uri` varchar(1023) NOT NULL,
+INDEX (`uri`)
 );
 
 CREATE TABLE `voc_BizLoc_attr` (
 `id` bigint NOT NULL REFERENCES `voc_BizLoc`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 CREATE TABLE `voc_BizStep` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
-`uri` varchar(1023) NOT NULL 
+`uri` varchar(1023) NOT NULL,
+INDEX (`uri`)
 );
 
 CREATE TABLE `voc_BizStep_attr` (
 `id` bigint NOT NULL REFERENCES `voc_BizStep`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 CREATE TABLE `voc_BizTransType` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
-`uri` varchar(1023) NOT NULL 
+`uri` varchar(1023) NOT NULL ,
+INDEX (`uri`)
 );
 
 CREATE TABLE `voc_BizTransType_attr` (
 `id` bigint NOT NULL REFERENCES `voc_BizTransType`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 CREATE TABLE `voc_BizTrans` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
-`uri` varchar(1023) NOT NULL 
+`uri` varchar(1023) NOT NULL, 
+INDEX (`uri`)
 );
 
 CREATE TABLE `voc_BizTrans_attr` (
 `id` bigint NOT NULL REFERENCES `voc_BizTrans`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 CREATE TABLE `voc_Disposition` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
-`uri` varchar(1023) NOT NULL 
+`uri` varchar(1023) NOT NULL,
+INDEX (`uri`)
 );
 
 CREATE TABLE `voc_Disposition_attr` (
 `id` bigint NOT NULL REFERENCES `voc_Disposition`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 CREATE TABLE `voc_ReadPoint` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
-`uri` varchar(1023) NOT NULL 
+`uri` varchar(1023) NOT NULL,
+INDEX (`uri`)
 );
 
 CREATE TABLE `voc_ReadPoint_attr` (
 `id` bigint NOT NULL REFERENCES `voc_ReadPoint`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 CREATE TABLE `voc_EPCClass` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
-`uri` varchar(1023) NOT NULL 
+`uri` varchar(1023) NOT NULL,
+INDEX (`uri`)
 );
 
 CREATE TABLE `voc_EPCClass_attr` (
 `id` bigint NOT NULL REFERENCES `voc_EPCClass`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 
@@ -115,13 +145,17 @@ CREATE TABLE `voc_EPCClass_attr` (
 CREATE TABLE `voc_Any` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `uri` varchar(1023) NOT NULL,
-`vtype` varchar(1023) NOT NULL
+`vtype` varchar(1023) NOT NULL,
+INDEX (`vtype`)
 );
 
 CREATE TABLE `voc_Any_attr` (
 `id` bigint NOT NULL REFERENCES `voc_Any`(`id`),
 `attribute` varchar(1023) NOT NULL,
-`value` varchar(1023) NOT NULL
+`value` varchar(1023) NOT NULL,
+INDEX (`id`),
+INDEX (`attribute`),
+INDEX (`value`)
 );
 
 
@@ -132,7 +166,8 @@ CREATE TABLE `voc_Any_attr` (
 CREATE TABLE `BizTransaction` (
 `id` bigint PRIMARY KEY auto_increment, -- id auto_increment
 `bizTrans` bigint NOT NULL REFERENCES `voc_BizTrans` (`id`),
-`type` bigint REFERENCES `voc_BizTransType` (`id`)
+`type` bigint REFERENCES `voc_BizTransType` (`id`),
+INDEX (`bizTrans`)
 );
 
 
@@ -152,8 +187,10 @@ CREATE TABLE `event_AggregationEvent` (
 `bizStep` bigint DEFAULT NULL REFERENCES `voc_BizStep` (`id`),
 `disposition` bigint DEFAULT NULL REFERENCES `voc_Disposition`(`id`),
 `readPoint` bigint DEFAULT NULL REFERENCES `voc_ReadPoint`(`id`),
-`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc`(`id`)
+`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc`(`id`),
 -- `bizTransaction` bigint DEFAULT NULL REFERENCES `voc_BizTrans`(`id`) 
+INDEX (`eventTime`),
+INDEX (`action`)
 );
 
 CREATE TABLE `event_AggregationEvent_EPCs` (
@@ -162,7 +199,8 @@ CREATE TABLE `event_AggregationEvent_EPCs` (
 `event_id` bigint NOT NULL REFERENCES `event_AggregationEvent`,
 `epc` varchar(1023) NOT NULL,
 `idx` int NOT NULL,
-INDEX (event_id)
+INDEX (event_id),
+INDEX (`epc`)
 );
 
 CREATE TABLE `event_AggregationEvent_bizTrans` ( 
@@ -201,15 +239,18 @@ CREATE TABLE `event_ObjectEvent` (
 `bizStep` bigint DEFAULT NULL REFERENCES `voc_BizStep` (`id`),
 `disposition` bigint DEFAULT NULL REFERENCES `voc_Disposition` (`id`),
 `readPoint` bigint DEFAULT NULL REFERENCES `voc_ReadPoint` (`id`),
-`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc` (`id`)
+`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc` (`id`),
 -- `bizTransaction` bigint DEFAULT NULL REFERENCES `voc_BizTrans` (`id`)
+INDEX (`eventTime`),
+INDEX (`action`)
 );
 
 CREATE TABLE `event_ObjectEvent_EPCs` (
 `event_id` bigint NOT NULL REFERENCES `event_ObjectEvent`,
 `epc` varchar(1023) NOT NULL,
 `idx` int NOT NULL,
-INDEX (event_id)
+INDEX (event_id),
+INDEX (`epc`)
 );
 
 CREATE TABLE `event_ObjectEvent_bizTrans` ( 
@@ -249,7 +290,8 @@ CREATE TABLE `event_QuantityEvent` (
 `bizStep` bigint DEFAULT NULL REFERENCES `voc_BizStep` (`id`),
 `disposition` bigint DEFAULT NULL REFERENCES `voc_Disposition` (`id`),
 `readPoint` bigint DEFAULT NULL REFERENCES `voc_ReadPoint` (`id`),
-`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc` (`id`)
+`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc` (`id`),
+INDEX (`eventTime`)
 );
 
 CREATE TABLE `event_QuantityEvent_bizTrans` ( 
@@ -289,15 +331,18 @@ CREATE TABLE `event_TransactionEvent` (
 `bizStep` bigint DEFAULT NULL REFERENCES `voc_BizStep` (`id`),
 `disposition` bigint DEFAULT NULL REFERENCES `voc_Disposition` (`id`),
 `readPoint` bigint DEFAULT NULL REFERENCES `voc_ReadPoint` (`id`),
-`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc` (`id`)
+`bizLocation` bigint DEFAULT NULL REFERENCES `voc_BizLoc` (`id`),
 -- `bizTransaction` bigint DEFAULT NULL REFERENCES `voc_BizTrans` (`id`)
+INDEX (`eventTime`),
+INDEX (`action`)
 );
 
 CREATE TABLE `event_TransactionEvent_EPCs` (
 `event_id` bigint NOT NULL REFERENCES `event_TransactionEvent`,
 `epc` varchar(1023) NOT NULL,
 `idx` int NOT NULL,
-INDEX (event_id)
+INDEX (event_id),
+INDEX (`epc`)
 );
 
 CREATE TABLE `event_TransactionEvent_bizTrans` ( 

@@ -19,6 +19,7 @@
 
 -- This script inserts some test data to play around with into the EPCIS database.
 
+BEGIN;
 
 -- ---------------------------------------------
 -- Business Transaction Test Data
@@ -194,3 +195,5 @@ INSERT INTO `voc_ReadPoint` (`id`, `uri`) VALUES
 (9, 'http://epcis.fosstrak.org/demo/loc/usa/baltimore'),
 (10, 'http://epcis.fosstrak.org/demo/loc/usa/newport'),
 (11, 'http://epcis.fosstrak.org/demo/loc/germany/hamburg');
+
+COMMIT;
