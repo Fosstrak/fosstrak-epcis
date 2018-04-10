@@ -72,42 +72,13 @@
 
   <repositories>
     <repository>
-      <id>fosstrak-repository</id>
-      <name>Fosstrak repository</name>
-      <url>http://maven-repository.fosstrak.org/releases</url>
+      <id>maven-repository</id>
+      <name>Maven repository</name>
+      <!-- url>http://maven-repository.fosstrak.org/releases</url -->
+      <url>https://mvnrepository.com/artifact/</url>
       <layout>default</layout>
     </repository>
-    <!--
-      JARs provided by Sun fall under Sun's Binary License which disallows
-      them from being distributed from Maven's central repository. Therefore
-      we need to specify where such libraries can be downloaded. See
-      http://maven.apache.org/guides/mini/guide-coping-with-sun-jars.html
-    -->
-    <repository>
-      <!-- for getting the jta libraries -->
-      <id>sun-maven2</id>
-      <name>Sun Maven 2 Repository</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
-    <repository>
-      <!-- for getting the jaxb libraries -->
-      <id>sun-maven1</id>
-      <name>java.net Maven Repository</name>
-      <url>http://download.java.net/maven/1</url>
-      <layout>legacy</layout>
-    </repository>
-    <repository>
-      <!-- for getting the cxf libraries -->
-      <id>apache-incubating</id>
-      <name>Apache Incubating Repository</name>
-      <url>http://people.apache.org/repo/m2-incubating-repository</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
+    <!-- Unnecessary/non-existent repositories removed - use Maven settings -->
   </repositories>
 
 

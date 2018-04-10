@@ -52,6 +52,12 @@
       <artifactId>log4j</artifactId>
       <version>1.2.14</version>
     </dependency>
+    <!-- added as hibernate 3.2.5.ga asks for version 1.0.1B which is no longer available -->
+    <dependency>
+        <groupId>javax.transaction</groupId>
+        <artifactId>jta</artifactId>
+        <version>1.1</version>
+    </dependency>
     <!-- Hibernate dependencies -->
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -230,7 +236,7 @@
 
   <pluginRepositories>
     <!-- for getting the tomcat-maven-plugin libraries -->
-    <pluginRepository>
+    <!-- pluginRepository>
       <id>Codehaus Maven Repository</id>
       <url>http://maven.codehaus.org/maven2/</url>
       <snapshots>
@@ -239,7 +245,7 @@
       <releases>
         <enabled>true</enabled>
       </releases>
-    </pluginRepository>
+    </pluginRepository -->
   </pluginRepositories>
 
 </project>

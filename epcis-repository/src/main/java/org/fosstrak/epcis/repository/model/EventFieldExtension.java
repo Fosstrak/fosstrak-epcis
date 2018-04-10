@@ -76,15 +76,18 @@ public class EventFieldExtension {
             try {
                 this.floatValue = new Float(strValue);
                 this.valueColumnName = "floatValue";
-                LOG.info("    value of extension is of type Float.");
+                //Changed to debug to avoid huge log files full of pointless info when capturing data
+                LOG.debug("    value of extension is of type Float.");
             } catch (NumberFormatException e2) {
                 try {
                     this.dateValue = TimeParser.parseAsTimestamp(strValue);
                     this.valueColumnName = "dateValue";
-                    LOG.info("    value of extension is of type Date.");
+                    //Changed to debug to avoid huge log files full of pointless info when capturing data
+                    LOG.debug("    value of extension is of type Date.");
                 } catch (Exception e3) {
                     // treat value as String
-                    LOG.info("    value of extension is of type String.");
+                    //Changed to debug to avoid huge log files full of pointless info when capturing data
+                    LOG.debug("    value of extension is of type String.");
                     this.valueColumnName = "strValue";
                 }
             }

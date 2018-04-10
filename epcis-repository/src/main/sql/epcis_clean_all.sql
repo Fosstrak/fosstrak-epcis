@@ -18,6 +18,9 @@
 
 
 -- Deletes all data from all the tables in your EPCIS database
+
+BEGIN;
+
 DELETE FROM `BizTransaction`;
 DELETE FROM `event_AggregationEvent`;
 DELETE FROM `event_AggregationEvent_bizTrans`;
@@ -51,3 +54,5 @@ DELETE FROM `voc_ReadPoint`;
 DELETE FROM `voc_ReadPoint_attr`;
 DELETE FROM `voc_Any`;
 DELETE FROM `voc_Any_attr`;
+
+COMMIT;
