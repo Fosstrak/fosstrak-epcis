@@ -352,9 +352,10 @@
       <id>steybem</id>
       <name>Marco Steybe</name>
       <email>-</email>
-      <organization>Zuehlke Engineering</organization>
+      <organization>-</organization>
       <roles>
         <role>project lead</role>
+        <role>developer</role>
       </roles>
     </developer>
     <developer>

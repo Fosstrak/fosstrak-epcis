@@ -4,6 +4,17 @@
         <title>Changes epcis-captureclient</title>
     </properties>
     <body>
+        <release version="0.5.1" date="2018-04-15" description="Bug fix and feature release">
+            <action date="2018-03-28" type="update">
+                Updated dependency versions for Spring/Hibernate/CXF to 3.2.18.RELEASE/3.6.10.FINAL/2.2.12 respectively.
+            </action>
+            <action date="2018-03-28" type="add">
+                Added indices to sample sql to speed up queries.
+            </action>
+            <action date="2018-03-28" type="update">
+                Adjusted some logging statements in EventFieldExtension to reduce huge amounts of needless logging.
+            </action>
+        </release>
         <release version="0.5" date="2010-12-28" description="Bug fix and feature release">
             <action dev="steybem" date="2010-08-13" type="add">
                 Added support for capturing EPCISMasterDataDocument in 
