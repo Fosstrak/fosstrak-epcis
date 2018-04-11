@@ -72,13 +72,17 @@
 
   <repositories>
     <repository>
+      <id>fosstrak-repository</id>
+      <name>Fosstrak repository</name>
+      <url>https://oss.sonatype.org/content/repositories/public</url>
+      <layout>default</layout>
+    </repository>
+    <repository>
       <id>maven-repository</id>
       <name>Maven repository</name>
-      <!-- url>http://maven-repository.fosstrak.org/releases</url -->
       <url>https://mvnrepository.com/artifact/</url>
       <layout>default</layout>
     </repository>
-    <!-- Unnecessary/non-existent repositories removed - use Maven settings -->
   </repositories>
 
 
@@ -117,11 +121,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <!-- Lock to this version in order to prevent obscure
-               ArrayIndexOutOfBoundsException during release:prepare.
-               See http://jira.codehaus.org/browse/MRELEASE-256 for
-               details on this issue. -->
-          <version>2.0-beta-4</version>
           <configuration>
             <tagBase>https://svn.fosstrak.org/repos/epcis/tags</tagBase>
           </configuration>
@@ -166,15 +165,24 @@
   </scm>
   <distributionManagement>
     <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <id>fosstrak-repository</id>
       <name>Fosstrak repository</name>
-      <url>sftp://maven-repository.fosstrak.org/local/home/fosstrakrep/public_html/releases</url>
+      <url>https://oss.sonatype.org/content/repositories/public/</url>
+      <layout>default</layout>
     </repository>
-    <snapshotRepository>
+    <!--<snapshotRepository>
       <id>fosstrak-repository</id>
       <name>Fosstrak repository</name>
       <url>sftp://maven-repository.fosstrak.org/local/home/fosstrakrep/public_html/snapshots</url>
-    </snapshotRepository>
+    </snapshotRepository>-->
     <site>
       <id>fosstrak-website</id>
       <name>Fosstrak website</name>
